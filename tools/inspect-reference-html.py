@@ -45,3 +45,10 @@ print('\\nCUSTOM THEME VARIABLES IN HTML:')
 for key in ['--dio-mono-font','--dio-mono-scale','--dio-ink:','--dio-btn:','--dio-art-scale','--dio-art-drop','--dio-tr-reach','--dio-tl-reach','--dio-focus']:
  for m in list(re.finditer(re.escape(key)+r'[^;\\"<>}]{0,110}',html))[-4:]:
   print(key,m.group(0)[:140])
+
+print('\\nDECODED THEME VARIABLES:')
+from html import unescape as decode_entities
+decoded=decode_entities(html)
+for name in ['--dio-mono-font:', '--dio-ink:', '--dio-btn:', '--dio-tl-reach:', '--dio-tr-reach:', '--dio-mono-weight:']:
+ for m in list(re.finditer(re.escape(name)+r'[^;<>]{1,170}', decoded))[:3]:
+  print(name, m.group(0)[:180])
