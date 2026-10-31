@@ -118,3 +118,24 @@ Visual QA observations:
 
 The latest four-viewport browser smoke test run passed at:
 https://github.com/Arrjack8847/testing-4/actions/runs/41253568370
+
+
+## Phase 6 — continuous living-scene details
+
+Added to the existing mobile-first opening scene:
+
+- 16 deterministic, low-density falling petals using the reference's documented pastel/purple palette. A single overlay canvas is capped at 30 frames per second and a device pixel ratio of 2.
+- Two CSS-animated distant birds with individual crossing times (15s and 18s) and gently flapping wings.
+- Two independently streaming waterfalls placed at the documented original palace-image coordinates (16% and 65.5% left; 64% down), with secondary flow and mist.
+- A refined ornamental 'Alex Brush' monogram using the reference's 1.08 scale, -0.42em overlap and 0.3em second-initial drop.
+- Reduced-motion support: the decorative canvas and birds disappear, waterfall stream animation stops, but the invitation button and scrolling remain usable.
+
+The original artwork itself has not been added to the GitHub repo. The project still downloads original assets temporarily when testing and can self-host them only when distribution rights cover publishing.
+
+### QA for this stage
+
+The browser smoke-test suite now has **20 tests across four mobile sizes** (320, 360, 390 and 430px). It checks artwork geometry, button position, cover/scroll/reset, individual waterfalls, particle canvas, bird elements and reduced-motion behavior.
+
+Latest passing test: https://github.com/Arrjack8847/testing-4/actions/runs/41254302741
+
+Screenshot matching remains an ongoing visual QA check, not a claim of pixel-perfect fidelity; the reference vendor's purchase/menu UI is intentionally excluded.
