@@ -1,0 +1,49 @@
+name: Mobile browser smoke tests
+on:
+  push:
+    paths:
+      - index.html
+      - scene.js
+      - styles.css
+      - package.json
+      - playwright.config.mjs
+      - tests/**
+      - .github/workflows/mobile-browser.yml
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test framework
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Download permitted source artwork temporarily for test session
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re
+          base = 'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'
+          names = re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names) == 25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              request = Request(base+name,headers={'User-Agent':'Mozilla/5.0'})
+              data = urlopen(request, timeout=40).read()
+              assert data[:4] == b'RIFF' and data[8:12] == b'WEBP', f'Invalid image: {name}'
+              Path('assets',name).write_bytes(data)
+          print('Verified 25 original WebPs for ephemeral testing.')
+          PY
+      - name: Run real mobile Chromium tests
+        run: npm run test:mobile
