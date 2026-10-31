@@ -1,0 +1,21 @@
+name: Inspect original WebP geometry
+on:
+  push:
+    paths:
+      - tools/analyze-reference.py
+      - .github/workflows/analyze-reference.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install WebP inspection dependency
+        run: python3 -m pip install --quiet --break-system-packages pillow
+      - name: Measure actual reference asset dimensions and alpha bounds
+        run: python3 tools/analyze-reference.py
