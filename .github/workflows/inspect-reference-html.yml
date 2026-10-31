@@ -1,0 +1,19 @@
+name: Inspect live reference HTML and stylesheet
+on:
+  push:
+    paths:
+      - tools/inspect-reference-html.py
+      - .github/workflows/inspect-reference-html.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect original markup and CSS
+        run: python3 tools/inspect-reference-html.py
