@@ -1,0 +1,17 @@
+name: Inspect reference sprite metadata
+on:
+  push:
+    paths:
+      - tools/extract-sprite-coordinates.py
+      - .github/workflows/extract-sprite-coordinates.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract flower and peacock coordinates
+        run: python3 tools/extract-sprite-coordinates.py
