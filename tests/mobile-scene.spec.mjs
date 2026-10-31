@@ -29,7 +29,8 @@ test('mobile artwork geometry matches full transparent canvas dimensions', async
       button: { x:button.x,y:button.y,width:button.width,height:button.height },
       spriteCount:sprites.length,peacockCount:peacocks.length,
       scrollWidth: document.documentElement.scrollWidth,
-      innerWidth: window.innerWidth
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight
     };
   });
   expect(geometry.master).toEqual([1080,1920]);
@@ -37,8 +38,8 @@ test('mobile artwork geometry matches full transparent canvas dimensions', async
   for (const tree of geometry.trees) {
     expect([tree.naturalWidth, tree.naturalHeight]).toEqual([1080,1920]);
     expect(tree.width).toBeCloseTo(geometry.stage.width * .7,0);
-    expect(tree.height).toBeCloseTo(geometry.stage.height * .7,0);
-    expect(tree.y).toBeCloseTo(geometry.stage.y + geometry.stage.height * .26,0);
+    expect(tree.height).toBeCloseTo(geometry.innerHeight * .7,0);
+    expect(tree.y).toBeCloseTo(geometry.innerHeight * .26,0);
   }
   expect(geometry.spriteCount).toBe(28);
   expect(geometry.peacockCount).toBe(2);
