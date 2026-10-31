@@ -156,3 +156,49 @@ test('reduce motion preference hides decorative particles but keeps interactions
   await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
   await expect(page.locator('#opened')).not.toHaveAttribute('inert');
 });
+
+
+test('paired-wing butterflies fly only in the appropriate scene state', async ({page}) => {
+  const errors=[];
+  page.on('pageerror', error=>errors.push(error.message));
+  await page.goto('/');
+  await waitForArt(page);
+  const cover=page.locator('.butterfly-cover');
+  const hero=page.locator('.butterfly-hero');
+  await expect(cover.locator('.butterfly')).toHaveCount(2);
+  await expect(hero.locator('.butterfly')).toHaveCount(2);
+  await expect(page.locator('.butterfly-wing')).toHaveCount(8);
+  await expect(cover).toHaveCSS('opacity','1');
+  await expect(hero).toHaveCSS('visibility','hidden');
+  const butterflies=await cover.locator('.butterfly').evaluateAll(nodes=>nodes.map(el=>({
+    size:[getComputedStyle(el).width,getComputedStyle(el).height],
+    source:getComputedStyle(el.querySelector('.butterfly-wing')).backgroundImage,
+    animation:getComputedStyle(el).animationName
+  })));
+  expect(butterflies[0].size).toEqual(['52px','41px']);
+  expect(butterflies[1].size).toEqual(['44px','34px']);
+  expect(butterflies[0].source).toContain('serambi-ungu/bfly_1.webp');
+  expect(butterflies[1].source).toContain('anggerik-nirmala/bfly_white.webp');
+  expect(butterflies[0].animation).toContain('bf-violet-cover');
+  expect(butterflies[1].animation).toContain('bf-ivory-cover');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(cover).toHaveCSS('visibility','hidden');
+  await expect(hero).toHaveCSS('visibility','hidden');
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo({top:Math.floor(innerHeight*.65),behavior:'instant'});
+  });
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
+  await expect(hero).toHaveCSS('visibility','visible');
+  expect(errors).toEqual([]);
+});
+
+test('reduced-motion hides decorative butterflies', async ({page}) => {
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await waitForArt(page);
+  await expect(page.locator('.butterfly-cover')).toBeHidden();
+  await expect(page.locator('.butterfly-hero')).toBeHidden();
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+});
