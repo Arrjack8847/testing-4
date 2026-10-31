@@ -439,3 +439,10 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 @media (prefers-reduced-motion:reduce) {
   .butterfly-layer {display:none;}
 }
+
+
+/* Don't run invisible flight loops on mobile; begin the valley flight when
+   the guest actually swipes, rather than using an already elapsed animation. */
+.butterfly-hero .butterfly {animation-play-state:paused;}
+.invitation[data-state="opened"][data-reading="yes"] .butterfly-hero .butterfly {animation-play-state:running;}
+.invitation[data-state="opened"] .butterfly-cover .butterfly {animation-play-state:paused;}
