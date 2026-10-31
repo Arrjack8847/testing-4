@@ -17,39 +17,41 @@ const notification = document.getElementById('networkNote');
 // Render the repeated reference assets as separate DOM elements.
 // Background layers retain the reference artwork's 563x1000 coordinate system.
 const definitions = [
-  ['sky.webp','sky-layer',{}],
-  ['palace.webp','depth palace reveal',{'--delay':'0ms'}],
-  ['reeds.webp','depth reeds reveal',{'--delay':'210ms'}],
-  ['arch.webp','depth arch reveal',{'--delay':'160ms'}],
-  ['tree_l.webp','depth tree tree-left reveal',{'--delay':'230ms'}],
-  ['tree_r.webp','depth tree tree-right reveal',{'--delay':'290ms'}],
-  ['drape.webp','depth canopy reveal',{'--delay':'320ms'}],
-  ['hang_1.webp','sprite hanging reveal',{'--x':'2%','--y':'-3%','--w':'18%','--delay':'380ms','--motion-delay':'-1.2s'}],
-  ['hang_2.webp','sprite hanging reveal alternate',{'--x':'15%','--y':'-1%','--w':'14%','--delay':'440ms','--motion-delay':'-3.6s'}],
-  ['hang_3.webp','sprite hanging reveal',{'--x':'29%','--y':'-2%','--w':'15%','--delay':'460ms','--motion-delay':'-2.1s'}],
-  ['hang_4.webp','sprite hanging reveal alternate',{'--x':'43%','--y':'-4%','--w':'14%','--delay':'490ms','--motion-delay':'-1.8s'}],
-  ['hang_3.webp','sprite hanging reveal',{'--x':'55%','--y':'-2%','--w':'15%','--delay':'530ms','--motion-delay':'-3.1s'}],
-  ['hang_4.webp','sprite hanging reveal alternate',{'--x':'68%','--y':'-2%','--w':'14%','--delay':'550ms','--motion-delay':'-2.8s'}],
-  ['hang_1.webp','sprite hanging reveal',{'--x':'80%','--y':'-4%','--w':'17%','--delay':'570ms','--motion-delay':'-1.7s'}],
-  ['peacock.webp','depth peacock peacock-left reveal',{'--delay':'510ms'}],
-  ['peacock.webp','depth peacock peacock-right reveal',{'--delay':'580ms'}],
-  ['spike_5.webp','sprite plant reveal',{'--x':'1%','--bottom':'0%','--w':'17%','--delay':'620ms'}],
-  ['spike_3.webp','sprite plant reveal alternate',{'--x':'14%','--bottom':'-1%','--w':'14%','--delay':'670ms'}],
-  ['spike_4.webp','sprite plant reveal',{'--x':'83%','--bottom':'-1%','--w':'16%','--delay':'710ms'}],
-  ['spike_5.webp','sprite plant reveal alternate',{'--x':'91%','--bottom':'0%','--w':'16%','--delay':'700ms'}],
-  ['stem_1.webp','sprite plant reveal',{'--x':'24%','--bottom':'-3%','--w':'12%','--delay':'680ms'}],
-  ['stem_2.webp','sprite plant reveal alternate',{'--x':'73%','--bottom':'-3%','--w':'11%','--delay':'730ms'}],
-  ['leaf_5.webp','sprite plant reveal',{'--x':'36%','--bottom':'-1%','--w':'18%','--delay':'770ms'}],
-  ['leaf_6.webp','sprite plant reveal alternate',{'--x':'58%','--bottom':'-1%','--w':'17%','--delay':'750ms'}],
-  ['leaf_4.webp','sprite plant reveal',{'--x':'4%','--bottom':'-2%','--w':'15%','--delay':'720ms'}],
-  ['leaf_5.webp','sprite plant reveal alternate',{'--x':'86%','--bottom':'-2%','--w':'16%','--delay':'750ms'}],
-  ['bloom_5.webp','sprite flower reveal',{'--x':'15%','--bottom':'-2%','--w':'13%','--delay':'770ms'}],
-  ['bloom_1.webp','sprite flower reveal alternate',{'--x':'30%','--bottom':'-1%','--w':'14%','--delay':'810ms'}],
-  ['bloom_5.webp','sprite flower reveal',{'--x':'54%','--bottom':'-1%','--w':'14%','--delay':'780ms'}],
-  ['bloom_1.webp','sprite flower reveal alternate',{'--x':'73%','--bottom':'-2%','--w':'14%','--delay':'820ms'}],
-  ['bloom_2.webp','sprite flower reveal',{'--x':'-2%','--bottom':'-3%','--w':'17%','--delay':'840ms'}],
-  ['bloom_6.webp','sprite flower reveal alternate',{'--x':'41%','--bottom':'-2%','--w':'15%','--delay':'850ms'}],
-  ['bloom_2.webp','sprite flower reveal',{'--x':'87%','--bottom':'-3%','--w':'17%','--delay':'860ms'}]
+  ["sky.webp","sky-layer",{}],
+  ["palace.webp","depth palace",{}],
+  ["reeds.webp","depth reeds",{}],
+  ["arch.webp","depth arch",{}],
+  ["tree_l.webp","depth tree tree-left",{}],
+  ["tree_r.webp","depth tree tree-right",{}],
+  ["drape.webp","depth canopy",{}],
+  ["hang_1.webp","sprite hanging",{"--x":"4","--y":"-3","--h":"36","--z":"1","--sa":"2.462268041237113","--sd":"3.4337078651685395s","--sl":"-0.92s"}],
+  ["hang_2.webp","sprite hanging",{"--x":"12","--y":"-4","--h":"28","--z":"1","--sa":"2.7958762886597937","--sd":"2.89438202247191s","--sl":"-1.49s"}],
+  ["hang_3.webp","sprite hanging",{"--x":"20","--y":"-5","--h":"22","--z":"1","--sa":"2.0742268041237115","--sd":"4.35505617977528s","--sl":"-2.07s"}],
+  ["hang_4.webp","sprite hanging",{"--x":"28","--y":"-6","--h":"15","--z":"1","--sa":"3.352577319587629","--sd":"3.8157303370786515s","--sl":"-2.65s"}],
+  ["hang_3.webp","sprite hanging flipped",{"--x":"96","--y":"-3","--h":"34","--z":"1","--sa":"1.8416494845360822","--sd":"3.2764044943820223s","--sl":"-3.23s"}],
+  ["hang_4.webp","sprite hanging flipped",{"--x":"88","--y":"-4","--h":"28","--z":"1","--sa":"1.909278350515464","--sd":"2.737078651685393s","--sl":"-3.81s"}],
+  ["hang_1.webp","sprite hanging flipped",{"--x":"80","--y":"-5","--h":"21","--z":"1","--sa":"3.1876288659793817","--sd":"4.1977528089887635s","--sl":"-0.39s"}],
+  ["hang_2.webp","sprite hanging flipped",{"--x":"72","--y":"-6","--h":"14","--z":"1","--sa":"2.465979381443299","--sd":"3.6584269662921347s","--sl":"-0.96s"}],
+  ["spike_5.webp","sprite plant front",{"--x":"5","--y":"4","--h":"44","--z":"1","--sa":"1.1199999999999999","--sd":"2.4s","--sl":"0s"}],
+  ["spike_3.webp","sprite plant front",{"--x":"13","--y":"4","--h":"36","--z":"1","--sa":"2.0148453608247423","--sd":"3.8606741573033707s","--sl":"-0.58s"}],
+  ["spike_4.webp","sprite plant front",{"--x":"95","--y":"4","--h":"42","--z":"1","--sa":"1.5096907216494846","--sd":"3.3213483146067415s","--sl":"-1.16s"}],
+  ["spike_5.webp","sprite plant front flipped",{"--x":"87","--y":"4","--h":"35","--z":"1","--sa":"2.404536082474227","--sd":"2.7820224719101123s","--sl":"-1.73s"}],
+  ["stem_1.webp","sprite plant front",{"--x":"9","--y":"2","--h":"26","--z":"2","--sa":"2.7134020618556702","--sd":"4.242696629213484s","--sl":"-2.31s"}],
+  ["stem_2.webp","sprite plant front flipped",{"--x":"91","--y":"2","--h":"26","--z":"2","--sa":"1.9917525773195877","--sd":"3.703370786516854s","--sl":"-2.89s"}],
+  ["leaf_5.webp","sprite leaf front still",{"--x":"36","--y":"-1","--h":"10","--z":"3","--sa":"3.270103092783505","--sd":"3.1640449438202247s","--sl":"-3.47s"}],
+  ["leaf_6.webp","sprite leaf front still",{"--x":"46","--y":"-1","--h":"8","--z":"3","--sa":"2.5484536082474225","--sd":"2.6247191011235955s","--sl":"-0.05s"}],
+  ["leaf_4.webp","sprite leaf front flipped still",{"--x":"55","--y":"-1","--h":"8","--z":"3","--sa":"1.8268041237113404","--sd":"4.085393258426966s","--sl":"-0.63s"}],
+  ["leaf_5.webp","sprite leaf front flipped still",{"--x":"64","--y":"-1","--h":"10","--z":"3","--sa":"3.105154639175258","--sd":"3.546067415730337s","--sl":"-1.2s"}],
+  ["bloom_5.webp","sprite flower front",{"--x":"39","--y":"-2","--h":"10","--z":"4","--sa":"2.3835051546391752","--sd":"3.006741573033708s","--sl":"-1.78s"}],
+  ["bloom_1.webp","sprite flower front",{"--x":"47","--y":"-2","--h":"8","--z":"4","--sa":"1.6618556701030929","--sd":"2.4674157303370787s","--sl":"-2.36s"}],
+  ["bloom_5.webp","sprite flower front flipped",{"--x":"53","--y":"-2","--h":"8","--z":"4","--sa":"2.9402061855670105","--sd":"3.928089887640449s","--sl":"-2.94s"}],
+  ["bloom_1.webp","sprite flower front flipped",{"--x":"61","--y":"-2","--h":"10","--z":"4","--sa":"2.218556701030928","--sd":"3.3887640449438203s","--sl":"-3.52s"}],
+  ["peacock.webp","sprite peacock-sprite front still",{"--x":"20","--y":"-2","--h":"40","--z":"6","--sa":"2.4478350515463916","--sd":"2.8494382022471907s","--sl":"-0.1s"}],
+  ["peacock.webp","sprite peacock-sprite front flipped still",{"--x":"80","--y":"-2","--h":"40","--z":"6","--sa":"1.9426804123711339","--sd":"4.310112359550562s","--sl":"-0.67s"}],
+  ["bloom_2.webp","sprite flower front",{"--x":"23","--y":"-1","--h":"8","--z":"7","--sa":"2.0536082474226807","--sd":"3.7707865168539323s","--sl":"-1.25s"}],
+  ["bloom_6.webp","sprite flower front",{"--x":"31","--y":"-2","--h":"9","--z":"7","--sa":"3.331958762886598","--sd":"3.2314606741573035s","--sl":"-1.83s"}],
+  ["bloom_2.webp","sprite flower front flipped",{"--x":"77","--y":"-1","--h":"8","--z":"7","--sa":"2.6103092783505155","--sd":"2.692134831460674s","--sl":"-2.41s"}],
+  ["bloom_6.webp","sprite flower front flipped",{"--x":"69","--y":"-2","--h":"9","--z":"7","--sa":"1.888659793814433","--sd":"4.152808988764045s","--sl":"-2.99s"}],
 ];
 
 const byFile = new Map();
@@ -63,7 +65,7 @@ for (const [filename, classes, properties] of definitions) {
   img.draggable = false;
   if (filename === 'tree_l.webp' || filename === 'tree_r.webp') img.classList.add('gentle-tree');
   if (classes.includes('hanging')) img.classList.add('swing');
-  if (classes.includes('plant')) img.classList.add('plant-sway');
+  if (classes.includes('plant') || classes.includes('leaf')) img.classList.add('plant-sway');
   if (classes.includes('flower')) img.classList.add('flower-sway');
   wrapper.appendChild(img);
   art.appendChild(wrapper);
