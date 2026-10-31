@@ -127,6 +127,8 @@ function resetInvitation() {
   opened.inert = true;
   openedOnce = false;
   document.documentElement.style.overflowY = 'hidden';
+  // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
+  document.documentElement.style.setProperty('--stage-parallax', '0px');
   window.scrollTo({top:0, behavior:'instant'});
   document.getElementById('openButton').focus({preventScroll:true});
 }
