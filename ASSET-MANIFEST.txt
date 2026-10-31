@@ -1,0 +1,29 @@
+Celestial Lake — reference scene assets (25 unique WebP files)
+Source: https://undangankahwin.com/images/concierge/packs/tasik-kayangan/
+Artwork owner permission is required before downloading or redistribution.
+
+scene.webp
+sky.webp
+palace.webp
+reeds.webp
+arch.webp
+tree_l.webp
+tree_r.webp
+drape.webp
+hang_1.webp
+hang_2.webp
+hang_3.webp
+hang_4.webp
+spike_3.webp
+spike_4.webp
+spike_5.webp
+stem_1.webp
+stem_2.webp
+leaf_4.webp
+leaf_5.webp
+leaf_6.webp
+bloom_1.webp
+bloom_2.webp
+bloom_5.webp
+bloom_6.webp
+peacock.webp
