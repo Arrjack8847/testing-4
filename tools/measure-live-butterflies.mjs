@@ -27,4 +27,20 @@ try {
   const btn=page.getByRole('button',{name:'Open Invitation'});
   for(let i=0;i<await btn.count();i++)if(await btn.nth(i).isVisible()){await btn.nth(i).click();break;}
   await page.waitForTimeout(2500);await sample('after_open_2500ms');
+  for(const fraction of [.15,.35,.65,.95]){
+    await page.evaluate(f=>window.scrollTo({top:Math.round(innerHeight*f),behavior:'instant'}),fraction);
+    await page.waitForTimeout(450);
+    const state=await page.evaluate(()=>{
+      const r=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),w:Math.round(b.width),h:Math.round(b.height)};};
+      const q=s=>document.querySelector(s);
+      return {scrollY:scrollY,scrollWidth:document.documentElement.scrollWidth,
+        hero:r(q('.cgv-dio-hero')),hint:r(q('.dio-hint')),
+        main:r(q('.cgv-invite')),heroContent:r(q('.cgv-dio-hero .cgv-hero-content')),
+        title:r(q('.cgv-dio-hero .cgv-t2')),
+        heroPosition:q('.cgv-dio-hero')?getComputedStyle(q('.cgv-dio-hero')).position:'',
+        hintPosition:q('.dio-hint')?getComputedStyle(q('.dio-hint')).position:'',
+        sceneClass:q('.cgv-dio-hero .dio')?.className};
+    });
+    console.log('REFERENCE_SCROLL '+JSON.stringify({fraction,...state}));
+  }
 } finally {await browser.close();}
