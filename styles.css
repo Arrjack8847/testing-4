@@ -171,10 +171,10 @@ body { font-family:'EB Garamond', Georgia,serif; }
 /* Trees have a 1080x1920 source canvas, but the live reference displays
    each at 70% viewport HEIGHT, anchored 4% above the bottom.
    Full-size stacking was an earlier assumption and is now corrected. */
-.depth.tree {top:auto;bottom:4%;width:70%;height:70%;z-index:8;
+.depth.tree {top:auto;bottom:4dvh;width:39.375dvh;height:70dvh;z-index:8;
   transform-origin:50% 100%;transition:transform 1.45s cubic-bezier(.55,0,.75,.4),opacity 1.25s ease;}
-.depth.tree-left {left:-24%;right:auto;}
-.depth.tree-right {left:auto;right:-34%;}
+.depth.tree-left {left:calc(25vw - 39.375dvh * .759 + max(0px,(56.25dvh - 100vw)/2));right:auto;}
+.depth.tree-right {left:auto;right:calc(27vw - 39.375dvh * .929 + max(0px,(56.25dvh - 100vw)/2));}
 .depth.tree img {height:100%;width:100%;object-fit:contain;}
 .depth.tree .gentle-tree {animation-duration:7.5s;}
 .depth.tree-right .gentle-tree {animation-duration:8.6s;animation-delay:-3s;}
@@ -210,7 +210,7 @@ body { font-family:'EB Garamond', Georgia,serif; }
 .cover {display:flex;align-items:center;flex-direction:column;justify-content:flex-start;
   padding-top:min(23dvh,calc(54dvh - 200px));color:#5c264f;}
 .monogram {position:static;top:auto;left:auto;width:auto;display:flex;align-items:flex-end;justify-content:center;
-  font-family:'Pinyon Script','EB Garamond',serif;font-weight:500;
+  font-family:'Alex Brush','EB Garamond',serif;font-weight:400;
   font-size:clamp(64px,min(27vw,13.6dvh),118px);line-height:.9;letter-spacing:0;
   text-shadow:0 2px 18px rgba(255,250,244,.85);}
 .monogram span {display:block;padding:0;font:inherit;letter-spacing:0;}
