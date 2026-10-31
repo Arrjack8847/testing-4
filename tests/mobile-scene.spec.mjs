@@ -109,3 +109,50 @@ test('developer alignment controls and reset work after scrolling', async ({ pag
     page.evaluate(() => document.documentElement.style.getPropertyValue('--stage-parallax').trim())).toBe('0px');
   await expect(page.locator('#opened')).toHaveAttribute('inert','');
 });
+
+
+test('ambient petals, birds and waterfall geometry remain lightweight', async ({ page }) => {
+  const runtimeErrors = [];
+  page.on('pageerror', err => runtimeErrors.push(err.message));
+  await page.goto('/');
+  await waitForArt(page);
+  await expect(page.locator('#petalCanvas')).toBeAttached();
+  await expect(page.locator('.sky-birds > span')).toHaveCount(2);
+  await expect(page.locator('.waterfalls > .waterfall')).toHaveCount(2);
+  const detail = await page.evaluate(() => {
+    const canvas = document.querySelector('#petalCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const waterfalls = [...document.querySelectorAll('.waterfall')].map(el => ({
+      top:el.style.top,left:el.style.left,height:el.style.height,width:el.style.width,
+      children:el.children.length
+    }));
+    return {
+      canvasSize:[rect.width,rect.height],
+      canvasPixels:[canvas.width,canvas.height],
+      artLoaded:document.querySelector('.depth.palace img').naturalWidth,
+      waterfalls
+    };
+  });
+  expect(detail.canvasSize[0]).toBeCloseTo(await page.evaluate(() => innerWidth),0);
+  expect(detail.canvasSize[1]).toBeCloseTo(await page.evaluate(() => innerHeight),0);
+  expect(detail.canvasPixels[0]).toBeGreaterThan(0);
+  expect(detail.artLoaded).toBe(1920);
+  expect(detail.waterfalls).toEqual([
+    {left:'16%',top:'64%',width:'10%',height:'11.5%',children:3},
+    {left:'65.5%',top:'64%',width:'12%',height:'11.5%',children:3}
+  ]);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('.depth.palace .waterfalls')).toHaveCSS('scale','.99', {timeout:3000});
+  expect(runtimeErrors).toEqual([]);
+});
+
+test('reduce motion preference hides decorative particles but keeps interactions', async ({ page }) => {
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await waitForArt(page);
+  await expect(page.locator('#petalCanvas')).toBeHidden();
+  await expect(page.locator('.sky-birds')).toBeHidden();
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+  await expect(page.locator('#opened')).not.toHaveAttribute('inert');
+});
