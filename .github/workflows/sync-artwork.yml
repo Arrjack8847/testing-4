@@ -1,0 +1,58 @@
+name: Sync original artwork (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_public_distribution:
+        description: I have permission to redistribute these assets in this public GitHub repository
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync-artwork:
+    # This workflow is never run automatically. It needs an explicit
+    # confirmation because GitHub repository assets are publicly redistributable.
+    if: ${{ inputs.confirm_public_distribution }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and validate 25 original WebP files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          import re
+          root = 'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'
+          manifest = Path('ASSET-MANIFEST.txt').read_text()
+          names = list(dict.fromkeys(re.findall(r'^([a-z0-9_]+\.webp)$', manifest, re.M)))
+          assert len(names) == 25, f'Expected 25 original files, got {len(names)}'
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              target = Path('assets') / name
+              if target.is_file() and target.stat().st_size >= 200:
+                  header = target.read_bytes()[:12]
+                  if header[:4] == b'RIFF' and header[8:] == b'WEBP':
+                      print('Exists:', name)
+                      continue
+              request = Request(root + name, headers={'User-Agent':'Mozilla/5.0 CelestialLakeAssetSync/1.0'})
+              with urlopen(request, timeout=30) as reply:
+                  body = reply.read()
+              if len(body) < 200 or body[:4] != b'RIFF' or body[8:12] != b'WEBP':
+                  raise RuntimeError(f'Invalid WebP asset: {name}')
+              target.write_bytes(body)
+              print('Downloaded:', name, len(body))
+          PY
+      - name: Commit source artwork
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets
+          if git diff --cached --quiet; then
+            echo "Artwork already up to date."
+          else
+            git commit -m "assets: add authorized Celestial Lake reference artwork"
+            git push
+          fi
