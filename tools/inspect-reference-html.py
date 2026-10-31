@@ -40,3 +40,8 @@ for href in p.links[:10]:
    ix=data.find(n)
    if ix>=0:print(n,re.sub(r'\s+',' ',data[max(0,ix-100):ix+500])[:600])
  except Exception as e:print('stylesheet error',str(e)[:200])
+
+print('\\nCUSTOM THEME VARIABLES IN HTML:')
+for key in ['--dio-mono-font','--dio-mono-scale','--dio-ink:','--dio-btn:','--dio-art-scale','--dio-art-drop','--dio-tr-reach','--dio-tl-reach','--dio-focus']:
+ for m in list(re.finditer(re.escape(key)+r'[^;\\"<>}]{0,110}',html))[-4:]:
+  print(key,m.group(0)[:140])
