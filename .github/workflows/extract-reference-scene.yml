@@ -1,0 +1,17 @@
+name: Extract reference scene geometry
+on:
+  push:
+    paths:
+      - tools/extract-reference-scene.py
+      - .github/workflows/extract-reference-scene.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract reference CSS and opening artwork positions
+        run: python3 tools/extract-reference-scene.py
