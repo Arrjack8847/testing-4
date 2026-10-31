@@ -118,6 +118,7 @@ const artworkReady = Promise.all(allNames.map(async name => {
 let openedOnce = false;
 function openInvitation() {
   invite.dataset.state = 'opened';
+  invite.dataset.reading = 'no';
   cover.inert = true;
   opened.inert = false;
   openedOnce = true;
@@ -125,6 +126,7 @@ function openInvitation() {
 }
 function resetInvitation() {
   invite.dataset.state = 'cover';
+  invite.dataset.reading = 'no';
   cover.inert = false;
   opened.inert = true;
   openedOnce = false;
@@ -143,7 +145,11 @@ window.addEventListener('pageshow', () => {
 // Scroll modifies depth only; no animation frame is wasted when idle.
 let scheduled = false;
 window.addEventListener('scroll', () => {
-  if (!openedOnce || scheduled || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!openedOnce) return;
+  // The reference initially displays only the valley. The names are revealed
+  // as the guest follows the swipe cue, not immediately after the cover tap.
+  invite.dataset.reading = window.scrollY >= window.innerHeight * .15 ? 'yes' : 'no';
+  if (scheduled || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   scheduled = true;
   requestAnimationFrame(() => {
     const amount = Math.min(window.scrollY, window.innerHeight);
