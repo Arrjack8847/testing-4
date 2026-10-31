@@ -2,6 +2,9 @@ name: Visual comparison — 390px cover
 on:
   push:
     paths:
+      - index.html
+      - styles.css
+      - scene.js
       - tools/compare-live-screens.mjs
       - .github/workflows/visual-compare.yml
   workflow_dispatch:
