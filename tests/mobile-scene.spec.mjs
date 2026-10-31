@@ -142,7 +142,7 @@ test('ambient petals, birds and waterfall geometry remain lightweight', async ({
     {left:'65.5%',top:'64%',width:'12%',height:'11.5%',children:3}
   ]);
   await page.getByRole('button',{name:'Open Invitation'}).click();
-  await expect(page.locator('.depth.palace .waterfalls')).toHaveCSS('scale','.99', {timeout:3000});
+  await expect(page.locator('.depth.palace .waterfalls')).toHaveCSS('scale','0.99', {timeout:3000});
   expect(runtimeErrors).toEqual([]);
 });
 
