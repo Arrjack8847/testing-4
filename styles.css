@@ -145,3 +145,103 @@ html.debug-freeze .scene-stage { --stage-parallax:0px; }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
+
+
+/* Phase 5: geometry measured from the actual live 390x844 mobile reference.
+   Original artwork files remain their respective owners' property.
+   This CSS is an independent implementation of the measured layout. */
+:root { --ink:#5c264f; --gold:#5c264f; --unit:min(1dvh,2.164vw); --open-time:900ms; }
+body { font-family:'EB Garamond', Georgia,serif; }
+/* The reference's 9:16 art frame is bottom-aligned, NOT vertically centered. */
+.scene-stage { top:auto;bottom:0;width:max(100%,56.25dvh);transform:translate(-50%,var(--stage-parallax)); }
+/* The cover is animated even BEFORE the guest opens it. */
+.invitation[data-layers="ready"] .master-art {opacity:0;}
+.invitation[data-layers="ready"] .animated-scene {opacity:1;}
+.sky-layer {transform-origin:50% 72%;transition:transform 1.7s cubic-bezier(.6,0,.25,1);}
+.sky-layer img {animation:none;}
+/* Palace was measured at 557x557 with its bottom at 844px.
+   In the opened valley it grows to 836x836 around the SAME bottom anchor. */
+.depth.palace {inset:0;width:100%;height:100%;z-index:3;}
+.depth.palace img {position:absolute;left:50%;bottom:0;top:auto;height:100%;width:auto;max-width:none;
+  translate:-50% 0;scale:.66;transform-origin:50% 100%;transition:scale 1.7s cubic-bezier(.6,0,.25,1);}
+.depth.reeds,.depth.arch {top:auto;left:50%;bottom:0;width:100vw;height:auto;translate:-50% 0;}
+.depth.reeds img,.depth.arch img {width:100%;height:auto;object-fit:contain;}
+.depth.reeds {z-index:5;transform:translateY(40%);opacity:0;transition:transform 1s ease .7s,opacity 1s ease .7s;}
+.depth.arch {z-index:7;transform-origin:50% 72%;transition:transform 1.5s cubic-bezier(.55,0,.75,.4),opacity 1.3s ease;}
+/* Trees have a 1080x1920 source canvas, but the live reference displays
+   each at 70% viewport HEIGHT, anchored 4% above the bottom.
+   Full-size stacking was an earlier assumption and is now corrected. */
+.depth.tree {top:auto;bottom:4%;width:70%;height:70%;z-index:8;
+  transform-origin:50% 100%;transition:transform 1.45s cubic-bezier(.55,0,.75,.4),opacity 1.25s ease;}
+.depth.tree-left {left:-24%;right:auto;}
+.depth.tree-right {left:auto;right:-34%;}
+.depth.tree img {height:100%;width:100%;object-fit:contain;}
+.depth.tree .gentle-tree {animation-duration:7.5s;}
+.depth.tree-right .gentle-tree {animation-duration:8.6s;animation-delay:-3s;}
+.depth.canopy {top:-11dvh;bottom:auto;left:50%;width:104vw;height:auto;translate:-50% 0;z-index:11;
+  transform-origin:50% 0;transition:transform 1.35s cubic-bezier(.55,0,.75,.4),opacity 1s ease;}
+.depth.canopy img {width:100%;height:auto;animation:floral-sway 9s ease-in-out infinite alternate;}
+/* Sprite coordinates are copied as measurements, not hand-estimated.
+   --x: horizontal viewport percentage
+   --y: distance from top (hanging) or bottom (other)
+   --h: height in common artwork units
+*/
+.animated-scene > .sprite {
+  left:calc((100% - 100vw)/2 + var(--x) * 1vw);
+  width:max-content;height:calc(var(--h) * var(--unit));
+  top:auto;bottom:calc(var(--y) * var(--unit));
+  translate:-50% 0;transform-origin:50% 100%;
+}
+.animated-scene > .sprite.hanging {top:calc(var(--y) * var(--unit));bottom:auto;z-index:12;transform-origin:50% 0;}
+.animated-scene > .sprite.front {z-index:calc(15 + var(--z,1));}
+.animated-scene > .sprite.flipped {scale:-1 1;}
+.animated-scene > .sprite img {display:block;width:auto;height:100%;max-width:none;}
+.sprite.hanging .swing {animation:reference-sway var(--sd,4s) ease-in-out var(--sl,0s) infinite alternate;transform-origin:50% 0;}
+.sprite.plant .plant-sway,.sprite.flower .flower-sway,.sprite.leaf .plant-sway {
+  animation:reference-sway var(--sd,4s) ease-in-out var(--sl,0s) infinite alternate;transform-origin:50% 100%;
+}
+.sprite.still img {animation:none!important;}
+@keyframes reference-sway {
+  from {transform:rotate(calc(var(--sa,2)*-1deg));}
+  to {transform:rotate(calc(var(--sa,2)*1deg));}
+}
+/* The reference cover groups its large script monogram, small title,
+   paired names, divider, and pill control above the living scene. */
+.cover {display:flex;align-items:center;flex-direction:column;justify-content:flex-start;
+  padding-top:min(23dvh,calc(54dvh - 200px));color:#5c264f;}
+.monogram {position:static;top:auto;left:auto;width:auto;display:flex;align-items:flex-end;justify-content:center;
+  font-family:'Pinyon Script','EB Garamond',serif;font-weight:500;
+  font-size:clamp(64px,min(27vw,13.6dvh),118px);line-height:.9;letter-spacing:0;
+  text-shadow:0 2px 18px rgba(255,250,244,.85);}
+.monogram span {display:block;padding:0;font:inherit;letter-spacing:0;}
+.monogram span + span {margin-left:-.08em;transform:translateY(.1em);}
+.cover-copy {position:static;top:auto;left:auto;width:100%;margin-top:min(22px,2.6dvh);text-shadow:0 1px 10px rgba(255,250,244,.95);}
+.cover-copy .eyebrow {font-family:'EB Garamond',serif;font-size:16px;line-height:1.2;letter-spacing:.03em;color:#5c264f;margin:0 0 3px;}
+.cover-copy h1 {font-family:'EB Garamond',serif;font-size:22px;font-weight:600;line-height:1.2;letter-spacing:.02em;}
+.cover-copy h1 em {font-size:1em;font-weight:600;font-style:normal;}
+.cover-rule {display:block;width:min(56%,230px);height:1px;flex:0 0 1px;margin:min(12px,1.4dvh) 0 0;
+  background:linear-gradient(90deg,transparent,#5c264fb2,transparent);}
+.open-button {top:50.02%;left:50%;position:absolute;translate:-50% 0;
+  width:220.6px;min-width:0;height:49.1px;min-height:0;padding:0 26px;margin:0;
+  border:0;border-radius:999px;background:#5c264f;color:#fff8ef;
+  font:600 14px/1.2 'EB Garamond',Georgia,serif;letter-spacing:.16em;text-transform:uppercase;
+  box-shadow:0 10px 24px rgba(70,40,24,.32),inset 0 1px 0 rgba(255,236,214,.35);}
+.opened {font-family:'EB Garamond',Georgia,serif;}
+/* The camera moves INTO the valley, removing the close architectural
+   ornaments, rather than only fading between two copies of the same scene. */
+.invitation[data-state="opened"] .sky-layer {transform:translateY(-4%) scale(1.12);}
+.invitation[data-state="opened"] .depth.palace img {scale:.99;}
+.invitation[data-state="opened"] .depth.reeds {transform:translateY(0);opacity:1;}
+.invitation[data-state="opened"] .depth.arch {transform:scale(2.6);opacity:0;}
+.invitation[data-state="opened"] .depth.tree-left {transform:scale(2.1) translateX(-14%);opacity:0;}
+.invitation[data-state="opened"] .depth.tree-right {transform:scale(2.1) translateX(14%);opacity:0;}
+.invitation[data-state="opened"] .depth.canopy {transform:scale(2.2) translateY(-10%);opacity:0;}
+.invitation[data-state="opened"] .sprite.hanging {opacity:0;transform:translateY(-20dvh);transition:opacity 1s ease,transform 1.35s ease;}
+.invitation[data-state="opened"] .sprite.front {transform:translateY(20dvh);transition:transform 1.7s ease;}
+/* Explicit comparison mode always wins over the default animated cover. */
+.invitation[data-compare="master"] .master-art {opacity:1!important;}
+.invitation[data-compare="master"] .animated-scene {opacity:0!important;}
+.invitation[data-compare="layers"] .master-art {opacity:0!important;}
+.invitation[data-compare="layers"] .animated-scene {opacity:1!important;}
+.invitation[data-compare="blend"] .master-art {opacity:calc(1 - var(--debug-blend,.5))!important;}
+.invitation[data-compare="blend"] .animated-scene {opacity:var(--debug-blend,.5)!important;}
