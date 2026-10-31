@@ -348,3 +348,8 @@ body { font-family:'EB Garamond', Georgia,serif; }
   .petal-canvas{display:none;}
   .waterfall i,.waterfall b{animation:none!important;}
 }
+
+/* Refined with the Celestial Lake theme's measured ornamental type variables:
+   script size 1.08x, linked initials with -.42em overlap, second initial .3em lower. */
+.monogram { font-size:calc(clamp(64px,min(27vw,13.6dvh),118px) * 1.08); }
+.monogram span + span {margin-left:-.42em;transform:translateY(.3em);}
