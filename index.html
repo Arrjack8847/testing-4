@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d4c8de">
+  <meta name="description" content="Celestial Lake — mobile wedding invitation scene, first-section development prototype.">
+  <title>Celestial Lake — Mobile Invitation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="scene.js" defer></script>
+</head>
+<body>
+  <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
+    <section class="viewport" id="viewport" aria-label="Wedding invitation opening scene">
+      <div class="scene-stage" id="stage" aria-hidden="true">
+        <img class="master-art" id="masterArt" alt="" fetchpriority="high">
+        <div class="animated-scene" id="animatedScene"></div>
+      </div>
+      <div class="reading-veil" aria-hidden="true"></div>
+      <section class="cover" id="cover" aria-label="Invitation cover">
+        <div class="monogram" aria-label="R and S">R <span>✧</span> S</div>
+        <div class="cover-copy">
+          <p class="eyebrow">The Wedding of</p>
+          <h1>Rayyan <em>&amp;</em> Sofea</h1>
+        </div>
+        <button class="open-button" id="openButton" type="button">Open Invitation</button>
+      </section>
+      <section class="opened" id="opened" aria-label="Opened invitation" inert>
+        <div class="opened-copy">
+          <p class="eyebrow">The Wedding of</p>
+          <h2>Rayyan <em>&amp;</em> Sofea</h2>
+          <p class="date">23 . 01 . 2027</p>
+          <p class="guest"><span>Specially inviting</span><strong>Family &amp; Friends</strong></p>
+        </div>
+        <a href="#message" class="swipe-cue" aria-label="Swipe up for wedding message">Swipe up <span aria-hidden="true">⌄</span></a>
+      </section>
+      <div class="network-note" id="networkNote" role="status" aria-live="polite" hidden></div>
+    </section>
+    <!-- Temporary scroll target only. The user requested section 1, not the rest of the invitation. -->
+    <section class="message" id="message" aria-label="Wedding message preview">
+      <p class="eyebrow">The Wedding of</p>
+      <h2>Rayyan <em>&amp;</em> Sofea</h2>
+      <p class="date">23 . 01 . 2027</p>
+      <div class="rule" aria-hidden="true">✧</div>
+      <p class="bismillah" lang="ar">﷽</p>
+      <p>With grateful hearts and surrounded by the love of our families, we request the pleasure of your company as we celebrate the joy of our marriage and the beginning of a lifetime together.</p>
+    </section>
+  </main>
+  <aside class="debug-panel" id="debugPanel" hidden aria-label="Developer comparison panel">
+    <b>Artwork comparison</b>
+    <label>Mode
+      <select id="compareMode">
+        <option value="normal">Normal invitation</option>
+        <option value="master">Original master image</option>
+        <option value="layers">Individual artwork layers</option>
+        <option value="blend">Blend / overlap check</option>
+      </select>
+    </label>
+    <label id="blendControl" hidden>Layer opacity
+      <input id="blendSlider" type="range" min="0" max="100" value="50">
+      <output id="blendValue">50%</output>
+    </label>
+    <label><input type="checkbox" id="freezeMotion" checked> Freeze animation</label>
+    <small class="stats" id="debugStats">Checking artwork…</small>
+    <div class="debug-actions">
+      <button id="resetButton" type="button">Reset</button>
+      <button id="debugOpen" type="button">Open</button>
+    </div>
+    <small>Source asset rights and original motion curves must be verified before publication.</small>
+  </aside>
+</body>
+</html>
