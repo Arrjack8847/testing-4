@@ -1,0 +1,14 @@
+{
+  "name": "celestial-lake-mobile",
+  "private": true,
+  "version": "0.4.0",
+  "description": "Mobile first-section invitation reference recreation",
+  "scripts": {
+    "test:mobile": "playwright test",
+    "test:source": "python3 tools/check-source.py",
+    "test:syntax": "node --check scene.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
