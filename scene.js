@@ -68,6 +68,21 @@ for (const [filename, classes, properties] of definitions) {
   if (classes.includes('plant') || classes.includes('leaf')) img.classList.add('plant-sway');
   if (classes.includes('flower')) img.classList.add('flower-sway');
   wrapper.appendChild(img);
+  if (filename === 'palace.webp') {
+    // Two water streams are placed against the same 1920px painting as the original.
+    // The overlay scales with the building, so the falls do not drift during the camera push.
+    const water = document.createElement('div');
+    water.className = 'waterfalls';
+    for (const [left, width, phase] of [['16%','10%','0s'], ['65.5%','12%','-.7s']]) {
+      const fall = document.createElement('span');
+      fall.className = 'waterfall';
+      Object.assign(fall.style, {left, width, top:'64%', height:'11.5%'});
+      fall.style.setProperty('--fall-delay', phase);
+      for (const tag of ['i','i','b']) fall.appendChild(document.createElement(tag));
+      water.appendChild(fall);
+    }
+    wrapper.appendChild(water);
+  }
   art.appendChild(wrapper);
   if (!byFile.has(filename)) byFile.set(filename, []);
   byFile.get(filename).push(img);
@@ -76,6 +91,83 @@ for (const [filename, classes, properties] of definitions) {
 const glow = document.createElement('div');
 glow.className = 'water-glow';
 art.appendChild(glow);
+
+// The original scene contains two stylised flying birds in front of the sky.
+// Keeping them as one lightweight CSS animation avoids continuous JavaScript work.
+const birds = document.createElement('div');
+birds.className = 'sky-birds';
+for (const [top, duration, delay, size] of [
+  ['14%', '15s', '.6s', '1'],
+  ['22%', '18s', '5.5s', '.8']
+]) {
+  const bird = document.createElement('span');
+  bird.style.cssText = `top:${top};--bird-duration:${duration};--bird-delay:${delay};--bird-scale:${size}`;
+  bird.innerHTML = '<svg viewBox="0 0 40 16" aria-hidden="true"><path d="M1 9 C8 2 14 3 20 10 C26 3 32 2 39 9 C32 6 26 8 20 13 C14 8 8 6 1 9Z"/></svg>';
+  birds.appendChild(bird);
+}
+art.appendChild(birds);
+
+// Canvas petals resemble the reference's low-density, pastel falling particles.
+// Deterministic seed and capped drawing resolution give repeatable lightweight motion.
+const petalCanvas = document.getElementById('petalCanvas');
+const petalContext = petalCanvas.getContext('2d', {alpha:true});
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const petalPalette = [
+  'rgba(122,16,97,.4)','rgba(200,170,220,.65)',
+  'rgba(255,255,255,.8)','rgba(160,150,210,.5)'
+];
+let seed = 20270123;
+function randomUnit() {
+  seed = (1664525 * seed + 1013904223) >>> 0;
+  return seed / 4294967296;
+}
+const petals = Array.from({length:16}, () => ({
+  x:randomUnit(), y:randomUnit(),
+  size:1.8+randomUnit()*3.7, speed:.015+randomUnit()*.020,
+  drift:.006+randomUnit()*.012, spin:randomUnit()*6.283,
+  phase:randomUnit()*6.283,
+  tint:petalPalette[Math.floor(randomUnit()*petalPalette.length)]
+}));
+let petalW=0, petalH=0, lastDraw=0, prevFrame=0, petalFrame=0;
+function resizePetals() {
+  const bounds = petalCanvas.getBoundingClientRect();
+  petalW=bounds.width;petalH=bounds.height;
+  const ratio=Math.min(window.devicePixelRatio||1,2);
+  petalCanvas.width=Math.round(petalW*ratio);
+  petalCanvas.height=Math.round(petalH*ratio);
+  petalContext?.setTransform(ratio,0,0,ratio,0,0);
+}
+function renderPetals(now) {
+  petalFrame=requestAnimationFrame(renderPetals);
+  if (!petalContext || document.hidden || reduceMotion.matches ||
+      document.documentElement.classList.contains('debug-freeze')) {
+    prevFrame=now;
+    if (petalContext && reduceMotion.matches) petalContext.clearRect(0,0,petalW,petalH);
+    return;
+  }
+  // 30 fps cap for entry-level Android devices, with bounded delta on tab restoration.
+  if(now-lastDraw < 1000/30) return;
+  const dt=prevFrame ? Math.min((now-prevFrame)/1000,.05) : 0;
+  prevFrame=now;lastDraw=now;
+  petalContext.clearRect(0,0,petalW,petalH);
+  for(const p of petals) {
+    p.y += p.speed*dt;
+    if(p.y>1.04) {p.y=-.04;p.x=randomUnit();}
+    const x=(p.x+Math.sin(now/2800+p.phase)*p.drift)*petalW;
+    const y=p.y*petalH;
+    petalContext.save();
+    petalContext.translate(x,y);
+    petalContext.rotate(p.spin+now*.00025);
+    petalContext.fillStyle=p.tint;
+    petalContext.beginPath();
+    petalContext.ellipse(0,0,p.size*.60,p.size*1.35,.32,0,Math.PI*2);
+    petalContext.fill();
+    petalContext.restore();
+  }
+}
+resizePetals();
+window.addEventListener('resize',resizePetals,{passive:true});
+petalFrame=requestAnimationFrame(renderPetals);
 
 const allNames = ['scene.webp', ...byFile.keys()];
 const failed = new Set();
