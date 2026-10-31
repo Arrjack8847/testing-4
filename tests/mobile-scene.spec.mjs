@@ -67,12 +67,16 @@ test('cover opens and enables vertical invitation scrolling', async ({ page }) =
   await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
   await expect(page.locator('#opened')).not.toHaveAttribute('inert');
   await expect(page.locator('#cover')).toHaveAttribute('inert','');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
   await expect.poll(async () => page.evaluate(() => document.documentElement.style.overflowY)).toBe('auto');
   await page.evaluate(() => {
     document.documentElement.style.scrollBehavior = 'auto';
     window.scrollTo({top: Math.floor(window.innerHeight * .65), behavior: 'instant'});
   });
   await expect.poll(async () => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','1');
 });
 
 test('developer alignment controls and reset work after scrolling', async ({ page }) => {
