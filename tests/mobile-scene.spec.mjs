@@ -20,9 +20,14 @@ test('mobile artwork geometry matches full transparent canvas dimensions', async
         naturalWidth:image.naturalWidth, naturalHeight:image.naturalHeight };
     });
     const master = document.querySelector('#masterArt');
+    const button = document.querySelector('#openButton').getBoundingClientRect();
+    const sprites = document.querySelectorAll('.sprite');
+    const peacocks = document.querySelectorAll('.sprite.peacock-sprite');
     return {
       stage: {x:stage.x, y:stage.y, width:stage.width, height:stage.height},
       trees, master: [master.naturalWidth,master.naturalHeight],
+      button: { x:button.x,y:button.y,width:button.width,height:button.height },
+      spriteCount:sprites.length,peacockCount:peacocks.length,
       scrollWidth: document.documentElement.scrollWidth,
       innerWidth: window.innerWidth
     };
@@ -31,10 +36,23 @@ test('mobile artwork geometry matches full transparent canvas dimensions', async
   expect(geometry.trees).toHaveLength(2);
   for (const tree of geometry.trees) {
     expect([tree.naturalWidth, tree.naturalHeight]).toEqual([1080,1920]);
-    expect(tree.width).toBeCloseTo(geometry.stage.width,0);
-    expect(tree.height).toBeCloseTo(geometry.stage.height,0);
-    expect(tree.x).toBeCloseTo(geometry.stage.x,0);
-    expect(tree.y).toBeCloseTo(geometry.stage.y,0);
+    expect(tree.width).toBeCloseTo(geometry.stage.width * .7,0);
+    expect(tree.height).toBeCloseTo(geometry.stage.height * .7,0);
+    expect(tree.y).toBeCloseTo(geometry.stage.y + geometry.stage.height * .26,0);
+  }
+  expect(geometry.spriteCount).toBe(28);
+  expect(geometry.peacockCount).toBe(2);
+  if (geometry.innerWidth === 390) {
+    expect(geometry.stage.width).toBeCloseTo(474.75,0);
+    expect(geometry.stage.x).toBeCloseTo(-42.375,0);
+    expect(geometry.trees[0].x).toBeGreaterThan(-170);
+    expect(geometry.trees[0].x).toBeLessThan(-140);
+    expect(geometry.trees[1].x).toBeGreaterThan(245);
+    expect(geometry.trees[1].x).toBeLessThan(280);
+    expect(geometry.button.x).toBeCloseTo(84.7,0);
+    expect(geometry.button.y).toBeCloseTo(422.2,0);
+    expect(geometry.button.width).toBeCloseTo(220.6,0);
+    expect(geometry.button.height).toBeCloseTo(49.1,0);
   }
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.innerWidth + 1);
   expect(runtimeErrors).toEqual([]);
