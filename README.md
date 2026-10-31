@@ -48,12 +48,12 @@ Source dimensions and alpha bounding boxes were measured by `tools/analyze-refer
 | `scene.webp` | 1080 × 1920 | Full-bleed original composition |
 | `sky.webp` | 1080 × 1920 | Full-canvas background |
 | `arch.webp` | 1080 × 1920 | Full-canvas alpha overlay |
-| `tree_l.webp`, `tree_r.webp` | 1080 × 1920 each | Full-canvas alpha overlays; **do not resize independently** |
+| `tree_l.webp`, `tree_r.webp` | 1080 × 1920 each | Source canvases are full-height, but the reference **renders each at 70% viewport height** |
 | `reeds.webp`, `drape.webp` | 1080 × 1920 each | Full-canvas overlays; preserve transparent margin |
 | `palace.webp` | 1920 × 1920 | Separately aligned, not yet pixel-verified |
 | `peacock.webp` | 741 × 1401 | Separately positioned and mirrored, not yet pixel-verified |
 
-The `styles.css` full-canvas tree correction is based on these dimensions. Other layer placements and animation curves still require comparison with the original live mobile layout.
+The later Phase 5 CSS correction uses **measured live DOM geometry**, superseding the earlier full-canvas-tree rendering assumption. The source dimensions remain unchanged. Some camera-motion microtimings and later sections still require visual comparison.
 
 ### Browser testing
 
@@ -68,3 +68,28 @@ npm run test:mobile
 ```
 
 A separate live-reference measurement script, `tools/measure-live-reference.mjs`, inspects the original at 390 × 844 to record actual DOM rectangles and opening state. Output is captured in the **Measure live mobile reference** GitHub Actions logs.
+
+## Phase 5 — live reference geometry (390 × 844 viewport)
+
+Measured in the original website using headless mobile Chromium and extracted reference opening-scene metadata.
+
+| Reference item | Live bounds / settings |
+|---|---|
+| Art frame | x=-42.4, y=0, width=474.8, height=844 |
+| Opening button | x=84.7, y=422.2, width=220.6, height=49.1 |
+| Left tree | approximately x=-156, y=219, width=334, height=592 |
+| Right tree | approximately x=261, y=217, width=337, height=593 |
+| Peacocks (before opening) | width=178.5, height=337.6, top=523.3 |
+| Palace (before opening) | square 557 × 557, bottom aligned |
+| Palace (after opening) | approximately 836 × 836, bottom aligned |
+| Opening camera push | approximately 1.7 seconds |
+| Text / button family | EB Garamond; large ornamental script monogram |
+
+Changes on `main`:
+- The **animated layered garden is displayed from the start**, rather than requiring a button click.
+- 28 decorative sprite placements and individual animation durations are mapped from the live page's own cover metadata, including the hanging strands, plant clusters and two peacocks.
+- The opening transition zooms into the valley and removes the foreground arch/trees.
+- The first mobile screen now uses a measured closed-cover button placement.
+- Automated mobile tests check measured bounds and interaction behavior.
+
+The geometry numbers come from the live reference, but do not themselves constitute proof of pixel-perfect screenshots. Actual visual comparison is still a separate gate.
