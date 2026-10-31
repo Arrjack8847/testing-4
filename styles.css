@@ -245,3 +245,31 @@ body { font-family:'EB Garamond', Georgia,serif; }
 .invitation[data-compare="layers"] .animated-scene {opacity:1!important;}
 .invitation[data-compare="blend"] .master-art {opacity:calc(1 - var(--debug-blend,.5))!important;}
 .invitation[data-compare="blend"] .animated-scene {opacity:var(--debug-blend,.5)!important;}
+
+/* Phase 5 visual sequence refinement, validated against actual mobile screenshots.
+   At the moment of opening, the live reference shows the valley and swipe cue.
+   Names are introduced by later scrolling, not immediately after the button tap. */
+.opened-copy {opacity:0;transform:translateY(16px);transition:opacity .9s ease,transform .9s ease;}
+.invitation[data-state="opened"][data-reading="yes"] .opened-copy {
+  opacity:1;transform:translateY(0);
+}
+.invitation[data-state="opened"] .sprite.front {
+  opacity:0;
+  transform:translateY(45dvh);
+  transition:transform 1.7s cubic-bezier(.55,0,.75,.4),opacity 1.05s ease;
+}
+/* Compact raised swipe invitation visible over the lake.
+   Vendor-only navigation and payment controls are deliberately excluded. */
+.swipe-cue {
+  left:50%;width:106px;bottom:17.5%;translate:-50% 0;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:2px;border-radius:999px;padding:11px 15px 9px;
+  border:1px solid rgba(154,104,136,.22);
+  background:rgba(255,247,251,.94);
+  color:#6b315b;
+  font-family:'EB Garamond',Georgia,serif;font-size:12px;
+  font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  box-shadow:0 5px 19px rgba(68,39,64,.24);
+  text-shadow:none;
+}
+.swipe-cue span {order:-1;font-size:17px;margin:0;line-height:.5;transform:rotate(180deg);}
