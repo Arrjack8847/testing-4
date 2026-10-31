@@ -1,0 +1,19 @@
+name: Measure live cover butterflies
+on:
+  push:
+    paths:
+      - tools/measure-live-butterflies.mjs
+      - .github/workflows/measure-live-butterflies.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  butterfly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/measure-live-butterflies.mjs
