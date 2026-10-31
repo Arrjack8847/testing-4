@@ -353,3 +353,89 @@ body { font-family:'EB Garamond', Georgia,serif; }
    script size 1.08x, linked initials with -.42em overlap, second initial .3em lower. */
 .monogram { font-size:calc(clamp(64px,min(27vw,13.6dvh),118px) * 1.08); }
 .monogram span + span {margin-left:-.42em;transform:translateY(.3em);}
+
+
+/* Phase 7 — two-wing butterflies from live Tasik Kayangan cover inspection.
+   Real sprite sizes: violet 52x41, ivory 44x34. A measured flight crosses
+   the cover starting ~2 s after load; the second starts later.
+   Wings split one source WebP horizontally, hinged to the body. */
+.butterfly-layer {
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+  z-index:4;transition:opacity .9s ease,visibility .9s;
+}
+.butterfly-cover {opacity:1;visibility:visible;}
+.butterfly-hero {opacity:0;visibility:hidden;}
+.invitation[data-state="opened"] .butterfly-cover {opacity:0;visibility:hidden;}
+.invitation[data-state="opened"][data-reading="yes"] .butterfly-hero {opacity:1;visibility:visible;}
+.butterfly {
+  position:absolute;left:0;top:0;opacity:0;display:block;
+  width:var(--fly-size-w);height:var(--fly-size-h);
+  filter:drop-shadow(0 6px 5px rgba(40,52,40,.2));
+  will-change:transform,opacity;transform-origin:center center;
+}
+.butterfly-wing {
+  position:absolute;top:0;width:50%;height:100%;
+  background-image:var(--fly-image);
+  background-repeat:no-repeat;background-size:200% 100%;
+  backface-visibility:visible;will-change:transform;
+}
+.butterfly-wing-l {left:0;background-position:0 0;transform-origin:100% 50%;}
+.butterfly-wing-r {right:0;background-position:100% 0;transform-origin:0 50%;}
+.butterfly-wing-l {animation:bf-wing-left .54s ease-in-out infinite alternate;}
+.butterfly-wing-r {animation:bf-wing-right .54s ease-in-out infinite alternate;}
+.butterfly.ivory .butterfly-wing-l,.butterfly.ivory .butterfly-wing-r {animation-duration:.46s;animation-delay:-.1s;}
+@keyframes bf-wing-left {from{transform:perspective(210px) rotateY(-8deg);}to{transform:perspective(210px) rotateY(-72deg);}}
+@keyframes bf-wing-right {from{transform:perspective(210px) rotateY(8deg);}to{transform:perspective(210px) rotateY(72deg);}}
+/* Positions are expressed in the viewport so the flight stays mobile-centric
+   even though the 9:16 scenery is cropped differently on taller phones.
+   Reference samples: violet at x~227 y~-40 (2.5 s), x~162 y110 (4.5 s);
+   ivory at x~340 y104 (4.5 s), with rotation included in the rectangles. */
+.butterfly-cover .violet {
+  animation:bf-violet-cover 13s cubic-bezier(.47,.05,.53,.95) 1.9s infinite;
+}
+.butterfly-cover .ivory {
+  animation:bf-ivory-cover 14s cubic-bezier(.48,.12,.52,.92) 3.9s infinite;
+}
+.butterfly-hero .violet {
+  animation:bf-violet-hero 13.5s ease-in-out .8s infinite;
+}
+.butterfly-hero .ivory {
+  animation:bf-ivory-hero 14.5s ease-in-out 3.2s infinite;
+}
+@keyframes bf-violet-cover {
+  0%{opacity:0;transform:translate3d(285px,-85px,0) rotate(-125deg);}
+  5%{opacity:1;}
+  9%{opacity:1;transform:translate3d(calc(50vw + 65px),-25px,0) rotate(-138deg);}
+  23%{transform:translate3d(calc(50vw - 8px),116px,0) rotate(-157deg);}
+  52%{transform:translate3d(calc(50vw - 112px),238px,0) rotate(-201deg);}
+  80%{opacity:1;transform:translate3d(calc(50vw - 220px),358px,0) rotate(-242deg);}
+  93%,100%{opacity:0;transform:translate3d(-75px,430px,0) rotate(-270deg);}
+}
+@keyframes bf-ivory-cover {
+  0%{opacity:0;transform:translate3d(calc(100vw + 44px),40px,0) rotate(-25deg);}
+  6%{opacity:1;}
+  12%{transform:translate3d(calc(100vw - 38px),104px,0) rotate(-98deg);}
+  45%{transform:translate3d(calc(50vw + 20px),165px,0) rotate(-140deg);}
+  77%{opacity:1;transform:translate3d(75px,235px,0) rotate(-205deg);}
+  91%,100%{opacity:0;transform:translate3d(-80px,298px,0) rotate(-260deg);}
+}
+@keyframes bf-violet-hero {
+  0%{opacity:0;transform:translate3d(calc(100vw + 35px),17vh,0) rotate(-100deg);}
+  8%{opacity:1;}
+  40%{transform:translate3d(calc(50vw + 15px),26vh,0) rotate(-160deg);}
+  76%{opacity:1;transform:translate3d(50px,18vh,0) rotate(-235deg);}
+  92%,100%{opacity:0;transform:translate3d(-72px,34vh,0) rotate(-250deg);}
+}
+@keyframes bf-ivory-hero {
+  0%{opacity:0;transform:translate3d(-44px,19vh,0) rotate(35deg);}
+  8%{opacity:1;}
+  45%{transform:translate3d(calc(48vw - 20px),11vh,0) rotate(95deg);}
+  77%{opacity:1;transform:translate3d(calc(100vw - 28px),24vh,0) rotate(142deg);}
+  92%,100%{opacity:0;transform:translate3d(calc(100vw + 50px),35vh,0) rotate(160deg);}
+}
+html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
+  animation:none!important;
+}
+@media (prefers-reduced-motion:reduce) {
+  .butterfly-layer {display:none;}
+}
