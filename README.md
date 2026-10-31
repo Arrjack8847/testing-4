@@ -37,3 +37,34 @@ That workflow downloads and validates the 25 images, then commits them to `asset
 - **Not built:** later invitation sections. The scrollable message is a temporary functional continuation.
 
 The next stage is side-by-side mobile QA at 360px, 390px, and 430px and a pixel-level alignment pass before proceeding beyond the first section.
+
+
+## Measured original asset geometry (Phase 4)
+
+Source dimensions and alpha bounding boxes were measured by `tools/analyze-reference.py`, using actual original WebPs, not guessed from the page.
+
+| Image | Source dimensions | Rendering rule |
+|---|---|---|
+| `scene.webp` | 1080 × 1920 | Full-bleed original composition |
+| `sky.webp` | 1080 × 1920 | Full-canvas background |
+| `arch.webp` | 1080 × 1920 | Full-canvas alpha overlay |
+| `tree_l.webp`, `tree_r.webp` | 1080 × 1920 each | Full-canvas alpha overlays; **do not resize independently** |
+| `reeds.webp`, `drape.webp` | 1080 × 1920 each | Full-canvas overlays; preserve transparent margin |
+| `palace.webp` | 1920 × 1920 | Separately aligned, not yet pixel-verified |
+| `peacock.webp` | 741 × 1401 | Separately positioned and mirrored, not yet pixel-verified |
+
+The `styles.css` full-canvas tree correction is based on these dimensions. Other layer placements and animation curves still require comparison with the original live mobile layout.
+
+### Browser testing
+
+GitHub Actions automatically runs a real Chromium mobile smoke-test suite at **320 × 568, 360 × 740, 390 × 844 and 430 × 932**. It checks original image loading, full-canvas tree alignment, the opening interaction, vertical scrolling, developer comparison modes, and resetting after scroll. Reference assets are downloaded **temporarily within the runner**, not committed or distributed.
+
+Locally, with Node.js and Python installed, run:
+
+```sh
+npm install
+npx playwright install chromium
+npm run test:mobile
+```
+
+A separate live-reference measurement script, `tools/measure-live-reference.mjs`, inspects the original at 390 × 844 to record actual DOM rectangles and opening state. Output is captured in the **Measure live mobile reference** GitHub Actions logs.
