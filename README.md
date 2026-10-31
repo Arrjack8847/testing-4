@@ -93,3 +93,28 @@ Changes on `main`:
 - Automated mobile tests check measured bounds and interaction behavior.
 
 The geometry numbers come from the live reference, but do not themselves constitute proof of pixel-perfect screenshots. Actual visual comparison is still a separate gate.
+
+
+## Phase 5 screenshot QA — 390 × 844
+
+A GitHub Actions visual-comparison job captured the reference and this implementation at the same mobile viewport, both before and after tapping the button. It produces separate screenshots, difference maps, and a downloadable comparison artifact.
+
+Reference comparison run: https://github.com/Arrjack8847/testing-4/actions/runs/41253538422
+
+| Scene | Overall mean absolute RGB difference (0–255) | Content between y=105 and y=640 |
+|---|---:|---:|
+| Closed cover | 24.70 | 20.10 |
+| Just after Open Invitation | 21.80 | 11.12 |
+
+The reference website's catalogue/navigation header, WhatsApp, order controls, and footer navigation appear in the **reference screenshot** but are **vendor preview UI**, not part of the customer's wedding invitation. We intentionally do not clone those vendor controls. This explains part of the measured difference.
+
+Visual QA observations:
+- The central palace artwork aligns closely; template matching indicates zero whole-pixel shift for the central building.
+- The closed cover shows the original living garden immediately, with the paired ornamental monogram, title, names, rule, and pill button.
+- After opening, the valley fills the screen and the foreground peacocks retreat; text waits for scrolling.
+- The exact nonessential decorative petal positions and the remaining subpixel typography and dynamic animation curves are **not certified pixel-identical**.
+
+### Latest automated validation
+
+The latest four-viewport browser smoke test run passed at:
+https://github.com/Arrjack8847/testing-4/actions/runs/41253568370
