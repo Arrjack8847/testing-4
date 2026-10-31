@@ -1,0 +1,66 @@
+name: Visual comparison — 390px cover
+on:
+  push:
+    paths:
+      - tools/compare-live-screens.mjs
+      - .github/workflows/visual-compare.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Download artwork to temporary runner folder
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen,Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for n in names:
+              body=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+n,headers={'User-Agent':'Mozilla/5.0'}),timeout=30).read()
+              assert body[:4] == b'RIFF' and body[8:12] == b'WEBP'
+              Path('assets',n).write_bytes(body)
+          PY
+      - name: Start preview server
+        run: python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/http.log 2>&1 &
+      - name: Capture actual and reconstructed mobile scenes
+        run: node tools/compare-live-screens.mjs
+      - name: Compute screenshot image differences
+        if: always()
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageChops,ImageStat
+          for stage in ['closed','opened']:
+              a,b=Path(f'visual-evidence/reference-{stage}.png'),Path(f'visual-evidence/ours-{stage}.png')
+              if not a.is_file() or not b.is_file():
+                  print(stage,'missing screenshot',a.exists(),b.exists());continue
+              original=Image.open(a).convert('RGB')
+              ours=Image.open(b).convert('RGB')
+              assert original.size == ours.size, (original.size,ours.size)
+              difference=ImageChops.difference(original,ours)
+              s=ImageStat.Stat(difference)
+              mae=sum(s.mean)/3
+              top=ImageStat.Stat(difference.crop((0,0,390,500)))
+              mae_top=sum(top.mean)/3
+              difference.save(f'visual-evidence/difference-{stage}.png')
+              print(f'{stage.upper()} 390x844 RGB difference: full MAE={mae:.2f}/255, upper-500 MAE={mae_top:.2f}/255')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: celestial-lake-reference-comparison
+          path: visual-evidence/
+          retention-days: 14
