@@ -1,6 +1,6 @@
 :root {
   --ink:#594962; --gold:#957a58; --ivory:#f6f0e9;
-  --art-ratio:563 / 1000; --open-time:900ms;
+  --art-ratio:1080 / 1920; --open-time:900ms;
   --stage-parallax:0px; --debug-blend:.5;
 }
 *,*::before,*::after { box-sizing:border-box; }
@@ -11,7 +11,7 @@ button { cursor:pointer; font:inherit; }
 .invitation { position:relative; width:100%; max-width:430px; margin:0 auto; background:#eae0e5; box-shadow:0 0 60px #5f475321; }
 .viewport { position:relative; width:100%; height:100vh; height:100dvh; min-height:480px; overflow:hidden; isolation:isolate; background:#d0bfd9; }
 .scene-stage {
-  position:absolute; top:50%; left:50%; width:max(100%,56.3dvh);
+  position:absolute; top:50%; left:50%; width:max(100%,56.25dvh);
   aspect-ratio:var(--art-ratio);
   transform:translate(-50%,calc(-50% + var(--stage-parallax)));
   pointer-events:none; user-select:none; will-change:transform;
@@ -36,9 +36,12 @@ button { cursor:pointer; font:inherit; }
 .depth.reeds img { height:100%; object-fit:contain; }
 .depth.arch { inset:0; width:100%; height:100%; z-index:7; }
 .depth.arch img { height:100%; object-fit:contain; }
-.depth.tree { width:73%; top:-1%; z-index:8; }
-.depth.tree-left { left:-27%; }
-.depth.tree-right { right:-27%; }
+/* Both tree assets are full 1080x1920 transparent canvases, NOT isolated cropped trees.
+   Preserve exact canvas geometry instead of scaling them to 73% and moving out of frame. */
+.depth.tree { inset:0; width:100%; height:100%; z-index:8; }
+.depth.tree-left { left:0; right:auto; }
+.depth.tree-right { left:0; right:auto; }
+.depth.tree img { display:block; width:100%; height:100%; object-fit:contain; }
 .depth.tree .gentle-tree { transform-origin:18% 12%; animation:tree-sway 9s ease-in-out infinite alternate; }
 .depth.tree-right .gentle-tree { transform-origin:82% 12%; animation-delay:-4s; }
 .depth.canopy { inset:0; width:100%; height:100%; z-index:11; }
