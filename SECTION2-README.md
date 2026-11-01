@@ -48,7 +48,7 @@ The title animation and butterfly triggers preserve their existing calibrated sc
 
 - **Resolved in the Section 1–2 handoff update:** The sticky lake track now spans **3 viewport heights**, matching the measured reference. The calibrated image/lettering motion through about 2.42H is unchanged; its final 1H naturally scrolls out to the mauve message band. We removed a duplicate JS text-translation that would have made the lettering move too quickly when the sticky scene releases.
 - The remaining visual differences include the exact background texture, Bismillah graphic and minute text spacing; passing geometry tests is not a claim of pixel-perfect matching.
-- The original `band.webp` has a richer woven texture than our original CSS-generated approximation.
+- **Improved:** Our independently authored `assets/section2-mauve-original.svg` now adds subdued botanical relief and procedural grain, without copying the provider's textured WebP. This remains a visual approximation rather than the vendor asset.
 - The reference's Bismillah is a compact calligraphic design; our Unicode text is a font-dependent representation and should be refined with an original licensed ornament.
 - Our existing Section 3 is an **events panel**, while the actual reference follows Section 2 with **The Couple**. This requires a future section-order correction to reproduce the full site faithfully.
 - The reference has its own merchant header/footer controls, which are not part of our guest-facing invitation.
@@ -72,3 +72,13 @@ npm run test:crossbrowser
 ```
 
 This is a visual and behavioral reconstruction using independently written HTML/CSS/JavaScript, not a copy of the original source.
+
+## Focused screenshot comparison — 2026-11-02
+
+The corrected three-viewport handoff passed both the four-width mobile suite and the three-engine cross-browser suite. [Mobile run](https://github.com/Arrjack8847/testing-4/actions/runs/41329856603) · [Cross-browser run](https://github.com/Arrjack8847/testing-4/actions/runs/41329856546).
+
+The actual reference frame begins approximately **188px inside the mauve band**; our own frame starts at the same measured offset. We should **not** move the entire frame. The biggest visible difference was the weaker background texture, so an original embossed-paper vector overlay was added, and natural line wrapping was restored.
+
+Section 2 screenshots now also capture **2.75H and 3.25H**, in addition to the 2.5H and 3H transition checkpoints. Those positions match the read-only reference inspection, allowing more precise tuning of letter spacing and decorative edges.
+
+Sections 3–6 remain untouched during this refinement. Verify all commercial-use rights independently.
