@@ -13,10 +13,12 @@
   <link rel="stylesheet" href="section-two.css">
   <link rel="stylesheet" href="section-three.css">
   <link rel="stylesheet" href="section-four.css">
+  <link rel="stylesheet" href="section-five.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-three.js" defer></script>
   <script src="section-four.js" defer></script>
+  <script src="section-five.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -177,7 +179,63 @@
         <div class="save-date-ending save-date-reveal" aria-hidden="true">✧</div>
       </div>
     </section>
+    <!-- Section 5: original gallery. No photos are invented or embedded. -->
+    <section class="gallery-section" id="gallery" data-section="5"
+      aria-labelledby="galleryHeading" aria-hidden="true" inert>
+      <div class="gallery-atmosphere" aria-hidden="true">
+        <span class="gallery-halo"></span>
+        <span class="gallery-flora gallery-flora-left">❧</span>
+        <span class="gallery-flora gallery-flora-right">❧</span>
+        <span class="gallery-spark gallery-spark-one">✧</span>
+        <span class="gallery-spark gallery-spark-two">✦</span>
+        <span class="gallery-spark gallery-spark-three">✧</span>
+      </div>
+      <div class="gallery-content">
+        <p class="gallery-eyebrow gallery-reveal">A collection of moments</p>
+        <div class="gallery-flourish gallery-reveal" aria-hidden="true"><span></span>✦<span></span></div>
+        <h2 id="galleryHeading" class="gallery-heading gallery-reveal">Our Memories</h2>
+        <p class="gallery-intro gallery-reveal">Little moments, beautiful memories, and a story still unfolding.</p>
+        <div class="gallery-photos">
+          <button type="button" class="gallery-photo gallery-photo-feature gallery-reveal" data-gallery-slot="0" disabled>
+            <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 01</span><span class="gallery-photo-note">Awaiting your photograph</span></span>
+          </button>
+          <div class="gallery-photo-pair">
+            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="1" disabled>
+              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">Photo 02</span><span class="gallery-photo-note">Add a photograph</span></span>
+            </button>
+            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="2" disabled>
+              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 03</span><span class="gallery-photo-note">Add a photograph</span></span>
+            </button>
+          </div>
+          <div class="gallery-photo-pair gallery-photo-pair-last">
+            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="3" disabled>
+              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">Photo 04</span><span class="gallery-photo-note">Add a photograph</span></span>
+            </button>
+            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="4" disabled>
+              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 05</span><span class="gallery-photo-note">Add a photograph</span></span>
+            </button>
+          </div>
+        </div>
+        <p class="gallery-disclaimer gallery-reveal">Gallery preview — the couple's photographs have not been provided yet.</p>
+        <p class="gallery-ending gallery-reveal">And so our story continues…</p>
+        <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
+      </div>
+    </section>
   </main>
+  <dialog class="gallery-dialog" id="galleryDialog" aria-label="Wedding photo viewer">
+    <div class="gallery-viewer">
+      <button type="button" id="galleryClose" class="gallery-viewer-close" aria-label="Close photo viewer">×</button>
+      <figure class="gallery-viewer-figure">
+        <img id="galleryViewImage" alt="">
+        <figcaption id="galleryViewCaption"></figcaption>
+      </figure>
+      <nav class="gallery-viewer-navigation" aria-label="Photo navigation">
+        <button type="button" id="galleryPrevious" aria-label="Previous photo">‹</button>
+        <span id="galleryPosition" aria-live="polite"></span>
+        <button type="button" id="galleryNext" aria-label="Next photo">›</button>
+      </nav>
+    </div>
+  </dialog>
   <aside class="debug-panel" id="debugPanel" hidden aria-label="Developer comparison panel">
     <b>Artwork comparison</b>
     <label>Mode
