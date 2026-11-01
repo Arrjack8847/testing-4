@@ -296,3 +296,11 @@ This update changes the *work performed* while the scene is invisible, not the a
 - Real Chromium tests now exercise each pause/resume condition on 320px, 360px, 390px and 430px phones, including the active paint cadence.
 
 **Verification scope:** These are real browser behavioral/paint-activity checks, not claims of a particular CPU percentage or battery-life saving on physical devices. The original image licensing and user-visible visual-comparison caveats remain unchanged.
+
+
+### Phase 14 validation results
+
+- Full real mobile Chromium suite: **84/84 passed** across 320px, 360px, 390px and 430px devices, including lifecycle suspension, debug freeze, reduced-motion toggling and return-from-offscreen resume. [Passing run](https://github.com/Arrjack8847/testing-4/actions/runs/41289606498)
+- Latest source checks: [passed](https://github.com/Arrjack8847/testing-4/actions/runs/41289606504)
+- Five-stage 390×844 screenshot parity workflow: [passed](https://github.com/Arrjack8847/testing-4/actions/runs/41289581606). Measured full-frame mean RGB differences (0–255): closed 22.52, opened 20.61, mid-scroll 32.23, restored garden 23.57, written text 26.75. These are not visual-accuracy percentages.
+- These tests prove frame **suspension**, not a specific FPS improvement or measured energy saving on physical devices.
