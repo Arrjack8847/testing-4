@@ -55,3 +55,36 @@ test('reduced motion keeps all second-section text visible without transitions',
   expect(style.opacity).toBe('1');
   expect(style.transform).toBe('none');
 });
+
+
+test('Section 2 visual QA captures card at each mobile breakpoint', async ({page}, testInfo) => {
+  await page.goto('/');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo(0, Math.round(innerHeight * 4.12));
+  });
+  const letter = page.locator('#message');
+  await expect(letter).toHaveClass(/is-visible/);
+  const layout = await letter.evaluate(el => {
+    const frame=el.querySelector('.letter-page');
+    const rect=frame.getBoundingClientRect();
+    const screen=window.innerWidth;
+    const text=Array.from(el.querySelectorAll('.letter-content *'))
+      .filter(node=>node.children.length===0 && node.textContent.trim())
+      .map(node=>({text:node.textContent.trim().slice(0,40),
+        right:node.getBoundingClientRect().right,
+        left:node.getBoundingClientRect().left}));
+    return {screen,frameWidth:rect.width,frameLeft:rect.left,
+      frameRight:rect.right,overflow:document.documentElement.scrollWidth-screen,
+      outside:text.filter(x=>x.left < -1 || x.right > screen+1)};
+  });
+  expect(layout.frameLeft).toBeGreaterThanOrEqual(-1);
+  expect(layout.frameRight).toBeLessThanOrEqual(layout.screen+1);
+  expect(layout.overflow).toBeLessThanOrEqual(1);
+  expect(layout.outside).toEqual([]);
+  await page.screenshot({path:testInfo.outputPath('section-two-mobile-viewport.png'),
+    animations:'disabled'});
+  await letter.screenshot({path:testInfo.outputPath('section-two-full-letter.png'),
+    animations:'disabled'});
+});
