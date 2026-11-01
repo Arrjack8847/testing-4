@@ -793,3 +793,71 @@ html.debug-freeze .peacock-glint {
 }
 /* Flutter remains rooted to each sprite's own asset. Avoid overpowering the
    slow ambient movement with a global vignette or changing scroll geometry. */
+
+
+/* Phase 13 — original cover's five perch coordinates and flight speeds.
+   The source template defines perches at x/y: (.45,.94), (.56,.95),
+   (.50,.90), (.07,.44), (.93,.48) and species wingbeat frequencies of
+   2.2Hz and 2.6Hz. This code creates an original responsive route through
+   those positions; the original procedural routes vary between loads.
+   Timings are deliberately gentle and the butterfly pauses near flowers. */
+.butterfly-cover .violet {
+  animation-name:bf-violet-garden;
+  animation-duration:24s;
+  animation-timing-function:linear;
+  animation-delay:.45s;
+  animation-iteration-count:infinite;
+}
+.butterfly-cover .ivory {
+  animation-name:bf-ivory-garden;
+  animation-duration:22s;
+  animation-timing-function:linear;
+  animation-delay:2.7s;
+  animation-iteration-count:infinite;
+}
+/* CSS alternate halves each complete wingbeat cycle:
+   full cycle = 2 * .22727s = 2.2 Hz, 2 * .19231s = 2.6 Hz. */
+.butterfly.violet :is(.butterfly-wing-l,.butterfly-wing-r) {
+  animation-duration:.22727s;
+}
+.butterfly.ivory :is(.butterfly-wing-l,.butterfly-wing-r) {
+  animation-duration:.19231s;
+}
+.butterfly .butterfly-wing-r {animation-delay:-.065s;}
+/* Initial low-left approach matches reference browser measurements around
+   1.6-9.5 seconds; subsequent turns visit the documented garden perches.
+   The frame is viewport-relative and never modifies the 9:16 scenery. */
+@keyframes bf-violet-garden {
+  0% {
+    opacity:0;
+    transform:translate3d(-110px,48dvh,0) rotate(-20deg);
+  }
+  3% {opacity:1;}
+  11% {transform:translate3d(calc(6vw - 26px),64dvh,0) rotate(14deg);}
+  23% {transform:translate3d(calc(23vw - 26px),80dvh,0) rotate(25deg);}
+  35% {transform:translate3d(calc(45vw - 26px),calc(94dvh - 20px),0) rotate(19deg);}
+  42% {transform:translate3d(calc(49vw - 26px),calc(91dvh - 20px),0) rotate(-15deg);}
+  50% {transform:translate3d(calc(56vw - 26px),calc(95dvh - 20px),0) rotate(13deg);}
+  60% {transform:translate3d(calc(50vw - 26px),calc(90dvh - 20px),0) rotate(-38deg);}
+  73% {transform:translate3d(calc(7vw - 26px),calc(44dvh - 20px),0) rotate(-18deg);}
+  84% {transform:translate3d(calc(60vw - 26px),calc(32dvh - 20px),0) rotate(28deg);}
+  94% {opacity:1;transform:translate3d(calc(93vw - 26px),calc(48dvh - 20px),0) rotate(17deg);}
+  100% {opacity:0;transform:translate3d(calc(105vw - 26px),calc(49dvh - 20px),0) rotate(14deg);}
+}
+@keyframes bf-ivory-garden {
+  0% {opacity:0;transform:translate3d(-85px,47dvh,0) rotate(-26deg);}
+  5% {opacity:1;}
+  20% {transform:translate3d(calc(7vw - 22px),calc(60dvh - 17px),0) rotate(17deg);}
+  35% {transform:translate3d(calc(31vw - 22px),calc(82dvh - 17px),0) rotate(24deg);}
+  46% {transform:translate3d(calc(56vw - 22px),calc(95dvh - 17px),0) rotate(13deg);}
+  54% {transform:translate3d(calc(50vw - 22px),calc(90dvh - 17px),0) rotate(-30deg);}
+  68% {transform:translate3d(calc(7vw - 22px),calc(44dvh - 17px),0) rotate(-20deg);}
+  83% {transform:translate3d(calc(58vw - 22px),calc(32dvh - 17px),0) rotate(22deg);}
+  94% {opacity:1;transform:translate3d(calc(93vw - 22px),calc(48dvh - 17px),0) rotate(17deg);}
+  100% {opacity:0;transform:translate3d(calc(106vw - 22px),calc(52dvh - 17px),0) rotate(9deg);}
+}
+/* Avoid hiding the original, more ornamental valley-flight pair; those
+   remain delayed until the scroll enters the couple-name ceremony. */
+@media(prefers-reduced-motion:reduce) {
+  .butterfly-layer {display:none;}
+}
