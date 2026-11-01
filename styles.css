@@ -714,3 +714,82 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
     transform:none!important;
   }
 }
+
+
+/* Phase 12 — measured ambient motion: slow water mist and feather glints.
+   Lightweight CSS layers are attached to the existing palace and peacocks;
+   they use source artwork transparency rather than a flattened overlay. */
+.depth.palace .scene-mist {
+  position:absolute;
+  left:calc(var(--mist-x) - 11%);
+  top:72%;
+  width:calc(var(--mist-width) + 22%);
+  height:17%;
+  pointer-events:none;
+  mix-blend-mode:screen;
+  opacity:.75;
+}
+.scene-mist i {
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(36% 48% at 26% 62%,rgba(255,255,255,.65),transparent),
+    radial-gradient(30% 44% at 54% 48%,rgba(255,252,254,.58),transparent),
+    radial-gradient(34% 46% at 80% 64%,rgba(255,255,255,.60),transparent);
+  opacity:.40;
+  animation:scene-mist-drift 16s ease-in-out var(--mist-delay,0s) infinite alternate;
+}
+.scene-mist i:nth-child(2) {
+  inset:-8% 12% 10% -14%;
+  opacity:.30;
+  animation-duration:21s;
+  animation-delay:calc(var(--mist-delay,0s) - 7s);
+}
+.scene-mist i:nth-child(3) {
+  inset:14% -12% -10% 18%;
+  opacity:.26;
+  animation-duration:26s;
+  animation-delay:calc(var(--mist-delay,0s) - 13s);
+}
+@keyframes scene-mist-drift {
+  0%   { translate:-6% 0;  scale:1 1; }
+  50%  { translate:2% -4%; scale:1.08 1.10; }
+  100% { translate:7% 1%;  scale:.96 1; }
+}
+/* Very low-intensity recurring reflection on the still peacock feather image.
+   The same alpha mask follows each peacock's loaded WebP (including the mirror).
+   A soft-light blend prevents bright rectangular flashes around the artwork. */
+.sprite.peacock-sprite .peacock-glint {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(
+    105deg,
+    transparent 45%,
+    rgba(255,250,232,.80) 50%,
+    transparent 55%
+  ) 100% 0 / 300% 100% no-repeat;
+  -webkit-mask-image:var(--peacock-image,none);
+  mask-image:var(--peacock-image,none);
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  mix-blend-mode:soft-light;
+  opacity:.66;
+  animation:peacock-sheen 9s ease-in-out -3s infinite;
+}
+@keyframes peacock-sheen {
+  0%,52% { background-position:100% 0; }
+  88%,100% { background-position:0 0; }
+}
+html.debug-freeze .scene-mist i,
+html.debug-freeze .peacock-glint {
+  animation:none!important;
+}
+@media(prefers-reduced-motion:reduce) {
+  .scene-mist i, .peacock-glint { animation:none!important; }
+  .peacock-glint { display:none; }
+}
+/* Flutter remains rooted to each sprite's own asset. Avoid overpowering the
+   slow ambient movement with a global vignette or changing scroll geometry. */
