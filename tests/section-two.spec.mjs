@@ -133,6 +133,8 @@ test('Section 1 releases into Section 2 after exactly three mobile viewports',as
 
 test('Section 2 original textured layer is present and its reference-aligned frame retains geometry',async({page},testInfo)=>{
   const section=await reachMessage(page);
+  await expect(section).toHaveClass(/is-visible/);
+  await expect.poll(()=>section.locator('.letter-lead').evaluate(el=>getComputedStyle(el).opacity)).toBe('1');
   const sprite=await section.evaluate(el=>{
     const frame=el.querySelector('.letter-frame').getBoundingClientRect();
     const band=el.getBoundingClientRect();
