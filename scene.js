@@ -223,9 +223,13 @@ reduceMotion.addEventListener('change',syncAmbient);
 // scrolling beyond the invitation suspends both canvas and ambient CSS motion.
 if ('IntersectionObserver' in window) {
   const observer=new IntersectionObserver(entries=>{
-    sceneVisible=entries[0]?.isIntersecting ?? true;
+    const entry=entries[0];
+    // Pause once less than 7.5% of the viewport scene is visible. On some
+    // phone heights a 37-47px sliver remains above the next section at the
+    // maximum scroll position; animating that sliver wastes battery.
+    sceneVisible=entry ? entry.isIntersecting && entry.intersectionRatio>.075 : true;
     syncAmbient();
-  },{threshold:0});
+  },{threshold:[0,.075]});
   observer.observe(document.getElementById('viewport'));
 }
 // Debug controls change a root class, so watch only that class rather than
