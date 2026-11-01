@@ -215,3 +215,30 @@ test('Section 5 provides an accessible gallery without falsely populated photos'
   expect(overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
+
+
+test('Section 6 RSVP preview is accessible, validated and not falsely sent',async({page})=>{
+  const errors=await load(page);
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveAttribute('aria-hidden','true');
+  await expect(section).toHaveJSProperty('inert',true);
+  await open(page);
+  await expect(section).toHaveAttribute('aria-hidden','false');
+  await expect(section).toHaveJSProperty('inert',false);
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('rsvp').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toBeInViewport();
+  await expect(page.getByRole('heading',{level:2,name:'Kindly Respond'})).toBeVisible();
+  await expect(section.locator('#rsvpWarning')).toContainText('will not be sent');
+  await section.locator('#rsvpName').fill('Test Guest');
+  await section.getByRole('radio',{name:'Regretfully declines'}).check();
+  await section.getByRole('button',{name:'Preview RSVP — not sent'}).click();
+  await expect(section.locator('#rsvpPreview')).toBeVisible();
+  await expect(section.locator('#rsvpPreviewGuests')).toHaveText('Not attending');
+  await expect(section.locator('.rsvp-preview-disclosure')).toContainText('has not been submitted');
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});
