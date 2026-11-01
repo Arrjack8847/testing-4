@@ -1,0 +1,36 @@
+name: Compare butterfly flight over time
+on:
+  push:
+    paths:
+      - tools/compare-butterfly-flight.mjs
+      - .github/workflows/compare-butterfly-flight.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  flight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Acquire scene assets locally during test
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              response=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=40).read()
+              assert response[:4]==b'RIFF' and response[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(response)
+          PY
+      - name: Start local preview
+        run: python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/scene-server.log 2>&1 &
+      - name: Compare timed flight coordinates
+        run: node tools/compare-butterfly-flight.mjs
