@@ -211,6 +211,7 @@ let openedOnce = false;
 function openInvitation() {
   invite.dataset.state = 'opened';
   invite.dataset.reading = 'no';
+  invite.dataset.lettering = 'idle';
   applyScrollScene(0);
   cover.inert = true;
   opened.inert = false;
@@ -220,6 +221,7 @@ function openInvitation() {
 function resetInvitation() {
   invite.dataset.state = 'cover';
   invite.dataset.reading = 'no';
+  invite.dataset.lettering = 'idle';
   applyScrollScene(0);
   cover.inert = false;
   opened.inert = true;
@@ -293,6 +295,12 @@ function applyScrollScene(fraction) {
   invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
   invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
   invite.dataset.scrollActive = fraction > .025 ? 'yes' : 'no';
+  // The original invitation starts a one-time handwritten-name animation
+  // when the returning garden reaches its title. Continue writing even if
+  // the user stops swiping or reverses slightly. Reset starts a fresh take.
+  if (fraction >= 1.29 && invite.dataset.lettering !== 'playing') {
+    invite.dataset.lettering = 'playing';
+  }
 }
 function synchronizeReading() {
   scrollTick = false;
