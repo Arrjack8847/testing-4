@@ -72,7 +72,7 @@ test('reduced motion hides original butterflies and preserves readable names',as
 });
 
 
-test('garden flowers use gentle multi-phase sway without moving the edge anchors',async({page})=>{
+test('garden flowers use gentle multi-phase sway without moving the edge anchors',async({page},testInfo)=>{
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
@@ -88,6 +88,8 @@ test('garden flowers use gentle multi-phase sway without moving the edge anchors
       const sa=parseFloat(root.style.getPropertyValue('--sa'));
       return {
         className:root.className,origin:style.transformOrigin,
+        originY:Number.parseFloat(style.transformOrigin.split(' ')[1]),
+        imageHeight:img.offsetHeight,
         duration,keyframeOffsets:keyframes.map(k=>Number(k.offset.toFixed(2))),
         keyframeAngles:keyframes.map(k=>{
           const m=(k.transform||'').match(/rotate\((-?[\d.]+)deg\)/);
@@ -104,10 +106,19 @@ test('garden flowers use gentle multi-phase sway without moving the edge anchors
     expect(Math.max(...item.keyframeAngles.map(Math.abs))).toBeLessThanOrEqual(item.sa*1.01);
     // Relative pivots: the hanging flowers swing from the branch,
     // lower plants from their rooted ground attachment.
-    const y=Number.parseFloat(item.origin.split(' ')[1]);
-    expect(Number.isFinite(y)).toBe(true);
+    const upper=item.className.includes('hanging');
+    expect(item.imageHeight).toBeGreaterThan(8);
+    expect(Math.abs(item.originY-(upper?0:item.imageHeight))).toBeLessThan(2);
     expect(item.duration).toBeGreaterThan(2);
   }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({path:testInfo.outputPath('section-one-floral-cover.png'),animations:'allow'});
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await openAndScroll(page,1.5);
+  await page.screenshot({path:testInfo.outputPath('section-one-floral-ceremony.png'),animations:'allow'});
+  await openAndScroll(page,2.75);
+  await page.screenshot({path:testInfo.outputPath('section-one-floral-message-overlap.png'),animations:'allow'});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
 
