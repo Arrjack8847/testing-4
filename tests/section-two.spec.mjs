@@ -56,7 +56,7 @@ test('double-line message frame fits mobile viewports without overflow',async({p
   await expect(section.locator('img')).toHaveCount(0);
 });
 
-test('reduced motion keeps Section 2's scripture and message visible',async({page})=>{
+test('reduced motion keeps Section 2 scripture and message visible',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const section=await reachMessage(page);
   const frame=section.locator('.letter-frame');
