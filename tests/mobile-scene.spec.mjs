@@ -237,3 +237,44 @@ test('lake stays pinned while scrolling through the mobile opening section',asyn
     return box.y;
   })).toBeLessThan(height);
 });
+
+
+test('scroll reveal is gradual while the lake stays fixed',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo({top:Math.round(innerHeight*.24),behavior:'instant'});
+  });
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
+  await expect.poll(async()=>page.evaluate(()=>parseFloat(
+    getComputedStyle(document.querySelector('.opened-copy')).opacity
+  ))).toBeGreaterThan(.15);
+  const opacity=await page.locator('.opened-copy').evaluate(el=>Number(getComputedStyle(el).opacity));
+  expect(opacity).toBeLessThan(.95);
+  await expect.poll(async()=>page.evaluate(()=>
+    Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
+  )).toBe(0);
+  await expect.poll(async()=>page.evaluate(()=>
+    document.documentElement.style.getPropertyValue('--stage-parallax').trim()
+  )).toBe('0px');
+  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*.65),behavior:'instant'}));
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','1');
+});
+
+test('swipe cue reveals greeting instead of skipping the sticky lake',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.getByRole('link',{name:'Swipe up for wedding message'}).click();
+  await expect.poll(async()=>page.evaluate(()=>window.scrollY)).toBeGreaterThan(100);
+  await expect.poll(async()=>page.evaluate(()=>document.querySelector('#invitation').dataset.reading)).toBe('yes');
+  await expect.poll(async()=>page.evaluate(()=>window.scrollY / innerHeight)).toBeLessThan(1.01);
+  await expect.poll(async()=>page.evaluate(()=>Math.round(
+    document.querySelector('#viewport').getBoundingClientRect().top
+  ))).toBe(0);
+  await expect.poll(async()=>page.evaluate(()=>document.querySelector('#message').getBoundingClientRect().top))
+    .toBeGreaterThan(await page.evaluate(()=>innerHeight));
+});
