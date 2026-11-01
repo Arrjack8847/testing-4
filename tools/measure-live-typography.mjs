@@ -11,10 +11,10 @@ try{
    await page.evaluate(fraction=>{document.documentElement.style.scrollBehavior='auto';scrollTo({top:Math.round(innerHeight*fraction),behavior:'instant'});},fraction);
    await page.waitForTimeout(600);
    const data=await page.evaluate(()=>{
-     const sel=['.cgv-t1','.cgv-t2','.cgv-t2 .cgv-nl','.cgv-nl-n','.cgv-nl-amp','.cgv-t3','.cgv-hero-content'];
+     const sel=['.cgv-hero-content','.cgv-t1','.cgv-t2','.cgv-t2 .cgv-nl','.cgv-nl-n','.cgv-nl-amp','.cgv-t3'];
      const info={scroll:scrollY,items:[]};
      for(const selector of sel){
-       for(const el of [...document.querySelectorAll('.cgv-dio-hero '+selector)].slice(0,6)){
+       for(const el of [...document.querySelectorAll(selector)].slice(0,6)){
          const s=getComputedStyle(el),r=el.getBoundingClientRect();
          info.items.push({selector,tag:el.tagName,cls:String(el.className),text:(el.textContent||'').trim().slice(0,45),
            html:el.outerHTML.slice(0,430),
