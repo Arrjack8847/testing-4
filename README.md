@@ -139,3 +139,21 @@ The browser smoke-test suite now has **20 tests across four mobile sizes** (320,
 Latest passing test: https://github.com/Arrjack8847/testing-4/actions/runs/41254302741
 
 Screenshot matching remains an ongoing visual QA check, not a claim of pixel-perfect fidelity; the reference vendor's purchase/menu UI is intentionally excluded.
+
+
+## Phase 7 — living butterflies and sticky scroll
+
+The reference's first section has **two paired-wing butterflies on the cover**, and two additional butterfly elements in the opened hero. Their source files are used as remote CSS background images (not bundled or committed):
+
+- `/images/concierge/packs/serambi-ungu/bfly_1.webp` (52 × 41 CSS pixels).
+- `/images/concierge/packs/anggerik-nirmala/bfly_white.webp` (44 × 34 CSS pixels).
+
+Live 390 × 844 inspection of the reference found the first purple butterfly visible around 2.5 seconds (approximately x=227, y=-40, including its rotation), later near x=162, y=110 at 4.5 seconds, with the white butterfly near x=340, y=104. The current CSS approximates that trajectory with 3D wing folding and two staggered flights. **Exact motion curves remain an approximation**, not recovered source animation code.
+
+Butterflies pause while their scene is hidden, and disappear under the reduced-motion preference. The opened hero's butterflies begin only after scrolling.
+
+**Important scroll correction:** the live reference's lake hero remains `position: sticky` at top=0 when users scroll down 127, 295, 549 and 802 pixels on a 390 × 844 phone. Our prior first section scrolled off-screen. The new `.scene-scroll-track` fixes this, pinning the lake for a full viewport of scrolling and releasing it smoothly into the temporary next section. The welcome text can appear while the lake remains visible.
+
+Browser tests cover the phone widths 320/360/390/430px, the two butterfly states, reduced motion, and sticky scroll behavior. The commercial preview overlays on the source website are not replicated.
+
+The original butterfly assets come from **other packs referenced by the template**, so confirm the artwork license extends to those assets before public redistribution. All referenced artwork currently remains hosted at the source.
