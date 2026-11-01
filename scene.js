@@ -355,7 +355,10 @@ function applyScrollScene(fraction) {
   const palaceRetreat = easeBetween(fraction, .22, .72);
   const skyRetreat = easeBetween(fraction, .22, .55);
   const framing = easeBetween(fraction, .84, 1.42);
-  const blossoms = easeBetween(fraction, .59, .98);
+  // Border flowers visibly return by .75H in reference screenshots,
+  // while lower reeds recede after the opening and are gone by .45H.
+  const blossoms = easeBetween(fraction, .47, .78);
+  const reeds = 1-easeBetween(fraction, .12, .40);
   const peacocks = easeBetween(fraction, 1.06, 1.44);
   // Reference samples: small heading opacity ~0 at 1.3H and ~0.90 at 1.5H;
   // ampersand opacity ~0.14 at 1.7H and ~1 at 1.9H.
@@ -380,6 +383,8 @@ function applyScrollScene(fraction) {
   set('--hanging-scroll-shift', (-20*(1-framing)).toFixed(3)+'dvh');
   set('--front-scroll-opacity', blossoms.toFixed(4));
   set('--front-scroll-shift', (45*(1-blossoms)).toFixed(3)+'dvh');
+  set('--reed-scroll-opacity', reeds.toFixed(4));
+  set('--reed-scroll-shift', (38*(1-reeds)).toFixed(3)+'dvh');
   set('--peacock-scroll-opacity', peacocks.toFixed(4));
   set('--reading-progress', greeting.toFixed(4));
   set('--names-progress', names.toFixed(4));
