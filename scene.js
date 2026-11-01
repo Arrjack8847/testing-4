@@ -254,11 +254,12 @@ function applyScrollScene(fraction) {
   const framing = easeBetween(fraction, .84, 1.42);
   const blossoms = easeBetween(fraction, .59, .98);
   const peacocks = easeBetween(fraction, 1.06, 1.44);
-  const greeting = easeBetween(fraction, 1.37, 1.61);
-  // The reference's large script first name starts drawing while the smaller
-  // "The Wedding of" line is still appearing; the two names reveal in order.
-  const firstName = easeBetween(fraction, 1.29, 1.59);
-  const ampersand = easeBetween(fraction, 1.63, 1.84);
+  // Reference samples: small heading opacity ~0 at 1.3H and ~0.90 at 1.5H;
+  // ampersand opacity ~0.14 at 1.7H and ~1 at 1.9H.
+  const greeting = easeBetween(fraction, 1.29, 1.54);
+  // Large script reveals left-to-right slightly after the heading starts.
+  const firstName = easeBetween(fraction, 1.28, 1.65);
+  const ampersand = easeBetween(fraction, 1.64, 1.90);
   const secondName = easeBetween(fraction, 1.79, 2.08);
   const names = Math.max(firstName, secondName);
   const details = easeBetween(fraction, 2.08, 2.42);
