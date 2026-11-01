@@ -2,6 +2,9 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  // Cross-engine accessibility is a separate CI matrix, not repeated at
+  // every original mobile Chromium viewport.
+  testIgnore: ['cross-browser.spec.mjs'],
   timeout: 35_000,
   expect: { timeout: 25_000 },
   fullyParallel: true,
