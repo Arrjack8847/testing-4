@@ -483,3 +483,69 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 .invitation[data-state="opened"][data-reading="yes"] .swipe-cue {
   opacity:0;pointer-events:none;transition:opacity .25s ease;
 }
+
+
+/* Phase 9 — actual post-opening scroll choreography.
+   Source screenshot checkpoints: .45H lake only, .75H side blossoms,
+   .95H floral hangers, 1.15H arch and peacocks, 1.5H title and full frame.
+   The first-scene demo retains its sticky artwork until the next placeholder. */
+.scene-scroll-track {height:400vh;height:400dvh;}
+.invitation[data-state="opened"] .sky-layer {
+  transform:translateY(var(--sky-scroll-y,-4%)) scale(var(--sky-scroll-scale,1.12));
+}
+.invitation[data-state="opened"] .depth.palace img {
+  scale:var(--palace-scroll-scale,.99);
+}
+.invitation[data-state="opened"] .depth.palace .waterfalls {
+  scale:var(--palace-scroll-scale,.99);
+}
+.invitation[data-state="opened"] .depth.arch {
+  transform:scale(var(--frame-scroll-scale,2.6));
+  opacity:var(--frame-scroll-opacity,0);
+}
+.invitation[data-state="opened"] .depth.tree-left {
+  transform:scale(var(--tree-scroll-scale,2.1)) translateX(calc(-1 * var(--tree-scroll-shift,14%)));
+  opacity:var(--frame-scroll-opacity,0);
+}
+.invitation[data-state="opened"] .depth.tree-right {
+  transform:scale(var(--tree-scroll-scale,2.1)) translateX(var(--tree-scroll-shift,14%));
+  opacity:var(--frame-scroll-opacity,0);
+}
+.invitation[data-state="opened"] .depth.canopy {
+  transform:scale(var(--canopy-scroll-scale,2.2)) translateY(var(--canopy-scroll-shift,-10%));
+  opacity:var(--frame-scroll-opacity,0);
+}
+.invitation[data-state="opened"] .sprite.hanging {
+  opacity:var(--hanging-scroll-opacity,0);
+  transform:translateY(var(--hanging-scroll-shift,-20dvh));
+}
+.invitation[data-state="opened"] .sprite.front {
+  opacity:var(--front-scroll-opacity,0);
+  transform:translateY(var(--front-scroll-shift,45dvh));
+}
+.invitation[data-state="opened"] .sprite.peacock-sprite.front {
+  opacity:var(--peacock-scroll-opacity,0);
+  transform:translateY(var(--front-scroll-shift,45dvh));
+}
+.invitation[data-state="opened"][data-scroll-active="yes"] :is(
+  .sky-layer,.depth.palace img,.depth.palace .waterfalls,
+  .depth.arch,.depth.tree,.depth.canopy,.sprite.front,.sprite.hanging
+) {transition:none;}
+/* Text follows the returning ceremonial garden, NOT the empty lake.
+   The intro headline is visible around 1.5 viewport scrolls; names and
+   guest details are staggered later. */
+.opened-copy {top:30%;opacity:0;}
+.invitation[data-state="opened"][data-reading="yes"] .opened-copy {
+  opacity:var(--reading-progress,0);
+  transform:translateY(0);
+}
+.opened-copy h2 {opacity:var(--names-progress,0);}
+.opened-copy .date,.opened-copy .guest {opacity:var(--details-progress,0);}
+.invitation[data-state="opened"][data-swiped="yes"] .swipe-cue {
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+@media (prefers-reduced-motion:reduce) {
+  .invitation[data-state="opened"][data-scroll-active="yes"] :is(
+    .sky-layer,.depth.palace img,.depth.arch,.depth.tree,.depth.canopy,.sprite.front,.sprite.hanging
+  ){transition:none!important;}
+}
