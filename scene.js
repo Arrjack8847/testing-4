@@ -384,9 +384,10 @@ function applyScrollScene(fraction) {
   const blossoms = easeBetween(fraction, .47, .78);
   const reeds = 1-easeBetween(fraction, .12, .40);
   const peacocks = easeBetween(fraction, 1.06, 1.44);
-  // Reference samples: small heading opacity ~0 at 1.3H and ~0.90 at 1.5H;
-  // ampersand opacity ~0.14 at 1.7H and ~1 at 1.9H.
-  const greeting = easeBetween(fraction, 1.29, 1.54);
+  // Re-measured live at 390x844 after steady scroll: heading opacity
+  // ~0 at 1.35H, ~.43 at 1.50H, fully visible by 1.70H.
+  // The earlier 1.29-1.54H curve revealed this title too quickly.
+  const greeting = easeBetween(fraction, 1.37, 1.67);
   // Large script reveals left-to-right slightly after the heading starts.
   const firstName = easeBetween(fraction, 1.28, 1.65);
   const ampersand = easeBetween(fraction, 1.64, 1.90);
