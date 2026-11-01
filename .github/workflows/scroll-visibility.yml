@@ -1,0 +1,25 @@
+name: Inspect opened invitation scroll visibility
+on:
+  push:
+    paths:
+      - tools/inspect-scroll-visibility.mjs
+      - .github/workflows/scroll-visibility.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/inspect-scroll-visibility.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-reference-scroll-frames
+          path: scroll-evidence/
+          retention-days: 14
