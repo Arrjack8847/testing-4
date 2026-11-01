@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Alex+Brush&family=Pinyon+Script&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="scene.js" defer></script>
+  <script src="section-two.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -58,14 +59,36 @@
       <div class="network-note" id="networkNote" role="status" aria-live="polite" hidden></div>
     </section>
     </div>
-    <!-- Temporary scroll target only. The user requested section 1, not the rest of the invitation. -->
-    <section class="message" id="message" aria-label="Wedding message preview">
-      <p class="eyebrow">The Wedding of</p>
-      <h2>Rayyan <em>&amp;</em> Sofea</h2>
-      <p class="date">23 . 01 . 2027</p>
-      <div class="rule" aria-hidden="true">✧</div>
-      <p class="bismillah" lang="ar">﷽</p>
-      <p>With grateful hearts and surrounded by the love of our families, we request the pleasure of your company as we celebrate the joy of our marriage and the beginning of a lifetime together.</p>
+    <!-- Section 2: original invitation-letter composition; no third-party artwork. -->
+    <section class="message invitation-letter" id="message" aria-label="Wedding invitation message" data-section="2">
+      <div class="letter-atmosphere" aria-hidden="true">
+        <span class="letter-light letter-light-one"></span>
+        <span class="letter-light letter-light-two"></span>
+        <span class="letter-vine letter-vine-left"><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="letter-vine letter-vine-right"><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="letter-spark letter-spark-one">✧</span>
+        <span class="letter-spark letter-spark-two">✦</span>
+        <span class="letter-spark letter-spark-three">✧</span>
+      </div>
+      <div class="letter-page">
+        <div class="letter-corner letter-corner-tl" aria-hidden="true">❧</div>
+        <div class="letter-corner letter-corner-tr" aria-hidden="true">❧</div>
+        <div class="letter-corner letter-corner-bl" aria-hidden="true">❧</div>
+        <div class="letter-corner letter-corner-br" aria-hidden="true">❧</div>
+        <div class="letter-content">
+          <p class="letter-kicker letter-reveal">A celebration of love</p>
+          <div class="letter-flourish letter-reveal" aria-hidden="true"><span></span>✦<span></span></div>
+          <p class="bismillah letter-bismillah letter-reveal" lang="ar" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+          <p class="letter-intro letter-reveal">With grateful hearts and the blessings of our families,</p>
+          <h2 class="letter-heading letter-reveal">We joyfully invite you</h2>
+          <p class="letter-subheading letter-reveal">to celebrate the wedding of</p>
+          <p class="letter-names letter-reveal"><span>Rayyan</span><span class="letter-amp">&amp;</span><span>Sofea</span></p>
+          <div class="letter-divider letter-reveal" aria-hidden="true"><span></span>✧<span></span></div>
+          <p class="date letter-date letter-reveal">23 . 01 . 2027</p>
+          <p class="letter-closing letter-reveal">Your presence and good wishes will make this day even more meaningful to us.</p>
+          <div class="letter-footer-ornament letter-reveal" aria-hidden="true">❦</div>
+        </div>
+      </div>
     </section>
   </main>
   <aside class="debug-panel" id="debugPanel" hidden aria-label="Developer comparison panel">
