@@ -202,3 +202,38 @@ test('reduced-motion hides decorative butterflies', async ({page}) => {
   await page.getByRole('button',{name:'Open Invitation'}).click();
   await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
 });
+
+
+test('lake stays pinned while scrolling through the mobile opening section',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const first=await page.locator('#viewport').boundingBox();
+  expect(first).not.toBeNull();
+  expect(first.y).toBeCloseTo(0,0);
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo({top:Math.round(innerHeight*.9),behavior:'instant'});
+  });
+  await expect.poll(async()=>page.evaluate(()=>scrollY)).toBeGreaterThan(0);
+  await expect.poll(async()=>{
+    const box=document.querySelector('#viewport').getBoundingClientRect();
+    return Math.round(box.y);
+  }).toBe(0);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
+  const bounds=await page.locator('.opened-copy').boundingBox();
+  const height=await page.evaluate(()=>innerHeight);
+  expect(bounds.y).toBeGreaterThan(-1);
+  expect(bounds.y).toBeLessThan(height);
+  const nextStart=await page.locator('#message').boundingBox();
+  expect(nextStart.y).toBeGreaterThanOrEqual(height);
+  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*1.45),behavior:'instant'}));
+  await expect.poll(async()=>{
+    const box=document.querySelector('#viewport').getBoundingClientRect();
+    return Math.round(box.y);
+  }).toBeLessThan(0);
+  await expect.poll(async()=>{
+    const box=document.querySelector('#message').getBoundingClientRect();
+    return box.y;
+  }).toBeLessThan(height);
+});
