@@ -1,17 +1,18 @@
 'use strict';
-// Section 2 reveals once it approaches the phone viewport.
-// No timers or animation work while the visitor remains in Section 1.
+// Section 2 — animate the framed message itself, not the empty top padding.
+// Measured from the mobile reference: message begins after the lake hero,
+// frame enters later within the mauve textured band.
 (() => {
   const section = document.getElementById('message');
-  if (!section || !('IntersectionObserver' in window)) return;
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (reducedMotion.matches) return; // Keep all content readable immediately.
-  section.dataset.revealReady = 'true';
+  const frame = section?.querySelector('.letter-frame');
+  if (!section || !frame || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  section.dataset.revealReady='true';
   const observer = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) {
-      section.classList.add('is-visible');
-      observer.disconnect();
-    }
-  }, { threshold: 0.12 });
-  observer.observe(section);
+    if (!entries.some(entry=>entry.isIntersecting)) return;
+    section.classList.add('is-visible');
+    observer.disconnect();
+  },{threshold:.12});
+  observer.observe(frame);
 })();
