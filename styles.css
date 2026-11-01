@@ -556,3 +556,47 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 .invitation[data-state="opened"][data-reading="yes"] .opened-copy {
   transform:translateY(var(--text-scroll-shift,0px));
 }
+
+
+/* Phase 10 — flowing script name reveal within the returned ceremonial arch.
+   The first name draws from left to right at the 1.5H reference checkpoint.
+   All names remain actual selectable text, not embedded in a flattened image. */
+.opened-copy {left:3%;width:94%;top:30%;font-family:'EB Garamond',Georgia,serif;}
+.opened-copy .eyebrow {
+  color:#5b2d51;font-size:clamp(19px,5.5vw,23px);letter-spacing:.13em;
+  line-height:1.38;text-shadow:0 1px 7px #fff9f4bd;
+}
+.invitation[data-state="opened"] .opened-copy {opacity:1;transition:none;}
+.invitation[data-state="opened"] .opened-copy .eyebrow {
+  opacity:var(--reading-progress,0);
+}
+.invitation[data-state="opened"] .ceremony-names {
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;width:100%;margin:0 auto;
+  color:#5d2450;
+  font:400 clamp(58px,16.5vw,72px)/.83 'Alex Brush',cursive;
+  letter-spacing:0;text-align:center;
+  opacity:1;text-shadow:0 1px 7px #fff8f0a6;
+  transform:none;white-space:nowrap;
+}
+.ceremony-names .name-line {
+  display:block;max-width:100%;height:1.12em;line-height:1.12;
+  overflow:visible;transform:none;
+}
+.ceremony-names .name-first {
+  clip-path:inset(0 calc((1 - var(--first-name-progress,0))*100%) 0 0);
+  -webkit-clip-path:inset(0 calc((1 - var(--first-name-progress,0))*100%) 0 0);
+}
+.ceremony-names .name-amp {
+  display:block;font-family:'EB Garamond',Georgia,serif;
+  font-size:.47em;font-style:italic;line-height:.93;height:.93em;
+  opacity:var(--amp-progress,0);
+}
+.ceremony-names .name-second {
+  clip-path:inset(0 calc((1 - var(--second-name-progress,0))*100%) 0 0);
+  -webkit-clip-path:inset(0 calc((1 - var(--second-name-progress,0))*100%) 0 0);
+}
+.invitation[data-state="opened"] .opened-copy .date,
+.invitation[data-state="opened"] .opened-copy .guest {
+  opacity:var(--details-progress,0);
+}
