@@ -11,6 +11,8 @@ on:
       - section-four.js
       - section-five.css
       - section-five.js
+      - section-six.css
+      - section-six.js
       - styles.css
       - scene.js
       - phone-qa.js
