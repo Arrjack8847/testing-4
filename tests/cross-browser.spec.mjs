@@ -132,20 +132,21 @@ test('large text zoom is usable and keyboard action remains operable',async({pag
 });
 
 
-test('section 2 invitation letter follows the completed sticky scene', async ({page}) => {
-  const errors = await load(page);
+test('Section 2 measured mauve message band follows the sticky opener',async({page})=>{
+  const errors=await load(page);
   await open(page);
-  await page.evaluate(() => {
+  await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
-    window.scrollTo(0, Math.round(innerHeight * 4));
+    document.getElementById('message').scrollIntoView({block:'start',behavior:'instant'});
   });
-  await expect.poll(() => page.evaluate(() => scrollY/innerHeight)).toBeGreaterThan(3.9);
-  const letter = page.locator('#message');
+  const letter=page.locator('#message');
   await expect(letter).toHaveAttribute('data-section','2');
   await expect(letter).toHaveClass(/is-visible/);
-  await expect(page.getByRole('heading',{name:'We joyfully invite you'})).toBeVisible();
-  await expect(letter.locator('.letter-names')).toContainText('Rayyan');
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth-innerWidth);
+  await expect(page.getByRole('heading',{name:'Wedding invitation message'})).toHaveCount(1);
+  await expect(letter.locator('.letter-lead')).toContainText('With grateful hearts');
+  await expect(letter.locator('.letter-source')).toContainText('SURAH AR-RUM');
+  await expect(letter.locator('.letter-names')).toHaveCount(0);
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
