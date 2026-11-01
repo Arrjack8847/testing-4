@@ -32,7 +32,7 @@ test('RSVP is an honest preview with no destination configured',async({page})=>{
   expect(errors).toEqual([]);
 });
 
-test('accepting RSVP shows correct guest count and never claims submission',async({page})=>{
+test('accepting RSVP shows correct guest count and never claims submission',async({page},testInfo)=>{
   const {section,errors}=await reachRSVP(page);
   await section.locator('#rsvpName').fill('  Dana   Test  ');
   await section.getByRole('radio',{name:'Joyfully accepts'}).check();
@@ -48,6 +48,7 @@ test('accepting RSVP shows correct guest count and never claims submission',asyn
   await expect(section.locator('#rsvpPreviewMessage')).toHaveText('Looking forward to celebrating!');
   await expect(section.locator('.rsvp-preview-disclosure')).toContainText('has not been submitted');
   await expect(section.locator('#rsvpCopyButton')).toBeEnabled();
+  await section.screenshot({path:testInfo.outputPath('section-six-rsvp-preview.png'),animations:'disabled'});
   await guests.selectOption('2');
   await expect(section.locator('#rsvpPreview')).toBeHidden();
   expect(errors).toEqual([]);
