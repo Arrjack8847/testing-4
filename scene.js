@@ -158,8 +158,12 @@ let petalDrawCount=0, sceneVisible=true, pageSuspended=false;
 // screen and decorative motion is allowed. Previously this loop requested
 // frames indefinitely even for hidden tabs, reduced motion and frozen debug.
 function ambientAllowed() {
-  return !!petalContext && sceneVisible && !pageSuspended && !document.hidden &&
-    !reduceMotion.matches &&
+  // The final 1H of the 4H sticky containing block is deliberately
+  // overlaid by Section 2 at document 3H. The lake is no longer visible
+  // once the mauve message fully covers the phone.
+  return !!petalContext && sceneVisible &&
+    (invite.dataset.state !== 'opened' || window.scrollY < window.innerHeight*3) &&
+    !pageSuspended && !document.hidden && !reduceMotion.matches &&
     !document.documentElement.classList.contains('debug-freeze');
 }
 function syncAmbient() {
@@ -414,10 +418,10 @@ function applyScrollScene(fraction) {
   set('--second-name-progress', secondName.toFixed(4));
   set('--second-name-hidden',((1-secondName)*100).toFixed(2)+'%');
   set('--details-progress', details.toFixed(4));
-  // The 3H track's sticky viewport begins exiting naturally after 2H.
-  // Do not add a second upward translation: that used to compensate for the
-  // obsolete 4H track and now would move text twice as fast as the scenery.
-  set('--text-scroll-shift','0px');
+  // The 3H reference keeps its garden pinned while the text itself
+  // scrolls upward after 2H. The mauve section covers the garden from
+  // screen bottom to top during 2H–3H; no second scenery translation.
+  set('--text-scroll-shift',(-Math.max(0,fraction-2)*window.innerHeight).toFixed(1)+'px');
   set('--stage-parallax','0px');
   invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
   invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
@@ -433,6 +437,7 @@ function synchronizeReading() {
   scrollTick = false;
   if(!openedOnce) return;
   applyScrollScene(window.scrollY/Math.max(window.innerHeight,1));
+  syncAmbient(); // The overlay can hide a still-sticky scene before IO detects exit.
 }
 function requestReadingSync() {
   if (!openedOnce || scrollTick) return;
