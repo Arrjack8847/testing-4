@@ -548,10 +548,16 @@ test('butterfly routes visit real garden perches and match species wingbeat spee
   expect(flights[1].duration).toBe('22s');
   expect(parseFloat(flights[0].wingDuration)).toBeCloseTo(1/(2*2.2),3);
   expect(parseFloat(flights[1].wingDuration)).toBeCloseTo(1/(2*2.6),3);
+  const viewport=await page.evaluate(()=>({w:innerWidth,h:innerHeight}));
   for(const flight of flights) {
-    expect(flight.waypoints).toContain('94dvh');
-    expect(flight.waypoints).toContain('44dvh');
-    expect(flight.waypoints).toContain('48dvh');
-    expect(flight.waypoints).toContain('vw');
+    // Chromium resolves viewport units into pixel coordinates in the
+    // Web Animations API, so assess the path's actual normalized extent.
+    const coords=[...flight.waypoints.matchAll(/translate3d\\(\\s*([-\\d.]+)px,\\s*([-\\d.]+)px/g)]
+      .map(match=>({x:Number(match[1]),y:Number(match[2])}));
+    expect(coords.length).toBeGreaterThanOrEqual(10);
+    expect(Math.min(...coords.map(p=>p.x))).toBeLessThan(0);
+    expect(Math.max(...coords.map(p=>p.x))).toBeGreaterThan(viewport.w*.75);
+    expect(Math.max(...coords.map(p=>p.y))).toBeGreaterThan(viewport.h*.8);
+    expect(Math.min(...coords.map(p=>p.y))).toBeLessThan(viewport.h*.55);
   }
 });
