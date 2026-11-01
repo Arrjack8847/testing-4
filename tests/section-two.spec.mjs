@@ -82,15 +82,19 @@ test('capture the corrected mobile Section 2 at each viewport',async({page},test
 });
 
 
-test('Section 1 releases into Section 2 after exactly three mobile viewports',async({page},testInfo)=>{
+test('full sticky lake remains under mauve overlay until exactly 3H',async({page},testInfo)=>{
   await page.goto('/');
   const initial=await page.evaluate(()=>{
     const track=document.getElementById('sceneTrack').getBoundingClientRect();
     const message=document.getElementById('message').getBoundingClientRect();
-    return {height:innerHeight,trackHeight:track.height,messageStart:message.top+scrollY,
+    const trackStyle=getComputedStyle(document.getElementById('sceneTrack'));
+    return {height:innerHeight,trackHeight:track.height,
+      trackNegativeMargin:parseFloat(trackStyle.marginBottom),messageStart:message.top+scrollY,
       overflow:document.documentElement.scrollWidth-innerWidth};
   });
-  expect(initial.trackHeight/initial.height).toBeCloseTo(3,2);
+  expect(initial.trackHeight/initial.height).toBeCloseTo(4,2);
+  expect(initial.trackNegativeMargin/initial.height).toBeCloseTo(-1,2);
+  expect((initial.trackHeight+initial.trackNegativeMargin)/initial.height).toBeCloseTo(3,2);
   expect(initial.messageStart/initial.height).toBeCloseTo(3,2);
   expect(initial.overflow).toBeLessThanOrEqual(1);
 
@@ -108,12 +112,14 @@ test('Section 1 releases into Section 2 after exactly three mobile viewports',as
       messageTop:message.top/innerHeight,overlap:lake.bottom-message.top,
       textShift:document.documentElement.style.getPropertyValue('--text-scroll-shift').trim()};
   });
-  expect(mid.lakeTop).toBeCloseTo(-.5,1);
-  expect(mid.lakeBottom).toBeCloseTo(.5,1);
+  // Entire lake stays pinned under the mauve band. The lower half is
+  // intentionally overlaid; only the upper half of the garden remains visible.
+  expect(mid.lakeTop).toBeCloseTo(0,1);
+  expect(mid.lakeBottom).toBeCloseTo(1,1);
   expect(mid.messageTop).toBeCloseTo(.5,1);
-  expect(Math.abs(mid.overlap)).toBeLessThanOrEqual(2);
-  await expect.poll(()=>page.evaluate(()=>document.documentElement.style
-    .getPropertyValue('--text-scroll-shift').trim())).toBe('0px');
+  expect(mid.overlap/initial.height).toBeCloseTo(.5,1);
+  await expect.poll(()=>page.evaluate(()=>parseFloat(document.documentElement.style
+    .getPropertyValue('--text-scroll-shift'))/innerHeight)).toBeCloseTo(-.5,1);
   await page.screenshot({path:testInfo.outputPath('section-two-transition-half.png'),animations:'disabled'});
 
   await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*3),behavior:'instant'}));
@@ -122,10 +128,15 @@ test('Section 1 releases into Section 2 after exactly three mobile viewports',as
   const completed=await page.evaluate(()=>{
     const lake=document.getElementById('viewport').getBoundingClientRect();
     const message=document.getElementById('message').getBoundingClientRect();
-    return {lakeBottom:lake.bottom,messageTop:message.top};
+    return {lakeTop:lake.top,lakeBottom:lake.bottom,messageTop:message.top,
+      sectionBackground:getComputedStyle(document.getElementById('message')).backgroundColor};
   });
-  expect(Math.abs(completed.lakeBottom)).toBeLessThanOrEqual(2);
+  expect(Math.abs(completed.lakeTop)).toBeLessThanOrEqual(2);
+  expect(Math.abs(completed.lakeBottom-initial.height)).toBeLessThanOrEqual(2);
   expect(Math.abs(completed.messageTop)).toBeLessThanOrEqual(2);
+  expect(completed.sectionBackground).not.toBe('rgba(0, 0, 0, 0)');
+  // The mauve panel now fully covers the still-sticky artwork.
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
   await expect(page.locator('#message')).toHaveClass(/is-visible/);
   await page.screenshot({path:testInfo.outputPath('section-two-transition-full.png'),animations:'disabled'});
 });
