@@ -275,6 +275,9 @@ function applyScrollScene(fraction) {
   set('--reading-progress', greeting.toFixed(4));
   set('--names-progress', names.toFixed(4));
   set('--details-progress', details.toFixed(4));
+  // The live reference's text block begins moving upward after ~2 viewports,
+  // while the lake background itself stays pinned in place.
+  set('--text-scroll-shift', (-Math.max(0,fraction-2)*window.innerHeight).toFixed(1)+'px');
   set('--stage-parallax','0px');
   invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
   invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
