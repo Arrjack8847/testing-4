@@ -27,14 +27,28 @@ try{
     await Promise.all([ref.waitForTimeout(2600),local.waitForTimeout(2600)]);
     await ref.screenshot({path:'visual-evidence/reference-opened.png'});
     await local.screenshot({path:'visual-evidence/ours-opened.png'});
-    // Compare a genuine mid-swipe state, not only the instant after opening.
+    // Capture the first camera-retreat checkpoint, before the border garden returns.
     await Promise.all([ref,local].map(p=>p.evaluate(()=>{
       document.documentElement.style.scrollBehavior='auto';
+      scrollTo({top:Math.round(innerHeight*.25),behavior:'instant'});
+    })));
+    await Promise.all([ref.waitForTimeout(500),local.waitForTimeout(500)]);
+    await ref.screenshot({path:'visual-evidence/reference-early.png'});
+    await local.screenshot({path:'visual-evidence/ours-early.png'});
+    // Compare the largest previous camera misalignment, at 0.45 viewports.
+    await Promise.all([ref,local].map(p=>p.evaluate(()=>{
       scrollTo({top:Math.round(innerHeight*.45),behavior:'instant'});
     })));
     await Promise.all([ref.waitForTimeout(1100),local.waitForTimeout(1100)]);
     await ref.screenshot({path:'visual-evidence/reference-scrolled.png'});
     await local.screenshot({path:'visual-evidence/ours-scrolled.png'});
+    // The palace has nearly finished retreating before the floral frame returns.
+    await Promise.all([ref,local].map(p=>p.evaluate(()=>{
+      scrollTo({top:Math.round(innerHeight*.75),behavior:'instant'});
+    })));
+    await Promise.all([ref.waitForTimeout(600),local.waitForTimeout(600)]);
+    await ref.screenshot({path:'visual-evidence/reference-retreated.png'});
+    await local.screenshot({path:'visual-evidence/ours-retreated.png'});
     // The live opening returns to its floral arch near 1.5 viewport scrolls.
     // This additional checkpoint tests whether we reconstruct the same frame.
     await Promise.all([ref,local].map(p=>p.evaluate(()=>{
