@@ -61,7 +61,7 @@
       viewport: `${innerWidth}×${innerHeight}`,
       cssScreen: `${screen.width}×${screen.height}`,
       dpr: devicePixelRatio,
-      orientation: screen.orientation?.type || (innerWidth > innerHeight ? 'landscape' : 'portrait'),
+      orientation: innerWidth > innerHeight ? 'landscape' : 'portrait',
       browser: navigator.userAgent,
       reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
       horizontalOverflow: Math.max(0,document.documentElement.scrollWidth - innerWidth),
