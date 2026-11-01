@@ -552,7 +552,7 @@ test('butterfly routes visit real garden perches and match species wingbeat spee
   for(const flight of flights) {
     // Chromium resolves viewport units into pixel coordinates in the
     // Web Animations API, so assess the path's actual normalized extent.
-    const coords=[...flight.waypoints.matchAll(/translate3d\\(\\s*([-\\d.]+)px,\\s*([-\\d.]+)px/g)]
+    const coords=[...flight.waypoints.matchAll(/translate3d\(\s*([-\d.]+)px,\s*([-\d.]+)px/g)]
       .map(match=>({x:Number(match[1]),y:Number(match[2])}));
     expect(coords.length).toBeGreaterThanOrEqual(10);
     expect(Math.min(...coords.map(p=>p.x))).toBeLessThan(0);
