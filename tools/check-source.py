@@ -18,8 +18,12 @@ manifest = (ROOT / "ASSET-MANIFEST.txt").read_text(encoding="utf-8")
 # scripts read it at runtime rather than duplicating the 25 filenames.
 listed = set(re.findall(r"\b([a-z0-9_]+\.webp)\b", manifest))
 used = set(re.findall(r"\b([a-z0-9_]+\.webp)\b", js))
+# Two butterfly sprites are opt-in skin artwork, not main-scene manifest assets.
+butterfly_slots = {"bfly_1.webp", "bfly_white.webp"}
 assert len(listed) == 25, f"Expected 25 unique WebP assets, got {len(listed)}"
-assert listed == used, f"JS layer usage mismatch: {listed ^ used}"
+assert butterfly_slots.issubset(used), "Skin butterfly slot mapping is incomplete"
+scene_used = used - butterfly_slots
+assert listed == scene_used, f"JS layer usage mismatch: {listed ^ scene_used}"
 for script, source in [("download-assets.ps1", ps1), ("start.ps1", start)]:
     assert "ASSET-MANIFEST.txt" in source, f"{script} must read artwork manifest"
     assert "Test-ValidWebP" in source, f"{script} must validate cached WebPs"
