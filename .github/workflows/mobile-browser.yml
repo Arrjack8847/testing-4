@@ -9,6 +9,8 @@ on:
       - section-three.js
       - section-four.css
       - section-four.js
+      - section-five.css
+      - section-five.js
       - scene.js
       - phone-qa.js
       - styles.css
@@ -76,5 +78,13 @@ jobs:
         with:
           name: section-four-mobile-screenshots
           path: test-results/**/*section-four*.png
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload Section 5 mobile gallery screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section-five-mobile-screenshots
+          path: test-results/**/*section-five*.png
           if-no-files-found: warn
           retention-days: 14
