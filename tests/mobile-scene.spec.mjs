@@ -76,8 +76,9 @@ test('cover opens and enables vertical invitation scrolling', async ({ page }) =
     window.scrollTo({top: Math.floor(window.innerHeight * .65), behavior: 'instant'});
   });
   await expect.poll(async () => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
-  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','1');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-swiped','yes');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
 });
 
 test('developer alignment controls and reset work after scrolling', async ({ page }) => {
@@ -186,7 +187,7 @@ test('paired-wing butterflies fly only in the appropriate scene state', async ({
   await expect(hero).toHaveCSS('visibility','hidden');
   await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
-    window.scrollTo({top:Math.floor(innerHeight*.65),behavior:'instant'});
+    window.scrollTo({top:Math.floor(innerHeight*1.85),behavior:'instant'});
   });
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
   await expect(hero).toHaveCSS('visibility','visible');
@@ -220,14 +221,15 @@ test('lake stays pinned while scrolling through the mobile opening section',asyn
     const box=document.querySelector('#viewport').getBoundingClientRect();
     return Math.round(box.y);
   })).toBe(0);
-  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-swiped','yes');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
   const bounds=await page.locator('.opened-copy').boundingBox();
   const height=await page.evaluate(()=>innerHeight);
   expect(bounds.y).toBeGreaterThan(-1);
   expect(bounds.y).toBeLessThan(height);
   const nextStart=await page.locator('#message').boundingBox();
   expect(nextStart.y).toBeGreaterThanOrEqual(height);
-  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*1.45),behavior:'instant'}));
+  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*3.45),behavior:'instant'}));
   await expect.poll(async()=>page.evaluate(()=>{
     const box=document.querySelector('#viewport').getBoundingClientRect();
     return Math.round(box.y);
@@ -239,29 +241,46 @@ test('lake stays pinned while scrolling through the mobile opening section',asyn
 });
 
 
-test('scroll reveal is gradual while the lake stays fixed',async({page})=>{
+test('garden returns before wedding text during the pinned scroll',async({page})=>{
   await page.goto('/');
   await waitForArt(page);
   await page.getByRole('button',{name:'Open Invitation'}).click();
   await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
-  await page.evaluate(()=>{
-    document.documentElement.style.scrollBehavior='auto';
-    window.scrollTo({top:Math.round(innerHeight*.24),behavior:'instant'});
-  });
+  const visit=async fraction=>{
+    await page.evaluate(frac=>{
+      document.documentElement.style.scrollBehavior='auto';
+      scrollTo({top:Math.round(innerHeight*frac),behavior:'instant'});
+    },fraction);
+    await expect.poll(async()=>page.evaluate(()=>{
+      return Number((scrollY/innerHeight).toFixed(2));
+    })).toBeCloseTo(fraction,1);
+  };
+  await visit(.45);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-swiped','yes');
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await expect.poll(async()=>page.evaluate(()=>
+    document.documentElement.style.getPropertyValue('--frame-scroll-opacity')
+  )).toBe('0.0000');
+  await visit(1.15);
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(document.documentElement.style.getPropertyValue('--frame-scroll-opacity'))
+  )).toBeGreaterThan(.1);
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await visit(1.50);
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
-  await expect.poll(async()=>page.evaluate(()=>parseFloat(
-    getComputedStyle(document.querySelector('.opened-copy')).opacity
-  ))).toBeGreaterThan(.15);
-  const opacity=await page.locator('.opened-copy').evaluate(el=>Number(getComputedStyle(el).opacity));
-  expect(opacity).toBeLessThan(.95);
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(getComputedStyle(document.querySelector('.opened-copy')).opacity)
+  )).toBeGreaterThan(.25);
+  await expect(page.locator('.opened-copy h2')).toHaveCSS('opacity','0');
+  await visit(2.20);
+  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','1');
+  await expect(page.locator('.opened-copy h2')).toHaveCSS('opacity','1');
   await expect.poll(async()=>page.evaluate(()=>
     Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
   )).toBe(0);
   await expect.poll(async()=>page.evaluate(()=>
     document.documentElement.style.getPropertyValue('--stage-parallax').trim()
   )).toBe('0px');
-  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*.65),behavior:'instant'}));
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','1');
 });
 
 test('swipe cue reveals greeting instead of skipping the sticky lake',async({page})=>{
@@ -271,7 +290,7 @@ test('swipe cue reveals greeting instead of skipping the sticky lake',async({pag
   await page.getByRole('link',{name:'Swipe up for wedding message'}).click();
   await expect.poll(async()=>page.evaluate(()=>window.scrollY)).toBeGreaterThan(100);
   await expect.poll(async()=>page.evaluate(()=>document.querySelector('#invitation').dataset.reading)).toBe('yes');
-  await expect.poll(async()=>page.evaluate(()=>window.scrollY / innerHeight)).toBeLessThan(1.01);
+  await expect.poll(async()=>page.evaluate(()=>window.scrollY / innerHeight)).toBeLessThan(1.75);
   await expect.poll(async()=>page.evaluate(()=>Math.round(
     document.querySelector('#viewport').getBoundingClientRect().top
   ))).toBe(0);
