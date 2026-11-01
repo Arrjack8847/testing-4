@@ -665,6 +665,15 @@ test('first swipe retreats sky and palace before garden returns',async({page})=>
     },fraction);
     await expect.poll(async()=>page.evaluate(()=>Number((scrollY/innerHeight).toFixed(2))))
       .toBeCloseTo(fraction,1);
+    const ease=(x,a,b)=>{
+      const p=Math.max(0,Math.min(1,(x-a)/(b-a)));
+      return p*p*(3-2*p);
+    };
+    // Scroll state is applied by the scene's requestAnimationFrame callback.
+    // Wait for its committed CSS value, not merely for scrollY to change.
+    await expect.poll(async()=>page.evaluate(()=>
+      Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale'))
+    )).toBeCloseTo(.99-.33*ease(fraction,.22,.72),2);
     return page.evaluate(()=>({
       sky:Number(document.documentElement.style.getPropertyValue('--sky-scroll-scale')),
       palace:Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale')),
@@ -702,6 +711,16 @@ test('opened lake retains reeds briefly then returns border flowers by 0.75H',as
     await expect.poll(async()=>page.evaluate(()=>
       Number((window.scrollY/innerHeight).toFixed(2))
     )).toBeCloseTo(fraction,1);
+    const easing=(x,a,b)=>{
+      const p=Math.max(0,Math.min(1,(x-a)/(b-a)));
+      return p*p*(3-2*p);
+    };
+    await expect.poll(async()=>page.evaluate(()=>
+      Number(document.documentElement.style.getPropertyValue('--reed-scroll-opacity'))
+    )).toBeCloseTo(1-easing(fraction,.12,.40),3);
+    await expect.poll(async()=>page.evaluate(()=>
+      Number(document.documentElement.style.getPropertyValue('--front-scroll-opacity'))
+    )).toBeCloseTo(easing(fraction,.47,.78),3);
     return await page.evaluate(()=>({
       reeds:+document.documentElement.style.getPropertyValue('--reed-scroll-opacity'),
       flowers:+document.documentElement.style.getPropertyValue('--front-scroll-opacity'),
