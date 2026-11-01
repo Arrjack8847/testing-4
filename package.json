@@ -6,7 +6,7 @@
   "scripts": {
     "test:mobile": "playwright test",
     "test:source": "python3 tools/check-source.py",
-    "test:syntax": "node --check scene.js && node --check phone-qa.js && node --check section-two.js && node --check section-three.js && node --check section-four.js && node --check section-five.js",
+    "test:syntax": "node --check scene.js && node --check phone-qa.js && node --check section-two.js && node --check section-three.js && node --check section-four.js && node --check section-five.js && node --check section-six.js",
     "test:crossbrowser": "playwright test --config playwright.crossbrowser.config.mjs"
   },
   "devDependencies": {
