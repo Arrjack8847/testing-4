@@ -448,10 +448,16 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 .invitation[data-state="opened"] .butterfly-cover .butterfly {animation-play-state:paused;}
 
 
-/* Section 1 → Section 2: the live mobile reference's lake hero occupies
-   three viewport heights. Sticky scenery stays pinned for the first 2H,
-   then naturally scrolls away over the final 1H to reveal the mauve band. */
-.scene-scroll-track {position:relative;height:300vh;height:300dvh;}
+/* Section 1 → Section 2: the live reference keeps the whole lake frame
+   sticky through the final 3H boundary while the mauve band rises over it.
+   Give the sticky scene a 4H containing block and overlap its last 1H
+   with the message via negative margin: *document flow* still starts the
+   second scene at exactly 3H, without exposing the bottom of the artwork. */
+.scene-scroll-track {
+  position:relative;
+  height:400vh;height:400dvh;
+  margin-bottom:-100vh;margin-bottom:-100dvh;
+}
 .scene-scroll-track > .viewport {position:sticky;top:0;z-index:1;}
 .message {position:relative;z-index:2;}
 @media (min-width:431px) {
