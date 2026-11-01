@@ -954,3 +954,17 @@ html.debug-freeze .peacock-glint {
 @media (prefers-reduced-motion:reduce) {
   #phoneQaLaunch,.phone-qa-panel {animation:none!important;transition:none!important;}
 }
+
+/* Phase 17 — match the live 0H→0.75H transition.
+   The opened lake initially retains the tall reeds in the foreground,
+   which descend out of view by ~0.4 viewport scroll. Side flowers
+   return sooner, reaching the visible frame around 0.75H. */
+.invitation[data-state="opened"] .depth.reeds {
+  transform:translateY(var(--reed-scroll-shift,0dvh));
+  opacity:var(--reed-scroll-opacity,1);
+  transition:none;
+  pointer-events:none;
+}
+.invitation[data-state="opened"][data-scroll-active="yes"] .depth.reeds {
+  transition:none;
+}
