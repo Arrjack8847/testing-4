@@ -441,6 +441,14 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 }
 
 
+/* Section 1 timing calibration, measured at the returning garden:
+   the live reference already has visible butterflies near the ceremonial
+   arch by 1.5H. Start each original hero-flight path partway along its
+   route when the reading state begins, rather than leaving both sprites
+   invisible behind positive animation delays. Cover/perch routes unchanged. */
+.butterfly-hero .violet {animation-delay:-1.8s;}
+.butterfly-hero .ivory {animation-delay:-2.5s;}
+
 /* Don't run invisible flight loops on mobile; begin the valley flight when
    the guest actually swipes, rather than using an already elapsed animation. */
 .butterfly-hero .butterfly {animation-play-state:paused;}
