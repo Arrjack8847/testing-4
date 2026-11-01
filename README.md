@@ -341,3 +341,21 @@ The QA script is dynamically loaded **only** when `?phoneqa=1` is present. Norma
 - JavaScript/PowerShell syntax and source integrity passed. [Source check](https://github.com/Arrjack8847/testing-4/actions/runs/41291137906).
 - The regular invitation no longer loads the QA widget unless `?phoneqa=1` is explicitly requested. The tests confirm this.
 - **Not yet completed:** real Safari on a physical iPhone, Chrome on a physical Android device, thermal/battery observations, and direct touch smoothness observations. These require the owner to perform the test on their phone using the opt-in URL.
+
+
+## Phase 17 — mobile visual calibration against the live lake
+
+This phase reviews the real reference and local site at seven 390×844 scroll checkpoints, keeping the interactive Section 1 behavior intact. The largest mismatch was the **first 0.45 viewport of scrolling**: the original moved the palace and palm-tree backdrop farther away, while the prototype left the scenery almost unchanged.
+
+Implemented:
+- The palace camera retreat now starts at **0.22H** and completes around **0.72H**, instead of being delayed until the garden return after 0.52H.
+- The sky/canopy background also starts retreating around **0.22H**, closer to the reference's early scene change.
+- The temporary foreground reeds remain visible just after opening and retreat before **0.40H**, instead of disappearing instantly.
+- The tall border flowers return earlier, so the side plants are visible by **0.75H**, rather than remaining almost completely below the screen.
+- Full mobile-browser tests verify camera scales and the visibility progression; decorative peacocks, butterfly flights, handwriting and existing accessibility remain separate.
+
+The visual comparison now captures **closed, opened, early (0.25H), mid-scroll (0.45H), retreated (0.75H), restored (1.50H), and written** states. In addition to whole-screen RGB MAE, it reports a central **art-only** region (x=20–370, y=100–690), excluding most of the original vendor's shopping and navigation overlays. This central-region error is *not* a visual accuracy percentage.
+
+Before the additional reed/flower refinements, the 0.45H full-frame difference improved from approximately **32.2/255 to 25.7/255** in the same comparison method. The original garden's dynamic petals and butterflies make individual-frame pixel comparisons approximate rather than deterministic.
+
+This remains a development prototype using remotely sourced reference artwork. Do not deploy commercially without suitable rights to the art and a final real-device test.
