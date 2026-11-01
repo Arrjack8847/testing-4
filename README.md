@@ -359,3 +359,13 @@ The visual comparison now captures **closed, opened, early (0.25H), mid-scroll (
 Before the additional reed/flower refinements, the 0.45H full-frame difference improved from approximately **32.2/255 to 25.7/255** in the same comparison method. The original garden's dynamic petals and butterflies make individual-frame pixel comparisons approximate rather than deterministic.
 
 This remains a development prototype using remotely sourced reference artwork. Do not deploy commercially without suitable rights to the art and a final real-device test.
+
+
+### Phase 17 verification
+
+- **124/124** mobile Chromium tests passed across 320px, 360px, 390px and 430px, including camera retreat, early reeds, border-flower return, handwriting, reduced motion and performance lifecycle. [Passing run](https://github.com/Arrjack8847/testing-4/actions/runs/41292963972).
+- Seven-stage screenshot comparison succeeded. [Visual comparison run](https://github.com/Arrjack8847/testing-4/actions/runs/41292594122).
+- At the previously mismatched 0.45H point, the full-frame RGB mean absolute difference decreased from approximately **32.2/255 before this phase to 25.7/255 after camera correction**. Scores fluctuate slightly with procedurally animated petals and butterflies.
+- The reference site's own navigation and purchasing overlays are intentionally not included in the invitation. The comparison also includes a vendor-UI-excluding central art region to avoid confusing UI differences with artwork positioning.
+- The former two intermittently failing scroll assertions were changed to wait for the `requestAnimationFrame`-applied CSS state and passed cleanly on the final run.
+- Final visual parity is still approximate, and testing on a physical phone remains required before production use.
