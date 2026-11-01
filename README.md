@@ -369,3 +369,18 @@ This remains a development prototype using remotely sourced reference artwork. D
 - The reference site's own navigation and purchasing overlays are intentionally not included in the invitation. The comparison also includes a vendor-UI-excluding central art region to avoid confusing UI differences with artwork positioning.
 - The former two intermittently failing scroll assertions were changed to wait for the `requestAnimationFrame`-applied CSS state and passed cleanly on the final run.
 - Final visual parity is still approximate, and testing on a physical phone remains required before production use.
+
+
+## Phase 18 — cross-browser accessibility and performance QA
+
+A separate `npm run test:crossbrowser` command checks **Chromium, Firefox and WebKit** at a 390×844 viewport without weakening the previous multi-viewport Chromium regression tests. [Detailed QA matrix](PHASE18-QA.md).
+
+The new suite found and fixed a real accessibility defect: `inert` by itself did not reliably remove the unopened section's Swipe Up link from the browser accessibility role queries. The cover and opened section now synchronize both `inert` and explicit `aria-hidden` states. Keyboard activation of **Open Invitation** also moves focus onto the newly revealed Swipe Up link so the focused button is not lost.
+
+Seven checks per engine cover accessible headings and landmark semantics, keyboard/focus behavior, opening and staged garden scroll, reduced-motion content, 44×44 CSS px touch targets, horizontal overflow, canvas resolution caps, and enlarged-text usability.
+
+- [Phase 18 three-engine workflow](https://github.com/Arrjack8847/testing-4/actions/workflows/crossbrowser-a11y.yml)
+- [Latest passing 21-test run](https://github.com/Arrjack8847/testing-4/actions/runs/41303729880)
+- [Original mobile regression suite](https://github.com/Arrjack8847/testing-4/actions/workflows/mobile-browser.yml)
+
+**Limits:** Linux Playwright WebKit is not physical iPhone Safari; Firefox is tested in a narrow browser viewport rather than Playwright's unsupported Firefox `isMobile` mode. Actual VoiceOver/TalkBack, battery drain, network latency and artwork licensing have not been certified.
