@@ -9,6 +9,8 @@ on:
       - section-three.js
       - section-four.css
       - section-four.js
+      - section-five.css
+      - section-five.js
       - styles.css
       - scene.js
       - phone-qa.js
