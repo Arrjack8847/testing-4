@@ -11,6 +11,8 @@ on:
       - section-four.js
       - section-five.css
       - section-five.js
+      - section-six.css
+      - section-six.js
       - scene.js
       - phone-qa.js
       - styles.css
@@ -86,5 +88,13 @@ jobs:
         with:
           name: section-five-mobile-screenshots
           path: test-results/**/*section-five*.png
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload Section 6 RSVP mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section-six-mobile-screenshots
+          path: test-results/**/*section-six*.png
           if-no-files-found: warn
           retention-days: 14
