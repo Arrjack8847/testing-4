@@ -173,3 +173,29 @@ Reference measurements confirm the original hero remains at screen y=0 while the
 - The visual comparison workflow now captures **closed**, **opened**, and **45%-scrolled** states at 390×844, with differences saved as GitHub Actions artifacts.
 
 This remains Section 1 development only. The `#message` continuation is deliberately a placeholder, not a claim that Section 2 is complete.
+
+
+## Phase 9 — reference-calibrated garden return during scrolling
+
+**Critical visual finding:** The live Tasik Kayangan hero does not simply reveal the wedding names over the bare lake. The opened screen initially remains a quiet valley. The foreground flowers and ceremonial frame then return as the guest scrolls, followed by the text. Reference frames captured at 390 × 844:
+
+| Scrolled viewport height | Live reference state |
+|---|---|
+| 0–0.45H | Bare lake and distant palace; no overlay heading |
+| 0.75H | Side floral plants return |
+| 0.95H | Wisteria strands begin returning, palace appears smaller |
+| 1.15H | Decorative arch and peacocks progressively re-enter |
+| 1.50H | Arch fully frames lake, peacocks restored, small "The Wedding of" begins |
+| 1.70–1.90H | Heading becomes visible and names begin to appear |
+| 2.15H onward | Heading/content travel upward while lake hero stays pinned |
+
+Revisions:
+- Replaced the premature 12–47% scroll text fade with seven coordinated `requestAnimationFrame`-driven CSS variable transitions controlling sky, palace, arch, trees, canopy, decorative blossoms, peacocks and typography.
+- The garden returns across approximately 0.52–1.44 viewport heights. Greeting begins around 1.37H; names follow after 1.68H.
+- Temporary `scene-scroll-track` extended to **4 viewport heights**, keeping scenery sticky for the staged reveal and leaving the existing next-section placeholder reachable. This is a Phase 1 interaction scaffold, not a verified measurement of the original full-page length.
+- Text begins traveling vertically upward after 2.0H without moving the lake.
+- Original waterfall, birds, petals, butterfly, reduced-motion and debug behavior remain included.
+- Swipe Up takes guests along the same scene to the staged heading without jumping past Section 1.
+- The visual QA workflow now compares four states: cover, just opened, 0.45H mid-scroll and 1.50H restored frame.
+
+The exact proprietary animation curves remain independently approximated; these checkpoints are grounded in the reference screenshots and browser inspections.
