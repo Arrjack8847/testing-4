@@ -211,7 +211,7 @@ let openedOnce = false;
 function openInvitation() {
   invite.dataset.state = 'opened';
   invite.dataset.reading = 'no';
-  document.documentElement.style.setProperty('--reading-progress', '0');
+  applyScrollScene(0);
   cover.inert = true;
   opened.inert = false;
   openedOnce = true;
@@ -220,6 +220,7 @@ function openInvitation() {
 function resetInvitation() {
   invite.dataset.state = 'cover';
   invite.dataset.reading = 'no';
+  applyScrollScene(0);
   cover.inert = false;
   opened.inert = true;
   openedOnce = false;
@@ -236,23 +237,53 @@ window.addEventListener('pageshow', () => {
   if (!openedOnce && window.scrollY) window.scrollTo(0, 0);
 });
 
-// The actual Celestial Lake scene is sticky at y=0 across the initial swipe.
-// Moving the whole stage upward during that interval was incorrect. Scroll only
-// reveals the greeting; decorative movement remains independent of scrolling.
+// Reference scroll calibration at 390x844:
+// 0-.45H: unobstructed valley; .75H: flower borders return;
+// .95H: hanging floral frame; 1.15H: arch and peacocks appear;
+// 1.5H: arch framed, "The Wedding of" begins to fade in.
+// Unlike a normal parallax webpage, the whole scenic hero stays STICKY.
 let scrollTick = false;
+const clamp = x => Math.max(0, Math.min(1, x));
+function easeBetween(x, start, end) {
+  const p = clamp((x-start)/(end-start));
+  return p*p*(3-2*p);
+}
+function applyScrollScene(fraction) {
+  const rootStyle = document.documentElement.style;
+  const garden = easeBetween(fraction, .52, 1.43);
+  const framing = easeBetween(fraction, .84, 1.42);
+  const blossoms = easeBetween(fraction, .59, .98);
+  const peacocks = easeBetween(fraction, 1.06, 1.44);
+  const greeting = easeBetween(fraction, 1.37, 1.61);
+  const names = easeBetween(fraction, 1.68, 2.04);
+  const details = easeBetween(fraction, 2.02, 2.34);
+  const set = (name,value) => rootStyle.setProperty(name,String(value));
+  set('--sky-scroll-scale', (1.12-.12*garden).toFixed(4));
+  set('--sky-scroll-y', (-4*(1-garden)).toFixed(3)+'%');
+  set('--palace-scroll-scale', (.99-.33*garden).toFixed(4));
+  set('--frame-scroll-scale', (2.6-1.6*framing).toFixed(4));
+  set('--frame-scroll-opacity', framing.toFixed(4));
+  set('--tree-scroll-scale', (2.1-1.1*framing).toFixed(4));
+  set('--tree-scroll-shift', (14*(1-framing)).toFixed(3)+'%');
+  set('--canopy-scroll-scale', (2.2-1.2*framing).toFixed(4));
+  set('--canopy-scroll-shift', (-10*(1-framing)).toFixed(3)+'%');
+  set('--hanging-scroll-opacity', framing.toFixed(4));
+  set('--hanging-scroll-shift', (-20*(1-framing)).toFixed(3)+'dvh');
+  set('--front-scroll-opacity', blossoms.toFixed(4));
+  set('--front-scroll-shift', (45*(1-blossoms)).toFixed(3)+'dvh');
+  set('--peacock-scroll-opacity', peacocks.toFixed(4));
+  set('--reading-progress', greeting.toFixed(4));
+  set('--names-progress', names.toFixed(4));
+  set('--details-progress', details.toFixed(4));
+  set('--stage-parallax','0px');
+  invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
+  invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
+  invite.dataset.scrollActive = fraction > .025 ? 'yes' : 'no';
+}
 function synchronizeReading() {
   scrollTick = false;
-  if (!openedOnce) return;
-  const height = Math.max(window.innerHeight, 1);
-  const fraction = Math.max(0, window.scrollY / height);
-  // Gentle fade: initial valley remains unobstructed, then text arrives
-  // over the stationary lake after the first deliberate upward swipe.
-  const progress = Math.max(0, Math.min(1, (fraction - .12) / .35));
-  invite.dataset.reading = fraction >= .15 ? 'yes' : 'no';
-  document.documentElement.style.setProperty('--reading-progress', String(progress));
-  // The measured reference's background remains pinned until the sticky
-  // section ends; never translate the entire artwork on the scroll event.
-  document.documentElement.style.setProperty('--stage-parallax', '0px');
+  if(!openedOnce) return;
+  applyScrollScene(window.scrollY/Math.max(window.innerHeight,1));
 }
 function requestReadingSync() {
   if (!openedOnce || scrollTick) return;
@@ -262,12 +293,13 @@ function requestReadingSync() {
 window.addEventListener('scroll', requestReadingSync, {passive:true});
 window.addEventListener('resize', requestReadingSync, {passive:true});
 
-// The Swipe Up prompt should reveal the greeting within the pinned lake scene,
-// rather than jumping past it directly to the next section.
+// The cue moves into the INTRO on the same sticky lake, never straight
+// past the user to a different section. Smooth native scrolling drives all
+// of the coordinated cover-return and letter-reveal effects.
 document.querySelector('.swipe-cue')?.addEventListener('click', event => {
   if (!openedOnce) return;
   event.preventDefault();
-  const destination = Math.max(window.scrollY, window.innerHeight * .65);
+  const destination = Math.max(window.scrollY, window.innerHeight*1.6);
   window.scrollTo({top:destination,
     behavior:reduceMotion.matches ? 'instant' : 'smooth'});
 });
