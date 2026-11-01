@@ -688,3 +688,37 @@ test('first swipe retreats sky and palace before garden returns',async({page})=>
   )).toBeCloseTo(.66,2);
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
 });
+
+
+test('opened lake retains reeds briefly then returns border flowers by 0.75H',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const at=async fraction=>{
+    await page.evaluate(f=>{
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:Math.round(innerHeight*f),behavior:'instant'});
+    },fraction);
+    await expect.poll(async()=>page.evaluate(()=>
+      Number((window.scrollY/innerHeight).toFixed(2))
+    )).toBeCloseTo(fraction,1);
+    return await page.evaluate(()=>({
+      reeds:+document.documentElement.style.getPropertyValue('--reed-scroll-opacity'),
+      flowers:+document.documentElement.style.getPropertyValue('--front-scroll-opacity'),
+      reedComputed:+getComputedStyle(document.querySelector('.depth.reeds')).opacity,
+      pinned:Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
+    }));
+  };
+  const start=await at(0);
+  expect(start.reeds).toBeCloseTo(1,2);
+  const early=await at(.25);
+  expect(early.reeds).toBeGreaterThan(.2);
+  expect(early.reeds).toBeLessThan(.9);
+  const mid=await at(.45);
+  expect(mid.reeds).toBe(0);
+  expect(mid.flowers).toBe(0);
+  const returning=await at(.75);
+  expect(returning.flowers).toBeGreaterThan(.95);
+  expect(returning.pinned).toBe(0);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
+});
