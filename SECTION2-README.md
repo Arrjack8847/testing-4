@@ -38,15 +38,15 @@ The vendor's visible invitation paragraph uses the same demonstration wording al
 
 ## Section 1 → Section 2 handoff test
 
-The reference's first scene is 3× the viewport height, with the second mauve section starting at document y=3H. The local implementation now uses one `300dvh` scroll-track definition.
+The reference's **effective first-scene document span** is 3× the viewport height. Our lake now uses a `400dvh` sticky containing block with `margin-bottom:-100dvh`, so Section 2 still starts at document y=3H while the complete garden can remain pinned beneath the incoming mauve scene.
 
-At scroll=2.5H, the lake's lower edge and mauve band's upper edge meet halfway down the screen. At scroll=3H, the lake has exited and Section 2 starts at screen y=0. Both checkpoints are captured as `section-two-transition-half.png` and `section-two-transition-full.png` for each mobile viewport in the normal browser suite.
+At scroll=2.5H, the lake is still pinned at screen y=0 and Section 2 rises from the halfway point, covering the lower part of the garden. At scroll=3H, the mauve band completely covers the sticky garden. Both checkpoints are captured as `section-two-transition-half.png` and `section-two-transition-full.png`.
 
 The title animation and butterfly triggers preserve their existing calibrated scroll checkpoints; Sections 3–6 are not modified.
 
 ## Remaining differences / visual QA
 
-- **Resolved in the Section 1–2 handoff update:** The sticky lake track now spans **3 viewport heights**, matching the measured reference. The calibrated image/lettering motion through about 2.42H is unchanged; its final 1H naturally scrolls out to the mauve message band. We removed a duplicate JS text-translation that would have made the lettering move too quickly when the sticky scene releases.
+- **Corrected after screenshot comparison:** The reference uses a sticky *full garden* during the overlap. The implementation uses a 4H sticky containing block and a -1H flow overlap, preserving a 3H effective hero before Section 2. The names move upward independently after 2H, while the lake remains visually pinned; ambient particles pause once the message fully covers the scene.
 - The remaining visual differences include the exact background texture, Bismillah graphic and minute text spacing; passing geometry tests is not a claim of pixel-perfect matching.
 - **Improved:** Our independently authored `assets/section2-mauve-original.svg` now adds subdued botanical relief and procedural grain, without copying the provider's textured WebP. This remains a visual approximation rather than the vendor asset.
 - The reference's Bismillah is a compact calligraphic design; our Unicode text is a font-dependent representation and should be refined with an original licensed ornament.
@@ -75,7 +75,7 @@ This is a visual and behavioral reconstruction using independently written HTML/
 
 ## Focused screenshot comparison — 2026-11-02
 
-The corrected three-viewport handoff passed both the four-width mobile suite and the three-engine cross-browser suite. [Mobile run](https://github.com/Arrjack8847/testing-4/actions/runs/41329856603) · [Cross-browser run](https://github.com/Arrjack8847/testing-4/actions/runs/41329856546).
+The first three-viewport flow implementation passed both the four-width mobile suite and the three-engine cross-browser suite; its **visual layering mismatch was later identified and corrected**. [Mobile run](https://github.com/Arrjack8847/testing-4/actions/runs/41329856603) · [Cross-browser run](https://github.com/Arrjack8847/testing-4/actions/runs/41329856546).
 
 The actual reference frame begins approximately **188px inside the mauve band**; our own frame starts at the same measured offset. We should **not** move the entire frame. The biggest visible difference was the weaker background texture, so an original embossed-paper vector overlay was added, and natural line wrapping was restored.
 
