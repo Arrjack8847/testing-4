@@ -237,7 +237,7 @@ if ('IntersectionObserver' in window) {
 new MutationObserver(syncAmbient).observe(document.documentElement,{
   attributes:true,attributeFilter:['class']
 });
-if (debug) {
+if (debug || query.has('phoneqa')) {
   Object.defineProperty(window,'__scenePerf',{
     value:Object.freeze({
       get draws(){return petalDrawCount;},
@@ -447,4 +447,13 @@ if (debug) {
     document.getElementById('debugStats').textContent = `${allNames.length - failed.size}/${allNames.length} files loaded. ${ready ? 'Layered scene ready.' : 'Using fallback.'}` +
       (failed.size ? '\nMissing: ' + [...failed].join(', ') : '');
   });
+}
+
+
+// Opt-in phone testing only. The diagnostics never run in a guest invitation.
+// On-device results stay in this browser until the tester chooses to copy them.
+if (query.has('phoneqa')) {
+  const loader=document.createElement('script');
+  loader.src='./phone-qa.js';
+  document.body.appendChild(loader);
 }
