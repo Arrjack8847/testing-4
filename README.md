@@ -318,3 +318,18 @@ This pass fixes two genuine broken-image paths and improves Windows local testin
 - See [REAL-DEVICE-TESTING.md](REAL-DEVICE-TESTING.md) for the same-Wi-Fi iPhone/Android testing procedure, accessibility checks and performance observations.
 
 These improvements do not redistribute or bundle the source artwork, and do not change the approved normal opening or scroll choreography.
+
+
+## Phase 16 — actual-phone test preparation
+
+Open the same local preview on an iPhone or Android device using **`http://<PC-IPv4>:8000/?phoneqa=1`** after starting `start.ps1` on the Windows PC. The device must share the same private Wi-Fi network.
+
+An opt-in **Phone QA** panel now offers:
+- Real browser viewport, pixel ratio, orientation, image-loading state, scene state, reduced motion, near-offscreen animation state and horizontal overflow diagnostics.
+- A five-second local performance sample (browser animation-frame callback rate, actual falling-petal canvas draw rate, and long-task count when the browser supports that API).
+- Five manually checked real-device interaction checks, free-text notes, and a copyable report. On browsers that block clipboard access over local-network HTTP, the report appears as selectable text.
+- Privacy: No analytics, tracking server or automatic result upload. The report stays in the tester's browser unless intentionally copied.
+
+The QA script is dynamically loaded **only** when `?phoneqa=1` is present. Normal guest invitations do not load the panel or its instrumentation. The browser automation covers panel tap targets, local report generation, screenshot-safe layout, rotation-size handling and sampling across the four existing phone viewport sizes.
+
+**Important:** This completes the real-device *testing preparation*, not an actual physical-device certification. The owner must open the local URL on a phone and perform the checks described in [REAL-DEVICE-TESTING.md](REAL-DEVICE-TESTING.md). The five-second sample is an observation, not proof of thermal stability or battery life.
