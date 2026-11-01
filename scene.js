@@ -304,7 +304,12 @@ const artworkReady = Promise.all(allNames.map(async name => {
 
 // Cover is a focusable action, not a scroll-triggered trap.
 let openedOnce = false;
-function openInvitation() {
+function openInvitation(event) {
+  // When activated from a keyboard, the button becomes inert. Move focus to
+  // the new invitation action so screen-reader and keyboard users are not
+  // stranded on the document body. Touch/click activation remains unchanged.
+  const keyboardActivation = event?.detail === 0 &&
+    (event?.currentTarget?.id === 'openButton' || event?.currentTarget?.id === 'debugOpen');
   invite.dataset.state = 'opened';
   invite.dataset.reading = 'no';
   invite.dataset.lettering = 'idle';
@@ -313,6 +318,9 @@ function openInvitation() {
   opened.inert = false;
   openedOnce = true;
   document.documentElement.style.overflowY = 'auto';
+  if (keyboardActivation) {
+    document.querySelector('.swipe-cue')?.focus({preventScroll:true});
+  }
 }
 function resetInvitation() {
   invite.dataset.state = 'cover';
