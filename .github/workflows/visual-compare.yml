@@ -46,7 +46,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image,ImageChops,ImageStat
-          for stage in ['closed','opened','scrolled']:
+          for stage in ['closed','opened','scrolled','restored']:
               a,b=Path(f'visual-evidence/reference-{stage}.png'),Path(f'visual-evidence/ours-{stage}.png')
               if not a.is_file() or not b.is_file():
                   print(stage,'missing screenshot',a.exists(),b.exists());continue
