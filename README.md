@@ -1,10 +1,10 @@
 # Celestial Lake — mobile wedding invitation prototype
 
-## Current scope — Sections 1, 2 and 3
+## Current scope — Sections 1–4
 
-**Section 1** remains the calibrated interactive sticky lake opener with the existing camera choreography and ambient animation. **Section 2** contains a separately styled, original ivory-and-gold invitation letter and scroll reveal; see [SECTION2-README.md](SECTION2-README.md). **Section 3** adds a date, time and venue presentation with guarded directions; see [SECTION3-README.md](SECTION3-README.md). The second and third scenes are original companion designs, not verified copies of the commercial reference, and all names/date are demonstration details. Event time and venue are unconfirmed, and RSVP is not implemented. Earlier phase notes below describe the historical Section 1-only scope.
+**Section 1** remains the calibrated interactive sticky lake opener with the existing camera choreography and ambient animation. **Section 2** contains a separately styled, original ivory-and-gold invitation letter and scroll reveal; see [SECTION2-README.md](SECTION2-README.md). **Section 3** adds a date, time and venue presentation with guarded directions; see [SECTION3-README.md](SECTION3-README.md). **Section 4** adds an original date-only countdown and confirmation-gated all-day calendar reminder; see [SECTION4-README.md](SECTION4-README.md). Sections 2–4 are original companion scenes, not verified copies of later commercial-reference sections, and names/dates are demonstration details. Event time and venue are unconfirmed, and RSVP is not implemented. Earlier phase notes below describe the historical Section 1-only scope.
 
-Mobile-first recreation of the **first section only** of [Undangan Kahwin's Celestial Lake](https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en).
+The original first-section reference for this multi-section mobile prototype is [Undangan Kahwin's Celestial Lake](https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en).
 
 This repository uses the reference's 25 unique WebP asset filenames and a layered HTML/CSS/JavaScript scene. The project owner reported permission to use the artwork on their website. The reference's original CSS and JavaScript were **not** available, so layer coordinates and animation timings are approximations, not a pixel-verified 1:1 reproduction.
 
