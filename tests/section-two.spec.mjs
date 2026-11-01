@@ -80,3 +80,52 @@ test('capture the corrected mobile Section 2 at each viewport',async({page},test
     animations:'disabled'
   });
 });
+
+
+test('Section 1 releases into Section 2 after exactly three mobile viewports',async({page},testInfo)=>{
+  await page.goto('/');
+  const initial=await page.evaluate(()=>{
+    const track=document.getElementById('sceneTrack').getBoundingClientRect();
+    const message=document.getElementById('message').getBoundingClientRect();
+    return {height:innerHeight,trackHeight:track.height,messageStart:message.top+scrollY,
+      overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(initial.trackHeight/initial.height).toBeCloseTo(3,2);
+  expect(initial.messageStart/initial.height).toBeCloseTo(3,2);
+  expect(initial.overflow).toBeLessThanOrEqual(1);
+
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo({top:Math.round(innerHeight*2.5),behavior:'instant'});
+  });
+  await expect.poll(()=>page.evaluate(()=>Number((scrollY/innerHeight).toFixed(2))))
+    .toBeCloseTo(2.5,1);
+  const mid=await page.evaluate(()=>{
+    const lake=document.getElementById('viewport').getBoundingClientRect();
+    const message=document.getElementById('message').getBoundingClientRect();
+    return {lakeTop:lake.top/innerHeight,lakeBottom:lake.bottom/innerHeight,
+      messageTop:message.top/innerHeight,overlap:lake.bottom-message.top,
+      textShift:document.documentElement.style.getPropertyValue('--text-scroll-shift').trim()};
+  });
+  expect(mid.lakeTop).toBeCloseTo(-.5,1);
+  expect(mid.lakeBottom).toBeCloseTo(.5,1);
+  expect(mid.messageTop).toBeCloseTo(.5,1);
+  expect(Math.abs(mid.overlap)).toBeLessThanOrEqual(2);
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.style
+    .getPropertyValue('--text-scroll-shift').trim())).toBe('0px');
+  await page.screenshot({path:testInfo.outputPath('section-two-transition-half.png'),animations:'disabled'});
+
+  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*3),behavior:'instant'}));
+  await expect.poll(()=>page.evaluate(()=>Number((scrollY/innerHeight).toFixed(2))))
+    .toBeCloseTo(3,1);
+  const completed=await page.evaluate(()=>{
+    const lake=document.getElementById('viewport').getBoundingClientRect();
+    const message=document.getElementById('message').getBoundingClientRect();
+    return {lakeBottom:lake.bottom,messageTop:message.top};
+  });
+  expect(Math.abs(completed.lakeBottom)).toBeLessThanOrEqual(2);
+  expect(Math.abs(completed.messageTop)).toBeLessThanOrEqual(2);
+  await expect(page.locator('#message')).toHaveClass(/is-visible/);
+  await page.screenshot({path:testInfo.outputPath('section-two-transition-full.png'),animations:'disabled'});
+});
