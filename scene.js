@@ -7,6 +7,14 @@ const REMOTE = 'https://undangankahwin.com/images/concierge/packs/tasik-kayangan
 const query = new URLSearchParams(location.search);
 const forceRemote = query.get('remote') === '1';
 const debug = query.has('debug');
+// Phase 21: opt-in original-art skin. The default prototype is untouched.
+// Use ?skin=golden-autumn to load assets/skins/golden-autumn/*.webp.
+// A non-default skin never falls back to the reference provider's artwork.
+const requestedSkin = query.get('skin') || '';
+const activeSkin = /^[a-z0-9][a-z0-9-]{0,39}$/.test(requestedSkin) && requestedSkin !== 'reference'
+  ? requestedSkin : '';
+const skinAssetBase = activeSkin ? './assets/skins/' + activeSkin + '/' : './assets/';
+
 const invite = document.getElementById('invitation');
 const art = document.getElementById('animatedScene');
 const master = document.getElementById('masterArt');
@@ -253,8 +261,8 @@ const allNames = ['scene.webp', ...byFile.keys()];
 const failed = new Set();
 function loadArtwork(name) {
   // Prefer locally stored artwork, fallback to reference host when absent.
-  const local = './assets/' + name;
-  const sources = forceRemote ? [REMOTE + name] : [local, REMOTE + name];
+  const local = skinAssetBase + name;
+  const sources = activeSkin ? [local] : (forceRemote ? [REMOTE + name] : [local, REMOTE + name]);
   return new Promise(resolve => {
     let index = 0;
     const test = new Image();
@@ -471,6 +479,17 @@ if (debug) {
   });
 }
 
+
+// Skin butterfly sprites retain the existing flight, timing and wing animation.
+// They are loaded from the same skin folder as the landscape artwork.
+if (activeSkin) {
+  for (const butterfly of document.querySelectorAll('.butterfly.violet')) {
+    butterfly.style.setProperty('--fly-image', 'url("' + skinAssetBase + 'bfly_1.webp")');
+  }
+  for (const butterfly of document.querySelectorAll('.butterfly.ivory')) {
+    butterfly.style.setProperty('--fly-image', 'url("' + skinAssetBase + 'bfly_white.webp")');
+  }
+}
 
 // Opt-in phone testing only. The diagnostics never run in a guest invitation.
 // On-device results stay in this browser until the tester chooses to copy them.
