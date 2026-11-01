@@ -46,8 +46,8 @@
     </g>
   </defs>
   <rect width="390" height="762" fill="#6b4e61"/>
-  <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".55"/>
-  <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".44"/>
+  <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".25"/>
+  <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".18"/>
   <rect width="390" height="762" fill="url(#luster)" opacity=".13"/>
   <!-- Embossed scrolling foliage is kept mainly along the margins. -->
   <g stroke="#321f31" opacity=".05" stroke-width="4" transform="translate(1 2)">
