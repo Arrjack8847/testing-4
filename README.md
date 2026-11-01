@@ -157,3 +157,19 @@ Butterflies pause while their scene is hidden, and disappear under the reduced-m
 Browser tests cover the phone widths 320/360/390/430px, the two butterfly states, reduced motion, and sticky scroll behavior. The commercial preview overlays on the source website are not replicated.
 
 The original butterfly assets come from **other packs referenced by the template**, so confirm the artwork license extends to those assets before public redistribution. All referenced artwork currently remains hosted at the source.
+
+
+## Phase 8 — progressive scroll reveal
+
+A failed Phase 7 browser test was traced to a test-harness error (`document` was referenced in Node rather than inside `page.evaluate`), not a demonstrated runtime scroll failure. The assertion was fixed.
+
+Reference measurements confirm the original hero remains at screen y=0 while the guest scrolls the first ~802px of a 390×844 mobile viewport. This revision preserves the 200dvh sticky scene track and makes scroll behavior more faithful:
+
+- **Removed the erroneous scroll-driven movement of the entire background.** Camera motion still happens on the opening action; scroll motion no longer pulls the landscape out of position.
+- **Progressive greeting:** after roughly 12% of viewport scroll, the greeting opacity interpolates to fully visible by roughly 47% of viewport scroll. This is an implementation calibration, not a recovered vendor timing curve.
+- **Swipe Up** smoothly advances within the pinned first scene to reveal the greeting; it no longer skips directly to the temporary next-section placeholder.
+- Reduced-motion users receive the same content without decorative motion; the text remains accessible.
+- The mobile Chromium suite checks mid-scroll opacity, sticky top position, next-section release and the tap behavior of Swipe Up.
+- The visual comparison workflow now captures **closed**, **opened**, and **45%-scrolled** states at 390×844, with differences saved as GitHub Actions artifacts.
+
+This remains Section 1 development only. The `#message` continuation is deliberately a placeholder, not a claim that Section 2 is complete.
