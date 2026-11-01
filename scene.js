@@ -284,14 +284,22 @@ const artworkReady = Promise.all(allNames.map(async name => {
   }
   return result;
 })).then(() => {
-  invite.dataset.layers = failed.size === 0 ? 'ready' : 'failed';
-  if (failed.size) {
-    notification.hidden = false;
-    notification.textContent = failed.has('scene.webp')
-      ? 'Original scene image could not be loaded. Run download-assets.ps1 to store artwork locally.'
-      : 'Some animated layers are unavailable. Displaying the original static scene.';
+  // Only the 24 separate layered files are essential to the moving garden.
+  // If scene.webp is missing but every layer loaded, prefer the complete
+  // animated scene instead of incorrectly hiding it and showing a blank page.
+  const layersComplete = [...byFile.keys()].every(name => !failed.has(name));
+  const masterLoaded = !failed.has('scene.webp');
+  const mode = layersComplete ? 'ready' : masterLoaded ? 'failed' : 'unavailable';
+  invite.dataset.layers = mode;
+  notification.hidden = mode === 'ready';
+  if (mode === 'failed') {
+    notification.textContent =
+      'Animated artwork is incomplete. Showing the still invitation image.';
+  } else if (mode === 'unavailable') {
+    notification.textContent =
+      'Invitation artwork could not be loaded. Check your connection or run download-assets.ps1.';
   }
-  return failed.size === 0;
+  return layersComplete;
 });
 
 // Cover is a focusable action, not a scroll-triggered trap.
