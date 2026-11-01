@@ -255,8 +255,13 @@ function applyScrollScene(fraction) {
   const blossoms = easeBetween(fraction, .59, .98);
   const peacocks = easeBetween(fraction, 1.06, 1.44);
   const greeting = easeBetween(fraction, 1.37, 1.61);
-  const names = easeBetween(fraction, 1.68, 2.04);
-  const details = easeBetween(fraction, 2.02, 2.34);
+  // The reference's large script first name starts drawing while the smaller
+  // "The Wedding of" line is still appearing; the two names reveal in order.
+  const firstName = easeBetween(fraction, 1.29, 1.59);
+  const ampersand = easeBetween(fraction, 1.63, 1.84);
+  const secondName = easeBetween(fraction, 1.79, 2.08);
+  const names = Math.max(firstName, secondName);
+  const details = easeBetween(fraction, 2.08, 2.42);
   const set = (name,value) => rootStyle.setProperty(name,String(value));
   set('--sky-scroll-scale', (1.12-.12*garden).toFixed(4));
   set('--sky-scroll-y', (-4*(1-garden)).toFixed(3)+'%');
@@ -274,6 +279,9 @@ function applyScrollScene(fraction) {
   set('--peacock-scroll-opacity', peacocks.toFixed(4));
   set('--reading-progress', greeting.toFixed(4));
   set('--names-progress', names.toFixed(4));
+  set('--first-name-progress', firstName.toFixed(4));
+  set('--amp-progress', ampersand.toFixed(4));
+  set('--second-name-progress', secondName.toFixed(4));
   set('--details-progress', details.toFixed(4));
   // The live reference's text block begins moving upward after ~2 viewports,
   // while the lake background itself stays pinned in place.
