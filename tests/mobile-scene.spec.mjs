@@ -634,8 +634,10 @@ test('scrolling past sticky Section 1 suspends ambient motion and restores on re
     const end=document.documentElement.scrollHeight-innerHeight;
     scrollTo({top:end,behavior:'instant'});
   });
+  // The next section can leave a narrow 37–47px strip of the sticky hero
+  // on tall phones, so pause once its visible area is below 7.5%.
   await expect.poll(async()=>page.evaluate(()=>document.querySelector('#viewport')
-    .getBoundingClientRect().bottom)).toBeLessThanOrEqual(0);
+    .getBoundingClientRect().bottom / innerHeight)).toBeLessThan(.075);
   await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
   await expect(page.locator('.sprite.hanging img').first())
     .toHaveCSS('animation-play-state','paused');
