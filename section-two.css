@@ -1,0 +1,144 @@
+/* Section 2 — an original, image-free wedding invitation letter.
+   Scoped to #message so the calibrated first-section camera stays untouched. */
+#message.invitation-letter {
+  position:relative;
+  z-index:2;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:100dvh;
+  padding:clamp(72px,11dvh,112px) clamp(13px,4vw,25px) clamp(92px,13dvh,120px);
+  text-align:center;
+  color:#604d64;
+  background:
+    radial-gradient(ellipse at 50% -12%,#c5b2ce 0,transparent 52%),
+    radial-gradient(ellipse at 5% 80%,#e7d6e6 0,transparent 48%),
+    radial-gradient(ellipse at 100% 100%,#e4cbdb 0,transparent 50%),
+    linear-gradient(170deg,#ded1e2 0%,#f0e7ec 43%,#e2d7e8 100%);
+}
+#message.invitation-letter::before {
+  content:"";position:absolute;z-index:0;left:0;top:0;right:0;height:130px;
+  background:linear-gradient(to bottom,rgba(116,91,140,.12),transparent);
+  pointer-events:none;
+}
+#message.invitation-letter::after {
+  content:"";position:absolute;z-index:0;inset:0;opacity:.48;pointer-events:none;
+  background-image:radial-gradient(#fff9f5 1px, transparent 1.6px);
+  background-size:38px 42px;
+  mask-image:linear-gradient(to bottom,transparent 9%,#000 38%,#000 81%,transparent 100%);
+}
+#message .letter-atmosphere {position:absolute;z-index:0;inset:0;overflow:hidden;pointer-events:none;}
+#message .letter-light {position:absolute;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,251,229,.55),transparent 70%);
+  filter:blur(13px);animation:letter-light-drift 13s ease-in-out infinite alternate;}
+#message .letter-light-one {top:3%;left:-190px;}
+#message .letter-light-two {bottom:-80px;right:-160px;animation-delay:-7s;}
+#message .letter-vine {position:absolute;width:190px;height:270px;
+  transform-origin:50% 10%;opacity:.65;animation:letter-vine-sway 9s ease-in-out infinite alternate;}
+#message .letter-vine-left {left:-95px;top:8%;--vine-turn:-5deg;}
+#message .letter-vine-right {right:-98px;bottom:7%;top:auto;
+  rotate:180deg;--vine-turn:5deg;animation-delay:-4.5s;}
+#message .letter-vine::before {content:"";position:absolute;left:50%;top:-14px;width:2px;height:270px;
+  border-radius:100%;background:linear-gradient(#ad936d,#a08a85 60%,transparent);
+  transform:rotate(22deg);transform-origin:top;}
+#message .letter-vine i {position:absolute;width:26px;height:54px;border-radius:100% 0 100% 0;
+  background:linear-gradient(155deg,rgba(158,140,126,.58),rgba(111,112,90,.22));
+  border:1px solid rgba(157,129,101,.3);}
+#message .letter-vine i:nth-child(1){top:24px;left:97px;rotate:-54deg;}
+#message .letter-vine i:nth-child(2){top:75px;left:66px;rotate:121deg;}
+#message .letter-vine i:nth-child(3){top:126px;left:123px;rotate:-48deg;}
+#message .letter-vine i:nth-child(4){top:168px;left:82px;rotate:124deg;}
+#message .letter-vine i:nth-child(5){top:208px;left:132px;rotate:-43deg;}
+#message .letter-spark {position:absolute;color:#bca47b;font:20px Georgia,serif;
+  opacity:.35;animation:letter-spark-drift 6s ease-in-out infinite alternate;}
+#message .letter-spark-one{top:9%;right:17%;animation-delay:-2s;}
+#message .letter-spark-two{top:55%;left:5%;font-size:12px;animation-delay:-4s;}
+#message .letter-spark-three{bottom:9%;right:14%;animation-delay:-1s;}
+#message .letter-page {
+  position:relative;z-index:1;width:100%;max-width:390px;
+  margin-inline:auto;padding:clamp(34px,7vw,49px) clamp(19px,6vw,34px) clamp(42px,9vw,58px);
+  border:1px solid rgba(166,135,96,.58);
+  border-radius:152px 152px 12px 12px / 90px 90px 12px 12px;
+  background:
+    radial-gradient(ellipse at 50% 4%,rgba(255,252,239,.95),transparent 48%),
+    linear-gradient(160deg,rgba(255,253,247,.96),rgba(248,241,236,.94) 58%,rgba(255,249,243,.96));
+  box-shadow:0 16px 42px rgba(76,48,84,.16),inset 0 0 50px rgba(207,183,164,.12);
+}
+#message .letter-page::before{content:"";position:absolute;inset:8px;
+  border:1px solid rgba(188,159,116,.48);
+  border-radius:148px 148px 7px 7px / 85px 85px 7px 7px;
+  pointer-events:none;}
+#message .letter-page::after{content:"";position:absolute;inset:15px;pointer-events:none;
+  border:1px solid rgba(212,189,153,.2);
+  border-radius:145px 145px 4px 4px / 78px 78px 4px 4px;}
+#message .letter-corner {position:absolute;color:#b39770;font:24px Georgia,serif;opacity:.75;pointer-events:none;}
+#message .letter-corner-tl {top:99px;left:20px;rotate:-34deg;}
+#message .letter-corner-tr {top:99px;right:20px;rotate:34deg;scale:-1 1;}
+#message .letter-corner-bl {bottom:17px;left:17px;rotate:48deg;}
+#message .letter-corner-br {bottom:17px;right:17px;rotate:-48deg;scale:-1 1;}
+#message .letter-content {position:relative;z-index:1;}
+#message .letter-content p {max-width:100%;margin-left:auto;margin-right:auto;}
+#message .letter-kicker {
+  margin:35px 0 20px!important;font:500 10px/1.5 'Cinzel',Georgia,serif;
+  letter-spacing:.26em;text-transform:uppercase;color:#a48162;
+}
+#message .letter-flourish,#message .letter-divider {
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  color:#bb9b70;font:20px/1 Georgia,serif;}
+#message .letter-flourish span,#message .letter-divider span {
+  display:block;width:44px;height:1px;
+  background:linear-gradient(90deg,transparent,#c6a67e,transparent);}
+#message .letter-bismillah {font:400 clamp(21px,6vw,27px)/1.8 'Times New Roman',serif;
+  color:#775c73;margin:28px 0 23px!important;letter-spacing:normal;}
+#message .letter-intro,#message .letter-subheading,#message .letter-closing {
+  font:400 clamp(16px,4.2vw,19px)/1.6 'EB Garamond',Georgia,serif;
+  color:#695b67;text-wrap:pretty;}
+#message .letter-intro {margin:0 auto 14px!important;max-width:27ch!important;}
+#message h2.letter-heading {
+  margin:0 auto 12px;font:400 clamp(31px,8.5vw,39px)/1.1 'Pinyon Script',cursive;
+  letter-spacing:0;color:#765b76;text-shadow:none;}
+#message .letter-subheading{margin:0 auto 13px!important;}
+#message .letter-names {
+  display:flex;align-items:center;flex-direction:column;
+  gap:0;margin:0 auto 9px!important;
+  font:400 clamp(53px,16vw,73px)/.85 'Pinyon Script',cursive;
+  color:#94745f;text-shadow:0 2px 12px rgba(230,199,164,.2);
+}
+#message .letter-names span {display:block;white-space:nowrap;}
+#message .letter-names .letter-amp {font-size:.52em;line-height:1.18;color:#a58980;}
+#message .letter-divider {margin:27px auto 19px;font-size:17px;}
+#message .date.letter-date{
+  margin:0 auto 23px!important;font:500 12px/1.5 'Cinzel',Georgia,serif;
+  letter-spacing:.21em;color:#836879;}
+#message .letter-closing {
+  max-width:27ch!important;margin:0 auto 12px!important;color:#806b76;
+}
+#message .letter-footer-ornament {color:#b89c77;font-size:27px;line-height:1;margin-top:22px;}
+/* Reveal only when enhancement script is active. Plain HTML remains readable without JS. */
+#message[data-reveal-ready="true"] .letter-reveal {opacity:0;transform:translateY(18px);
+  transition:opacity 850ms ease,transform 850ms cubic-bezier(.2,.65,.25,1);
+  transition-delay:var(--letter-delay,0ms);}
+#message[data-reveal-ready="true"].is-visible .letter-reveal {opacity:1;transform:translateY(0);}
+#message .letter-reveal:nth-child(1){--letter-delay:0ms}
+#message .letter-reveal:nth-child(2){--letter-delay:80ms}
+#message .letter-reveal:nth-child(3){--letter-delay:160ms}
+#message .letter-reveal:nth-child(4){--letter-delay:240ms}
+#message .letter-reveal:nth-child(5){--letter-delay:320ms}
+#message .letter-reveal:nth-child(6){--letter-delay:400ms}
+#message .letter-reveal:nth-child(7){--letter-delay:480ms}
+#message .letter-reveal:nth-child(8){--letter-delay:560ms}
+#message .letter-reveal:nth-child(9){--letter-delay:640ms}
+#message .letter-reveal:nth-child(10){--letter-delay:720ms}
+#message .letter-reveal:nth-child(11){--letter-delay:800ms}
+@keyframes letter-vine-sway {from{transform:rotate(-2deg)}to{transform:rotate(3deg)}}
+@keyframes letter-light-drift {from{transform:translate(-16px,5px)}to{transform:translate(22px,-25px)}}
+@keyframes letter-spark-drift {from{transform:translateY(5px);opacity:.25}to{transform:translateY(-11px);opacity:.7}}
+@media(max-width:350px){
+  #message.invitation-letter{padding-inline:10px;}
+  #message .letter-page{padding-inline:18px;}
+  #message .letter-corner-tl{left:13px;}
+  #message .letter-corner-tr{right:13px;}
+}
+@media(prefers-reduced-motion:reduce){
+  #message .letter-vine,#message .letter-light,#message .letter-spark{animation:none!important;}
+  #message[data-reveal-ready="true"] .letter-reveal{opacity:1!important;transform:none!important;transition:none!important;}
+}
