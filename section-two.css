@@ -104,7 +104,15 @@
   color:#94745f;text-shadow:0 2px 12px rgba(230,199,164,.2);
 }
 #message .letter-names span {display:block;white-space:nowrap;}
-#message .letter-names .letter-amp {font-size:.52em;line-height:1.18;color:#a58980;}
+#message .letter-names .letter-amp {
+  font-family:'EB Garamond',Georgia,serif;
+  font-size:clamp(27px,8vw,35px);
+  font-style:italic;
+  font-weight:400;
+  line-height:1.03;
+  letter-spacing:0;
+  color:#a58980;
+}
 #message .letter-divider {margin:27px auto 19px;font-size:17px;}
 #message .date.letter-date{
   margin:0 auto 23px!important;font:500 12px/1.5 'Cinzel',Georgia,serif;
