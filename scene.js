@@ -280,8 +280,10 @@ function applyScrollScene(fraction) {
   set('--reading-progress', greeting.toFixed(4));
   set('--names-progress', names.toFixed(4));
   set('--first-name-progress', firstName.toFixed(4));
+  set('--first-name-hidden',((1-firstName)*100).toFixed(2)+'%');
   set('--amp-progress', ampersand.toFixed(4));
   set('--second-name-progress', secondName.toFixed(4));
+  set('--second-name-hidden',((1-secondName)*100).toFixed(2)+'%');
   set('--details-progress', details.toFixed(4));
   // The live reference's text block begins moving upward after ~2 viewports,
   // while the lake background itself stays pinned in place.
