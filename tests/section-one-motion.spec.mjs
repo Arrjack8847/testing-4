@@ -70,3 +70,81 @@ test('reduced motion hides original butterflies and preserves readable names',as
   await expect(page.locator('.name-second')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+
+test('garden flowers use gentle multi-phase sway without moving the edge anchors',async({page})=>{
+  const errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-layers','ready',{timeout:30000});
+  const data=await page.evaluate(()=>{
+    const roots=[...document.querySelectorAll('.sprite.hanging,.sprite.plant:not(.still),.sprite.flower')];
+    return roots.map(root=>{
+      const img=root.querySelector('img');
+      const style=getComputedStyle(img);
+      const animation=img.getAnimations().find(a=>a.animationName==='reference-sway');
+      const keyframes=animation?.effect?.getKeyframes() || [];
+      const duration=parseFloat(style.animationDuration);
+      const sa=parseFloat(root.style.getPropertyValue('--sa'));
+      return {
+        className:root.className,origin:style.transformOrigin,
+        duration,keyframeOffsets:keyframes.map(k=>Number(k.offset.toFixed(2))),
+        keyframeAngles:keyframes.map(k=>{
+          const m=(k.transform||'').match(/rotate\((-?[\d.]+)deg\)/);
+          return m?Number(m[1]):NaN;
+        }),
+        sa
+      };
+    });
+  });
+  expect(data.length).toBeGreaterThanOrEqual(18);
+  for(const item of data){
+    expect(item.keyframeOffsets).toEqual([0,.17,.38,.57,.78,1]);
+    expect(item.keyframeAngles.every(Number.isFinite)).toBe(true);
+    expect(Math.max(...item.keyframeAngles.map(Math.abs))).toBeLessThanOrEqual(item.sa*1.01);
+    // Relative pivots: the hanging flowers swing from the branch,
+    // lower plants from their rooted ground attachment.
+    const y=Number.parseFloat(item.origin.split(' ')[1]);
+    expect(Number.isFinite(y)).toBe(true);
+    expect(item.duration).toBeGreaterThan(2);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('two butterfly species briefly hover near lower garden flowers',async({page})=>{
+  const errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-layers','ready',{timeout:30000});
+  const paths=await page.locator('.butterfly-cover .butterfly').evaluateAll(nodes=>nodes.map(el=>{
+    const animation=el.getAnimations().find(a=>/^bf-(violet|ivory)-garden$/.test(a.animationName||''));
+    const frames=animation?.effect?.getKeyframes() || [];
+    const grab=offset=>{
+      const k=frames.find(k=>Math.abs(k.offset-offset)<.0001);
+      if(!k)return null;
+      const match=(k.transform||'').match(/translate3d\(\s*([-\d.]+)px,\s*([-\d.]+)px/);
+      return match ? {x:Number(match[1]),y:Number(match[2])}:null;
+    };
+    const violet=el.classList.contains('violet');
+    return {
+      species:violet?'violet':'ivory',
+      duration:getComputedStyle(el).animationDuration,
+      before:grab(violet?.35:.46),
+      dwell:grab(violet?.38:.49),
+      drift:grab(violet?.40:.51),
+      after:grab(violet?.42:.54),
+      wing:getComputedStyle(el.querySelector('.butterfly-wing-l')).animationDuration
+    };
+  }));
+  expect(paths).toHaveLength(2);
+  for(const p of paths){
+    for(const k of ['before','dwell','drift','after'])expect(p[k]).not.toBeNull();
+    const distance=Math.hypot(p.before.x-p.dwell.x,p.before.y-p.dwell.y);
+    expect(distance).toBeLessThan(1.5);
+    const shift=Math.hypot(p.after.x-p.before.x,p.after.y-p.before.y);
+    expect(shift).toBeGreaterThan(6);
+    expect(parseFloat(p.duration)).toBeGreaterThan(20);
+    expect(parseFloat(p.wing)).toBeLessThan(.25);
+  }
+  expect(errors).toEqual([]);
+});
