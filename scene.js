@@ -315,7 +315,9 @@ function openInvitation(event) {
   invite.dataset.lettering = 'idle';
   applyScrollScene(0);
   cover.inert = true;
+  cover.setAttribute('aria-hidden','true');
   opened.inert = false;
+  opened.setAttribute('aria-hidden','false');
   openedOnce = true;
   document.documentElement.style.overflowY = 'auto';
   if (keyboardActivation) {
@@ -328,7 +330,9 @@ function resetInvitation() {
   invite.dataset.lettering = 'idle';
   applyScrollScene(0);
   cover.inert = false;
+  cover.setAttribute('aria-hidden','false');
   opened.inert = true;
+  opened.setAttribute('aria-hidden','true');
   openedOnce = false;
   document.documentElement.style.overflowY = 'hidden';
   // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
