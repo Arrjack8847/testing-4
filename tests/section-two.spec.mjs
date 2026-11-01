@@ -151,7 +151,7 @@ test('Section 2 original textured layer is present and its reference-aligned fra
     expect(sprite.messageHeight).toBeCloseTo(762,0);
     expect(sprite.leadRelative).toBeGreaterThan(280);
     expect(sprite.leadRelative).toBeLessThan(320);
-    expect(sprite.leadWidth).toBeGreaterThanOrEqual(315);
+    expect(sprite.leadWidth).toBeCloseTo(322,0);
   }
   const textureResponse=await page.request.get('/assets/section2-mauve-original.svg');
   expect(textureResponse.ok()).toBe(true);
