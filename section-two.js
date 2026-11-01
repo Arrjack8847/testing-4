@@ -1,18 +1,56 @@
 'use strict';
-// Section 2 — animate the framed message itself, not the empty top padding.
-// Measured from the mobile reference: message begins after the lake hero,
-// frame enters later within the mauve textured band.
+// Section 2 — scroll reveal and visible-only decorative petals.
+// The mauve scene overlaps the pinned lake between 2H and 3H.
+// The frame becomes readable only as its content enters the viewport.
 (() => {
   const section = document.getElementById('message');
+  const invitation = document.getElementById('invitation');
   const frame = section?.querySelector('.letter-frame');
-  if (!section || !frame || !('IntersectionObserver' in window)) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!section || !frame || !invitation) return;
 
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let onScreen = false;
+  function syncPetals() {
+    section.dataset.petalsActive = String(
+      onScreen && invitation.dataset.state === 'opened' && !document.hidden && !reduced.matches
+    );
+  }
+  syncPetals();
+
+  // Avoid running infinite petal motion behind the closed cover, or after the
+  // guest leaves Section 2. This also handles pages opened from bfcache.
+  new MutationObserver(syncPetals).observe(invitation, {
+    attributes:true,attributeFilter:['data-state']
+  });
+  document.addEventListener('visibilitychange',syncPetals);
+  reduced.addEventListener('change',syncPetals);
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      onScreen = entries.some(entry=>entry.isIntersecting);
+      syncPetals();
+    },{threshold:0,rootMargin:'40px 0px'}).observe(section);
+  } else {
+    // Browser fallback: still respect reduced motion and cover state.
+    const check = () => {
+      const box=section.getBoundingClientRect();
+      onScreen = box.bottom > -40 && box.top < innerHeight+40;
+      syncPetals();
+    };
+    window.addEventListener('scroll',check,{passive:true});
+    window.addEventListener('resize',check,{passive:true});
+    check();
+  }
+
+  if (reduced.matches || !('IntersectionObserver' in window)) {
+    section.classList.add('is-visible');
+    return;
+  }
   section.dataset.revealReady='true';
-  const observer = new IntersectionObserver(entries => {
+  const revealObserver = new IntersectionObserver(entries => {
     if (!entries.some(entry=>entry.isIntersecting)) return;
     section.classList.add('is-visible');
-    observer.disconnect();
+    revealObserver.disconnect();
   },{threshold:.12});
-  observer.observe(frame);
+  revealObserver.observe(frame);
 })();
