@@ -229,12 +229,13 @@ test('lake stays pinned while scrolling through the mobile opening section',asyn
   expect(bounds.y).toBeLessThan(height);
   const nextStart=await page.locator('#message').boundingBox();
   expect(nextStart.y).toBeGreaterThanOrEqual(height);
-  // At 2.45H the sticky 3H track is already releasing the lake.
+  // At 2.45H the reference's lake remains pinned, while the mauve band
+  // has begun covering its lower edge.
   await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*2.45),behavior:'instant'}));
   await expect.poll(async()=>page.evaluate(()=>{
     const box=document.querySelector('#viewport').getBoundingClientRect();
     return Math.round(box.y);
-  })).toBeLessThan(0);
+  })).toBe(0);
   await expect.poll(async()=>page.evaluate(()=>{
     const box=document.querySelector('#message').getBoundingClientRect();
     return box.y;
@@ -288,21 +289,21 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   await expect.poll(async()=>page.evaluate(()=>
     parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
   )).toBe(1);
-  // The lake is now leaving naturally after the sticky portion (2H).
+  // The measured source keeps the entire garden pinned past 2H; only
+  // the names scroll upwards while the mauve panel covers its lower part.
   await expect.poll(async()=>page.evaluate(()=>
-    Number((document.querySelector('#viewport').getBoundingClientRect().top/innerHeight).toFixed(2))
-  )).toBeCloseTo(-.2,1);
+    Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
+  )).toBe(0);
   await expect.poll(async()=>page.evaluate(()=>
     document.documentElement.style.getPropertyValue('--stage-parallax').trim()
   )).toBe('0px');
   await visit(2.5);
-  // No extra text offset is applied: the viewport and text must exit together.
   await expect.poll(async()=>page.evaluate(()=>
-    document.documentElement.style.getPropertyValue('--text-scroll-shift').trim()
-  )).toBe('0px');
-  await expect.poll(async()=>page.evaluate(()=>
-    Number((document.querySelector('#viewport').getBoundingClientRect().top/innerHeight).toFixed(2))
+    Number((parseFloat(document.documentElement.style.getPropertyValue('--text-scroll-shift'))/innerHeight).toFixed(2))
   )).toBeCloseTo(-.5,1);
+  await expect.poll(async()=>page.evaluate(()=>
+    Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
+  )).toBe(0);
 });
 
 test('swipe cue reveals greeting instead of skipping the sticky lake',async({page})=>{
