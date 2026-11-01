@@ -16,6 +16,8 @@ jobs:
         run: |
           node --check scene.js
           node --check phone-qa.js
+          node --check section-two.js
+          node --check section-three.js
           node --check tests/phone-qa.spec.mjs
       - name: Validate scene and artwork references
         run: python3 tools/check-source.py
