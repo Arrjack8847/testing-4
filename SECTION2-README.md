@@ -1,63 +1,65 @@
-# Section 2 — Invitation Letter
+# Section 2 — observed live reference and implementation
 
-## Status and relationship to the reference
+**Reference:** Tasik Kayangan English mobile demo,
+`https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en`
 
-Section 2 replaces the former blank wedding-message preview after the 4dvh sticky lake scene in Section 1. It is a **new original companion design**, not a verified pixel-accurate recreation of the vendor's second section; its complete reference imagery and choreography were not available for reliable inspection.
+**Evidence:** [read-only live inspection run](https://github.com/Arrjack8847/testing-4/actions/runs/41328045666).
+The temporary `reference-section2-inspection` artifact contains `report.json` and 390×844 screenshots. No third-party artwork has been imported into this repository by the inspector.
 
-The original Section 1 artwork, camera positions, butterfly timings, scroll restoration, handwritten names, and swipe mechanics were not changed.
+## What the live template actually shows
 
-## Visual design
+The second reference scene is **not a parchment wedding card with large couple names and a date**. It is a narrow, mauve-textured message scene framed by two fine rectangular rules.
 
-- Mobile-first ivory wedding letter with an arched top and double gold frame.
-- Lilac-to-parchment ambient transition from the lake scene.
-- Self-contained CSS vines, glints and soft light; no additional borrowed artwork.
-- Bismillah, invitation wording, Rayyan and Sofea, and date from the existing prototype. These are demonstration details, **not authenticated wedding data**.
-- Ordinary selectable HTML text for accessibility and later localization.
+At a 390×844 portrait viewport, after opening the invitation:
 
-## Scroll behavior
+| Measurement | Measured reference |
+|---|---|
+| Hero section | y=0–2532, exactly 3 viewports |
+| Invitation-message section | y=2532–3294.4, height 762.4px |
+| Inner content region | 334px wide |
+| Decorative double-rule frame | approx 346×495px |
+| Lead text | EB Garamond, 19px, white, centered |
+| Background | Mauve textured band (the original uses `band.webp` as a background image) |
+| Ambient detail | Scattered pale pink/purple petals |
+| Content order | Bismillah icon → invitation paragraph → italic quotation → Surah Ar-Rum 21 label |
+| Next reference section | **The Couple**, y=3294–5134, approx 1840px, with floral canopy, cream arch and portrait cards |
 
-Section 1 remains sticky over its existing 4-viewport track. After the track, the invitation letter enters naturally. A small IntersectionObserver in `section-two.js` reveals its lines one time at 12% visibility, then disconnects. If JavaScript is unavailable, the content stays visible. With reduced motion enabled, all content appears without fades or movement.
+The vendor's visible invitation paragraph uses the same demonstration wording already present in our earlier prototype. The revised quote in our version is a short original paraphrase of the verse's sentiment, rather than a verbatim copy of the site's translation.
 
-The first-section "Swipe up" cue still scrolls into the middle of the first cinematic sequence, rather than skipping the wedding names or jumping immediately to Section 2.
+## What changed in our Section 2
 
-## Files
+- Replaced the previous large ivory invitation-letter scene and names/date with the reference-observed message hierarchy.
+- Created an **original CSS textile texture** instead of importing the vendor's `band.webp`.
+- Used thin double rectangular borders at the measured width.
+- Restored white serif typography and a distinct italic religious quote.
+- Added restrained drifting petals, with motion disabled for Reduce Motion.
+- Triggered scroll-reveal when the actual frame is visible, not when empty section padding first enters the viewport.
+- Updated mobile and cross-engine regression tests.
 
-- `index.html`: Second-section accessible semantic content and references to new style/script.
-- `section-two.css`: Scoped styles; leaves the calibrated first-scene CSS unchanged.
-- `section-two.js`: One-time reveal only.
-- `tests/section-two.spec.mjs`: Four mobile viewport checks for reveal, layout and motion preferences.
-- `tests/cross-browser.spec.mjs`: Added three-engine second-section check.
+## Remaining differences / visual QA
 
-## QA
+- Our current sticky opening runs approximately **four viewport heights**; the measured original hero is **three**. Changing this would touch Section 1, so it was deliberately left alone until a separate integration phase.
+- The original `band.webp` has a richer woven texture than our original CSS-generated approximation.
+- The reference's Bismillah is a compact calligraphic design; our Unicode text is a font-dependent representation and should be refined with an original licensed ornament.
+- Our existing Section 3 is an **events panel**, while the actual reference follows Section 2 with **The Couple**. This requires a future section-order correction to reproduce the full site faithfully.
+- The reference has its own merchant header/footer controls, which are not part of our guest-facing invitation.
+- Capture the updated implementation at 320, 360, 390 and 430 CSS pixels, compare it against the reference screenshot, then adjust frame baseline and typography. Physical iPhone/Android testing remains outstanding.
+- The original first-section artwork and other provider-owned assets must not be commercially published without verified rights.
 
-Run locally:
+## Local test
 
 ```powershell
 git pull origin main
 powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
-Scroll past the completed first section. For browser checks:
+Open `http://localhost:8000`, tap **Open Invitation**, and scroll to the mauve message scene. In another terminal:
 
 ```powershell
 npm install
-npx playwright install chromium firefox webkit
 npm run test:syntax
 npm run test:mobile
 npm run test:crossbrowser
 ```
 
-The new section still requires real phone testing and comparison with the live reference before calling it a match. It adds **no** new WebPs and does not change Phase 19's commercial artwork restrictions. The next section's event venue, time and RSVP remain out of scope until reliable content is provided.
-
-
-## Section 2 QA — 2026-11-01
-
-Verified in the repository's automated mobile suite:
-- Four viewports: 320×568, 360×740, 390×844, and 430×932.
-- CSS layout checks detect horizontal page overflow, clipped leaf text, and a frame exceeding the mobile width.
-- Captured actual rendered viewport and full-letter screenshots at each size.
-- [Passing mobile screenshot run](https://github.com/Arrjack8847/testing-4/actions/runs/41320475830) (artifact: `section-two-mobile-screenshots`).
-- After visual inspection, the tiny Pinyon Script ampersand was changed to a clearer EB Garamond italic ampersand. This minor change is limited to `section-two.css`.
-- The 25-scene-file source integrity check was repaired to exclude two optional skin butterfly assets; [source validation passed](https://github.com/Arrjack8847/testing-4/actions/runs/41320852847).
-
-These are automated browser checks. No claim of exact visual matching to the inaccessible second scene of the commercial reference or of real-device iPhone/Android certification is made. The wedding details are still examples, and the original reference-provider artwork in Section 1 remains subject to public-use rights.
+This is a visual and behavioral reconstruction using independently written HTML/CSS/JavaScript, not a copy of the original source.
