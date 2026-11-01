@@ -5,6 +5,8 @@ on:
       - index.html
       - section-two.css
       - section-two.js
+      - section-three.css
+      - section-three.js
       - styles.css
       - scene.js
       - phone-qa.js
