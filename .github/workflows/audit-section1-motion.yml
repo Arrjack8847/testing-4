@@ -1,0 +1,45 @@
+name: Sections 1–2 reference animation audit (read-only)
+on:
+  push:
+    paths:
+      - tools/audit-section1-motion.mjs
+      - .github/workflows/audit-section1-motion.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Stage 25 reference assets temporarily for original scene QA
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen,Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              response=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=35).read()
+              assert response[:4]==b'RIFF' and response[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(response)
+          PY
+      - run: python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section1-audit.log 2>&1 &
+      - name: Compare garden and lettering scroll checkpoints
+        run: node tools/audit-section1-motion.mjs
+      - name: Upload temporary reference/local screenshot and metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section1-animation-timeline-evidence
+          path: section1-motion-evidence/
+          retention-days: 5
+          if-no-files-found: warn
