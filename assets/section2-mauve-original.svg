@@ -50,17 +50,17 @@
   <rect width="390" height="762" fill="#9c8296" filter="url(#relief)" opacity=".31"/>
   <rect width="390" height="762" fill="url(#luster)" opacity=".13"/>
   <!-- Embossed scrolling foliage is kept mainly along the margins. -->
-  <g stroke="#321f31" opacity=".095" stroke-width="4" transform="translate(1 2)">
+  <g stroke="#321f31" opacity=".05" stroke-width="4" transform="translate(1 2)">
     <use href="#sprig"/><use href="#curl" transform="translate(-26 178) scale(.68)"/>
     <use href="#sprig" transform="translate(389 759) rotate(180)"/>
     <use href="#curl" transform="translate(416 543) rotate(182) scale(.7)"/>
   </g>
-  <g stroke="#d7bbcd" opacity=".22" stroke-width="2.1">
+  <g stroke="#d7bbcd" opacity=".13" stroke-width="2.1">
     <use href="#sprig"/><use href="#curl" transform="translate(-26 178) scale(.68)"/>
     <use href="#sprig" transform="translate(389 759) rotate(180)"/>
     <use href="#curl" transform="translate(416 543) rotate(182) scale(.7)"/>
   </g>
-  <g stroke="#e8cedd" opacity=".11" stroke-width="1.2" fill="none">
+  <g stroke="#e8cedd" opacity=".075" stroke-width="1.2" fill="none">
     <path d="M-15,447 Q21,413 49,427 T84,460 Q96,501 67,513 Q51,517 53,492"/>
     <path d="M405,304 Q363,289 345,314 T305,356 Q315,387 340,377 Q357,362 342,352"/>
     <path d="M-15,586 Q40,561 58,601 Q70,635 103,627"/>
