@@ -80,8 +80,23 @@ for (const [filename, classes, properties] of definitions) {
       fall.style.setProperty('--fall-delay', phase);
       for (const tag of ['i','i','b']) fall.appendChild(document.createElement(tag));
       water.appendChild(fall);
+      // Floating mist is independent of the water streams. The three overlapping
+      // clouds move on different long cycles and remain anchored to the falls.
+      const mist = document.createElement('div');
+      mist.className = 'scene-mist';
+      mist.style.setProperty('--mist-x', left);
+      mist.style.setProperty('--mist-width', width);
+      mist.style.setProperty('--mist-delay', phase);
+      for (let index = 0; index < 3; index++) mist.appendChild(document.createElement('i'));
+      water.appendChild(mist);
     }
     wrapper.appendChild(water);
+  }
+  if (classes.includes('peacock-sprite')) {
+    const sheen = document.createElement('i');
+    sheen.className = 'peacock-glint';
+    sheen.setAttribute('aria-hidden', 'true');
+    wrapper.appendChild(sheen);
   }
   art.appendChild(wrapper);
   if (!byFile.has(filename)) byFile.set(filename, []);
@@ -192,7 +207,15 @@ const artworkReady = Promise.all(allNames.map(async name => {
   const result = await loadArtwork(name);
   if (result.okay) {
     if (name === 'scene.webp') master.src = result.src;
-    else byFile.get(name).forEach(img => { img.src = result.src; });
+    else byFile.get(name).forEach(img => {
+      img.src = result.src;
+      // Use whichever image URL successfully loaded (local or remote) as the
+      // alpha mask for the soft peacock feather glint; never duplicate art.
+      if (name === 'peacock.webp') {
+        const sheen = img.parentElement?.querySelector('.peacock-glint');
+        if (sheen) sheen.style.setProperty('--peacock-image', 'url("' + result.src + '")');
+      }
+    });
   }
   return result;
 })).then(() => {
