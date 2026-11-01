@@ -1,0 +1,53 @@
+name: Sections 1–2 focused mobile visual QA
+on:
+  push:
+    paths:
+      - index.html
+      - styles.css
+      - scene.js
+      - section-two.css
+      - section-two.js
+      - assets/section2-mauve-original.svg
+      - tests/section-two.spec.mjs
+      - .github/workflows/section1-2-visual.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phone-390:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Load test-only reference artwork into ephemeral runner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              body=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=40).read()
+              assert body[:4]==b'RIFF' and body[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(body)
+          print('Artwork loaded for temporary browser QA only.')
+          PY
+      - name: Run Section 2 and 1→2 checkpoint geometry in 390px mobile Chromium
+        run: npx playwright test tests/section-two.spec.mjs --project=iphone-390 --workers=1
+      - name: Upload focused transition and message screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section1-2-iphone390-visual-checkpoints
+          path: test-results/**/*section-two*.png
+          retention-days: 7
+          if-no-files-found: warn
