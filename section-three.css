@@ -41,7 +41,7 @@
   color:#896980;letter-spacing:0;text-shadow:0 3px 16px #fff9f4cc;}
 .event-section .event-subtitle{font:400 clamp(16px,4.3vw,20px)/1.45 'EB Garamond',Georgia,serif;
   margin:0 auto 40px;color:#796779;}
-.event-section .event-date-card{width:min(100%,300px);margin:0 auto 15px;
+.event-section .event-date-card{display:block;width:min(100%,300px);margin:0 auto 15px;
   position:relative;padding:24px 16px 22px;border:1px solid #c2aa8b;
   border-radius:158px 158px 10px 10px / 98px 98px 10px 10px;
   background:linear-gradient(160deg,#fffdf8f0,#f9f1ece8);
