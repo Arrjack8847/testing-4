@@ -129,3 +129,40 @@ test('Section 1 releases into Section 2 after exactly three mobile viewports',as
   await expect(page.locator('#message')).toHaveClass(/is-visible/);
   await page.screenshot({path:testInfo.outputPath('section-two-transition-full.png'),animations:'disabled'});
 });
+
+
+test('Section 2 original textured layer is present and its reference-aligned frame retains geometry',async({page},testInfo)=>{
+  const section=await reachMessage(page);
+  const sprite=await section.evaluate(el=>{
+    const frame=el.querySelector('.letter-frame').getBoundingClientRect();
+    const band=el.getBoundingClientRect();
+    const source=getComputedStyle(el,'::before');
+    const lead=el.querySelector('.letter-lead').getBoundingClientRect();
+    return {top:frame.top-band.top,width:frame.width,
+      messageHeight:band.height,leadRelative:lead.top-band.top,leadWidth:lead.width,
+      texture:source.backgroundImage,opacity:source.opacity,
+      opacityText:getComputedStyle(el.querySelector('.letter-lead')).opacity};
+  });
+  expect(sprite.texture).toContain('section2-mauve-original.svg');
+  expect(sprite.opacityText).toBe('1');
+  if(await page.evaluate(()=>innerWidth)===390){
+    expect(sprite.top).toBeCloseTo(188,0);
+    expect(sprite.width).toBeCloseTo(346,0);
+    expect(sprite.messageHeight).toBeCloseTo(762,0);
+    expect(sprite.leadRelative).toBeGreaterThan(280);
+    expect(sprite.leadRelative).toBeLessThan(320);
+    expect(sprite.leadWidth).toBeGreaterThanOrEqual(315);
+  }
+  const textureResponse=await page.request.get('/assets/section2-mauve-original.svg');
+  expect(textureResponse.ok()).toBe(true);
+  expect(await textureResponse.text()).toContain('<svg');
+
+  for(const fraction of [2.75,3.25]){
+    await page.evaluate(frac=>window.scrollTo({top:Math.round(innerHeight*frac),behavior:'instant'}),fraction);
+    await expect.poll(()=>page.evaluate(()=>Number((scrollY/innerHeight).toFixed(2))))
+      .toBeCloseTo(fraction,1);
+    await page.screenshot({
+      path:testInfo.outputPath('section-two-reference-checkpoint-'+String(fraction).replace('.','_')+'.png'),
+      animations:'disabled'});
+  }
+});
