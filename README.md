@@ -304,3 +304,17 @@ This update changes the *work performed* while the scene is invisible, not the a
 - Latest source checks: [passed](https://github.com/Arrjack8847/testing-4/actions/runs/41289606504)
 - Five-stage 390×844 screenshot parity workflow: [passed](https://github.com/Arrjack8847/testing-4/actions/runs/41289581606). Measured full-frame mean RGB differences (0–255): closed 22.52, opened 20.61, mid-scroll 32.23, restored garden 23.57, written text 26.75. These are not visual-accuracy percentages.
 - These tests prove frame **suspension**, not a specific FPS improvement or measured energy saving on physical devices.
+
+
+## Phase 15 — resilient artwork loading and phone QA
+
+This pass fixes two genuine broken-image paths and improves Windows local testing:
+
+- The layered garden is now used when **all animated components load**, even if the separately flattened `scene.webp` fails. The original master file is no longer incorrectly required for the moving scene.
+- If an individual animated component fails but `scene.webp` loaded, the page falls back to the original still picture with a short explanatory message.
+- If neither source can load, visitors still see a readable gradient-backed invitation with a working **Open Invitation** button, rather than a broken or empty view.
+- Both Windows scripts read `ASSET-MANIFEST.txt`, check **all 25 WebP files**, verify their RIFF/WEBP signatures, and replace invalid downloads atomically. Already valid files are reused.
+- Source CI checks consistency against the manifest and parses both PowerShell scripts; mobile browser tests deliberately abort image requests to verify all three fallback modes.
+- See [REAL-DEVICE-TESTING.md](REAL-DEVICE-TESTING.md) for the same-Wi-Fi iPhone/Android testing procedure, accessibility checks and performance observations.
+
+These improvements do not redistribute or bundle the source artwork, and do not change the approved normal opening or scroll choreography.
