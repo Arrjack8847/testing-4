@@ -82,3 +82,16 @@ The actual reference frame begins approximately **188px inside the mauve band**;
 Section 2 screenshots now also capture **2.75H and 3.25H**, in addition to the 2.5H and 3H transition checkpoints. Those positions match the read-only reference inspection, allowing more precise tuning of letter spacing and decorative edges.
 
 Sections 3–6 remain untouched during this refinement. Verify all commercial-use rights independently.
+
+
+## Focused texture and motion refinement — 2026-11-02
+
+A direct 390×844 screenshot comparison at 2.75H and 3.25H showed that the earlier mauve overlay looked too flat and light against the reference's embossed surface. We strengthened the original procedural relief, inspected the render, then **reduced** it after the first pass looked too streaky. The resulting overlay uses an independently designed botanical embossed texture, rather than the source site's artwork.
+
+The approximate sampled background mean (RGB) in one unobstructed 2.75H screenshot region changed from **131/108/124** to **116/91/108**, compared with **119/92/107** in the reference. High-frequency luminance variation in that same region is approximately **7.7** in both the reference and the corrected render. These numerical checks cover a small patch, not the whole visual composition, and do not imply pixel-perfect fidelity or identical relief artwork.
+
+The frame remains centered at 346px; the 322px lead text column and 188px top offset at 390px have not been moved. All other sections' markup and scripts remain unchanged.
+
+Decorative petals in Section 2 now have a visibility gate. They run only when the invitation is opened, the mauve band is actually visible, the tab is active and Reduce Motion is off. They pause when the section exits or the invitation closes. The one-time message reveal remains independent of petal motion.
+
+Focused browser QA now checks the active/paused petal state and mobile reference-position screenshots. Real-device performance and any commercial-asset rights still require independent verification.
