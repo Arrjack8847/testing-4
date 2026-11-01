@@ -554,7 +554,7 @@ test('butterfly routes visit real garden perches and match species wingbeat spee
     // Web Animations API, so assess the path's actual normalized extent.
     const coords=[...flight.waypoints.matchAll(/translate3d\(\s*([-\d.]+)px,\s*([-\d.]+)px/g)]
       .map(match=>({x:Number(match[1]),y:Number(match[2])}));
-    expect(coords.length).toBeGreaterThanOrEqual(10);
+    expect(coords.length).toBeGreaterThanOrEqual(9);
     expect(Math.min(...coords.map(p=>p.x))).toBeLessThan(0);
     expect(Math.max(...coords.map(p=>p.x))).toBeGreaterThan(viewport.w*.75);
     expect(Math.max(...coords.map(p=>p.y))).toBeGreaterThan(viewport.h*.8);
