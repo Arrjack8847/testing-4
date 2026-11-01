@@ -549,3 +549,10 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
     .sky-layer,.depth.palace img,.depth.arch,.depth.tree,.depth.canopy,.sprite.front,.sprite.hanging
   ){transition:none!important;}
 }
+
+
+/* Reference late scroll: the content block travels upward after 2 viewport
+   heights while the artwork remains pinned. See scroll QA at 2.15/2.5/2.9H. */
+.invitation[data-state="opened"][data-reading="yes"] .opened-copy {
+  transform:translateY(var(--text-scroll-shift,0px));
+}
