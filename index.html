@@ -14,6 +14,8 @@
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
+    <!-- The original lake hero stays sticky while the guest scrolls. -->
+    <div class="scene-scroll-track" id="sceneTrack">
     <section class="viewport" id="viewport" aria-label="Wedding invitation opening scene">
       <div class="scene-stage" id="stage" aria-hidden="true">
         <img class="master-art" id="masterArt" alt="" fetchpriority="high">
@@ -51,6 +53,7 @@
       </section>
       <div class="network-note" id="networkNote" role="status" aria-live="polite" hidden></div>
     </section>
+    </div>
     <!-- Temporary scroll target only. The user requested section 1, not the rest of the invitation. -->
     <section class="message" id="message" aria-label="Wedding message preview">
       <p class="eyebrow">The Wedding of</p>
