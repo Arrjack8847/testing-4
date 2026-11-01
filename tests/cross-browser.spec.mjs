@@ -136,10 +136,13 @@ test('Section 2 measured mauve message band follows the three-viewport lake',asy
   const errors=await load(page);
   const geometry=await page.evaluate(()=>({
     track:document.getElementById('sceneTrack').getBoundingClientRect().height,
+    negativeMargin:parseFloat(getComputedStyle(document.getElementById('sceneTrack')).marginBottom),
     messageTop:document.getElementById('message').getBoundingClientRect().top,
     viewport:innerHeight
   }));
-  expect(geometry.track/geometry.viewport).toBeCloseTo(3,2);
+  expect(geometry.track/geometry.viewport).toBeCloseTo(4,2);
+  expect(geometry.negativeMargin/geometry.viewport).toBeCloseTo(-1,2);
+  expect((geometry.track+geometry.negativeMargin)/geometry.viewport).toBeCloseTo(3,2);
   expect(geometry.messageTop/geometry.viewport).toBeCloseTo(3,2);
   await open(page);
   await page.evaluate(()=>{
