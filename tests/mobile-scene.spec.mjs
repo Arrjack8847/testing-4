@@ -216,10 +216,10 @@ test('lake stays pinned while scrolling through the mobile opening section',asyn
     window.scrollTo({top:Math.round(innerHeight*.9),behavior:'instant'});
   });
   await expect.poll(async()=>page.evaluate(()=>scrollY)).toBeGreaterThan(0);
-  await expect.poll(async()=>{
+  await expect.poll(async()=>page.evaluate(()=>{
     const box=document.querySelector('#viewport').getBoundingClientRect();
     return Math.round(box.y);
-  }).toBe(0);
+  })).toBe(0);
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
   const bounds=await page.locator('.opened-copy').boundingBox();
   const height=await page.evaluate(()=>innerHeight);
@@ -228,12 +228,12 @@ test('lake stays pinned while scrolling through the mobile opening section',asyn
   const nextStart=await page.locator('#message').boundingBox();
   expect(nextStart.y).toBeGreaterThanOrEqual(height);
   await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*1.45),behavior:'instant'}));
-  await expect.poll(async()=>{
+  await expect.poll(async()=>page.evaluate(()=>{
     const box=document.querySelector('#viewport').getBoundingClientRect();
     return Math.round(box.y);
-  }).toBeLessThan(0);
-  await expect.poll(async()=>{
+  })).toBeLessThan(0);
+  await expect.poll(async()=>page.evaluate(()=>{
     const box=document.querySelector('#message').getBoundingClientRect();
     return box.y;
-  }).toBeLessThan(height);
+  })).toBeLessThan(height);
 });
