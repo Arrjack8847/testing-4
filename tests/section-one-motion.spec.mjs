@@ -29,13 +29,13 @@ test('ceremony heading follows measured live 1.35H, 1.50H and 1.70H opacity',asy
     .toBeGreaterThan(.33);
   const halfway=Number(await heading.evaluate(el=>getComputedStyle(el).opacity));
   expect(halfway).toBeLessThan(.55);
-  await page.screenshot({path:testInfo.outputPath('section-one-ceremony-1_50H.png'),animations:'disabled'});
+  await page.screenshot({path:testInfo.outputPath('section-one-ceremony-1_50H.png'),animations:'allow'});
   await openAndScroll(page,1.7);
   await expect.poll(()=>heading.evaluate(el=>Number(getComputedStyle(el).opacity))).toBe(1);
-  await page.screenshot({path:testInfo.outputPath('section-one-ceremony-1_70H.png'),animations:'disabled'});
+  await page.screenshot({path:testInfo.outputPath('section-one-ceremony-1_70H.png'),animations:'allow'});
   expect(errors).toEqual([]);
 });
-test('returning-garden butterfly animation begins with the names instead of waiting offscreen',async({page})=>{
+test('returning-garden butterfly animation begins with the names instead of waiting offscreen',async({page},testInfo)=>{
   const errors=await prepared(page);
   await expect(page.locator('.butterfly-hero')).toBeHidden();
   await openAndScroll(page,1.5);
@@ -56,6 +56,9 @@ test('returning-garden butterfly animation begins with the names instead of wait
   })));
   expect(styles.every(x=>x.state==='running')).toBe(true);
   expect(styles.every(x=>x.delay.startsWith('-'))).toBe(true);
+  // Preserve the moving species rather than forcing animation completion
+  // during screenshot capture; this is a real animation checkpoint.
+  await page.screenshot({path:testInfo.outputPath('section-one-butterflies-1_50H.png'),animations:'allow'});
   expect(errors).toEqual([]);
 });
 test('reduced motion hides original butterflies and preserves readable names',async({page})=>{
