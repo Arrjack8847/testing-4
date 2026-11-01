@@ -50,6 +50,7 @@
   const feedback = byId('phoneQaFeedback');
   const checks = byId('phoneQaChecks');
   let sample = null;
+  let lastReport = null;
   let measuring = false;
   let panelOpen = false;
 
@@ -168,6 +169,7 @@
 
   byId('phoneQaCopy').addEventListener('click',async()=>{
     const text=makeReport();
+    lastReport=text;
     try {
       if(!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable over HTTP');
       await navigator.clipboard.writeText(text);
@@ -185,6 +187,6 @@
   Object.defineProperty(window,'__phoneQa',{value:Object.freeze({
     get telemetry(){return fields();},
     get sample(){return sample;},
-    get report(){return makeReport();}
+    get report(){return lastReport || makeReport();}
   })});
 })();
