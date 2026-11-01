@@ -354,7 +354,7 @@ test('ceremony lettering matches live 390px typography and stacked geometry',asy
   expect(geometry.names.font).toContain('Pinyon Script');
   await expect.poll(async()=>page.locator('.name-first').evaluate(el=>
     getComputedStyle(el).clipPath
-  )).toMatch(/inset\\(0px 100% 0px 0px\\)|inset\\(0px 100% 0px\\)/);
+  )).toBe('inset(0px 100% 0px 0px)');
   await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
     scrollTo({top:innerHeight*1.5,behavior:'instant'});
