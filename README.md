@@ -263,3 +263,20 @@ Implementation details: these effects are additive DOM/CSS overlays, require no 
 New mobile browser tests check 2 mist banks × 3 cloud layers, 2 independent peacock glints, mask availability, animation durations, opening behavior and reduced-motion/debug controls. The original cover/garden/lettering layouts are not repositioned in this pass.
 
 **Limitation:** Although the effects match observed structure and broad timing, they are not certified pixel-perfect copies of every particle, mist displacement or reflection intensity.
+
+
+## Phase 13 — garden-based butterfly flight
+
+The live template uses **ButterflyGarden**, a procedural flight system rather than a fixed CSS timeline. Its publicly exposed animation configuration lists:
+
+- Purple butterfly sprite: 52×41 CSS px, 2.2 wingbeats/second, glide factor 0.7, speed 0.12.
+- Ivory butterfly sprite: 44×34 CSS px, 2.6 wingbeats/second, glide factor 0.6, speed 0.15.
+- Five normalized perches: `(.45,.94)`, `(.56,.95)`, `(.50,.90)`, `(.07,.44)`, `(.93,.48)`.
+
+A live-motion comparison confirmed the original flight can start from the lower-left and cross toward the bottom-center, differing substantially from our old upper-right-only crossing. Because its procedural path can differ between reloads, a single screenshot or recorded path is not an exact motion specification.
+
+Our **original implementation** uses two responsive CSS timelines (24s and 22s) covering the documented perch areas, brief hovering arcs, low-left approach and an eventual upper-right departure. The wing animations now run at the species' expected frequencies (2.2Hz and 2.6Hz). These are independently authored approximations of the reference interaction; we have not copied its internal ButterflyGarden component.
+
+The decorative flower sprites already use individually measured `--sa`, `--sd` and `--sl` parameters, with stem sway anchored at the bottom and hanging wisteria anchored at the top. Phase 13 adds regression checks for each asset's own duration and delay rather than introducing a global, synchronized flower animation.
+
+The existing opening button, sticky lake, butterfly/flower state transitions, handwritten names, and reduced-motion controls remain unchanged. Automated checks cover normalized perch movement and individually timed floral sway on four mobile viewport sizes.
