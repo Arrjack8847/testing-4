@@ -473,3 +473,55 @@ test('ambient overlays pause for reduced motion and debug freeze',async({page})=
   await page.locator('#debugOpen').click();
   await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
 });
+
+
+test('floral clusters sway independently from their correct root points',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  const motion=await page.evaluate(()=>{
+    const read=(selector)=>[...document.querySelectorAll(selector)].map(el=>{
+      const img=el.querySelector('img'),s=getComputedStyle(img);
+      return {
+        sprite:el.className,
+        duration:s.animationDuration,
+        delay:s.animationDelay,
+        animation:s.animationName,
+        origin:s.transformOrigin,
+        expectedDuration:el.style.getPropertyValue('--sd'),
+        expectedDelay:el.style.getPropertyValue('--sl')
+      };
+    });
+    return {
+      flowers:read('.sprite.flower'),
+      hanging:read('.sprite.hanging'),
+      plants:read('.sprite.plant:not(.still)'),
+      stationary:read('.sprite.still')
+    };
+  });
+  expect(motion.flowers.length).toBeGreaterThanOrEqual(4);
+  expect(motion.hanging.length).toBe(8);
+  expect(motion.plants.length).toBeGreaterThanOrEqual(5);
+  for(const item of [...motion.flowers,...motion.hanging,...motion.plants]) {
+    expect(item.animation).toBe('reference-sway');
+    expect(item.duration).toBe(item.expectedDuration);
+    expect(item.delay).toBe(item.expectedDelay);
+  }
+  expect(new Set(motion.hanging.map(x=>x.duration)).size).toBeGreaterThan(3);
+  for(const item of motion.stationary) expect(item.animation).toBe('none');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('.sprite.hanging')).toHaveCount(8);
+});
+
+test('reduced motion stops decorative floral sway without blocking opening',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await waitForArt(page);
+  const stationary=await page.locator('.sprite.hanging img').first().evaluate(el=>{
+    const a=getComputedStyle(el);
+    return {duration:a.animationDuration, iterations:a.animationIterationCount};
+  });
+  expect(stationary.duration).toBe('1e-05s');
+  expect(stationary.iterations).toBe('1');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+});
