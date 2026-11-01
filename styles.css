@@ -472,3 +472,14 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 @media (prefers-reduced-motion:reduce) {
   .opened-copy{transition:none;}
 }
+
+
+/* Phase 8 visual correction: the real opened/45%-scrolled lake has neither
+   the foreground reed screen nor the original Swipe Up pill on top of it. */
+.invitation[data-state="opened"] .depth.reeds {
+  transform:translateY(50%);opacity:0;pointer-events:none;
+  transition:opacity .45s ease,transform 1.1s ease;
+}
+.invitation[data-state="opened"][data-reading="yes"] .swipe-cue {
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
