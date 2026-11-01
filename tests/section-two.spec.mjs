@@ -180,3 +180,33 @@ test('Section 2 original textured layer is present and its reference-aligned fra
       animations:'disabled'});
   }
 });
+
+
+test('petal motion runs only on the opened, visible message scene',async({page})=>{
+  await page.goto('/');
+  const section=page.locator('#message');
+  const petal=section.locator('.letter-petal').first();
+  await expect(section).toHaveAttribute('data-petals-active','false');
+  await expect(petal).toHaveCSS('animation-play-state','paused');
+
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('message').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toHaveAttribute('data-petals-active','true');
+  await expect(petal).toHaveCSS('animation-play-state','running');
+
+  await page.evaluate(()=>document.getElementById('eventDetails').scrollIntoView({
+    block:'start',behavior:'instant'
+  }));
+  await expect(section).toHaveAttribute('data-petals-active','false');
+  await expect(petal).toHaveCSS('animation-play-state','paused');
+});
+
+test('petals remain motionless under a reduced-motion preference',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const section=await reachMessage(page);
+  await expect(section).toHaveAttribute('data-petals-active','false');
+  await expect(section.locator('.letter-petal').first()).toHaveCSS('animation-name','none');
+});
