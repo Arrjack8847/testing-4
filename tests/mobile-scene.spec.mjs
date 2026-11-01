@@ -652,3 +652,39 @@ test('scrolling past sticky Section 1 suspends ambient motion and restores on re
   await expect.poll(()=>page.evaluate(()=>window.__scenePerf.draws))
     .toBeGreaterThan(frozen);
 });
+
+
+test('first swipe retreats sky and palace before garden returns',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const seek=async fraction=>{
+    await page.evaluate(fraction=>{
+      document.documentElement.style.scrollBehavior='auto';
+      scrollTo({top:Math.round(innerHeight*fraction),behavior:'instant'});
+    },fraction);
+    await expect.poll(async()=>page.evaluate(()=>Number((scrollY/innerHeight).toFixed(2))))
+      .toBeCloseTo(fraction,1);
+    return page.evaluate(()=>({
+      sky:Number(document.documentElement.style.getPropertyValue('--sky-scroll-scale')),
+      palace:Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale')),
+      sceneTop:Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
+    }));
+  };
+  const initial=await seek(0);
+  expect(initial.sky).toBeCloseTo(1.12,2);
+  expect(initial.palace).toBeCloseTo(.99,2);
+  const start=await seek(.25);
+  expect(start.palace).toBeGreaterThan(.95);
+  const mid=await seek(.45);
+  expect(mid.palace).toBeGreaterThan(.79);
+  expect(mid.palace).toBeLessThan(.89);
+  expect(mid.sky).toBeGreaterThan(.97);
+  expect(mid.sky).toBeLessThan(1.06);
+  expect(mid.sceneTop).toBe(0);
+  await seek(.8);
+  await expect.poll(async()=>page.evaluate(()=>
+    Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale'))
+  )).toBeCloseTo(.66,2);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
+});
