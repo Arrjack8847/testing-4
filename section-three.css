@@ -8,6 +8,18 @@
     radial-gradient(ellipse at 110% 90%,#d6c6df,transparent 45%),
     linear-gradient(180deg,#e4dae6 0%,#faf3ea 29%,#f4e9e7 69%,#e0d1e3 100%);
 }
+/* Transition bridge: Section 2 finishes in lavender, so the next scene
+   enters through a similar hue before revealing its warm ivory background. */
+.event-section::after {
+  content:"";
+  position:absolute;z-index:1;pointer-events:none;
+  top:0;left:0;right:0;
+  height:clamp(80px,16dvh,155px);
+  background:linear-gradient(to bottom,
+    #e2d7e8 0%,
+    rgba(226,215,232,.72) 30%,
+    rgba(226,215,232,0) 100%);
+}
 .event-section::before {content:"";position:absolute;z-index:0;inset:0;opacity:.38;pointer-events:none;
   background-image:radial-gradient(#fff 1px,transparent 1.5px);background-size:43px 48px;}
 .event-section .event-inner {position:relative;z-index:2;max-width:390px;margin:0 auto;}
