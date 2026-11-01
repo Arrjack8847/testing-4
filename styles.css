@@ -201,9 +201,17 @@ body { font-family:'EB Garamond', Georgia,serif; }
   animation:reference-sway var(--sd,4s) ease-in-out var(--sl,0s) infinite alternate;transform-origin:50% 100%;
 }
 .sprite.still img {animation:none!important;}
+/* Original living-garden wind: offset timings remain per asset, as measured,
+   but a slight easing lull and a small return wobble prevent perfectly
+   mechanical pendulum motion. Only img elements rotate; their top/bottom
+   anchoring wrappers, and therefore the visible scene edges, stay fixed. */
 @keyframes reference-sway {
-  from {transform:rotate(calc(var(--sa,2)*-1deg));}
-  to {transform:rotate(calc(var(--sa,2)*1deg));}
+  0%   {transform:rotate(calc(var(--sa,2)*-0.88deg));}
+  17%  {transform:rotate(calc(var(--sa,2)*-0.60deg));}
+  38%  {transform:rotate(calc(var(--sa,2)*0.10deg));}
+  57%  {transform:rotate(calc(var(--sa,2)*0.48deg));}
+  78%  {transform:rotate(calc(var(--sa,2)*0.78deg));}
+  100% {transform:rotate(calc(var(--sa,2)*1deg));}
 }
 /* The reference cover groups its large script monogram, small title,
    paired names, divider, and pill control above the living scene. */
@@ -847,7 +855,10 @@ html.debug-freeze .peacock-glint {
   3% {opacity:1;}
   11% {transform:translate3d(calc(6vw - 26px),64dvh,0) rotate(14deg);}
   23% {transform:translate3d(calc(23vw - 26px),80dvh,0) rotate(25deg);}
+  /* Short low-flower pause: wings keep beating while flight velocity eases. */
   35% {transform:translate3d(calc(45vw - 26px),calc(94dvh - 20px),0) rotate(19deg);}
+  38% {transform:translate3d(calc(45vw - 26px),calc(94dvh - 20px),0) rotate(15deg);}
+  40% {transform:translate3d(calc(46vw - 26px),calc(93dvh - 20px),0) rotate(6deg);}
   42% {transform:translate3d(calc(49vw - 26px),calc(91dvh - 20px),0) rotate(-15deg);}
   50% {transform:translate3d(calc(56vw - 26px),calc(95dvh - 20px),0) rotate(13deg);}
   60% {transform:translate3d(calc(50vw - 26px),calc(90dvh - 20px),0) rotate(-38deg);}
@@ -861,7 +872,10 @@ html.debug-freeze .peacock-glint {
   5% {opacity:1;}
   20% {transform:translate3d(calc(7vw - 22px),calc(60dvh - 17px),0) rotate(17deg);}
   35% {transform:translate3d(calc(31vw - 22px),calc(82dvh - 17px),0) rotate(24deg);}
+  /* Independent white butterfly settles slightly later than the violet one. */
   46% {transform:translate3d(calc(56vw - 22px),calc(95dvh - 17px),0) rotate(13deg);}
+  49% {transform:translate3d(calc(56vw - 22px),calc(95dvh - 17px),0) rotate(9deg);}
+  51% {transform:translate3d(calc(55vw - 22px),calc(94dvh - 17px),0) rotate(-4deg);}
   54% {transform:translate3d(calc(50vw - 22px),calc(90dvh - 17px),0) rotate(-30deg);}
   68% {transform:translate3d(calc(7vw - 22px),calc(44dvh - 17px),0) rotate(-20deg);}
   83% {transform:translate3d(calc(58vw - 22px),calc(32dvh - 17px),0) rotate(22deg);}
