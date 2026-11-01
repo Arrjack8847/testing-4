@@ -27,6 +27,23 @@ try{
     await Promise.all([ref.waitForTimeout(2600),local.waitForTimeout(2600)]);
     await ref.screenshot({path:'visual-evidence/reference-opened.png'});
     await local.screenshot({path:'visual-evidence/ours-opened.png'});
+    // Compare a genuine mid-swipe state, not only the instant after opening.
+    await Promise.all([ref,local].map(p=>p.evaluate(()=>{
+      document.documentElement.style.scrollBehavior='auto';
+      scrollTo({top:Math.round(innerHeight*.45),behavior:'instant'});
+    })));
+    await Promise.all([ref.waitForTimeout(1100),local.waitForTimeout(1100)]);
+    await ref.screenshot({path:'visual-evidence/reference-scrolled.png'});
+    await local.screenshot({path:'visual-evidence/ours-scrolled.png'});
+    for (const [label,p] of [['reference',ref],['ours',local]]) {
+      const v=await p.evaluate(()=>({
+        scrollY:window.scrollY,
+        heroY:(document.querySelector('#viewport')||document.querySelector('.cgv-dio-hero'))?.getBoundingClientRect().y,
+        reading:document.querySelector('#invitation')?.dataset.reading||null,
+        titleOpacity:document.querySelector('.opened-copy')?getComputedStyle(document.querySelector('.opened-copy')).opacity:null
+      }));
+      console.log('SCROLLED_STATE',label,JSON.stringify(v));
+    }
   }
   console.log('Reference interaction succeeded:',launched);
   console.log('Reference viewport',JSON.stringify(viewport));
