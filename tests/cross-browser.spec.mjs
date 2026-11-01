@@ -192,3 +192,26 @@ test('Section 4 calendar-day countdown remains accessible across browser engines
   expect(overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
+
+
+test('Section 5 provides an accessible gallery without falsely populated photos',async({page})=>{
+  const errors=await load(page);
+  const gallery=page.locator('#gallery');
+  await expect(gallery).toHaveAttribute('aria-hidden','true');
+  await expect(gallery).toHaveJSProperty('inert',true);
+  await open(page);
+  await expect(gallery).toHaveAttribute('aria-hidden','false');
+  await expect(gallery).toHaveJSProperty('inert',false);
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('gallery').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(gallery).toBeInViewport();
+  await expect(page.getByRole('heading',{level:2,name:'Our Memories'})).toBeVisible();
+  await expect(gallery.locator('[data-gallery-slot]')).toHaveCount(5);
+  await expect(gallery.locator('[data-gallery-slot="0"]')).toBeDisabled();
+  await expect(gallery.locator('.gallery-disclaimer')).toContainText('not been provided');
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});
