@@ -1,0 +1,15 @@
+name: Inspect mist and floral dynamics
+on:
+  push:
+    paths:
+      - tools/inspect-mist-floral.py
+      - .github/workflows/mist-floral-audit.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/inspect-mist-floral.py
