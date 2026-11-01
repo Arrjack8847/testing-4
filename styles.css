@@ -861,3 +861,18 @@ html.debug-freeze .peacock-glint {
 @media(prefers-reduced-motion:reduce) {
   .butterfly-layer {display:none;}
 }
+
+
+/* Phase 14 — performance gating, not a visual redesign.
+   When the sticky scene leaves the viewport or the page/tab is hidden,
+   the same finite-state controller pauses its canvas RAF and decorative
+   animations. Scroll-linked layout and accessibility are unaffected. */
+.invitation[data-ambient="paused"] .animated-scene *,
+.invitation[data-ambient="paused"] .sky-birds *,
+.invitation[data-ambient="paused"] .butterfly,
+.invitation[data-ambient="paused"] .butterfly-wing {
+  animation-play-state:paused !important;
+}
+.invitation[data-ambient="paused"] .butterfly {
+  will-change:auto;
+}
