@@ -27,11 +27,14 @@ test('accessible named opening, ordered headings, and inert content',async({page
   await expect(page.getByRole('heading',{name:'Rayyan & Sofea',level:1})).toHaveCount(1);
   await expect(page.getByRole('button',{name:'Open Invitation'})).toHaveCount(1);
   await expect(page.locator('#opened')).toHaveJSProperty('inert',true);
+  await expect(page.locator('#opened')).toHaveAttribute('aria-hidden','true');
   await expect(page.getByRole('link',{name:'Swipe up for wedding message'})).toHaveCount(0);
   await expect(page.locator('#stage')).toHaveAttribute('aria-hidden','true');
   await open(page);
   await expect(page.locator('#cover')).toHaveJSProperty('inert',true);
+  await expect(page.locator('#cover')).toHaveAttribute('aria-hidden','true');
   await expect(page.locator('#opened')).toHaveJSProperty('inert',false);
+  await expect(page.locator('#opened')).toHaveAttribute('aria-hidden','false');
   await expect(page.getByRole('link',{name:'Swipe up for wedding message'})).toHaveCount(1);
   expect(errors).toEqual([]);
 });
