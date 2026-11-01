@@ -458,3 +458,17 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
   /* The desktop shell is only a phone preview; mobile behavior remains primary. */
   .scene-scroll-track > .viewport {position:sticky;top:0;}
 }
+
+
+/* Phase 8 — verified sticky reference: do not translate the entire art on scroll.
+   The first swipe reveals text over the lake, not an abrupt full-page jump. */
+:root { --reading-progress:0; }
+.opened-copy {opacity:0;transform:translateY(16px);transition:opacity .12s linear,transform .8s ease;}
+.invitation[data-state="opened"][data-reading="yes"] .opened-copy {
+  opacity:var(--reading-progress,0);transform:translateY(0);
+}
+/* Keep the lake in place for the full duration of its sticky track. */
+.scene-scroll-track .scene-stage {will-change:auto;}
+@media (prefers-reduced-motion:reduce) {
+  .opened-copy{transition:none;}
+}
