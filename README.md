@@ -222,3 +222,22 @@ Implementation:
 - Tests check 390px text geometry, progress values, clipping and the existing four-viewport interactions.
 
 The reference's hand-drawn line-level reveal effect is approximated with progressive horizontal clipping; it is not claimed to match individual stroke paths.
+
+
+## Phase 11 — timed, soft-mask script writing
+
+The live original's name-writing CSS confirms a moving, feathered gradient mask rather than hard clipping. Its first name uses a 1.5-second writing animation after an initial short delay, followed by the smaller ampersand and a later second-name animation.
+
+This implementation now uses an independently coded equivalent:
+
+- When the restored garden reaches the ceremonial title (approximately **1.29 viewport heights**), the names start a **one-time writing animation**.
+- The first name reveals through a soft gradient mask in 1.5 seconds after a 0.35-second delay.
+- The ampersand rises into view with its own 0.8-second transition after 1.05 seconds.
+- The second name begins its 1.5-second reveal 1.45 seconds after activation.
+- The writing continues **even if scrolling stops**, instead of being tied directly to the scroll position, and Reset re-arms it.
+- Both script names remain accessible/selectable HTML, using measured Pinyon Script rather than rasterized artwork.
+- With reduced-motion enabled, names appear without animated writing once the guest reaches that part of the invitation.
+- Browser checks cover startup, mask state, durations, staggered reveal, stationary scroll, and replay after reset.
+- Visual comparison now includes a **completed-lettering** frame in addition to the closed, opened, mid-scroll and restored-garden screenshots.
+
+**Accuracy note:** The effect uses a soft left-to-right moving mask. It is not a vector pen physically tracing every character's individual strokes; that would require glyph-specific stroke paths and separate artwork.
