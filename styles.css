@@ -584,8 +584,8 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
   overflow:visible;transform:none;
 }
 .ceremony-names .name-first {
-  clip-path:inset(0 calc((1 - var(--first-name-progress,0))*100%) 0 0);
-  -webkit-clip-path:inset(0 calc((1 - var(--first-name-progress,0))*100%) 0 0);
+  clip-path:inset(0 var(--first-name-hidden,100%) 0 0);
+  -webkit-clip-path:inset(0 var(--first-name-hidden,100%) 0 0);
 }
 .ceremony-names .name-amp {
   display:block;font-family:'EB Garamond',Georgia,serif;
@@ -593,8 +593,8 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
   opacity:var(--amp-progress,0);
 }
 .ceremony-names .name-second {
-  clip-path:inset(0 calc((1 - var(--second-name-progress,0))*100%) 0 0);
-  -webkit-clip-path:inset(0 calc((1 - var(--second-name-progress,0))*100%) 0 0);
+  clip-path:inset(0 var(--second-name-hidden,100%) 0 0);
+  -webkit-clip-path:inset(0 var(--second-name-hidden,100%) 0 0);
 }
 .invitation[data-state="opened"] .opened-copy .date,
 .invitation[data-state="opened"] .opened-copy .guest {
