@@ -280,3 +280,19 @@ Our **original implementation** uses two responsive CSS timelines (24s and 22s) 
 The decorative flower sprites already use individually measured `--sa`, `--sd` and `--sl` parameters, with stem sway anchored at the bottom and hanging wisteria anchored at the top. Phase 13 adds regression checks for each asset's own duration and delay rather than introducing a global, synchronized flower animation.
 
 The existing opening button, sticky lake, butterfly/flower state transitions, handwritten names, and reduced-motion controls remain unchanged. Automated checks cover normalized perch movement and individually timed floral sway on four mobile viewport sizes.
+
+
+## Phase 14 — mobile animation performance and lifecycle
+
+This update changes the *work performed* while the scene is invisible, not the approved artwork, camera framing or scroll choreography.
+
+- The canvas still paints up to **30 times per second** while Section 1 is visible. It no longer requests animation frames while the tab/page is hidden, the first scene is off-screen, reduced motion is enabled, or developer freeze is active.
+- A single `IntersectionObserver` tracks the sticky `#viewport`. When the user scrolls completely beyond Section 1, both the petal rendering loop and decorative CSS animations pause. Returning to the garden resumes motion without restarting the invitation or changing scroll progress.
+- `visibilitychange`, `pagehide`/`pageshow` and the reduced-motion media-query change event update the same centralized controller. No polling interval is used.
+- The debug freeze toggle is observed as a **class change**, rather than running an endless idle `requestAnimationFrame` loop to check it.
+- On resumption, delta-time counters are reset to prevent any large jump in petal positions.
+- The existing 2× device-pixel-ratio cap is retained for canvas resolution; the artwork quality and number of petals are unchanged.
+- Debug builds (`?debug=1`) expose a read-only `window.__scenePerf` diagnostic with `draws`, `pendingFrame`, `sceneVisible` and `ambient`. It is not exposed in the normal customer invitation.
+- Real Chromium tests now exercise each pause/resume condition on 320px, 360px, 390px and 430px phones, including the active paint cadence.
+
+**Verification scope:** These are real browser behavioral/paint-activity checks, not claims of a particular CPU percentage or battery-life saving on physical devices. The original image licensing and user-visible visual-comparison caveats remain unchanged.
