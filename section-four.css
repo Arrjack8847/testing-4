@@ -1,0 +1,115 @@
+/* Section 4 — an original image-free Save the Date experience.
+   Scoped to .save-date-section; no earlier scene styles are changed. */
+.save-date-section {
+  position:relative;z-index:2;isolation:isolate;overflow:hidden;
+  min-height:100dvh;padding:clamp(90px,12dvh,125px) clamp(16px,5vw,26px) clamp(105px,13dvh,145px);
+  text-align:center;color:#715b73;
+  background:radial-gradient(ellipse at 50% 11%,#fff6eb 0%,transparent 49%),
+    radial-gradient(ellipse at -12% 83%,#d9c1da 0%,transparent 48%),
+    radial-gradient(ellipse at 120% 69%,#d0c2db 0%,transparent 50%),
+    linear-gradient(180deg,#e0d1e3 0%,#f2e7eb 27%,#fff7ef 56%,#ded0e1 100%);
+}
+.save-date-section::before {
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.37;
+  background-image:radial-gradient(#fffdfa 1px,transparent 1.6px);
+  background-size:41px 47px;
+}
+.save-date-section::after {
+  content:"";position:absolute;top:0;left:0;right:0;height:clamp(90px,17dvh,150px);
+  pointer-events:none;background:linear-gradient(#e0d1e3,rgba(224,209,227,.0));z-index:1;
+}
+.save-date-section .save-date-content {position:relative;z-index:2;max-width:390px;margin:0 auto;}
+.save-date-section .save-date-atmosphere {position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.save-date-section .save-date-halo {
+  position:absolute;left:50%;top:20%;border-radius:50%;width:360px;height:360px;
+  border:1px solid rgba(192,158,112,.28);translate:-50% 0;opacity:.72;
+  box-shadow:0 0 0 18px rgba(255,251,236,.12),0 0 55px rgba(255,245,219,.15);
+  animation:save-date-glow 11s ease-in-out infinite alternate;
+}
+.save-date-section .save-date-halo-b{width:420px;height:420px;top:19%;opacity:.38;
+  animation-delay:-5s;}
+.save-date-section .save-date-bloom{position:absolute;top:11%;left:-35px;
+  color:#bd9baa;font:130px/1 Georgia,serif;opacity:.28;
+  transform-origin:20% 80%;animation:save-date-flower 8s ease-in-out infinite alternate;}
+.save-date-section .save-date-bloom-right{left:auto;right:-40px;top:67%;
+  rotate:170deg;animation-delay:-4s;}
+.save-date-section .save-date-star{position:absolute;color:#bda078;opacity:.6;
+  font:25px/1 Georgia,serif;animation:save-date-star 7s ease-in-out infinite alternate;}
+.save-date-section .save-date-star-one{top:13%;right:12%;}
+.save-date-section .save-date-star-two{top:42%;left:7%;font-size:13px;animation-delay:-2s;}
+.save-date-section .save-date-star-three{bottom:12%;right:13%;animation-delay:-5s;}
+.save-date-section .save-date-eyebrow{margin:0 0 16px;font:500 10px/1.5 'Cinzel',Georgia,serif;
+  text-transform:uppercase;letter-spacing:.22em;color:#997b69;}
+.save-date-section .save-date-flourish{display:flex;align-items:center;justify-content:center;
+  gap:13px;color:#b69b78;font:22px/1 Georgia,serif;margin:0 0 20px;}
+.save-date-section .save-date-flourish span{height:1px;width:49px;display:block;
+  background:linear-gradient(90deg,transparent,#b8a281,transparent);}
+.save-date-section h2.save-date-title{font:400 clamp(58px,17vw,79px)/1.03 'Pinyon Script',cursive;
+  letter-spacing:0;text-shadow:0 3px 12px #fffcf4a8;color:#896882;margin:0 auto 12px;}
+.save-date-section .save-date-intro{font:400 clamp(17px,4.6vw,21px)/1.5 'EB Garamond',Georgia,serif;
+  max-width:26ch;margin:0 auto 47px;color:#796879;}
+.save-date-section .save-date-orbit{position:relative;display:grid;place-items:center;
+  width:min(78vw,290px);aspect-ratio:1;margin:0 auto 22px;border-radius:50%;
+  border:1px solid rgba(186,151,108,.75);
+  background:radial-gradient(circle at 50% 39%,#fffefa 0%,#fbf4f0 57%,#f4e7e9 100%);
+  box-shadow:inset 0 0 40px #fff8efc9,0 16px 40px #6a4e7926,0 0 0 8px #ffffff48;}
+.save-date-section .save-date-orbit::before{content:"";position:absolute;inset:10px;border:1px solid #c4a7897a;
+  border-radius:50%;pointer-events:none;}
+.save-date-section .save-date-orbit::after{content:"✦";position:absolute;top:-18px;left:50%;
+  translate:-50% 0;color:#c2a179;font:26px Georgia,serif;text-shadow:0 0 8px #fffbf1;}
+.save-date-section .save-date-orbit-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:0;width:100%;padding:16px 10px;}
+.save-date-section .save-date-orbit-kicker{font:500 10px/1.4 'Cinzel',Georgia,serif;
+  text-transform:uppercase;letter-spacing:.1em;color:#9d826c;}
+.save-date-section .save-date-days{font:400 clamp(76px,24vw,113px)/1 'EB Garamond',Georgia,serif;
+  color:#83627c;letter-spacing:-.05em;font-variant-numeric:tabular-nums;}
+.save-date-section .save-date-days-unit{font:500 11px/1.25 'Cinzel',Georgia,serif;
+  text-transform:uppercase;letter-spacing:.23em;color:#9c806b;}
+.save-date-section .save-date-orbit-ornament{color:#c1a789;font:20px Georgia,serif;margin-top:11px;}
+.save-date-section .save-date-status{min-height:2em;margin:0 auto 44px;max-width:31ch;
+  font:400 15px/1.6 'EB Garamond',Georgia,serif;color:#79677a;}
+.save-date-section .save-date-card{max-width:352px;margin:0 auto;padding:32px 25px 29px;
+  background:linear-gradient(145deg,#fffcf7ef,#f8edece8);border:1px solid #c9ae95c7;border-radius:15px;
+  box-shadow:0 12px 38px #6a4d6820;}
+.save-date-section .save-date-small-label{display:block;font:500 10px/1.5 'Cinzel',Georgia,serif;
+  letter-spacing:.17em;text-transform:uppercase;color:#9f836c;margin:0 auto 12px;}
+.save-date-section .save-date-full-date{display:block;color:#765f77;
+  font:400 clamp(24px,7vw,31px)/1.25 'EB Garamond',Georgia,serif;margin:0 auto 13px;}
+.save-date-section .save-date-disclaimer{margin:0 auto 25px;max-width:30ch;color:#867584;
+  font:400 12px/1.55 system-ui,sans-serif;}
+.save-date-section .save-date-button{display:block;margin:0 auto;min-height:46px;width:100%;max-width:240px;
+  background:#795d7b;border:1px solid #795d7b;border-radius:28px;padding:12px 18px;
+  color:#fffaf6;font:500 12px/1.4 'Cinzel',Georgia,serif;letter-spacing:.07em;}
+.save-date-section .save-date-button:disabled{opacity:.5;cursor:not-allowed;
+  background:#b6a6b5;border-color:#b6a6b5;color:#493e4b;}
+.save-date-section .save-date-button:focus-visible{outline:3px solid #7d5988;outline-offset:4px;}
+.save-date-section .save-date-help{max-width:31ch;margin:15px auto 0;
+  font:400 12px/1.55 system-ui,sans-serif;color:#866f7e;}
+.save-date-section .save-date-closing{max-width:27ch;margin:46px auto 17px;
+  color:#7b6679;font:400 20px/1.5 'EB Garamond',Georgia,serif;}
+.save-date-section .save-date-ending{color:#b99b74;font:28px/1 Georgia,serif;}
+.save-date-section[data-reveal-ready="true"] .save-date-reveal{opacity:0;transform:translateY(18px);
+  transition:opacity .85s ease,transform .85s cubic-bezier(.2,.7,.25,1);
+  transition-delay:var(--date-stagger,0ms);}
+.save-date-section[data-reveal-ready="true"].is-visible .save-date-reveal{opacity:1;transform:none;}
+.save-date-section .save-date-reveal:nth-child(1){--date-stagger:0ms;}
+.save-date-section .save-date-reveal:nth-child(2){--date-stagger:80ms;}
+.save-date-section .save-date-reveal:nth-child(3){--date-stagger:150ms;}
+.save-date-section .save-date-reveal:nth-child(4){--date-stagger:220ms;}
+.save-date-section .save-date-reveal:nth-child(5){--date-stagger:280ms;}
+.save-date-section .save-date-reveal:nth-child(6){--date-stagger:350ms;}
+.save-date-section .save-date-reveal:nth-child(7){--date-stagger:410ms;}
+@keyframes save-date-glow {from{opacity:.42;scale:.98}to{opacity:.8;scale:1.03}}
+@keyframes save-date-flower {from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+@keyframes save-date-star {from{translate:0 8px;opacity:.32}to{translate:0 -7px;opacity:.7}}
+@media(max-width:350px){
+  .save-date-section{padding-inline:11px;}
+  .save-date-section .save-date-card{padding-inline:14px;}
+  .save-date-section .save-date-intro{margin-bottom:37px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .save-date-section .save-date-halo,.save-date-section .save-date-bloom,
+  .save-date-section .save-date-star{animation:none!important;}
+  .save-date-section[data-reveal-ready="true"] .save-date-reveal{
+    opacity:1!important;transform:none!important;transition:none!important;}
+}
