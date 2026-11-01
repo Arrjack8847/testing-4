@@ -414,9 +414,10 @@ function applyScrollScene(fraction) {
   set('--second-name-progress', secondName.toFixed(4));
   set('--second-name-hidden',((1-secondName)*100).toFixed(2)+'%');
   set('--details-progress', details.toFixed(4));
-  // The live reference's text block begins moving upward after ~2 viewports,
-  // while the lake background itself stays pinned in place.
-  set('--text-scroll-shift', (-Math.max(0,fraction-2)*window.innerHeight).toFixed(1)+'px');
+  // The 3H track's sticky viewport begins exiting naturally after 2H.
+  // Do not add a second upward translation: that used to compensate for the
+  // obsolete 4H track and now would move text twice as fast as the scenery.
+  set('--text-scroll-shift','0px');
   set('--stage-parallax','0px');
   invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
   invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
