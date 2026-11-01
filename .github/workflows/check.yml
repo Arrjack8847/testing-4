@@ -13,7 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check JavaScript syntax
-        run: node --check scene.js
+        run: |
+          node --check scene.js
+          node --check phone-qa.js
+          node --check tests/phone-qa.spec.mjs
       - name: Validate scene and artwork references
         run: python3 tools/check-source.py
       - name: Parse Windows PowerShell scripts
