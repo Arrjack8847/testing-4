@@ -5,6 +5,8 @@ on:
       - index.html
       - section-two.css
       - section-two.js
+      - section-three.css
+      - section-three.js
       - scene.js
       - phone-qa.js
       - styles.css
@@ -56,5 +58,13 @@ jobs:
         with:
           name: section-two-mobile-screenshots
           path: test-results/**/*section-two*.png
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload Section 3 mobile visual QA captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section-three-mobile-screenshots
+          path: test-results/**/*section-three*.png
           if-no-files-found: warn
           retention-days: 14
