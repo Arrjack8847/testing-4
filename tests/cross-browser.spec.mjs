@@ -132,8 +132,15 @@ test('large text zoom is usable and keyboard action remains operable',async({pag
 });
 
 
-test('Section 2 measured mauve message band follows the sticky opener',async({page})=>{
+test('Section 2 measured mauve message band follows the three-viewport lake',async({page})=>{
   const errors=await load(page);
+  const geometry=await page.evaluate(()=>({
+    track:document.getElementById('sceneTrack').getBoundingClientRect().height,
+    messageTop:document.getElementById('message').getBoundingClientRect().top,
+    viewport:innerHeight
+  }));
+  expect(geometry.track/geometry.viewport).toBeCloseTo(3,2);
+  expect(geometry.messageTop/geometry.viewport).toBeCloseTo(3,2);
   await open(page);
   await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
