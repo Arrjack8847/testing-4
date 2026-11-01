@@ -60,3 +60,36 @@ test('reduced-motion event details remain legible',async({page})=>{
   expect(motion).toEqual({opacity:'1',transform:'none'});
   await expect(event.locator('#eventDirectionsNote')).toBeVisible();
 });
+
+
+test('Section 2 to Section 3 transition is contiguous and visually bridged',async({page},testInfo)=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const seam=await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    const letter=document.getElementById('message');
+    const event=document.getElementById('eventDetails');
+    const continuous=letter.nextElementSibling===event;
+    const point=event.getBoundingClientRect().top+scrollY-innerHeight/2;
+    window.scrollTo(0,Math.round(point));
+    return {continuous};
+  });
+  expect(seam.continuous).toBe(true);
+  await expect(page.locator('#eventDetails')).toBeInViewport();
+  await expect(page.locator('#message')).toBeInViewport();
+  const position=await page.evaluate(()=>{
+    const letter=document.getElementById('message').getBoundingClientRect();
+    const event=document.getElementById('eventDetails').getBoundingClientRect();
+    const transition=getComputedStyle(document.getElementById('eventDetails'),'::after');
+    return {gap:event.top-letter.bottom,
+      gradient:transition.backgroundImage,
+      pointerEvents:transition.pointerEvents,
+      pageOverflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(Math.abs(position.gap)).toBeLessThanOrEqual(1);
+  expect(position.gradient).toContain('linear-gradient');
+  expect(position.pointerEvents).toBe('none');
+  expect(position.pageOverflow).toBeLessThanOrEqual(1);
+  await page.screenshot({path:testInfo.outputPath('section-three-transition-seam.png'),
+    animations:'disabled'});
+});
