@@ -349,6 +349,11 @@ function easeBetween(x, start, end) {
 function applyScrollScene(fraction) {
   const rootStyle = document.documentElement.style;
   const garden = easeBetween(fraction, .52, 1.43);
+  // The reference starts retreating from the valley during the first swipe:
+  // its palace roof and palm tree silhouettes move visibly lower by 0.45H.
+  // Our old garden-driven scale did not change at all until 0.52H.
+  const palaceRetreat = easeBetween(fraction, .22, .72);
+  const skyRetreat = easeBetween(fraction, .22, .55);
   const framing = easeBetween(fraction, .84, 1.42);
   const blossoms = easeBetween(fraction, .59, .98);
   const peacocks = easeBetween(fraction, 1.06, 1.44);
@@ -362,9 +367,9 @@ function applyScrollScene(fraction) {
   const names = Math.max(firstName, secondName);
   const details = easeBetween(fraction, 2.08, 2.42);
   const set = (name,value) => rootStyle.setProperty(name,String(value));
-  set('--sky-scroll-scale', (1.12-.12*garden).toFixed(4));
-  set('--sky-scroll-y', (-4*(1-garden)).toFixed(3)+'%');
-  set('--palace-scroll-scale', (.99-.33*garden).toFixed(4));
+  set('--sky-scroll-scale', (1.12-.12*skyRetreat).toFixed(4));
+  set('--sky-scroll-y', (-4*(1-skyRetreat)).toFixed(3)+'%');
+  set('--palace-scroll-scale', (.99-.33*palaceRetreat).toFixed(4));
   set('--frame-scroll-scale', (2.6-1.6*framing).toFixed(4));
   set('--frame-scroll-opacity', framing.toFixed(4));
   set('--tree-scroll-scale', (2.1-1.1*framing).toFixed(4));
