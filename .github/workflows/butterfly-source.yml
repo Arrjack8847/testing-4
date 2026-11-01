@@ -1,0 +1,15 @@
+name: Inspect butterfly motion source metadata
+on:
+  push:
+    paths:
+      - tools/inspect-butterfly-source.py
+      - .github/workflows/butterfly-source.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/inspect-butterfly-source.py
