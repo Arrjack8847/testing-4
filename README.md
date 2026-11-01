@@ -333,3 +333,11 @@ An opt-in **Phone QA** panel now offers:
 The QA script is dynamically loaded **only** when `?phoneqa=1` is present. Normal guest invitations do not load the panel or its instrumentation. The browser automation covers panel tap targets, local report generation, screenshot-safe layout, rotation-size handling and sampling across the four existing phone viewport sizes.
 
 **Important:** This completes the real-device *testing preparation*, not an actual physical-device certification. The owner must open the local URL on a phone and perform the checks described in [REAL-DEVICE-TESTING.md](REAL-DEVICE-TESTING.md). The five-second sample is an observation, not proof of thermal stability or battery life.
+
+
+### Phase 16 automated verification
+
+- **116/116** mobile Chromium tests passed on 320px, 360px, 390px and 430px viewport simulations, including on-device QA panel touch targets, copyable report, orientation-size handling, and a real five-second frame/petal-paint sample. [Browser test run](https://github.com/Arrjack8847/testing-4/actions/runs/41291137868).
+- JavaScript/PowerShell syntax and source integrity passed. [Source check](https://github.com/Arrjack8847/testing-4/actions/runs/41291137906).
+- The regular invitation no longer loads the QA widget unless `?phoneqa=1` is explicitly requested. The tests confirm this.
+- **Not yet completed:** real Safari on a physical iPhone, Chrome on a physical Android device, thermal/battery observations, and direct touch smoothness observations. These require the owner to perform the test on their phone using the opt-in URL.
