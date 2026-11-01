@@ -79,3 +79,32 @@ test('Section 4 respects reduced motion and remains readable',async({page})=>{
   expect(result.transform).toBe('none');
   await expect(section.locator('#saveDateButton')).toBeDisabled();
 });
+
+
+test('Section 3 to Section 4 keeps a continuous lavender transition',async({page},testInfo)=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const adjacent=await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    const prior=document.getElementById('eventDetails');
+    const next=document.getElementById('saveTheDate');
+    const adjacent=prior.nextElementSibling===next;
+    const nextTop=next.getBoundingClientRect().top+scrollY;
+    window.scrollTo(0,Math.round(nextTop-innerHeight*.5));
+    return adjacent;
+  });
+  expect(adjacent).toBe(true);
+  await expect(page.locator('#eventDetails')).toBeInViewport();
+  await expect(page.locator('#saveTheDate')).toBeInViewport();
+  const bounds=await page.evaluate(()=>{
+    const prior=document.getElementById('eventDetails').getBoundingClientRect();
+    const next=document.getElementById('saveTheDate').getBoundingClientRect();
+    const overlay=getComputedStyle(document.getElementById('saveTheDate'),'::after');
+    return {seam:next.top-prior.bottom,gradient:overlay.backgroundImage,
+      pageOverflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(Math.abs(bounds.seam)).toBeLessThanOrEqual(1);
+  expect(bounds.gradient).toContain('linear-gradient');
+  expect(bounds.pageOverflow).toBeLessThanOrEqual(1);
+  await page.screenshot({path:testInfo.outputPath('section-four-transition-seam.png'),animations:'disabled'});
+});
