@@ -16,3 +16,18 @@ jobs:
         run: node --check scene.js
       - name: Validate scene and artwork references
         run: python3 tools/check-source.py
+      - name: Parse Windows PowerShell scripts
+        shell: pwsh
+        run: |
+          foreach ($path in @('start.ps1', 'download-assets.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              (Join-Path $PWD $path), [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error $_.ToString() }
+              exit 1
+            }
+            Write-Host "$path PowerShell syntax OK"
+          }
