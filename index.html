@@ -12,9 +12,11 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="section-two.css">
   <link rel="stylesheet" href="section-three.css">
+  <link rel="stylesheet" href="section-four.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-three.js" defer></script>
+  <script src="section-four.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -136,6 +138,43 @@
         </div>
         <p class="event-farewell event-reveal">We look forward to celebrating this beautiful beginning with you.</p>
         <div class="event-closing-mark event-reveal" aria-hidden="true">❦</div>
+      </div>
+    </section>
+    <!-- Section 4: original date-only countdown. No unconfirmed ceremony time is implied. -->
+    <section class="save-date-section" id="saveTheDate" data-section="4"
+             aria-labelledby="saveDateHeading" aria-hidden="true" inert>
+      <div class="save-date-atmosphere" aria-hidden="true">
+        <span class="save-date-halo save-date-halo-a"></span>
+        <span class="save-date-halo save-date-halo-b"></span>
+        <span class="save-date-bloom save-date-bloom-left">❧</span>
+        <span class="save-date-bloom save-date-bloom-right">❧</span>
+        <span class="save-date-star save-date-star-one">✧</span>
+        <span class="save-date-star save-date-star-two">✦</span>
+        <span class="save-date-star save-date-star-three">✧</span>
+      </div>
+      <div class="save-date-content">
+        <p class="save-date-eyebrow save-date-reveal">A moment worth remembering</p>
+        <div class="save-date-flourish save-date-reveal" aria-hidden="true"><span></span>✦<span></span></div>
+        <h2 class="save-date-title save-date-reveal" id="saveDateHeading">Save the Date</h2>
+        <p class="save-date-intro save-date-reveal">A beautiful beginning, and a day to cherish.</p>
+        <div class="save-date-orbit save-date-reveal" aria-label="Days until the sample wedding date">
+          <div class="save-date-orbit-inner">
+            <span class="save-date-orbit-kicker">Counting the days</span>
+            <span id="countdownDays" class="save-date-days" aria-live="off">—</span>
+            <span id="countdownUnit" class="save-date-days-unit">Days</span>
+            <span class="save-date-orbit-ornament" aria-hidden="true">❦</span>
+          </div>
+        </div>
+        <p class="save-date-status save-date-reveal" id="countdownStatus" role="status" aria-live="polite">Calculating days until the sample wedding date…</p>
+        <div class="save-date-card save-date-reveal">
+          <span class="save-date-small-label">Sample wedding date</span>
+          <time datetime="2027-01-23" class="save-date-full-date">Saturday, 23 January 2027</time>
+          <p class="save-date-disclaimer">Demonstration date only. The wedding schedule has not been confirmed.</p>
+          <button type="button" id="saveDateButton" class="save-date-button" disabled>Save to Calendar</button>
+          <p class="save-date-help" id="saveDateHelp">Calendar reminder available after the wedding date is confirmed.</p>
+        </div>
+        <p class="save-date-closing save-date-reveal">We can't wait to share this day with you.</p>
+        <div class="save-date-ending save-date-reveal" aria-hidden="true">✧</div>
       </div>
     </section>
   </main>
