@@ -35,6 +35,14 @@ try{
     await Promise.all([ref.waitForTimeout(1100),local.waitForTimeout(1100)]);
     await ref.screenshot({path:'visual-evidence/reference-scrolled.png'});
     await local.screenshot({path:'visual-evidence/ours-scrolled.png'});
+    // The live opening returns to its floral arch near 1.5 viewport scrolls.
+    // This additional checkpoint tests whether we reconstruct the same frame.
+    await Promise.all([ref,local].map(p=>p.evaluate(()=>{
+      scrollTo({top:Math.round(innerHeight*1.5),behavior:'instant'});
+    })));
+    await Promise.all([ref.waitForTimeout(1000),local.waitForTimeout(1000)]);
+    await ref.screenshot({path:'visual-evidence/reference-restored.png'});
+    await local.screenshot({path:'visual-evidence/ours-restored.png'});
     for (const [label,p] of [['reference',ref],['ours',local]]) {
       const v=await p.evaluate(()=>({
         scrollY:window.scrollY,
