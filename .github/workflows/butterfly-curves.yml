@@ -1,0 +1,15 @@
+name: Audit butterfly flight curves
+on:
+  push:
+    paths:
+      - tools/inspect-butterfly-curves.py
+      - .github/workflows/butterfly-curves.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/inspect-butterfly-curves.py
