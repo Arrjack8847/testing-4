@@ -27,9 +27,11 @@
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(entries => {
-      onScreen = entries.some(entry=>entry.isIntersecting);
+      // Edge-touching sections are sometimes reported as intersecting with
+      // zero actual area; require a visible slice of the mauve band.
+      onScreen = entries.some(entry=>entry.isIntersecting && entry.intersectionRatio>.01);
       syncPetals();
-    },{threshold:0,rootMargin:'40px 0px'}).observe(section);
+    },{threshold:[0,.01]}).observe(section);
   } else {
     // Browser fallback: still respect reduced motion and cover state.
     const check = () => {
