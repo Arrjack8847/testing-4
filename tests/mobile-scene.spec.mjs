@@ -271,6 +271,12 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   await expect.poll(async()=>page.evaluate(()=>
     parseFloat(getComputedStyle(document.querySelector('.opened-copy .eyebrow')).opacity)
   )).toBeGreaterThan(.25);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-lettering','playing');
+  const activeAnimation=await page.locator('.name-first').evaluate(el=>{
+    const style=getComputedStyle(el);
+    return {name:style.animationName,duration:style.animationDuration,delay:style.animationDelay};
+  });
+  expect(activeAnimation).toEqual({name:'write-ceremony-name',duration:'1.5s',delay:'0.35s'});
   await expect.poll(async()=>page.evaluate(()=>
     parseFloat(document.documentElement.style.getPropertyValue('--first-name-progress'))
   )).toBeGreaterThan(.5);
@@ -352,9 +358,12 @@ test('ceremony lettering matches live 390px typography and stacked geometry',asy
     expect(geometry.names.size).toBe('60px');
   }
   expect(geometry.names.font).toContain('Pinyon Script');
+  await expect(page.locator('#invitation')).toHaveAttribute('data-lettering','idle');
   await expect.poll(async()=>page.locator('.name-first').evaluate(el=>
     getComputedStyle(el).clipPath
-  )).toBe('inset(0px 100% 0px 0px)');
+  )).toBe('none');
+  const maskBefore=await page.locator('.name-first').evaluate(el=>getComputedStyle(el).maskImage);
+  expect(maskBefore).toContain('linear-gradient');
   await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
     scrollTo({top:innerHeight*1.5,behavior:'instant'});
@@ -372,4 +381,40 @@ test('ceremony lettering matches live 390px typography and stacked geometry',asy
   await expect.poll(async()=>page.evaluate(()=>
     parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
   )).toBe(1);
+  await expect.poll(async()=>page.locator('.name-second').evaluate(el=>
+    getComputedStyle(el).maskPosition
+  ),{timeout:7000}).toBe('0% 0px');
+  await expect(page.locator('.name-first')).toHaveCSS('mask-position','0% 0px');
+  await expect(page.locator('.name-amp')).toHaveCSS('opacity','1');
+});
+
+
+test('writing continues after swipe stops and replays after reset', async ({page})=>{
+  await page.goto('/?debug=1');
+  await waitForArt(page);
+  await page.locator('#debugOpen').click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo({top:Math.round(innerHeight*1.4),behavior:'instant'});
+  });
+  await expect(page.locator('#invitation')).toHaveAttribute('data-lettering','playing');
+  const initialPosition=await page.locator('.name-first').evaluate(el=>
+    getComputedStyle(el).maskPosition
+  );
+  await expect.poll(async()=>page.locator('.name-first').evaluate(el=>
+    getComputedStyle(el).maskPosition
+  ),{timeout:4000}).toBe('0% 0px');
+  // The user has not scrolled further; a timed reveal must still finish.
+  await expect(page.locator('.name-first')).toHaveCSS('mask-position','0% 0px');
+  await page.locator('#resetButton').click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-lettering','idle');
+  await page.locator('#debugOpen').click();
+  await page.evaluate(()=>window.scrollTo({top:Math.round(innerHeight*1.4),behavior:'instant'}));
+  await expect(page.locator('#invitation')).toHaveAttribute('data-lettering','playing');
+  const replay=await page.locator('.name-first').evaluate(el=>({
+    animation:getComputedStyle(el).animationName,
+    position:getComputedStyle(el).maskPosition
+  }));
+  expect(replay.animation).toBe('write-ceremony-name');
+  expect(replay.position).not.toBe('0% 0px');
 });
