@@ -58,3 +58,15 @@ powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
 Use a narrow mobile browser window. Tap **Open Invitation**; scroll through the garden to the title around 1.5 viewport heights. The mauve message begins at the three-viewport document boundary.
+
+## Continuing Section 1 — anchored wind and butterfly perches (2026-11-02)
+
+The visual review identified a remaining *behavior* difference: all floral sprites had accurate, separately timed root pivots, but their shared `reference-sway` waveform ran as a perfectly regular two-endpoint pendulum. The independently written CSS now uses six gentle phases, including slower movement around the ends of each swing, while **retaining the same per-asset `--sa`, `--sd`, `--sl`, top/bottom transform origin, and individual asset placement**. The amplitude is bounded by the original `--sa`; no decorative layer is moved farther toward a phone's edges.
+
+The cover's violet and ivory butterflies still use their separate 24s and 22s routes and approximately 2.2/2.6 Hz wingbeats. Each now spends a short portion of its original route almost stationary over a lower-garden flower before continuing. These are **original route approximations**, not a reproduction of hidden source keyframes. Their pause positions differ slightly so they do not move as a synchronized pair.
+
+New focused browser regression tests verify the multiphase sway, asset anchor pivots, stationary perches, preserved species wingbeats, no horizontal overflow, and a reduced-motion state. Focused visual screenshots include the cover, ceremony garden around 1.5H, and the lake-to-mauve overlap around 2.75H. Sections 2–6 have not been modified in this pass; existing Section 1 and Section 2 timings remain unchanged.
+
+### QA and limits
+
+The screen-edge check is measured at the configured browser viewport sizes; live device checks and frame-rate measurements are still recommended before shipping. Use the [focused mobile visual workflow](https://github.com/Arrjack8847/testing-4/actions/workflows/section1-2-visual.yml) and [four-phone smoke suite](https://github.com/Arrjack8847/testing-4/actions/workflows/mobile-browser.yml) for updated results. Some vendor-owned artwork used in the test-only environment remains unlicensed for commercial redistribution.
