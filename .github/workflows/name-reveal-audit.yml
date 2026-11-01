@@ -1,0 +1,15 @@
+name: Audit live lettering reveal CSS
+on:
+  push:
+    paths:
+      - tools/inspect-name-reveal.py
+      - .github/workflows/name-reveal-audit.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/inspect-name-reveal.py
