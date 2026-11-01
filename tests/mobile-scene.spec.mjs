@@ -418,3 +418,58 @@ test('writing continues after swipe stops and replays after reset', async ({page
   expect(replay.animation).toBe('write-ceremony-name');
   expect(replay.position).not.toBe('0% 0px');
 });
+
+
+test('waterfall mist and peacock glints use independently animated masked layers',async({page})=>{
+  const pageErrors=[];
+  page.on('pageerror',error=>pageErrors.push(error.message));
+  await page.goto('/');
+  await waitForArt(page);
+  await expect(page.locator('.waterfalls .scene-mist')).toHaveCount(2);
+  await expect(page.locator('.scene-mist > i')).toHaveCount(6);
+  await expect(page.locator('.peacock-glint')).toHaveCount(2);
+  const details=await page.evaluate(()=>({
+    mist:[...document.querySelectorAll('.scene-mist')].map(e=>({
+      children:e.children.length,
+      animation:getComputedStyle(e.firstElementChild).animationName,
+      speed:getComputedStyle(e.firstElementChild).animationDuration
+    })),
+    peacocks:[...document.querySelectorAll('.peacock-glint')].map(e=>({
+      mask:getComputedStyle(e).maskImage,
+      animation:getComputedStyle(e).animationName,
+      duration:getComputedStyle(e).animationDuration
+    }))
+  }));
+  expect(details.mist).toHaveLength(2);
+  for(const mist of details.mist) {
+    expect(mist.children).toBe(3);
+    expect(mist.animation).toBe('scene-mist-drift');
+    expect(mist.speed).toBe('16s');
+  }
+  for(const bird of details.peacocks) {
+    expect(bird.mask).toContain('peacock.webp');
+    expect(bird.animation).toBe('peacock-sheen');
+    expect(bird.duration).toBe('9s');
+  }
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('.scene-mist')).toHaveCount(2);
+  expect(pageErrors).toEqual([]);
+});
+
+test('ambient overlays pause for reduced motion and debug freeze',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await waitForArt(page);
+  await expect(page.locator('.peacock-glint').first()).toBeHidden();
+  await expect(page.locator('.scene-mist i').first()).toHaveCSS('animation-name','none');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.goto('/?debug=1');
+  await waitForArt(page);
+  await expect(page.locator('.peacock-glint').first()).toHaveCSS('animation-name','none');
+  await expect(page.locator('.scene-mist i').first()).toHaveCSS('animation-name','none');
+  // Debugger can still open the invitation without breaking visual controls.
+  await page.locator('#debugOpen').click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+});
