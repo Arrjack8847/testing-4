@@ -241,3 +241,11 @@ This implementation now uses an independently coded equivalent:
 - Visual comparison now includes a **completed-lettering** frame in addition to the closed, opened, mid-scroll and restored-garden screenshots.
 
 **Accuracy note:** The effect uses a soft left-to-right moving mask. It is not a vector pen physically tracing every character's individual strokes; that would require glyph-specific stroke paths and separate artwork.
+
+
+### Phase 11 verification
+
+- Mobile Chromium: **48/48 passed** at 320, 360, 390 and 430px. [Run](https://github.com/Arrjack8847/testing-4/actions/runs/41286746444)
+- Live reference vs local: the two completed-name masks both reached `0% 0px` after holding the scroll, and both names remained legible. [Visual QA run](https://github.com/Arrjack8847/testing-4/actions/runs/41286797160)
+- Mean absolute RGB pixel differences at 390×844 (lower is better): closed 22.48/255, opened 20.46/255, 0.45H scroll 32.22/255, restored garden 24.10/255, completed names 26.15/255. These are **not percent accuracy scores** and include commercial preview UI present only in the original screenshot.
+- Vendor artwork remains externally referenced rather than publicly committed; verify public asset rights before production deployment.
