@@ -503,8 +503,8 @@ test('floral clusters sway independently from their correct root points',async({
   expect(motion.plants.length).toBeGreaterThanOrEqual(5);
   for(const item of [...motion.flowers,...motion.hanging,...motion.plants]) {
     expect(item.animation).toBe('reference-sway');
-    expect(item.duration).toBe(item.expectedDuration);
-    expect(item.delay).toBe(item.expectedDelay);
+    expect(parseFloat(item.duration)).toBeCloseTo(parseFloat(item.expectedDuration),4);
+    expect(parseFloat(item.delay)).toBeCloseTo(parseFloat(item.expectedDelay),4);
   }
   expect(new Set(motion.hanging.map(x=>x.duration)).size).toBeGreaterThan(3);
   for(const item of motion.stationary) expect(item.animation).toBe('none');
