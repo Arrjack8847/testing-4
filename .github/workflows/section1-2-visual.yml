@@ -9,6 +9,7 @@ on:
       - section-two.js
       - assets/section2-mauve-original.svg
       - tests/section-two.spec.mjs
+      - tests/section-one-motion.spec.mjs
       - .github/workflows/section1-2-visual.yml
   workflow_dispatch:
 
@@ -42,12 +43,14 @@ jobs:
           print('Artwork loaded for temporary browser QA only.')
           PY
       - name: Run Section 2 and 1→2 checkpoint geometry in 390px mobile Chromium
-        run: npx playwright test tests/section-two.spec.mjs --project=iphone-390 --workers=1
+        run: npx playwright test tests/section-one-motion.spec.mjs tests/section-two.spec.mjs --project=iphone-390 --workers=1
       - name: Upload focused transition and message screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: section1-2-iphone390-visual-checkpoints
-          path: test-results/**/*section-two*.png
+          path: |
+            test-results/**/*section-two*.png
+            test-results/**/*section-one*.png
           retention-days: 7
           if-no-files-found: warn
