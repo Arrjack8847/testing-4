@@ -648,3 +648,13 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
    offset the calibrated 390×844 text boxes while the camera settles. */
 .invitation .opened {translate:none;transition:opacity 700ms ease;}
 .invitation[data-state="opened"] .opened-copy {transform:translateY(0);}
+
+
+/* Phase 10 measured-container correction: remove inherited 6% side padding.
+   At 390px this yields heading x74/w242 and names group x28/w334,
+   with the scripted first-name box centered at x84/w222. */
+.opened-copy {padding-left:0;padding-right:0;}
+.opened-copy .eyebrow {width:242px;max-width:100%;margin:0 auto;}
+.invitation[data-state="opened"] .ceremony-names {
+  width:334px;max-width:calc(100% - 56px);
+}
