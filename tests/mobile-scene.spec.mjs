@@ -69,7 +69,7 @@ test('cover opens and enables vertical invitation scrolling', async ({ page }) =
   await expect(page.locator('#opened')).not.toHaveAttribute('inert');
   await expect(page.locator('#cover')).toHaveAttribute('inert','');
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
   await expect.poll(async () => page.evaluate(() => document.documentElement.style.overflowY)).toBe('auto');
   await page.evaluate(() => {
     document.documentElement.style.scrollBehavior = 'auto';
@@ -78,7 +78,7 @@ test('cover opens and enables vertical invitation scrolling', async ({ page }) =
   await expect.poll(async () => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   await expect(page.locator('#invitation')).toHaveAttribute('data-swiped','yes');
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
 });
 
 test('developer alignment controls and reset work after scrolling', async ({ page }) => {
@@ -245,7 +245,7 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   await page.goto('/');
   await waitForArt(page);
   await page.getByRole('button',{name:'Open Invitation'}).click();
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
   const visit=async fraction=>{
     await page.evaluate(frac=>{
       document.documentElement.style.scrollBehavior='auto';
@@ -257,7 +257,7 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   };
   await visit(.45);
   await expect(page.locator('#invitation')).toHaveAttribute('data-swiped','yes');
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
   await expect.poll(async()=>page.evaluate(()=>
     document.documentElement.style.getPropertyValue('--frame-scroll-opacity')
   )).toBe('0.0000');
@@ -265,16 +265,22 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   await expect.poll(async()=>page.evaluate(()=>
     parseFloat(document.documentElement.style.getPropertyValue('--frame-scroll-opacity'))
   )).toBeGreaterThan(.1);
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','0');
+  await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
   await visit(1.50);
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','yes');
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(getComputedStyle(document.querySelector('.opened-copy')).opacity)
+    parseFloat(getComputedStyle(document.querySelector('.opened-copy .eyebrow')).opacity)
   )).toBeGreaterThan(.25);
-  await expect(page.locator('.opened-copy h2')).toHaveCSS('opacity','0');
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(document.documentElement.style.getPropertyValue('--first-name-progress'))
+  )).toBeGreaterThan(.5);
+  await expect(page.locator('.ceremony-names')).toHaveCSS('opacity','1');
+  await expect(page.locator('.ceremony-names .name-amp')).toHaveCSS('opacity','0');
   await visit(2.20);
-  await expect(page.locator('.opened-copy')).toHaveCSS('opacity','1');
-  await expect(page.locator('.opened-copy h2')).toHaveCSS('opacity','1');
+  await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','1');
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
+  )).toBe(1);
   await expect.poll(async()=>page.evaluate(()=>
     Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
   )).toBe(0);
@@ -308,4 +314,56 @@ test('swipe cue reveals greeting instead of skipping the sticky lake',async({pag
   ))).toBe(0);
   await expect.poll(async()=>page.evaluate(()=>document.querySelector('#message').getBoundingClientRect().top))
     .toBeGreaterThan(await page.evaluate(()=>innerHeight));
+});
+
+
+test('ceremony lettering matches live 390px typography and stacked geometry',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const geometry=await page.evaluate(()=>{
+    const bounds=selector=>{
+      const el=document.querySelector(selector);
+      const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+      return {x:r.x,y:r.y,w:r.width,h:r.height,font:s.fontFamily,size:s.fontSize,spacing:s.letterSpacing};
+    };
+    return {
+      header:bounds('.opened-copy .eyebrow'),
+      names:bounds('.ceremony-names'),
+      first:bounds('.name-first'),
+      amp:bounds('.name-amp'),
+      second:bounds('.name-second')
+    };
+  });
+  if (await page.evaluate(()=>innerWidth)===390) {
+    expect(geometry.header.y).toBeCloseTo(253,0);
+    expect(geometry.header.h).toBeCloseTo(36,0);
+    expect(geometry.header.size).toBe('22px');
+    expect(geometry.header.spacing).toBe('2.2px');
+    expect(geometry.names.x).toBeCloseTo(28,0);
+    expect(geometry.names.y).toBeCloseTo(289,0);
+    expect(geometry.names.w).toBeCloseTo(334,0);
+    expect(geometry.names.h).toBeCloseTo(174,0);
+    expect(geometry.first.x).toBeCloseTo(84,0);
+    expect(geometry.first.y).toBeCloseTo(269,0);
+    expect(geometry.first.w).toBeCloseTo(222,0);
+    expect(geometry.amp.y).toBeCloseTo(356,0);
+    expect(geometry.second.y).toBeCloseTo(378,0);
+    expect(geometry.names.size).toBe('60px');
+  }
+  expect(geometry.names.font).toContain('Pinyon Script');
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    scrollTo({top:innerHeight*1.5,behavior:'instant'});
+  });
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(document.documentElement.style.getPropertyValue('--first-name-progress'))
+  )).toBeGreaterThan(.5);
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
+  )).toBe(0);
+  await page.evaluate(()=>scrollTo({top:innerHeight*2.2,behavior:'instant'}));
+  await expect.poll(async()=>page.evaluate(()=>
+    parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
+  )).toBe(1);
 });
