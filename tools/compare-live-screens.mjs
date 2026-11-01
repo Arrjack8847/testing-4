@@ -43,6 +43,17 @@ try{
     await Promise.all([ref.waitForTimeout(1000),local.waitForTimeout(1000)]);
     await ref.screenshot({path:'visual-evidence/reference-restored.png'});
     await local.screenshot({path:'visual-evidence/ours-restored.png'});
+    // The vendor animates actual name visibility on a timeline after reaching
+    // the ceremonial frame. Compare completed lettering after standing still.
+    await Promise.all([ref.waitForTimeout(2300),local.waitForTimeout(2300)]);
+    await ref.screenshot({path:'visual-evidence/reference-written.png'});
+    await local.screenshot({path:'visual-evidence/ours-written.png'});
+    const referenceWriting=await ref.evaluate(()=>[...document.querySelectorAll('.cgv-hero .cgv-nl-n')]
+      .filter(el=>el.getBoundingClientRect().width>50 && el.getBoundingClientRect().y<window.innerHeight)
+      .slice(0,2).map(el=>({text:el.textContent,mask:getComputedStyle(el).maskPosition,opacity:getComputedStyle(el).opacity})));
+    const ourWriting=await local.evaluate(()=>[...document.querySelectorAll('.ceremony-names .name-line')]
+      .map(el=>({text:el.textContent,mask:getComputedStyle(el).maskPosition,opacity:getComputedStyle(el).opacity})));
+    console.log('WRITING_COMPARISON',JSON.stringify({referenceWriting,ourWriting}));
     for (const [label,p] of [['reference',ref],['ours',local]]) {
       const v=await p.evaluate(()=>({
         scrollY:window.scrollY,
