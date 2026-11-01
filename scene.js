@@ -211,6 +211,7 @@ let openedOnce = false;
 function openInvitation() {
   invite.dataset.state = 'opened';
   invite.dataset.reading = 'no';
+  document.documentElement.style.setProperty('--reading-progress', '0');
   cover.inert = true;
   opened.inert = false;
   openedOnce = true;
@@ -225,6 +226,7 @@ function resetInvitation() {
   document.documentElement.style.overflowY = 'hidden';
   // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
   document.documentElement.style.setProperty('--stage-parallax', '0px');
+  document.documentElement.style.setProperty('--reading-progress', '0');
   window.scrollTo({top:0, behavior:'instant'});
   document.getElementById('openButton').focus({preventScroll:true});
 }
@@ -234,21 +236,41 @@ window.addEventListener('pageshow', () => {
   if (!openedOnce && window.scrollY) window.scrollTo(0, 0);
 });
 
-// Scroll modifies depth only; no animation frame is wasted when idle.
-let scheduled = false;
-window.addEventListener('scroll', () => {
+// The actual Celestial Lake scene is sticky at y=0 across the initial swipe.
+// Moving the whole stage upward during that interval was incorrect. Scroll only
+// reveals the greeting; decorative movement remains independent of scrolling.
+let scrollTick = false;
+function synchronizeReading() {
+  scrollTick = false;
   if (!openedOnce) return;
-  // The reference initially displays only the valley. The names are revealed
-  // as the guest follows the swipe cue, not immediately after the cover tap.
-  invite.dataset.reading = window.scrollY >= window.innerHeight * .15 ? 'yes' : 'no';
-  if (scheduled || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  scheduled = true;
-  requestAnimationFrame(() => {
-    const amount = Math.min(window.scrollY, window.innerHeight);
-    document.documentElement.style.setProperty('--stage-parallax', (-amount * .075).toFixed(1) + 'px');
-    scheduled = false;
-  });
-}, {passive:true});
+  const height = Math.max(window.innerHeight, 1);
+  const fraction = Math.max(0, window.scrollY / height);
+  // Gentle fade: initial valley remains unobstructed, then text arrives
+  // over the stationary lake after the first deliberate upward swipe.
+  const progress = Math.max(0, Math.min(1, (fraction - .12) / .35));
+  invite.dataset.reading = fraction >= .15 ? 'yes' : 'no';
+  document.documentElement.style.setProperty('--reading-progress', String(progress));
+  // The measured reference's background remains pinned until the sticky
+  // section ends; never translate the entire artwork on the scroll event.
+  document.documentElement.style.setProperty('--stage-parallax', '0px');
+}
+function requestReadingSync() {
+  if (!openedOnce || scrollTick) return;
+  scrollTick = true;
+  requestAnimationFrame(synchronizeReading);
+}
+window.addEventListener('scroll', requestReadingSync, {passive:true});
+window.addEventListener('resize', requestReadingSync, {passive:true});
+
+// The Swipe Up prompt should reveal the greeting within the pinned lake scene,
+// rather than jumping past it directly to the next section.
+document.querySelector('.swipe-cue')?.addEventListener('click', event => {
+  if (!openedOnce) return;
+  event.preventDefault();
+  const destination = Math.max(window.scrollY, window.innerHeight * .65);
+  window.scrollTo({top:destination,
+    behavior:reduceMotion.matches ? 'instant' : 'smooth'});
+});
 
 if (debug) {
   const panel = document.getElementById('debugPanel');
