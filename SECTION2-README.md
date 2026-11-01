@@ -36,9 +36,18 @@ The vendor's visible invitation paragraph uses the same demonstration wording al
 - Triggered scroll-reveal when the actual frame is visible, not when empty section padding first enters the viewport.
 - Updated mobile and cross-engine regression tests.
 
+## Section 1 → Section 2 handoff test
+
+The reference's first scene is 3× the viewport height, with the second mauve section starting at document y=3H. The local implementation now uses one `300dvh` scroll-track definition.
+
+At scroll=2.5H, the lake's lower edge and mauve band's upper edge meet halfway down the screen. At scroll=3H, the lake has exited and Section 2 starts at screen y=0. Both checkpoints are captured as `section-two-transition-half.png` and `section-two-transition-full.png` for each mobile viewport in the normal browser suite.
+
+The title animation and butterfly triggers preserve their existing calibrated scroll checkpoints; Sections 3–6 are not modified.
+
 ## Remaining differences / visual QA
 
-- Our current sticky opening runs approximately **four viewport heights**; the measured original hero is **three**. Changing this would touch Section 1, so it was deliberately left alone until a separate integration phase.
+- **Resolved in the Section 1–2 handoff update:** The sticky lake track now spans **3 viewport heights**, matching the measured reference. The calibrated image/lettering motion through about 2.42H is unchanged; its final 1H naturally scrolls out to the mauve message band. We removed a duplicate JS text-translation that would have made the lettering move too quickly when the sticky scene releases.
+- The remaining visual differences include the exact background texture, Bismillah graphic and minute text spacing; passing geometry tests is not a claim of pixel-perfect matching.
 - The original `band.webp` has a richer woven texture than our original CSS-generated approximation.
 - The reference's Bismillah is a compact calligraphic design; our Unicode text is a font-dependent representation and should be refined with an original licensed ornament.
 - Our existing Section 3 is an **events panel**, while the actual reference follows Section 2 with **The Couple**. This requires a future section-order correction to reproduce the full site faithfully.
