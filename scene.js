@@ -144,13 +144,13 @@ const petals = Array.from({length:16}, () => ({
   tint:petalPalette[Math.floor(randomUnit()*petalPalette.length)]
 }));
 let petalW=0, petalH=0, lastDraw=0, prevFrame=0, petalFrame=0;
-let petalDrawCount=0, sceneVisible=true;
+let petalDrawCount=0, sceneVisible=true, pageSuspended=false;
 
 // One RAF loop exists only while the first invitation scene is actually on
 // screen and decorative motion is allowed. Previously this loop requested
 // frames indefinitely even for hidden tabs, reduced motion and frozen debug.
 function ambientAllowed() {
-  return !!petalContext && sceneVisible && !document.hidden &&
+  return !!petalContext && sceneVisible && !pageSuspended && !document.hidden &&
     !reduceMotion.matches &&
     !document.documentElement.classList.contains('debug-freeze');
 }
@@ -210,8 +210,14 @@ function renderPetals(now) {
 resizePetals();
 window.addEventListener('resize',resizePetals,{passive:true});
 document.addEventListener('visibilitychange',syncAmbient);
-window.addEventListener('pagehide',syncAmbient);
-window.addEventListener('pageshow',syncAmbient);
+window.addEventListener('pagehide',()=>{
+  pageSuspended=true;
+  syncAmbient();
+});
+window.addEventListener('pageshow',()=>{
+  pageSuspended=false;
+  syncAmbient();
+});
 reduceMotion.addEventListener('change',syncAmbient);
 // Track the actual sticky first scene, not the 4-viewport scroll container:
 // scrolling beyond the invitation suspends both canvas and ambient CSS motion.
