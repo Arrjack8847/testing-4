@@ -876,3 +876,21 @@ html.debug-freeze .peacock-glint {
 .invitation[data-ambient="paused"] .butterfly {
   will-change:auto;
 }
+
+
+/* Phase 15 — artwork failure recovery.
+   The original invitation copy remains legible even when all art hosts fail.
+   This gradient appears ONLY when neither a full animated scene nor the
+   original still image is available, never on the normal artwork path. */
+.invitation[data-layers="unavailable"] .animated-scene,
+.invitation[data-layers="unavailable"] .master-art {display:none;}
+.invitation[data-layers="unavailable"] .viewport {
+  background:
+    radial-gradient(ellipse at 50% 24%,#fff5e4 0%,transparent 60%),
+    linear-gradient(170deg,#ede0ea 0%,#d3c3df 47%,#988bb3 100%);
+}
+.invitation[data-layers="unavailable"] .cover-copy,
+.invitation[data-layers="unavailable"] .monogram,
+.invitation[data-layers="unavailable"] .opened-copy {
+  text-shadow:0 1px 12px #fffaf0c9;
+}
