@@ -46,7 +46,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image,ImageChops,ImageStat
-          for stage in ['closed','opened','scrolled','restored','written']:
+          for stage in ['closed','opened','early','scrolled','retreated','restored','written']:
               a,b=Path(f'visual-evidence/reference-{stage}.png'),Path(f'visual-evidence/ours-{stage}.png')
               if not a.is_file() or not b.is_file():
                   print(stage,'missing screenshot',a.exists(),b.exists());continue
@@ -58,8 +58,12 @@ jobs:
               mae=sum(s.mean)/3
               top=ImageStat.Stat(difference.crop((0,0,390,500)))
               mae_top=sum(top.mean)/3
+              # Ignore the original site's merchant UI at y<100 and y>690.
+              # This central-region metric better isolates scene artwork parity.
+              art=ImageStat.Stat(difference.crop((20,100,370,690)))
+              mae_art=sum(art.mean)/3
               difference.save(f'visual-evidence/difference-{stage}.png')
-              print(f'{stage.upper()} 390x844 RGB difference: full MAE={mae:.2f}/255, upper-500 MAE={mae_top:.2f}/255')
+              print(f'{stage.upper()} 390x844 RGB difference: full MAE={mae:.2f}/255, upper-500 MAE={mae_top:.2f}/255, art-only MAE={mae_art:.2f}/255')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
