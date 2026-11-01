@@ -129,10 +129,10 @@ test('two butterfly species briefly hover near lower garden flowers',async({page
     return {
       species:violet?'violet':'ivory',
       duration:getComputedStyle(el).animationDuration,
-      before:grab(violet?.35:.46),
-      dwell:grab(violet?.38:.49),
-      drift:grab(violet?.40:.51),
-      after:grab(violet?.42:.54),
+      before:grab(violet ? 0.35 : 0.46),
+      dwell:grab(violet ? 0.38 : 0.49),
+      drift:grab(violet ? 0.40 : 0.51),
+      after:grab(violet ? 0.42 : 0.54),
       wing:getComputedStyle(el.querySelector('.butterfly-wing-l')).animationDuration
     };
   }));
