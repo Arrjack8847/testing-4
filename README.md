@@ -1,8 +1,8 @@
 # Celestial Lake — mobile wedding invitation prototype
 
-## Current scope — Sections 1 and 2
+## Current scope — Sections 1, 2 and 3
 
-**Section 1** remains the calibrated interactive sticky lake opener with the existing camera choreography and ambient animation. **Section 2** now contains a separately styled, original ivory-and-gold invitation letter and scroll reveal; see [SECTION2-README.md](SECTION2-README.md). The second section has **not** been verified as a visual match to the commercial reference and still uses demonstration names/date. Event details, venue and RSVP are not implemented. Earlier phase notes below describe the historical Section 1-only scope.
+**Section 1** remains the calibrated interactive sticky lake opener with the existing camera choreography and ambient animation. **Section 2** contains a separately styled, original ivory-and-gold invitation letter and scroll reveal; see [SECTION2-README.md](SECTION2-README.md). **Section 3** adds a date, time and venue presentation with guarded directions; see [SECTION3-README.md](SECTION3-README.md). The second and third scenes are original companion designs, not verified copies of the commercial reference, and all names/date are demonstration details. Event time and venue are unconfirmed, and RSVP is not implemented. Earlier phase notes below describe the historical Section 1-only scope.
 
 Mobile-first recreation of the **first section only** of [Undangan Kahwin's Celestial Lake](https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en).
 
