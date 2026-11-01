@@ -9,7 +9,7 @@ try {
  const btn=page.getByRole('button',{name:'Open Invitation'});
  for(let n=0;n<await btn.count();n++)if(await btn.nth(n).isVisible()){await btn.nth(n).click();break;}
  await page.waitForTimeout(2400);
- const fractions=[0,.25,.45,.75,.95,1.15,1.5];
+ const fractions=[1.5,1.7,1.9,2.15,2.5,2.9];
  for(const frac of fractions){
    await page.evaluate(frac=>{
      document.documentElement.style.scrollBehavior='auto';
