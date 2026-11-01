@@ -104,5 +104,9 @@ test('RSVP uses reduced-motion readable content and resets when closed',async({p
   await section.getByRole('radio',{name:'Joyfully accepts'}).check();
   await section.getByRole('button',{name:'Preview RSVP — not sent'}).click();
   await expect(section.locator('#rsvpPreview')).toBeVisible();
-  await page.evaluate(()=>document.getElementById('resetButton').click()).catch(()=>{});
+  await page.evaluate(()=>{document.getElementById('invitation').dataset.state='cover';});
+  await expect(section).toHaveAttribute('aria-hidden','true');
+  await expect(section).toHaveJSProperty('inert',true);
+  await expect(section.locator('#rsvpName')).toHaveValue('');
+  await expect(section.locator('#rsvpPreview')).toBeHidden();
 });
