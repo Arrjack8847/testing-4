@@ -1,0 +1,52 @@
+name: Phase 18 cross-browser and accessibility QA
+on:
+  push:
+    paths:
+      - index.html
+      - styles.css
+      - scene.js
+      - phone-qa.js
+      - package.json
+      - playwright.crossbrowser.config.mjs
+      - tests/cross-browser.spec.mjs
+      - .github/workflows/crossbrowser-a11y.yml
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  three-engine-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright test runner
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium, Firefox, and WebKit with Linux dependencies
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Download artwork for ephemeral testing only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          import re
+          names = re.findall(r'^([a-z0-9_]+\.webp)$', Path('ASSET-MANIFEST.txt').read_text(), re.M)
+          assert len(names) == 25
+          Path('assets').mkdir(exist_ok=True)
+          for n in names:
+              raw = urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+n, headers={'User-Agent':'Mozilla/5.0'}), timeout=40).read()
+              assert raw[:4] == b'RIFF' and raw[8:12] == b'WEBP', n
+              Path('assets',n).write_bytes(raw)
+          print('Verified 25 ephemeral WebPs')
+          PY
+      - name: Run accessibility and interaction tests in three engines
+        run: npm run test:crossbrowser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: phase18-browser-traces
+          path: test-results/
+          retention-days: 7
