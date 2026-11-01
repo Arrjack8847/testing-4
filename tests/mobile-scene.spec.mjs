@@ -180,8 +180,8 @@ test('paired-wing butterflies fly only in the appropriate scene state', async ({
   expect(butterflies[1].size).toEqual(['44px','34px']);
   expect(butterflies[0].source).toContain('serambi-ungu/bfly_1.webp');
   expect(butterflies[1].source).toContain('anggerik-nirmala/bfly_white.webp');
-  expect(butterflies[0].animation).toContain('bf-violet-cover');
-  expect(butterflies[1].animation).toContain('bf-ivory-cover');
+  expect(butterflies[0].animation).toContain('bf-violet-garden');
+  expect(butterflies[1].animation).toContain('bf-ivory-garden');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   await expect(cover).toHaveCSS('visibility','hidden');
   await expect(hero).toHaveCSS('visibility','hidden');
@@ -524,4 +524,34 @@ test('reduced motion stops decorative floral sway without blocking opening',asyn
   expect(stationary.iterations).toBe('1');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+});
+
+
+test('butterfly routes visit real garden perches and match species wingbeat speeds',async({page})=>{
+  await page.goto('/');
+  await waitForArt(page);
+  const flights=await page.locator('.butterfly-cover .butterfly').evaluateAll(nodes=>nodes.map(el=>{
+    const animation=el.getAnimations().find(a=>a.effect?.getKeyframes()?.length>2);
+    const wing=el.querySelector('.butterfly-wing-l');
+    const waypoints=animation?.effect?.getKeyframes()?.map(k=>k.transform || '').join(' ') || '';
+    return {
+      name:getComputedStyle(el).animationName,
+      duration:getComputedStyle(el).animationDuration,
+      wingDuration:getComputedStyle(wing).animationDuration,
+      waypoints
+    };
+  }));
+  expect(flights).toHaveLength(2);
+  expect(flights[0].name).toContain('bf-violet-garden');
+  expect(flights[1].name).toContain('bf-ivory-garden');
+  expect(flights[0].duration).toBe('24s');
+  expect(flights[1].duration).toBe('22s');
+  expect(parseFloat(flights[0].wingDuration)).toBeCloseTo(1/(2*2.2),3);
+  expect(parseFloat(flights[1].wingDuration)).toBeCloseTo(1/(2*2.6),3);
+  for(const flight of flights) {
+    expect(flight.waypoints).toContain('94dvh');
+    expect(flight.waypoints).toContain('44dvh');
+    expect(flight.waypoints).toContain('48dvh');
+    expect(flight.waypoints).toContain('vw');
+  }
 });
