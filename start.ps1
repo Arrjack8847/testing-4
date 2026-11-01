@@ -1,12 +1,34 @@
 # Mobile scene preview. Requires Python (py or python).
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
-$required = @('scene.webp','sky.webp','palace.webp','reeds.webp','arch.webp','tree_l.webp','tree_r.webp','drape.webp','peacock.webp')
-$missing = @($required | Where-Object { -not (Test-Path (Join-Path $PSScriptRoot ("assets\\" + $_))) })
+
+function Test-ValidWebP([string]$Path) {
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $false }
+  $bytes = [System.IO.File]::ReadAllBytes($Path)
+  return $bytes.Length -gt 64 -and
+    [Text.Encoding]::ASCII.GetString($bytes,0,4) -eq 'RIFF' -and
+    [Text.Encoding]::ASCII.GetString($bytes,8,4) -eq 'WEBP'
+}
+
+$manifest = Join-Path $PSScriptRoot 'ASSET-MANIFEST.txt'
+if (-not (Test-Path $manifest)) { throw 'ASSET-MANIFEST.txt not found.' }
+$required = @(Get-Content $manifest | Where-Object { $_ -match '^[a-z0-9_]+\.webp$' })
+if ($required.Count -ne 25) { throw "Expected 25 WebP artwork files; manifest lists $($required.Count)." }
+
+$missing = @($required | Where-Object {
+  -not (Test-ValidWebP (Join-Path $PSScriptRoot ("assets\" + $_)))
+})
 if ($missing.Count -gt 0) {
-  Write-Host 'Some reference images are missing; downloading artwork...' -ForegroundColor Yellow
+  Write-Host "Repairing $($missing.Count) missing or invalid artwork files..." -ForegroundColor Yellow
   & (Join-Path $PSScriptRoot 'download-assets.ps1')
 }
+$stillMissing = @($required | Where-Object {
+  -not (Test-ValidWebP (Join-Path $PSScriptRoot ("assets\" + $_)))
+})
+if ($stillMissing.Count -gt 0) {
+  throw "Artwork incomplete after download: $($stillMissing -join ', ')"
+}
+
 $py = Get-Command py -ErrorAction SilentlyContinue
 if ($null -ne $py) {
   Write-Host 'Visit http://localhost:8000 (or http://localhost:8000/?debug=1).' -ForegroundColor Green
