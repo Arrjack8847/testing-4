@@ -1,8 +1,8 @@
 # Celestial Lake — mobile wedding invitation prototype
 
-## Current scope — Sections 1–4
+## Current scope — Sections 1–5
 
-**Section 1** remains the calibrated interactive sticky lake opener with the existing camera choreography and ambient animation. **Section 2** contains a separately styled, original ivory-and-gold invitation letter and scroll reveal; see [SECTION2-README.md](SECTION2-README.md). **Section 3** adds a date, time and venue presentation with guarded directions; see [SECTION3-README.md](SECTION3-README.md). **Section 4** adds an original date-only countdown and confirmation-gated all-day calendar reminder; see [SECTION4-README.md](SECTION4-README.md). Sections 2–4 are original companion scenes, not verified copies of later commercial-reference sections, and names/dates are demonstration details. Event time and venue are unconfirmed, and RSVP is not implemented. Earlier phase notes below describe the historical Section 1-only scope.
+**Section 1** remains the calibrated interactive sticky lake opener with the existing camera choreography and ambient animation. **Section 2** contains a separately styled, original ivory-and-gold invitation letter and scroll reveal; see [SECTION2-README.md](SECTION2-README.md). **Section 3** adds a date, time and venue presentation with guarded directions; see [SECTION3-README.md](SECTION3-README.md). **Section 4** adds an original date-only countdown and confirmation-gated all-day calendar reminder; see [SECTION4-README.md](SECTION4-README.md). **Section 5** adds an original image-optional gallery with five local photo slots, a full-view photo dialog and no fictional people; see [SECTION5-README.md](SECTION5-README.md). Sections 2–5 are original companion scenes, not verified copies of later commercial-reference sections, and names/dates are demonstration details. Event time and venue are unconfirmed, and RSVP is not implemented. Earlier phase notes below describe the historical Section 1-only scope.
 
 The original first-section reference for this multi-section mobile prototype is [Undangan Kahwin's Celestial Lake](https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en).
 
