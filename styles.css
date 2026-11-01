@@ -642,3 +642,9 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
   .invitation[data-state="opened"] .ceremony-names {font-size:54px;}
   .ceremony-names .name-line {font-size:54px;}
 }
+
+
+/* The opened greeting is staged by scroll, so entrance translation must not
+   offset the calibrated 390×844 text boxes while the camera settles. */
+.invitation .opened {translate:none;transition:opacity 700ms ease;}
+.invitation[data-state="opened"] .opened-copy {transform:translateY(0);}
