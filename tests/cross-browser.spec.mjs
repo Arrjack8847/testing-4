@@ -149,3 +149,24 @@ test('section 2 invitation letter follows the completed sticky scene', async ({p
   expect(overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
+
+
+test('Section 3 event details remain accessible and safe without a venue',async({page})=>{
+  const errors=await load(page);
+  const event=page.locator('#eventDetails');
+  await expect(event).toHaveAttribute('aria-hidden','true');
+  await expect(event).toHaveJSProperty('inert',true);
+  await open(page);
+  await expect(event).toHaveAttribute('aria-hidden','false');
+  await expect(event).toHaveJSProperty('inert',false);
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    const target=document.getElementById('eventDetails');
+    window.scrollTo(0,Math.round(window.scrollY+target.getBoundingClientRect().top));
+  });
+  await expect(event).toBeInViewport();
+  await expect(page.getByRole('heading',{level:2,name:'The Celebration'})).toBeVisible();
+  await expect(event.locator('#eventVenue')).toHaveText('Venue to be announced');
+  await expect(event.locator('#eventDirections')).toBeHidden();
+  expect(errors).toEqual([]);
+});
