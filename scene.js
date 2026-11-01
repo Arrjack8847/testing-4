@@ -144,6 +144,31 @@ const petals = Array.from({length:16}, () => ({
   tint:petalPalette[Math.floor(randomUnit()*petalPalette.length)]
 }));
 let petalW=0, petalH=0, lastDraw=0, prevFrame=0, petalFrame=0;
+let petalDrawCount=0, sceneVisible=true;
+
+// One RAF loop exists only while the first invitation scene is actually on
+// screen and decorative motion is allowed. Previously this loop requested
+// frames indefinitely even for hidden tabs, reduced motion and frozen debug.
+function ambientAllowed() {
+  return !!petalContext && sceneVisible && !document.hidden &&
+    !reduceMotion.matches &&
+    !document.documentElement.classList.contains('debug-freeze');
+}
+function syncAmbient() {
+  const running=ambientAllowed();
+  invite.dataset.ambient=running ? 'running' : 'paused';
+  if (running && !petalFrame) {
+    lastDraw=0;
+    prevFrame=0;
+    petalFrame=requestAnimationFrame(renderPetals);
+  } else if (!running) {
+    if (petalFrame) cancelAnimationFrame(petalFrame);
+    petalFrame=0;
+    lastDraw=0;
+    prevFrame=0;
+    if (reduceMotion.matches) petalContext?.clearRect(0,0,petalW,petalH);
+  }
+}
 function resizePetals() {
   const bounds = petalCanvas.getBoundingClientRect();
   petalW=bounds.width;petalH=bounds.height;
@@ -153,17 +178,19 @@ function resizePetals() {
   petalContext?.setTransform(ratio,0,0,ratio,0,0);
 }
 function renderPetals(now) {
-  petalFrame=requestAnimationFrame(renderPetals);
-  if (!petalContext || document.hidden || reduceMotion.matches ||
-      document.documentElement.classList.contains('debug-freeze')) {
-    prevFrame=now;
-    if (petalContext && reduceMotion.matches) petalContext.clearRect(0,0,petalW,petalH);
+  // Mark consumed before scheduling the next frame. A visibility/observer
+  // callback can always cancel the outstanding frame by its ID.
+  petalFrame=0;
+  if (!ambientAllowed()) {
+    syncAmbient();
     return;
   }
-  // 30 fps cap for entry-level Android devices, with bounded delta on tab restoration.
+  petalFrame=requestAnimationFrame(renderPetals);
+  // Painting remains capped at 30 fps even on 120 Hz phones.
   if(now-lastDraw < 1000/30) return;
   const dt=prevFrame ? Math.min((now-prevFrame)/1000,.05) : 0;
   prevFrame=now;lastDraw=now;
+  petalDrawCount++;
   petalContext.clearRect(0,0,petalW,petalH);
   for(const p of petals) {
     p.y += p.speed*dt;
@@ -182,7 +209,35 @@ function renderPetals(now) {
 }
 resizePetals();
 window.addEventListener('resize',resizePetals,{passive:true});
-petalFrame=requestAnimationFrame(renderPetals);
+document.addEventListener('visibilitychange',syncAmbient);
+window.addEventListener('pagehide',syncAmbient);
+window.addEventListener('pageshow',syncAmbient);
+reduceMotion.addEventListener('change',syncAmbient);
+// Track the actual sticky first scene, not the 4-viewport scroll container:
+// scrolling beyond the invitation suspends both canvas and ambient CSS motion.
+if ('IntersectionObserver' in window) {
+  const observer=new IntersectionObserver(entries=>{
+    sceneVisible=entries[0]?.isIntersecting ?? true;
+    syncAmbient();
+  },{threshold:0});
+  observer.observe(document.getElementById('viewport'));
+}
+// Debug controls change a root class, so watch only that class rather than
+// running a polling timer or an idle requestAnimationFrame.
+new MutationObserver(syncAmbient).observe(document.documentElement,{
+  attributes:true,attributeFilter:['class']
+});
+if (debug) {
+  Object.defineProperty(window,'__scenePerf',{
+    value:Object.freeze({
+      get draws(){return petalDrawCount;},
+      get pendingFrame(){return petalFrame!==0;},
+      get sceneVisible(){return sceneVisible;},
+      get ambient(){return invite.dataset.ambient;}
+    }),configurable:false
+  });
+}
+syncAmbient();
 
 const allNames = ['scene.webp', ...byFile.keys()];
 const failed = new Set();
