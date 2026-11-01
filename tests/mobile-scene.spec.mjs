@@ -284,11 +284,12 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   // The reference scrolls the typography upward after 2H but leaves
   // the garden pinned behind it.
   await visit(2.5);
-  const textShift=await page.evaluate(()=>Number.parseFloat(
-    document.documentElement.style.getPropertyValue('--text-scroll-shift')
-  ));
   const viewportHeight=await page.evaluate(()=>innerHeight);
-  expect(textShift).toBeCloseTo(-.5*viewportHeight,0);
+  // Scroll listeners commit their CSS variables on the next animation frame.
+  // Poll instead of sampling a value from the previous scroll checkpoint.
+  await expect.poll(async()=>page.evaluate(()=>Number.parseFloat(
+    document.documentElement.style.getPropertyValue('--text-scroll-shift')
+  ))).toBeCloseTo(-.5*viewportHeight,0);
   await expect.poll(async()=>page.evaluate(()=>
     Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
   )).toBe(0);
