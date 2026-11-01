@@ -658,3 +658,59 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 .invitation[data-state="opened"] .ceremony-names {
   width:334px;max-width:calc(100% - 56px);
 }
+
+
+/* Phase 11 — continuously written lettering.
+   Reference audit: soft edged moving mask, first name 1.5s after a .35s
+   delay; ampersand rises after 1.05s, second name starts after 1.45s.
+   Unlike the earlier hard-edge scroll wipe, these keyframes continue after
+   the guest stops scrolling. Letters remain real, accessible HTML text. */
+.ceremony-names .name-line {
+  clip-path:none;
+  -webkit-clip-path:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 42%,transparent 62%);
+  mask-image:linear-gradient(90deg,#000 42%,transparent 62%);
+  -webkit-mask-size:270% 100%;
+  mask-size:270% 100%;
+  -webkit-mask-position:100% 0;
+  mask-position:100% 0;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+}
+.invitation[data-lettering="playing"] .ceremony-names .name-first {
+  animation:write-ceremony-name 1.5s cubic-bezier(.45,.05,.35,1) .35s both;
+}
+.invitation[data-lettering="playing"] .ceremony-names .name-second {
+  animation:write-ceremony-name 1.5s cubic-bezier(.45,.05,.35,1) 1.45s both;
+}
+.invitation[data-lettering="playing"] .ceremony-names .name-amp {
+  animation:rise-ceremony-amp .8s ease 1.05s both;
+}
+@keyframes write-ceremony-name {
+  0% {
+    -webkit-mask-position:100% 0;
+    mask-position:100% 0;
+  }
+  100% {
+    -webkit-mask-position:0 0;
+    mask-position:0 0;
+  }
+}
+@keyframes rise-ceremony-amp {
+  from { opacity:0; transform:translateY(8px) scale(.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+/* Respect reduced motion without hiding the couple's names after the scroll
+   arrives. Keep the ordinary threshold so names don't appear over the empty lake. */
+@media (prefers-reduced-motion:reduce) {
+  .invitation[data-lettering="playing"] .ceremony-names .name-line {
+    animation:none!important;
+    -webkit-mask-image:none!important;
+    mask-image:none!important;
+  }
+  .invitation[data-lettering="playing"] .ceremony-names .name-amp {
+    animation:none!important;
+    opacity:1!important;
+    transform:none!important;
+  }
+}
