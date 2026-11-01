@@ -287,7 +287,7 @@ The existing opening button, sticky lake, butterfly/flower state transitions, ha
 This update changes the *work performed* while the scene is invisible, not the approved artwork, camera framing or scroll choreography.
 
 - The canvas still paints up to **30 times per second** while Section 1 is visible. It no longer requests animation frames while the tab/page is hidden, the first scene is off-screen, reduced motion is enabled, or developer freeze is active.
-- A single `IntersectionObserver` tracks the sticky `#viewport`. When the user scrolls completely beyond Section 1, both the petal rendering loop and decorative CSS animations pause. Returning to the garden resumes motion without restarting the invitation or changing scroll progress.
+- A single `IntersectionObserver` tracks the sticky `#viewport`. Once less than **7.5% of the scene remains visible**, both the petal loop and decorative CSS animations pause. This handles phone heights where a 37–47px strip of the hero persists above the next section at maximum scroll. Returning to the garden resumes motion without restarting the invitation or changing scroll progress.
 - `visibilitychange`, `pagehide`/`pageshow` and the reduced-motion media-query change event update the same centralized controller. No polling interval is used.
 - The debug freeze toggle is observed as a **class change**, rather than running an endless idle `requestAnimationFrame` loop to check it.
 - On resumption, delta-time counters are reset to prevent any large jump in petal positions.
