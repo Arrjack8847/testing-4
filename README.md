@@ -249,3 +249,17 @@ This implementation now uses an independently coded equivalent:
 - Live reference vs local: the two completed-name masks both reached `0% 0px` after holding the scroll, and both names remained legible. [Visual QA run](https://github.com/Arrjack8847/testing-4/actions/runs/41286797160)
 - Mean absolute RGB pixel differences at 390×844 (lower is better): closed 22.48/255, opened 20.46/255, 0.45H scroll 32.22/255, restored garden 24.10/255, completed names 26.15/255. These are **not percent accuracy scores** and include commercial preview UI present only in the original screenshot.
 - Vendor artwork remains externally referenced rather than publicly committed; verify public asset rights before production deployment.
+
+
+## Phase 12 — subtler animated atmosphere
+
+The remaining reference scene movement was audited against the original's decorative CSS. Individual stems, hanging blossoms and larger trees already use separate anchored rotation cycles and per-asset phase offsets. The reference also contains two important ambient effects that were not present in the prototype:
+
+- **Waterfall mist:** three overlapping translucent clouds around each of the two waterfall outlets. Each cloud moves at a different slow rate (16, 21 and 26 seconds), while its parent remains fixed to the palace's natural coordinate system. The mist scales with the building during the opening camera push.
+- **Peacock feather light:** a gentle periodic reflection sweeps across each still peacock. The reflection is clipped to the peacock WebP's own alpha silhouette, uses a soft-light blend and lasts 9 seconds. The artwork itself remains stationary.
+
+Implementation details: these effects are additive DOM/CSS overlays, require no extra downloaded art, and use the actual resolved URL for the peacock source image (local if available, remote fallback otherwise). They are disabled or frozen under reduced-motion and developer freeze controls.
+
+New mobile browser tests check 2 mist banks × 3 cloud layers, 2 independent peacock glints, mask availability, animation durations, opening behavior and reduced-motion/debug controls. The original cover/garden/lettering layouts are not repositioned in this pass.
+
+**Limitation:** Although the effects match observed structure and broad timing, they are not certified pixel-perfect copies of every particle, mist displacement or reflection intensity.
