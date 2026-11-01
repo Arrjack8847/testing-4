@@ -39,6 +39,10 @@
   background:linear-gradient(145deg,#e7cadf,#a58cb5);
   filter:drop-shadow(0 1px 2px #402b3a29);
   transform:rotate(-19deg);animation:letter-petal-fall 10s linear infinite;
+  animation-play-state:paused;
+}
+#message[data-petals-active="true"] .letter-petal{
+  animation-play-state:running;
 }
 #message .letter-petal-1{left:17%;animation-delay:-6s;animation-duration:11s;}
 #message .letter-petal-2{left:36%;animation-delay:-2s;animation-duration:13s;scale:.72;}
