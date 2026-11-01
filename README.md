@@ -199,3 +199,26 @@ Revisions:
 - The visual QA workflow now compares four states: cover, just opened, 0.45H mid-scroll and 1.50H restored frame.
 
 The exact proprietary animation curves remain independently approximated; these checkpoints are grounded in the reference screenshots and browser inspections.
+
+
+## Phase 10 — measured ceremonial names (390 × 844)
+
+The first mobile scene's text was measured on the original live site after opening at 1.3–2.3 viewport heights of scroll. This supersedes the earlier estimated serif-only name heading.
+
+| Element | Reference DOM box | Computed type |
+|---|---|---|
+| The Wedding of | x=74, y=253, 242×36px | EB Garamond, 22px, letter spacing 2.2px |
+| Names group | x=28, y=289, 334×174px | Pinyon Script, 60px |
+| Rayyan | x=84, y=269, 222×96px | Pinyon Script, 60px |
+| Ampersand | x=102, y=356, 186×41px | Pinyon Script, 36px |
+| Sofea | x=84, y=378, 222×96px | Pinyon Script, 60px |
+
+Implementation:
+- Loads the actual **Pinyon Script** font rather than rendering wedding names in EB Garamond or Alex Brush.
+- Preserves accessible HTML text, with the first name, ampersand and second name revealed independently in the existing scroll sequence.
+- Uses vendor-measured element positions but independently implemented CSS clip paths; these are not extracted proprietary animation frames.
+- Uses direct percentage clip values for broader browser compatibility.
+- The opening monogram still uses Alex Brush, as separately observed in the reference's cover.
+- Tests check 390px text geometry, progress values, clipping and the existing four-viewport interactions.
+
+The reference's hand-drawn line-level reveal effect is approximated with progressive horizontal clipping; it is not claimed to match individual stroke paths.
