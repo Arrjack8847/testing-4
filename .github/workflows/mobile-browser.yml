@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - index.html
+      - section-two.css
+      - section-two.js
       - scene.js
       - phone-qa.js
       - styles.css
