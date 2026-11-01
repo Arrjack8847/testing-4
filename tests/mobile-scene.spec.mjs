@@ -561,3 +561,92 @@ test('butterfly routes visit real garden perches and match species wingbeat spee
     expect(Math.min(...coords.map(p=>p.y))).toBeLessThan(viewport.h*.55);
   }
 });
+
+
+test('debug freeze cancels petal frames and unfreezing resumes at 30fps or less',async({page})=>{
+  const errors=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('/?debug=1');
+  await waitForArt(page);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
+  expect(await page.evaluate(()=>window.__scenePerf.pendingFrame)).toBe(false);
+  await page.locator('#freezeMotion').uncheck();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await expect.poll(()=>page.evaluate(()=>window.__scenePerf.draws),{timeout:2000})
+    .toBeGreaterThan(2);
+  const before=await page.evaluate(()=>window.__scenePerf.draws);
+  await page.waitForTimeout(450);
+  const after=await page.evaluate(()=>window.__scenePerf.draws);
+  expect(after-before).toBeGreaterThan(2);
+  // A 450ms window at 30fps should draw about 13 frames, allowing slack.
+  expect(after-before).toBeLessThanOrEqual(20);
+  await page.locator('#freezeMotion').check();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
+  const frozen=await page.evaluate(()=>window.__scenePerf.draws);
+  await page.waitForTimeout(180);
+  expect(await page.evaluate(()=>window.__scenePerf.draws)).toBe(frozen);
+  expect(await page.evaluate(()=>window.__scenePerf.pendingFrame)).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test('petal loop reacts immediately to reduced-motion changes',async({page})=>{
+  await page.goto('/?debug=1');
+  await waitForArt(page);
+  await page.locator('#freezeMotion').uncheck();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
+  expect(await page.evaluate(()=>window.__scenePerf.pendingFrame)).toBe(false);
+  await expect(page.locator('.butterfly-cover')).toBeHidden();
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await expect.poll(()=>page.evaluate(()=>window.__scenePerf.pendingFrame))
+    .toBe(true);
+  await page.locator('#debugOpen').click();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-state','opened');
+});
+
+test('pagehide stops animation frames and pageshow restarts them',async({page})=>{
+  await page.goto('/?debug=1');
+  await waitForArt(page);
+  await page.locator('#freezeMotion').uncheck();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await page.evaluate(()=>window.dispatchEvent(new Event('pagehide')));
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
+  const before=await page.evaluate(()=>window.__scenePerf.draws);
+  await page.waitForTimeout(170);
+  expect(await page.evaluate(()=>window.__scenePerf.draws)).toBe(before);
+  expect(await page.evaluate(()=>window.__scenePerf.pendingFrame)).toBe(false);
+  await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await expect.poll(()=>page.evaluate(()=>window.__scenePerf.draws))
+    .toBeGreaterThan(before);
+});
+
+test('scrolling past sticky Section 1 suspends ambient motion and restores on return',async({page})=>{
+  await page.goto('/?debug=1');
+  await waitForArt(page);
+  await page.locator('#freezeMotion').uncheck();
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await page.locator('#debugOpen').click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    const end=document.documentElement.scrollHeight-innerHeight;
+    scrollTo({top:end,behavior:'instant'});
+  });
+  await expect.poll(async()=>page.evaluate(()=>document.querySelector('#viewport')
+    .getBoundingClientRect().bottom)).toBeLessThanOrEqual(0);
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','paused');
+  await expect(page.locator('.sprite.hanging img').first())
+    .toHaveCSS('animation-play-state','paused');
+  expect(await page.evaluate(()=>window.__scenePerf.pendingFrame)).toBe(false);
+  const frozen=await page.evaluate(()=>window.__scenePerf.draws);
+  await page.waitForTimeout(150);
+  expect(await page.evaluate(()=>window.__scenePerf.draws)).toBe(frozen);
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+  await expect(page.locator('#invitation')).toHaveAttribute('data-ambient','running');
+  await expect(page.locator('.sprite.hanging img').first())
+    .toHaveCSS('animation-play-state','running');
+  await expect.poll(()=>page.evaluate(()=>window.__scenePerf.draws))
+    .toBeGreaterThan(frozen);
+});
