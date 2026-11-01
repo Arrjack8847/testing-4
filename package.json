@@ -6,7 +6,8 @@
   "scripts": {
     "test:mobile": "playwright test",
     "test:source": "python3 tools/check-source.py",
-    "test:syntax": "node --check scene.js"
+    "test:syntax": "node --check scene.js && node --check phone-qa.js",
+    "test:crossbrowser": "playwright test --config playwright.crossbrowser.config.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"
