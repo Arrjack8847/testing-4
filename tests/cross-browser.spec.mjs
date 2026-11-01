@@ -170,3 +170,25 @@ test('Section 3 event details remain accessible and safe without a venue',async(
   await expect(event.locator('#eventDirections')).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+
+test('Section 4 calendar-day countdown remains accessible across browser engines',async({page})=>{
+  const errors=await load(page);
+  const section=page.locator('#saveTheDate');
+  await expect(section).toHaveAttribute('aria-hidden','true');
+  await expect(section).toHaveJSProperty('inert',true);
+  await open(page);
+  await expect(section).toHaveAttribute('aria-hidden','false');
+  await expect(section).toHaveJSProperty('inert',false);
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('saveTheDate').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toBeInViewport();
+  await expect(page.getByRole('heading',{level:2,name:'Save the Date'})).toBeVisible();
+  await expect(section.locator('#countdownDays')).toHaveText(/^\d+$/);
+  await expect(section.locator('#saveDateButton')).toBeDisabled();
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});
