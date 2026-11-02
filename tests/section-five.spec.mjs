@@ -5,7 +5,7 @@ async function reachGallery(page){
   page.on('pageerror',error=>errors.push(error.message));
   await page.goto('/');
   const gallery=page.locator('#gallery');
-  await expect(gallery).toHaveAttribute('data-section','5');
+  await expect(gallery).toHaveAttribute('data-section','6');
   await expect(gallery).toHaveAttribute('aria-hidden','true');
   await expect(gallery).toHaveJSProperty('inert',true);
   await page.getByRole('button',{name:'Open Invitation'}).click();

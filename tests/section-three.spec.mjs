@@ -17,11 +17,11 @@ async function reachEvents(page) {
   return event;
 }
 
-test('wedding event section follows invitation letter and preserves demo disclosures',async({page}) => {
+test('wedding event section follows reference-style Couple portraits and preserves demo disclosures',async({page}) => {
   const errors=[];
   page.on('pageerror',e => errors.push(e.message));
   const event = await reachEvents(page);
-  await expect(event).toHaveAttribute('data-section','3');
+  await expect(event).toHaveAttribute('data-section','4');
   await expect(page.getByRole('heading',{name:'The Celebration',level:2})).toBeVisible();
   await expect(event.locator('.event-date-day')).toHaveText('23');
   await expect(event.locator('.event-date-month')).toHaveText('JANUARY');
@@ -33,7 +33,7 @@ test('wedding event section follows invitation letter and preserves demo disclos
   expect(errors).toEqual([]);
 });
 
-test('Section 3 fits each mobile size without horizontal overflow',async({page},testInfo)=>{
+test('Celebration event details fit each mobile size without horizontal overflow',async({page},testInfo)=>{
   const event = await reachEvents(page);
   await expect(event).toHaveClass(/is-visible/);
   const geometry = await event.evaluate(section => {
@@ -62,26 +62,26 @@ test('reduced-motion event details remain legible',async({page})=>{
 });
 
 
-test('Section 2 to Section 3 transition is contiguous and visually bridged',async({page},testInfo)=>{
+test('Section 3 Couple to Celebration transition remains contiguous and visually bridged',async({page},testInfo)=>{
   await page.goto('/');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const seam=await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
     const letter=document.getElementById('message');
     const event=document.getElementById('eventDetails');
-    const continuous=letter.nextElementSibling===event;
+    const continuous=letter.nextElementSibling?.id==='couple' && document.getElementById('couple').nextElementSibling===event;
     const point=event.getBoundingClientRect().top+scrollY-innerHeight/2;
     window.scrollTo(0,Math.round(point));
     return {continuous};
   });
   expect(seam.continuous).toBe(true);
   await expect(page.locator('#eventDetails')).toBeInViewport();
-  await expect(page.locator('#message')).toBeInViewport();
+  await expect(page.locator('#couple')).toBeInViewport();
   const position=await page.evaluate(()=>{
-    const letter=document.getElementById('message').getBoundingClientRect();
+    const couple=document.getElementById('couple').getBoundingClientRect();
     const event=document.getElementById('eventDetails').getBoundingClientRect();
     const transition=getComputedStyle(document.getElementById('eventDetails'),'::after');
-    return {gap:event.top-letter.bottom,
+    return {gap:event.top-couple.bottom,
       gradient:transition.backgroundImage,
       pointerEvents:transition.pointerEvents,
       pageOverflow:document.documentElement.scrollWidth-innerWidth};

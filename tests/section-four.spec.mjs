@@ -20,7 +20,7 @@ async function visitCountdown(page){
 
 test('Section 4 follows the venue, shows a date-only sample countdown, and blocks unconfirmed download',async({page})=>{
   const {section,pageErrors}=await visitCountdown(page);
-  await expect(section).toHaveAttribute('data-section','4');
+  await expect(section).toHaveAttribute('data-section','5');
   await expect(page.getByRole('heading',{level:2,name:'Save the Date'})).toBeVisible();
   await expect(section.locator('.save-date-disclaimer')).toContainText('Demonstration date');
   await expect(section.locator('time')).toHaveAttribute('datetime','2027-01-23');

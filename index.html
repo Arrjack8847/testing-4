@@ -4,19 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#d4c8de">
-  <meta name="description" content="Celestial Lake mobile invitation prototype — animated garden, wedding letter, celebration, countdown and photo gallery.">
+  <meta name="description" content="Celestial Lake mobile invitation prototype — animated garden, wedding letter, couple portraits, celebration and RSVP.">
   <title>Celestial Lake — Mobile Invitation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Alex+Brush&family=Pinyon+Script&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="section-two.css">
+  <link rel="stylesheet" href="section-couple.css">
   <link rel="stylesheet" href="section-three.css">
   <link rel="stylesheet" href="section-four.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
+  <script src="section-couple.js" defer></script>
   <script src="section-three.js" defer></script>
   <script src="section-four.js" defer></script>
   <script src="section-five.js" defer></script>
@@ -94,8 +96,51 @@
         </div>
       </div>
     </section>
-    <!-- Section 3: independently designed event information; all details below are SAMPLE/UNCONFIRMED. -->
-    <section class="event-section" id="eventDetails" data-section="3" aria-labelledby="eventHeading" aria-hidden="true" inert>
+    <!-- Section 3: original floral Couple scene based on the reference's vertical composition.
+         Drawn background and artwork are original placeholders, NOT photographs of real people. -->
+    <section class="couple-section" id="couple" data-section="3"
+      aria-labelledby="coupleHeading" aria-hidden="true" inert>
+      <div class="couple-arch" aria-hidden="true"></div>
+      <span class="couple-arch-finial" aria-hidden="true"></span>
+      <div class="couple-hanging" aria-hidden="true"></div>
+      <div class="couple-floating-petals" aria-hidden="true">
+        <span style="--p-x:8%;--p-delay:-7s;--p-duration:14s"></span>
+        <span style="--p-x:22%;--p-delay:-2s;--p-duration:16s"></span>
+        <span style="--p-x:76%;--p-delay:-11s;--p-duration:13s"></span>
+        <span style="--p-x:93%;--p-delay:-5s;--p-duration:19s"></span>
+        <span style="--p-x:46%;--p-delay:-15s;--p-duration:21s"></span>
+      </div>
+      <div class="couple-inner">
+        <header class="couple-intro couple-reveal">
+          <p class="couple-salutation">Assalamualaikum W.B.T.</p>
+          <h2 class="couple-title" id="coupleHeading">The Couple</h2>
+        </header>
+        <article class="couple-profile couple-profile--groom" aria-label="Groom">
+          <div class="couple-portrait couple-reveal">
+            <img id="groomPortrait" src="./assets/couple-groom-art-original.svg"
+              width="240" height="333" loading="lazy" decoding="async"
+              alt="Original illustrated groom outfit placeholder; no groom photograph supplied">
+          </div>
+          <h3 class="couple-name couple-reveal">Rayyan</h3>
+          <p class="couple-role couple-reveal">THE GROOM</p>
+          <p class="couple-family couple-reveal">With the love and blessings of his family</p>
+        </article>
+        <p class="couple-separator couple-reveal" aria-label="and">&amp;</p>
+        <article class="couple-profile couple-profile--bride" aria-label="Bride">
+          <div class="couple-portrait couple-reveal">
+            <img id="bridePortrait" src="./assets/couple-bride-art-original.svg"
+              width="240" height="333" loading="lazy" decoding="async"
+              alt="Original illustrated bridal bouquet placeholder; no bride photograph supplied">
+          </div>
+          <h3 class="couple-name couple-reveal">Sofea</h3>
+          <p class="couple-role couple-reveal">THE BRIDE</p>
+          <p class="couple-family couple-reveal">With the love and blessings of her family</p>
+        </article>
+        <p class="couple-demo-note">Illustrated previews · Replace with the couple's own photographs</p>
+      </div>
+    </section>
+    <!-- Section 4: independently designed event information; all details below are SAMPLE/UNCONFIRMED. -->
+    <section class="event-section" id="eventDetails" data-section="4" aria-labelledby="eventHeading" aria-hidden="true" inert>
       <div class="event-ambient" aria-hidden="true">
         <span class="event-arc event-arc-one"></span>
         <span class="event-arc event-arc-two"></span>
@@ -139,8 +184,8 @@
         <div class="event-closing-mark event-reveal" aria-hidden="true">❦</div>
       </div>
     </section>
-    <!-- Section 4: original date-only countdown. No unconfirmed ceremony time is implied. -->
-    <section class="save-date-section" id="saveTheDate" data-section="4"
+    <!-- Section 5: original date-only countdown. No unconfirmed ceremony time is implied. -->
+    <section class="save-date-section" id="saveTheDate" data-section="5"
              aria-labelledby="saveDateHeading" aria-hidden="true" inert>
       <div class="save-date-atmosphere" aria-hidden="true">
         <span class="save-date-halo save-date-halo-a"></span>
@@ -176,8 +221,8 @@
         <div class="save-date-ending save-date-reveal" aria-hidden="true">✧</div>
       </div>
     </section>
-    <!-- Section 5: original gallery. No photos are invented or embedded. -->
-    <section class="gallery-section" id="gallery" data-section="5"
+    <!-- Section 6: original gallery. No photos are invented or embedded. -->
+    <section class="gallery-section" id="gallery" data-section="6"
       aria-labelledby="galleryHeading" aria-hidden="true" inert>
       <div class="gallery-atmosphere" aria-hidden="true">
         <span class="gallery-halo"></span>
@@ -218,8 +263,8 @@
         <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
-    <!-- Section 6: original RSVP form preview. Nothing is submitted until a backend is configured. -->
-    <section class="rsvp-section" id="rsvp" data-section="6"
+    <!-- Section 7: original RSVP form preview. Nothing is submitted until a backend is configured. -->
+    <section class="rsvp-section" id="rsvp" data-section="7"
       aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="rsvp-atmosphere" aria-hidden="true">
         <span class="rsvp-flower rsvp-flower-a">❧</span>

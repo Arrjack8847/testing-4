@@ -1,6 +1,6 @@
-# Section 3 — Wedding Celebration and Venue
+# Section 4 — Wedding Celebration and Venue (legacy module name section-three)
 
-This third scene follows the existing Section 2 invitation letter. It is an **original mobile design** using CSS ornamentation; it is not certified as a frame-accurate recreation of the provider's third scene.
+This preserved celebration scene now follows the new Section 3 The Couple, which itself follows the existing Section 2 invitation letter. It is an **original mobile design** using CSS ornamentation; it is not certified as a frame-accurate recreation of the provider's third scene.
 
 ## What's included
 
@@ -19,8 +19,8 @@ The January 23 date is **sample only**, authored in `index.html` at the `#eventD
 
 ## Files
 
-- `index.html` — Section 3 content, after the letter section.
-- `section-three.css` — completely scoped event styling with independent reduced-motion rules.
+- `index.html` — Section 4 Celebration content, after the new Couple section.
+- `section-three.css` — legacy filename for Section 4's scoped event styling with independent reduced-motion rules.
 - `section-three.js` — event metadata, map-link safeguards, cover accessibility state, reveal.
 - `tests/section-three.spec.mjs` — 4 mobile phone-size browser checks, screenshots, and accessibility cases.
 - `tests/cross-browser.spec.mjs` — Chromium, Firefox and WebKit event scene smoke check.
