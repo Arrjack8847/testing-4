@@ -70,17 +70,28 @@ test('couple layout has measured first-portrait geometry at 390px and never over
 });
 test('second portrait has a separate reveal, and section joins Celebration without gaps',async({page},testInfo)=>{
   const {section,errors}=await openCouple(page);
+  const first=section.locator('.couple-profile--groom .couple-portrait');
   const second=section.locator('.couple-profile--bride .couple-portrait');
+  // Wait for BOTH 900ms scroll-reveal transforms to finish. Measuring one
+  // entering card against one settled card produced misleading 22px offsets.
+  await first.scrollIntoViewIfNeeded();
+  await expect(first).toHaveClass(/in-view/);
+  await expect.poll(()=>first.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
   await second.scrollIntoViewIfNeeded();
   await expect(second).toHaveClass(/in-view/);
+  await expect.poll(()=>second.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
   const values=await section.evaluate(el=>{
     const a=el.querySelector('.couple-profile--groom .couple-portrait').getBoundingClientRect();
     const b=el.querySelector('.couple-profile--bride .couple-portrait').getBoundingClientRect();
-    return {difference:b.top-a.top,overflow:document.documentElement.scrollWidth-innerWidth};
+    const root=el.getBoundingClientRect();
+    return {difference:b.top-a.top,brideOffset:b.top-root.top,
+      overflow:document.documentElement.scrollWidth-innerWidth};
   });
   if(await page.evaluate(()=>innerWidth)===390){
-    expect(values.difference).toBeGreaterThan(748);
-    expect(values.difference).toBeLessThan(768);
+    expect(values.difference).toBeGreaterThan(756);
+    expect(values.difference).toBeLessThan(758);
+    expect(values.brideOffset).toBeGreaterThan(1115);
+    expect(values.brideOffset).toBeLessThan(1117);
   }
   expect(values.overflow).toBeLessThanOrEqual(1);
   await page.screenshot({path:testInfo.outputPath('section3-couple-second-'+testInfo.project.name+'.png'),animations:'disabled'});
@@ -127,4 +138,40 @@ test('original floral scene parallax follows scrolling without moving cards',asy
   expect(first.offset).toBeLessThan(-10);
   expect(second.bg).toContain('couple-garden-original.svg');
   expect(second.overflow).toBeLessThanOrEqual(1);
+});
+
+
+test('Section 3 original lakeside edge illustration is behind arch and keeps section 4 seam intact',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const image=section.locator('.couple-lake-finish');
+  await expect(image).toHaveCount(1);
+  const data=await section.evaluate(el=>{
+    const foot=el.querySelector('.couple-lake-finish');
+    const arch=el.querySelector('.couple-arch');
+    const a=arch.getBoundingClientRect();
+    const f=foot.getBoundingClientRect();
+    const s=el.getBoundingClientRect();
+    const next=document.getElementById('eventDetails').getBoundingClientRect();
+    return {sectionWidth:s.width,footerWidth:f.width,footerHeight:f.height,
+      footerBottom:f.bottom-s.bottom,
+      panelBeyondFooter:a.bottom-f.top,belowPanel:f.bottom-a.bottom,
+      zFooter:+getComputedStyle(foot).zIndex,zArch:+getComputedStyle(arch).zIndex,
+      bg:getComputedStyle(foot).backgroundImage,
+      gap:next.top-s.bottom,overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(data.footerWidth).toBeCloseTo(data.sectionWidth,0);
+  expect(data.footerHeight).toBeCloseTo(178,0);
+  expect(data.footerBottom).toBeCloseTo(0,0);
+  expect(data.zArch).toBeGreaterThan(data.zFooter);
+  expect(data.belowPanel).toBeCloseTo(140,0);
+  expect(data.bg).toContain('couple-lake-finish-original.svg');
+  expect(Math.abs(data.gap)).toBeLessThanOrEqual(1);
+  expect(data.overflow).toBeLessThanOrEqual(1);
+  const loaded=await page.evaluate(async()=>{
+    const img=new Image();
+    img.src='./assets/couple-lake-finish-original.svg';
+    try {await img.decode();return img.naturalWidth>0;}catch{return false;}
+  });
+  expect(loaded).toBe(true);
+  expect(errors).toEqual([]);
 });
