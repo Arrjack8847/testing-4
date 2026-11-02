@@ -324,6 +324,48 @@ test('reference preview camera matches four measured 390px scroll checkpoints',a
   }
 });
 
+
+test('reference garden camera moves continuously forwards and backwards across Section 3',async({page})=>{
+  await page.goto('/?coupleReference=1');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const section=page.locator('#couple');
+  const geometry=await section.evaluate(el=>({
+    start:el.getBoundingClientRect().top+window.scrollY,
+    travel:Math.max(0,el.offsetHeight-window.innerHeight)
+  }));
+  const samples=[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1,.7,.4,.1];
+  let previous=null;
+  for(const fraction of samples){
+    const target=Math.round(geometry.start+geometry.travel*fraction);
+    await page.evaluate(async y=>{
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:y,behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },target);
+    const reading=await section.evaluate(el=>({
+      y:window.scrollY,
+      camera:Number(el.dataset.referenceCameraOffset),
+      total:Number.parseFloat(el.style.getPropertyValue('--couple-reference-y')),
+      top:el.getBoundingClientRect().top,
+      height:el.offsetHeight,
+      screen:window.innerHeight
+    }));
+    const pinned=Math.max(0,Math.min(reading.height-reading.screen,-reading.top));
+    expect(Number.isFinite(reading.camera)).toBe(true);
+    expect(Math.abs(reading.total-(pinned+reading.camera))).toBeLessThan(1.5);
+    expect(reading.camera).toBeGreaterThanOrEqual(-44.81);
+    expect(reading.camera).toBeLessThanOrEqual(20.01);
+    if(previous){
+      // Drift rate must remain at or below the calibrated 0.0427 px per
+      // scroll pixel: no discontinuity when reversing in the same section.
+      const allowed=Math.abs(reading.y-previous.y)*.0427+.5;
+      expect(Math.abs(reading.camera-previous.camera)).toBeLessThanOrEqual(allowed);
+    }
+    previous=reading;
+  }
+});
+
 test('reference preview entrance matches measured 52px lift and Reduced Motion removes it',async({page})=>{
   await page.goto('/?coupleReference=1');
   const section=page.locator('#couple');
