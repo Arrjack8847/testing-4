@@ -130,3 +130,21 @@
   .ref-program {padding-top:44px}
   .ref-program .ref-timeline li {min-height:72px}
 }
+
+/* Reuse our own Section 3 botanical/lakeside artwork for a continuous
+   environment without bundling or hotlinking any additional provider images. */
+.reference-continuation .ref-environment::before {
+ content:"";position:absolute;inset:0;opacity:.20;pointer-events:none;
+ background:url("./assets/couple-botanical-edges-original.svg") center center / 100% 100% no-repeat;
+ -webkit-mask-image:linear-gradient(to bottom,transparent,black 13%,black 88%,transparent);
+ mask-image:linear-gradient(to bottom,transparent,black 13%,black 88%,transparent);
+}
+.reference-continuation .ref-environment::after {
+ content:"";position:absolute;left:0;right:0;bottom:0;height:112px;
+ background:url("./assets/couple-lake-finish-original.svg") center bottom / 100% auto no-repeat;
+ opacity:.22;pointer-events:none;
+ -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 70%);
+ mask-image:linear-gradient(to bottom,transparent 0%,black 70%);
+}
+.reference-continuation .ref-vine {z-index:1}
+.reference-continuation .ref-light {z-index:0}
