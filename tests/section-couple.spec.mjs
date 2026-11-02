@@ -99,3 +99,26 @@ test('couple scene respects Reduced Motion and disables decorative petals',async
   expect(style).toEqual({opacity:'1',transform:'none'});
   await expect(section.locator('.couple-floating-petals span').first()).toHaveCSS('animation-name','none');
 });
+
+test('original floral scene parallax follows scrolling without moving cards',async({page})=>{
+  const {section}=await openCouple(page);
+  const sample=async ratio=>{
+    await page.evaluate(f=>window.scrollTo({top:Math.round(innerHeight*f),behavior:'instant'}),ratio);
+    await expect.poll(()=>page.evaluate(()=>{
+      const section=document.getElementById('couple');
+      return section.style.getPropertyValue('--couple-bg-y').trim();
+    })).not.toBe('');
+    return section.evaluate(el=>({
+      offset:parseFloat(el.style.getPropertyValue('--couple-bg-y')),
+      bg:getComputedStyle(el).backgroundImage,
+      overflow:document.documentElement.scrollWidth-innerWidth
+    }));
+  };
+  const first=await sample(3.75);
+  const second=await sample(5);
+  await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-bg-y'))))
+    .toBeGreaterThan(5);
+  expect(first.offset).toBeLessThan(-10);
+  expect(second.bg).toContain('couple-garden-original.svg');
+  expect(second.overflow).toBeLessThanOrEqual(1);
+});
