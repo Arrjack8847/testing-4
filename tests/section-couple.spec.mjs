@@ -175,3 +175,46 @@ test('Section 3 original lakeside edge illustration is behind arch and keeps sec
   expect(loaded).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test('original botanical side art and carved arch render without covering text or overflowing',async({page},testInfo)=>{
+  const {section,errors}=await openCouple(page);
+  const report=await section.evaluate(async el=>{
+    const edge=el.querySelector('.couple-botanical-edges');
+    const arch=el.querySelector('.couple-arch');
+    const content=el.querySelector('.couple-inner');
+    const load=async path=>{
+      const img=new Image();
+      img.src=path;
+      try{await img.decode();return {width:img.naturalWidth,height:img.naturalHeight};}
+      catch{return {width:0,height:0};}
+    };
+    const [flowers,relief]=await Promise.all([
+      load('./assets/couple-botanical-edges-original.svg'),
+      load('./assets/couple-arch-relief-original.svg')
+    ]);
+    return {
+      flow:el.nextElementSibling?.id,
+      flowers,relief,
+      edgeZ:Number(getComputedStyle(edge).zIndex),
+      archZ:Number(getComputedStyle(arch).zIndex),
+      contentZ:Number(getComputedStyle(content).zIndex),
+      edgeImage:getComputedStyle(edge).backgroundImage,
+      archImage:getComputedStyle(arch).backgroundImage,
+      overflow:document.documentElement.scrollWidth-innerWidth,
+      seam:el.nextElementSibling.getBoundingClientRect().top-el.getBoundingClientRect().bottom
+    };
+  });
+  expect(report.flow).toBe('eventDetails');
+  expect(report.flowers).toEqual({width:390,height:1840});
+  expect(report.relief).toEqual({width:366,height:1571});
+  expect(report.edgeZ).toBeGreaterThan(report.archZ);
+  expect(report.contentZ).toBeGreaterThan(report.edgeZ);
+  expect(report.edgeImage).toContain('couple-botanical-edges-original.svg');
+  expect(report.archImage).toContain('couple-arch-relief-original.svg');
+  expect(report.overflow).toBeLessThanOrEqual(1);
+  expect(Math.abs(report.seam)).toBeLessThanOrEqual(1);
+  const width=await page.evaluate(()=>innerWidth);
+  await page.evaluate(()=>document.getElementById('couple').scrollIntoView({block:'start',behavior:'instant'}));
+  await page.screenshot({path:testInfo.outputPath('section3-botanical-'+width+'.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+});
