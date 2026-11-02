@@ -324,6 +324,9 @@ test('reference preview entrance matches measured 52px lift and Reduced Motion r
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
   const first=section.locator('.couple-profile--groom .couple-portrait');
+  // The initial opacity uses a CSS transition. Wait until it has settled
+  // instead of sampling an intermediate value between 1 and 0.
+  await expect.poll(()=>first.evaluate(el=>getComputedStyle(el).opacity)).toBe('0');
   const initial=await first.evaluate(el=>({
     transform:getComputedStyle(el).transform,
     opacity:getComputedStyle(el).opacity
