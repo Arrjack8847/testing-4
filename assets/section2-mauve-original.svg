@@ -2,7 +2,7 @@
   <!-- Original, procedural embossed-paper overlay. No vendor images or vectors. -->
   <defs>
     <filter id="fiber" x="0%" y="0%" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency=".17 .20" numOctaves="4" seed="37" stitchTiles="stitch" result="noise"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".095 .13" numOctaves="4" seed="37" stitchTiles="stitch" result="noise"/>
       <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
       <feComponentTransfer in="gray" result="contrast">
         <feFuncR type="linear" slope="2.15" intercept="-.575"/>
@@ -12,8 +12,8 @@
       </feComponentTransfer>
     </filter>
     <filter id="relief" x="0%" y="0%" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency=".11 .097" numOctaves="4" seed="11" result="height"/>
-      <feDiffuseLighting in="height" surfaceScale="14" diffuseConstant=".95" lighting-color="#e5cddd" result="light">
+      <feTurbulence type="fractalNoise" baseFrequency=".025 .038" numOctaves="3" seed="11" result="height"/>
+      <feDiffuseLighting in="height" surfaceScale="21" diffuseConstant=".95" lighting-color="#e5cddd" result="light">
         <feDistantLight azimuth="315" elevation="49"/>
       </feDiffuseLighting>
       <feComponentTransfer in="light">
@@ -46,7 +46,7 @@
     </g>
     <!-- Original linen grain and hand-embossed ornament. -->
     <filter id="linen" x="0%" y="0%" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency=".64 .57" numOctaves="2" seed="91" result="grain"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".42 .34" numOctaves="2" seed="91" result="grain"/>
       <feColorMatrix in="grain" type="saturate" values="0"/>
       <feComponentTransfer>
         <feFuncR type="linear" slope="1.3" intercept="-.15"/>
@@ -71,10 +71,10 @@
     </g>
   </defs>
   <rect width="390" height="762" fill="#68455a"/>
-  <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".30"/>
-  <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".23"/>
+  <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".25"/>
+  <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".20"/>
   <rect width="390" height="762" fill="url(#luster)" opacity=".13"/>
-  <rect width="390" height="762" fill="#d7bdce" filter="url(#linen)" opacity=".32"/>
+  <rect width="390" height="762" fill="#d7bdce" filter="url(#linen)" opacity=".20"/>
   <!-- Original stamped botanical relief, shaded as pressed fabric. -->
   <g stroke="#332132" stroke-width="1.65" opacity=".045" transform="translate(1.1 1.4)">
     <use href="#wrought-branch" transform="translate(21 92) scale(1.22)"/>
@@ -95,6 +95,22 @@
     <path d="M192,-18 C179,102 195,207 185,314 S174,580 183,792" stroke="#342333" stroke-width="1.6" opacity=".055"/>
     <path d="M194,-18 C181,102 197,207 187,314 S176,580 185,792" stroke="#e9cada" stroke-width="1" opacity=".060"/>
     <path d="M344,-10 C357,106 343,263 358,386 S359,641 351,790" stroke="#39273a" stroke-width="1" opacity=".05"/>
+  </g>
+  <!-- Broad asymmetrical creases add the low-frequency relief missing from grain-only paper.
+       Original paths; paired lowlights/highlights remain subtle behind live wording. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M87,-17 C105,41 74,98 93,145 S106,232 92,299 S107,420 99,495 S112,612 92,785"
+      stroke="#26172c" stroke-width="2.8" opacity=".14"/>
+    <path d="M91,-17 C109,41 78,98 97,145 S110,232 96,299 S111,420 103,495 S116,612 96,785"
+      stroke="#e6c5d5" stroke-width="1.9" opacity=".18"/>
+    <path d="M288,-23 C275,69 305,148 278,217 S295,319 283,384 S264,520 292,593 S291,705 273,790"
+      stroke="#2b182d" stroke-width="3.1" opacity=".12"/>
+    <path d="M292,-23 C279,69 309,148 282,217 S299,319 287,384 S268,520 296,593 S295,705 277,790"
+      stroke="#f1d8e2" stroke-width="2" opacity=".16"/>
+    <path d="M-30,277 C51,258 66,276 115,302 S214,327 267,288 S352,265 423,279"
+      stroke="#2b1c30" stroke-width="1.5" opacity=".065"/>
+    <path d="M-30,281 C51,262 66,280 115,306 S214,331 267,292 S352,269 423,283"
+      stroke="#edd1df" stroke-width="1" opacity=".07"/>
   </g>
   <!-- Embossed scrolling foliage is kept mainly along the margins. -->
   <g stroke="#321f31" opacity=".05" stroke-width="4" transform="translate(1 2)">
