@@ -5,7 +5,11 @@
   box-sizing:border-box;width:100%;min-height:1840px;
   padding:225px 28px 170px;
   text-align:center;color:#6c3a60;
-  background:#dedbda url("./assets/couple-garden-original.svg") center top/100% 100% no-repeat;
+  background-color:#dedbda;
+  background-image:url("./assets/couple-garden-original.svg");
+  background-repeat:no-repeat;
+  background-size:100% calc(100% + 128px);
+  background-position:center calc(-64px + var(--couple-bg-y,0px));
 }
 .couple-section::before{
   content:"";pointer-events:none;position:absolute;inset:0;z-index:0;
