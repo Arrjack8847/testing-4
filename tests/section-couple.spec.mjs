@@ -128,3 +128,39 @@ test('original floral scene parallax follows scrolling without moving cards',asy
   expect(second.bg).toContain('couple-garden-original.svg');
   expect(second.overflow).toBeLessThanOrEqual(1);
 });
+
+
+test('Section 3 original lakeside edge illustration is behind arch and keeps section 4 seam intact',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const image=section.locator('.couple-lake-finish');
+  await expect(image).toHaveCount(1);
+  const data=await section.evaluate(el=>{
+    const foot=el.querySelector('.couple-lake-finish');
+    const arch=el.querySelector('.couple-arch');
+    const a=arch.getBoundingClientRect();
+    const f=foot.getBoundingClientRect();
+    const s=el.getBoundingClientRect();
+    const next=document.getElementById('eventDetails').getBoundingClientRect();
+    return {sectionWidth:s.width,footerWidth:f.width,footerHeight:f.height,
+      footerBottom:f.bottom-section.getBoundingClientRect().bottom,
+      panelBeyondFooter:a.bottom-f.top,belowPanel:f.bottom-a.bottom,
+      zFooter:+getComputedStyle(foot).zIndex,zArch:+getComputedStyle(arch).zIndex,
+      bg:getComputedStyle(foot).backgroundImage,
+      gap:next.top-s.bottom,overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(data.footerWidth).toBeCloseTo(data.sectionWidth,0);
+  expect(data.footerHeight).toBeCloseTo(178,0);
+  expect(data.footerBottom).toBeCloseTo(0,0);
+  expect(data.zArch).toBeGreaterThan(data.zFooter);
+  expect(data.belowPanel).toBeCloseTo(140,0);
+  expect(data.bg).toContain('couple-lake-finish-original.svg');
+  expect(Math.abs(data.gap)).toBeLessThanOrEqual(1);
+  expect(data.overflow).toBeLessThanOrEqual(1);
+  const loaded=await page.evaluate(async()=>{
+    const img=new Image();
+    img.src='./assets/couple-lake-finish-original.svg';
+    try {await img.decode();return img.naturalWidth>0;}catch{return false;}
+  });
+  expect(loaded).toBe(true);
+  expect(errors).toEqual([]);
+});
