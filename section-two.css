@@ -75,7 +75,7 @@
 #message .letter-content p,#message .letter-content blockquote{margin-left:auto;margin-right:auto;}
 #message .letter-bismillah{
   margin:0 auto 21px!important;color:#fff9fa;
-  font:400 44px/1.1 'Times New Roman',serif;letter-spacing:0;
+  font:400 39px/48.4px 'Times New Roman',serif;letter-spacing:0;
   text-align:center;direction:rtl;
 }
 #message .letter-lead{
