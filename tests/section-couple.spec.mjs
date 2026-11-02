@@ -224,6 +224,11 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
   await page.goto('/?coupleReference=1');
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
+  // Three known WebP URLs (garden, groom, bride) are actively observed,
+  // not merely referenced in markup. Third-party hosting may block them.
+  await expect(section).toHaveAttribute('data-reference-webp-state',/^(loading|ready|partial)$/);
+  await expect.poll(()=>section.getAttribute('data-reference-webp-count'))
+    .toMatch(/^[0-3]$/);
   await expect(section.locator('.couple-name').first()).toHaveText('Muhammad Rayyan bin Bujang');
   await expect(section.locator('.couple-name').nth(1)).toHaveText('Nur Sofea binti Dzulkharnain');
   await expect(section.locator('#groomPortrait')).toHaveAttribute('data-reference-url',/couples\/moody-groom\.webp$/);
