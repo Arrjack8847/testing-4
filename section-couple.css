@@ -199,6 +199,14 @@
 .couple-section[data-art="reference"] .couple-arch::before,
 .couple-section[data-art="reference"] .couple-arch::after{display:none;}
 .couple-section[data-art="reference"] .couple-demo-note{display:none;}
+/* The live reference groom image fills its unchanged 240.5 x 332.7 frame
+   with a measured 1.05 inner-image zoom at the 390px groom checkpoint.
+   Zoom ONLY the comparison portrait, not the card or original-art mode. */
+.couple-section[data-art="reference"] .couple-profile--groom .couple-portrait img{
+  transform:scale(1.05);
+  transform-origin:center center;
+}
+
 @media(prefers-reduced-motion:reduce){
   .couple-section[data-art="reference"] .couple-reference-scene{will-change:auto;}
 }
