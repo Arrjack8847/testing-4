@@ -23,12 +23,26 @@
   pointer-events:none;
   background:url("./assets/couple-lake-finish-original.svg") center bottom/100% 178px no-repeat;
 }
+/* Independent original botanical side garden. Its painted flowers hug the
+   outer margins and never obscure the couple's live HTML text or portrait cards. */
+.couple-section .couple-botanical-edges{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:url("./assets/couple-botanical-edges-original.svg") center top/100% 100% no-repeat;
+  transform-origin:center bottom;
+  animation:couple-botanical-breathe 16s ease-in-out infinite alternate;
+}
+@keyframes couple-botanical-breathe{
+  to{transform:translate3d(0,2px,0) scale(1.006)}
+}
 .couple-section .couple-arch{
   position:absolute;z-index:1;pointer-events:none;
   top:129px;left:12px;right:12px;bottom:140px;
   border:1.5px solid rgba(182,148,93,.76);
   border-radius:48% 48% 9px 9px / 13% 13% 0 0;
-  background:linear-gradient(100deg,rgba(255,255,255,.91),rgba(250,247,244,.96) 48%,rgba(255,251,244,.91));
+  background-image:url("./assets/couple-arch-relief-original.svg"),
+    linear-gradient(100deg,rgba(255,255,255,.94),rgba(250,247,244,.97) 48%,rgba(255,251,244,.93));
+  background-size:100% 100%,100% 100%;
+  background-repeat:no-repeat;
   box-shadow:0 0 0 5px rgba(255,250,237,.4),0 10px 30px rgba(41,29,46,.11),
     inset 0 0 0 8px rgba(250,242,232,.36);
 }
@@ -140,7 +154,8 @@
   .couple-section .couple-portrait{width:72%;}
 }
 @media(prefers-reduced-motion:reduce){
-  .couple-section .couple-hanging,.couple-section .couple-floating-petals span{animation:none!important;}
+  .couple-section .couple-hanging,.couple-section .couple-botanical-edges,
+  .couple-section .couple-floating-petals span{animation:none!important;}
   .couple-section[data-reveal-ready="true"] .couple-reveal,
   .couple-section .couple-reveal{opacity:1!important;transform:none!important;transition:none!important;}
 }
