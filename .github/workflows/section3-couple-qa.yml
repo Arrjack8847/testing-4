@@ -6,6 +6,7 @@ on:
       - section-couple.css
       - section-couple.js
       - assets/couple-garden-original.svg
+      - assets/couple-canopy-original.svg
       - assets/couple-groom-art-original.svg
       - assets/couple-bride-art-original.svg
       - tests/section-couple.spec.mjs
