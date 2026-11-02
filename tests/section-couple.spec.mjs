@@ -366,6 +366,43 @@ test('reference garden camera moves continuously forwards and backwards across S
   }
 });
 
+
+test('reference groom image uses measured 5% zoom without resizing the portrait frame',async({page})=>{
+  await page.goto('/?coupleReference=1');
+  const section=page.locator('#couple');
+  await expect(section).toHaveAttribute('data-art','reference');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const groom=section.locator('.couple-profile--groom .couple-portrait');
+  await groom.scrollIntoViewIfNeeded();
+  await expect(groom).toHaveClass(/in-view/);
+  await expect.poll(()=>groom.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+  const report=await groom.evaluate(el=>{
+    const image=el.querySelector('img');
+    const frame=el.getBoundingClientRect();
+    const picture=image.getBoundingClientRect();
+    const scale=getComputedStyle(image).transform;
+    return {
+      frameWidth:frame.width,frameHeight:frame.height,
+      zoomedWidth:picture.width,zoomedHeight:picture.height,
+      unscaledWidth:image.clientWidth,unscaledHeight:image.clientHeight,
+      scale,overflow:getComputedStyle(el).overflow,
+      horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  expect(report.scale).toBe('matrix(1.05, 0, 0, 1.05, 0, 0)');
+  expect(report.zoomedWidth/report.unscaledWidth).toBeCloseTo(1.05,2);
+  expect(report.zoomedHeight/report.unscaledHeight).toBeCloseTo(1.05,2);
+  expect(report.overflow).toBe('hidden');
+  expect(report.horizontalOverflow).toBeLessThanOrEqual(1);
+  if(await page.evaluate(()=>innerWidth)===390){
+    expect(report.frameWidth).toBeCloseTo(240.5,0);
+    expect(report.frameHeight).toBeCloseTo(332.7,0);
+  }
+  // The original-art preview is unaffected by the reference-only crop.
+  await page.goto('/');
+  await expect(page.locator('#groomPortrait')).toHaveCSS('transform','none');
+});
+
 test('reference preview entrance matches measured 52px lift and Reduced Motion removes it',async({page})=>{
   await page.goto('/?coupleReference=1');
   const section=page.locator('#couple');
