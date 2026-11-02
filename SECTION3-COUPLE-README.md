@@ -10,6 +10,8 @@ At 390px the reference Couple section begins at document y=3294.4 and ends y=513
 
 - An original long wisteria garden, lake/arch background at `assets/couple-garden-original.svg` and an original CSS ivory/gold arched frame.
 - An original exit scene at `assets/couple-lake-finish-original.svg` with stone balustrades, carved ornaments, lavender water and botanical edging. It sits behind the arch and is revealed only at the end, reducing the abrupt empty-lavender strip before the preserved Celebration section.
+- A higher-density **original** botanical overlay at `assets/couple-botanical-edges-original.svg`: hand-authored wisteria and hydrangea clusters, ivy stems, gilded side tracery and stone urns around the panel. The artwork is decorative and stays behind the couple's actual text.
+- `assets/couple-arch-relief-original.svg` adds a subtle carved cream/gold floral texture and crest over the original arch silhouette without changing its measured dimensions. Both new SVGs are authored specifically for this prototype and are not downloaded from the reference website.
 - Groom and bride portraits are **illustrated sample placeholders**: `assets/couple-groom-art-original.svg`, `assets/couple-bride-art-original.svg`. No individual is being represented as the actual couple. Replace both sources with owned/licensed wedding photographs before publication.
 - Text uses the existing Rayyan and Sofea example names. No parent identities, private dates, or family information have been invented.
 - Section 3 uses `#couple`, a 1840px-tall reference-measured layout on 390px, with a 1776px minimum on 320px.
