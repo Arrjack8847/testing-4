@@ -63,7 +63,7 @@
 }
 .couple-section .couple-profile{display:flex;align-items:center;flex-direction:column;width:100%;position:relative;}
 .couple-section .couple-profile--groom{margin-top:44px;}
-.couple-section .couple-profile--bride{margin-top:52px;}
+.couple-section .couple-profile--bride{margin-top:30px;}
 .couple-section .couple-portrait{
   box-sizing:border-box;width:72%;max-width:240.5px;
   aspect-ratio:240.5 / 332.7;max-height:none;
@@ -124,7 +124,7 @@
   .couple-section{min-height:1776px;padding:225px 28px 170px;}
   .couple-section .couple-arch{left:12px;right:12px;bottom:140px;}
   .couple-section .couple-portrait{width:72%;}
-  .couple-section .couple-profile--bride{margin-top:52px;}
+  .couple-section .couple-profile--bride{margin-top:30px;}
   .couple-section .couple-family{font-size:17px;line-height:29px;}
   .couple-section .couple-name{font-size:42px;}
 }
