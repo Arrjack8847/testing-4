@@ -29,3 +29,9 @@ In `index.html`, replace the `src` values for `#groomPortrait` and `#bridePortra
 - Existing tests preserve Section 1/2 scroll handoff and the functional Celebration event information.
 - Visual similarity is not pixel-perfect: the original composite garden and original example photos differ deliberately. Real customer photography and physical iPhone/Android checks are still needed for commercial release.
 - The base website currently uses original-provider image fallbacks in its earlier Section 1; independent/public redistribution permission must be confirmed.
+
+## Optional reference-art comparison (development only)
+
+To compare the approved layout against the actual vendor artwork, open `http://localhost:8000/?coupleReference=1` or append `?coupleReference=1` to a commit-specific public preview URL. This **opt-in** view uses the reference website's existing `scene.webp` background, `arch_panel.svg`, and example `moody-groom.webp` / `moody-bride.webp` by direct URL without committing downloaded vendor assets. It also fills reference example names and family lines for typography comparison. Hotlinking may fail or be blocked by the provider; the portrait elements fall back to our original illustrations when that happens. The no-flag default uses only our original Section 3 art and dummy text.
+
+This preview mode is for visual comparison, **not production or redistribution**. Referenced artwork, photography, and example identities require appropriate permission before commercial use. Sections 1–2 and Sections 4–7 are unchanged by the flag.
