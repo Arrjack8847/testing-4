@@ -46,6 +46,7 @@
         section.dataset.referencePhotoFallback = 'true';
       }
     });
+    img.dataset.referenceUrl = item.url;
     img.src = item.url;
     img.alt = item.alt;
     const profile = img.closest('.couple-profile');
