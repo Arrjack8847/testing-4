@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
   <link rel="stylesheet" href="reference-continuation.css">
+  <link rel="stylesheet" href="invite-navigation.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-couple.js" defer></script>
@@ -26,6 +27,7 @@
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
   <script src="reference-continuation.js" defer></script>
+  <script src="invite-navigation.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -430,6 +432,14 @@
       </div>
     </section>
   </main>
+  <nav class="invite-navigation" id="inviteNavigation" aria-label="Invitation sections" aria-hidden="true" inert hidden>
+    <button type="button" data-invite-target="viewport" aria-label="Go to opening scene"><span aria-hidden="true">⌂</span><small>Home</small></button>
+    <button type="button" data-invite-target="couple" aria-label="Go to the couple"><span aria-hidden="true">♡</span><small>Couple</small></button>
+    <button type="button" data-invite-target="eventDetails" aria-label="Go to wedding events"><span aria-hidden="true">✧</span><small>Events</small></button>
+    <button type="button" data-invite-target="runningOrder" aria-label="Go to order of the day"><span aria-hidden="true">☷</span><small>Order</small></button>
+    <button type="button" data-invite-target="gallery" aria-label="Go to photo gallery"><span aria-hidden="true">▣</span><small>Gallery</small></button>
+    <button type="button" data-invite-target="rsvp" aria-label="Go to RSVP"><span aria-hidden="true">✉</span><small>RSVP</small></button>
+  </nav>
   <dialog class="gallery-dialog" id="galleryDialog" aria-label="Wedding photo viewer">
     <div class="gallery-viewer">
       <button type="button" id="galleryClose" class="gallery-viewer-close" aria-label="Close photo viewer">×</button>
