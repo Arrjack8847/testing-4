@@ -1,0 +1,53 @@
+name: Section 1 to 2 transition boundary QA
+on:
+  push:
+    paths:
+      - tests/section1-2-handoff.spec.mjs
+      - .github/workflows/section1-2-handoff.yml
+      - styles.css
+      - scene.js
+      - section-two.css
+      - section-two.js
+      - index.html
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  four-phone-seams:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Load temporary test artwork; never commit reference WebPs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              body=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert body[:4]==b'RIFF' and body[8:12]==b'WEBP',name
+              Path('assets',name).write_bytes(body)
+          PY
+      - name: Check four phone widths, reverse swipes and boundary seams
+        run: npx playwright test tests/section1-2-handoff.spec.mjs --workers=2
+      - name: Upload transition checkpoints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section1-2-handoff-four-phone-screenshots
+          path: |
+            test-results/**/*handoff-*.png
+            test-results/**/*section2-to-3-prototype-edge*.png
+          retention-days: 7
+          if-no-files-found: warn
