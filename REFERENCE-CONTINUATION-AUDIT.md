@@ -20,8 +20,11 @@ Source gallery lazy-loading moved later content by ~264px.
 
 ## Implementation / remaining differences
 - Approved opening, letter, couple: preserved from PR #12 head 593c8212.
-- Existing Event and date-only Countdown: preserved, but not yet the source's
-  two sample event cards or second-precision countdown; sample venue not connected.
+- Existing Event scene remains a single original example card, not the source's
+  two Akad Nikah/Reception venue cards. Calendar export remains disabled.
+- Added a separate H:M:S example countdown for the source's 10:00 AM Malaysia-time
+  demonstration ceremony, updating once per second while visible, alongside the
+  existing local-calendar-day countdown. It is not a verified customer appointment.
 - Added running-order timeline, dress swatches, gift preview, illustrative
   wish wall, and closing message in original independent CSS.
 - Existing gallery remains five image placeholders with keyboard/swipe dialog.
@@ -73,3 +76,11 @@ Open http://localhost:8000 and tap Open Invitation.
 Run npm install; npx playwright install chromium firefox webkit;
 npm run test:syntax; npx playwright test tests/reference-continuation.spec.mjs;
 npm run test:mobile; npm run test:crossbrowser.
+
+## Latest branch QA note
+The original gallery and RSVP mobile specs assumed old direct sibling relationships.
+After inserting Dress Code before Gallery and Gift before RSVP, those tests initially
+failed only their stale adjacency assertions. They were updated to test the new
+adjacent seams instead. A dedicated continuation GitHub Actions workflow now tests
+ordering, four phone widths, gallery, RSVP, example countdown and reduced motion.
+CI results must be checked on the final head SHA, not extrapolated from earlier passes.
