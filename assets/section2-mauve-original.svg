@@ -70,7 +70,7 @@
       <path d="M0,-7 L7,0 L0,7 L-7,0Z"/>
     </g>
   </defs>
-  <rect width="390" height="762" fill="#6b4e61"/>
+  <rect width="390" height="762" fill="#68455a"/>
   <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".30"/>
   <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".23"/>
   <rect width="390" height="762" fill="url(#luster)" opacity=".13"/>
