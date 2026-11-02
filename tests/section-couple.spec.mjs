@@ -300,9 +300,14 @@ test('reference preview camera matches four measured 390px scroll checkpoints',a
     expect(Math.abs(reading.visual-reading.expectedVisual)).toBeLessThan(1.5);
     expect(reading.overflow).toBeLessThanOrEqual(1);
     cameras.push(reading.camera);
-    if(viewport===390 && y===3587){
-      await page.screenshot({path:testInfo.outputPath('section3-reference-midpoint-390.png'),animations:'disabled'});
-    }
+    // Save reference-art evidence at entry, groom, bride and lower garden
+    // on EVERY configured phone, not only 390px. This makes visual alignment
+    // review possible without assuming all widths crop the same artwork.
+    const stage={2743:'entry',3165:'groom',3587:'middle',4220:'bride'}[y];
+    await page.screenshot({
+      path:testInfo.outputPath('section3-reference-'+viewport+'-'+stage+'.png'),
+      animations:'disabled'
+    });
   }
   expect(cameras[0]).toBeLessThan(cameras[1]);
   expect(cameras[1]).toBeLessThan(cameras[2]);
