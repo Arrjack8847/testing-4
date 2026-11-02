@@ -2,7 +2,7 @@
   <!-- Original, procedural embossed-paper overlay. No vendor images or vectors. -->
   <defs>
     <filter id="fiber" x="0%" y="0%" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency=".16 .19" numOctaves="4" seed="37" stitchTiles="stitch" result="noise"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".095 .105" numOctaves="4" seed="37" stitchTiles="stitch" result="noise"/>
       <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
       <feComponentTransfer in="gray" result="contrast">
         <feFuncR type="linear" slope="2.15" intercept="-.575"/>
@@ -12,8 +12,8 @@
       </feComponentTransfer>
     </filter>
     <filter id="relief" x="0%" y="0%" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency=".092 .075" numOctaves="4" seed="11" result="height"/>
-      <feDiffuseLighting in="height" surfaceScale="13" diffuseConstant=".95" lighting-color="#e5cddd" result="light">
+      <feTurbulence type="fractalNoise" baseFrequency=".048 .055" numOctaves="4" seed="11" result="height"/>
+      <feDiffuseLighting in="height" surfaceScale="11" diffuseConstant=".95" lighting-color="#e5cddd" result="light">
         <feDistantLight azimuth="315" elevation="49"/>
       </feDiffuseLighting>
       <feComponentTransfer in="light">
@@ -44,11 +44,58 @@
       <path d="M10,177 Q110,101 125,200 C132,238 83,268 72,238 C66,215 95,213 99,228"/>
       <path d="M-24,266 C38,244 57,305 78,319 C105,341 129,325 134,304"/>
     </g>
+    <!-- Original linen grain and hand-embossed ornament. -->
+    <filter id="linen" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".52 .44" numOctaves="2" seed="91" result="grain"/>
+      <feColorMatrix in="grain" type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.3" intercept="-.15"/>
+        <feFuncG type="linear" slope="1.3" intercept="-.15"/>
+        <feFuncB type="linear" slope="1.3" intercept="-.15"/>
+        <feFuncA type="linear" slope=".45"/>
+      </feComponentTransfer>
+    </filter>
+    <g id="wrought-branch" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0,10 C35,38 12,92 41,133 C64,163 47,205 71,237"/>
+      <path d="M16,49 C2,33 -7,31 -16,42 C-12,62 4,64 16,49Z"/>
+      <path d="M25,90 C44,67 61,76 54,94 C44,108 33,100 25,90Z"/>
+      <path d="M31,129 C3,111 -6,129 10,145 C19,148 26,137 31,129Z"/>
+      <path d="M47,167 C60,146 83,148 80,168 C71,178 54,174 47,167Z"/>
+      <path d="M57,205 C30,190 27,209 41,222 C49,228 55,213 57,205Z"/>
+      <path d="M30,72 C46,61 46,42 49,30 M39,137 C65,127 68,114 69,104"/>
+    </g>
+    <g id="woven-medallion" fill="none" stroke-linejoin="round">
+      <path d="M0,-19 Q5,-10 13,-13 Q10,-5 19,0 Q10,5 13,13 Q5,10 0,19 Q-5,10 -13,13 Q-10,5 -19,0 Q-10,-5 -13,-13 Q-5,-10 0,-19Z"/>
+      <path d="M0,-13 L13,0 L0,13 L-13,0Z"/>
+      <path d="M0,-7 L7,0 L0,7 L-7,0Z"/>
+    </g>
   </defs>
   <rect width="390" height="762" fill="#6b4e61"/>
-  <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".25"/>
-  <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".18"/>
+  <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".20"/>
+  <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".15"/>
   <rect width="390" height="762" fill="url(#luster)" opacity=".13"/>
+  <rect width="390" height="762" fill="#d7bdce" filter="url(#linen)" opacity=".15"/>
+  <!-- Original stamped botanical relief, shaded as pressed fabric. -->
+  <g stroke="#332132" stroke-width="2.4" opacity=".105" transform="translate(1.1 1.4)">
+    <use href="#wrought-branch" transform="translate(21 92) scale(1.22)"/>
+    <use href="#wrought-branch" transform="translate(375 712) rotate(180) scale(1.25)"/>
+    <use href="#wrought-branch" transform="translate(320 30) rotate(17) scale(.86)"/>
+    <use href="#woven-medallion" transform="translate(105 112) rotate(14)"/>
+    <use href="#woven-medallion" transform="translate(275 457) rotate(9) scale(.82)"/>
+  </g>
+  <g stroke="#ead1e0" stroke-width="1.55" opacity=".115" transform="translate(-.8 -.9)">
+    <use href="#wrought-branch" transform="translate(21 92) scale(1.22)"/>
+    <use href="#wrought-branch" transform="translate(375 712) rotate(180) scale(1.25)"/>
+    <use href="#wrought-branch" transform="translate(320 30) rotate(17) scale(.86)"/>
+    <use href="#woven-medallion" transform="translate(105 112) rotate(14)"/>
+    <use href="#woven-medallion" transform="translate(275 457) rotate(9) scale(.82)"/>
+  </g>
+  <!-- Gentle irregular fiber creases characteristic of embossed handmade paper. -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M192,-18 C179,102 195,207 185,314 S174,580 183,792" stroke="#342333" stroke-width="1.6" opacity=".09"/>
+    <path d="M194,-18 C181,102 197,207 187,314 S176,580 185,792" stroke="#e9cada" stroke-width="1" opacity=".10"/>
+    <path d="M344,-10 C357,106 343,263 358,386 S359,641 351,790" stroke="#39273a" stroke-width="1" opacity=".05"/>
+  </g>
   <!-- Embossed scrolling foliage is kept mainly along the margins. -->
   <g stroke="#321f31" opacity=".05" stroke-width="4" transform="translate(1 2)">
     <use href="#sprig"/><use href="#curl" transform="translate(-26 178) scale(.68)"/>
