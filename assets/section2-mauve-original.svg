@@ -49,9 +49,9 @@
       <feTurbulence type="fractalNoise" baseFrequency=".56 .43" numOctaves="2" seed="91" result="grain"/>
       <feColorMatrix in="grain" type="saturate" values="0"/>
       <feComponentTransfer>
-        <feFuncR type="linear" slope="1.5" intercept="-.24"/>
-        <feFuncG type="linear" slope="1.5" intercept="-.24"/>
-        <feFuncB type="linear" slope="1.5" intercept="-.24"/>
+        <feFuncR type="linear" slope="1.8" intercept="-.39"/>
+        <feFuncG type="linear" slope="1.8" intercept="-.39"/>
+        <feFuncB type="linear" slope="1.8" intercept="-.39"/>
         <feFuncA type="linear" slope=".45"/>
       </feComponentTransfer>
     </filter>
@@ -74,7 +74,7 @@
   <rect width="390" height="762" fill="#b99db0" filter="url(#fiber)" opacity=".19"/>
   <rect width="390" height="762" fill="#988094" filter="url(#relief)" opacity=".15"/>
   <rect width="390" height="762" fill="url(#luster)" opacity=".13"/>
-  <rect width="390" height="762" fill="#d7bdce" filter="url(#linen)" opacity=".34"/>
+  <rect width="390" height="762" fill="#d7bdce" filter="url(#linen)" opacity=".47"/>
   <!-- Original stamped botanical relief, shaded as pressed fabric. -->
   <g stroke="#332132" stroke-width="1.65" opacity=".045" transform="translate(1.1 1.4)">
     <use href="#wrought-branch" transform="translate(21 92) scale(1.22)"/>
