@@ -237,8 +237,13 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
     arch:getComputedStyle(el.querySelector('.couple-arch')).borderImageSource,
     garden:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
     clouds:getComputedStyle(el.querySelector('.couple-hanging')).display,
-    width:document.documentElement.scrollWidth-window.innerWidth
+    width:document.documentElement.scrollWidth-window.innerWidth,
+    washOpacity:getComputedStyle(el,'::before').opacity,
+    washZ:Number(getComputedStyle(el,'::before').zIndex),
+    archZ:Number(getComputedStyle(el.querySelector('.couple-arch')).zIndex)
   }));
+  expect(style.washOpacity).toBe('0.1');
+  expect(style.archZ).toBeGreaterThan(style.washZ);
   expect(style.arch).toContain('arch_panel.svg');
   expect(style.garden).toContain('tasik-kayangan/scene.webp');
   expect(style.clouds).toBe('none');
