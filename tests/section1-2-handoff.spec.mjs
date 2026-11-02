@@ -86,13 +86,15 @@ test('Section 2→3 flow has no geometry gap or overlapping horizontal edges',as
   const dims=await page.evaluate(()=>{
     const message=document.querySelector('#message').getBoundingClientRect();
     const next=document.querySelector('#eventDetails').getBoundingClientRect();
-    const frame=document.querySelector('#message .letter-frame').getBoundingClientRect();
+    // The frame is still in its entrance transform at scroll=0. Use its
+    // layout box, not the temporary scale(.985) visual bounding box.
+    const frame=document.querySelector('#message .letter-frame');
     return {
       vh:innerHeight,vw:innerWidth,
       messageTop:message.top+scrollY,
       messageBottom:message.bottom+scrollY,
       nextTop:next.top+scrollY,
-      frameX:frame.x,frameRight:frame.right,
+      frameX:frame.offsetLeft,frameRight:frame.offsetLeft+frame.offsetWidth,
       messageHeight:message.height,
       overflow:document.documentElement.scrollWidth-innerWidth
     };
