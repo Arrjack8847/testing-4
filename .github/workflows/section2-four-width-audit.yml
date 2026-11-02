@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - tools/audit-section2-four-widths.mjs
+      - section-two.css
+      - tests/section-two.spec.mjs
       - .github/workflows/section2-four-width-audit.yml
   workflow_dispatch:
 
@@ -38,6 +40,8 @@ jobs:
               Path('assets', name).write_bytes(data)
           print('Loaded test-only scene assets into the temporary CI runner.')
           PY
+      - name: Verify Section 2 regression geometry at all four widths
+        run: npx playwright test tests/section-two.spec.mjs --workers=2
       - name: Start local mobile prototype
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/section2-web.log 2>&1 &
