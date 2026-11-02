@@ -5,6 +5,7 @@ on:
       - index.html
       - section-couple.css
       - section-couple.js
+      - section-couple-reference.js
       - assets/couple-garden-original.svg
       - assets/couple-canopy-original.svg
       - assets/couple-lake-finish-original.svg

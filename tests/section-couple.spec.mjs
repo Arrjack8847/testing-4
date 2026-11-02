@@ -218,3 +218,37 @@ test('original botanical side art and carved arch render without covering text o
   await page.screenshot({path:testInfo.outputPath('section3-botanical-'+width+'.png'),animations:'disabled'});
   expect(errors).toEqual([]);
 });
+
+
+test('opt-in Section 3 reference-art preview uses existing vendor asset URLs without changing default',async({page})=>{
+  await page.goto('/?coupleReference=1');
+  const section=page.locator('#couple');
+  await expect(section).toHaveAttribute('data-art','reference');
+  await expect(section.locator('.couple-name').first()).toHaveText('Muhammad Rayyan bin Bujang');
+  await expect(section.locator('.couple-name').nth(1)).toHaveText('Nur Sofea binti Dzulkharnain');
+  await expect(section.locator('#groomPortrait')).toHaveAttribute('data-reference-url',/couples\/moody-groom\.webp$/);
+  await expect(section.locator('#bridePortrait')).toHaveAttribute('data-reference-url',/couples\/moody-bride\.webp$/);
+  const style=await section.evaluate(el=>({
+    arch:getComputedStyle(el.querySelector('.couple-arch')).borderImageSource,
+    garden:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
+    clouds:getComputedStyle(el.querySelector('.couple-hanging')).display,
+    width:document.documentElement.scrollWidth-window.innerWidth
+  }));
+  expect(style.arch).toContain('arch_panel.svg');
+  expect(style.garden).toContain('tasik-kayangan/scene.webp');
+  expect(style.clouds).toBe('none');
+  expect(style.width).toBeLessThanOrEqual(1);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('couple').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-reference-y')))).toBeGreaterThan(-1);
+  const seam=await section.evaluate(el=>el.nextElementSibling.getBoundingClientRect().top-el.getBoundingClientRect().bottom);
+  expect(Math.abs(seam)).toBeLessThanOrEqual(1);
+
+  await page.goto('/');
+  await expect(page.locator('#couple')).not.toHaveAttribute('data-art','reference');
+  await expect(page.locator('#groomPortrait')).toHaveAttribute('src','./assets/couple-groom-art-original.svg');
+  await expect(page.locator('#bridePortrait')).toHaveAttribute('src','./assets/couple-bride-art-original.svg');
+});

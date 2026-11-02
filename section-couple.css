@@ -159,3 +159,46 @@
   .couple-section[data-reveal-ready="true"] .couple-reveal,
   .couple-section .couple-reveal{opacity:1!important;transform:none!important;transition:none!important;}
 }
+
+/* Opt-in VISUAL COMPARISON ONLY: ?coupleReference=1.
+   This mode requests the public reference images from their original host.
+   It must not be treated as a licensed production asset pack; the default
+   website continues using independent original art and sample portraits. */
+.couple-section .couple-reference-scene{display:none;}
+.couple-section[data-art="reference"]{
+  background:#f2ecf3;
+}
+.couple-section[data-art="reference"]::before{display:none;}
+.couple-section[data-art="reference"] .couple-reference-scene{
+  display:block;position:absolute;inset:0 auto auto 0;
+  width:100%;height:100dvh;min-height:480px;
+  z-index:0;pointer-events:none;
+  background:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/scene.webp")
+    center center/cover no-repeat;
+  transform:translate3d(0,var(--couple-reference-y,0px),0);
+}
+.couple-section[data-art="reference"] .couple-lake-finish,
+.couple-section[data-art="reference"] .couple-botanical-edges,
+.couple-section[data-art="reference"] .couple-hanging,
+.couple-section[data-art="reference"] .couple-arch-finial{
+  display:none;
+}
+/* Use the original arch panel border slices only in the opted-in local
+   reference mode. The dimensions/position remain those of Section 3. */
+.couple-section[data-art="reference"] .couple-arch{
+  border:solid transparent;
+  border-width:200px 28px 26px;
+  border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_panel.svg");
+  border-image-slice:200 28 26 fill;
+  border-image-width:200px 28px 26px;
+  border-image-repeat:stretch;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+}
+.couple-section[data-art="reference"] .couple-arch::before,
+.couple-section[data-art="reference"] .couple-arch::after{display:none;}
+.couple-section[data-art="reference"] .couple-demo-note{display:none;}
+@media(prefers-reduced-motion:reduce){
+  .couple-section[data-art="reference"] .couple-reference-scene{will-change:auto;}
+}
