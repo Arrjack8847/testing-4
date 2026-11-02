@@ -3,7 +3,7 @@
 .couple-section{
   position:relative;z-index:2;isolation:isolate;overflow:hidden;
   box-sizing:border-box;width:100%;min-height:1840px;
-  padding:239px 22px 98px;
+  padding:225px 28px 170px;
   text-align:center;color:#6c3a60;
   background:#dedbda url("./assets/couple-garden-original.svg") center top/100% 100% no-repeat;
 }
@@ -14,7 +14,7 @@
 }
 .couple-section .couple-arch{
   position:absolute;z-index:1;pointer-events:none;
-  top:111px;left:20px;right:20px;bottom:140px;
+  top:129px;left:12px;right:12px;bottom:140px;
   border:1.5px solid rgba(182,148,93,.76);
   border-radius:48% 48% 9px 9px / 13% 13% 0 0;
   background:linear-gradient(100deg,rgba(255,255,255,.91),rgba(250,247,244,.96) 48%,rgba(255,251,244,.91));
@@ -34,7 +34,7 @@
   border-radius:48% 48% 3px 3px / 13% 13% 0 0;
 }
 .couple-section .couple-arch-finial{
-  pointer-events:none;position:absolute;z-index:2;left:50%;top:107px;
+  pointer-events:none;position:absolute;z-index:2;left:50%;top:125px;
   width:10px;height:10px;background:#b79b6d;border:2px solid #f5e8cb;
   transform:translateX(-50%) rotate(45deg);
 }
@@ -51,40 +51,44 @@
 }
 .couple-section .couple-intro{width:100%;margin:0;}
 .couple-section .couple-salutation{
-  margin:0 0 10px;font:400 10px/1.6 'Cinzel',serif;
-  letter-spacing:.36em;text-transform:uppercase;color:#9d7193;
+  margin:0 0 12px;font:400 11px/18.15px 'EB Garamond',Georgia,serif;
+  letter-spacing:4.95px;text-transform:uppercase;color:#9d7193;
 }
 .couple-section .couple-title{
   margin:0;white-space:nowrap;color:#7e3f6d;text-shadow:0 2px 8px rgba(249,239,241,.8);
-  font:400 clamp(58px,16vw,67px)/1.12 'Pinyon Script','Alex Brush',cursive;
+  font:400 52px/59.8px 'Pinyon Script','Alex Brush',cursive;
 }
 .couple-section .couple-profile{display:flex;align-items:center;flex-direction:column;width:100%;position:relative;}
-.couple-section .couple-profile--groom{margin-top:36px;}
-.couple-section .couple-profile--bride{margin-top:196px;}
+.couple-section .couple-profile--groom{margin-top:44px;}
+.couple-section .couple-profile--bride{margin-top:52px;}
 .couple-section .couple-portrait{
-  box-sizing:border-box;width:min(240px,calc(100% - 34px));
-  aspect-ratio:240 / 333;max-height:none;
-  border:5px solid #fffdfa;border-radius:14px;
+  box-sizing:border-box;width:72%;max-width:240.5px;
+  aspect-ratio:240.5 / 332.7;max-height:none;
+  border:5px solid #fffdfa;border-radius:16px;
   box-shadow:0 2px 2px rgba(57,39,43,.1),0 0 0 1px rgba(178,147,113,.30),
     0 12px 25px rgba(57,43,48,.10);
   overflow:hidden;background:#483044;
 }
 .couple-section .couple-portrait img{display:block;width:100%;height:100%;object-fit:cover;}
 .couple-section .couple-name{
-  margin:22px 0 0;width:100%;color:#80436f;
-  font:400 clamp(47px,13.3vw,62px)/.97 'Pinyon Script','Alex Brush',cursive;
+  margin:30px 0 0;width:100%;height:92.4px;color:#80436f;
+  font:400 42px/46.2px 'Pinyon Script','Alex Brush',cursive;
   overflow-wrap:anywhere;text-shadow:0 1px 4px rgba(255,250,255,.75);
 }
 .couple-section .couple-role{
-  margin:15px 0 6px;font:400 10px/1.5 'Cinzel',serif;letter-spacing:.31em;color:#9d8097;
+  margin:14px 0 4px;font:400 11px/18.15px 'EB Garamond',Georgia,serif;letter-spacing:3.3px;color:#9d8097;text-transform:uppercase;
 }
 .couple-section .couple-family{
-  max-width:312px;margin:0;
-  color:#613a55;font:400 17px/1.5 'EB Garamond',Georgia,serif;
+  max-width:100%;min-height:62.7px;margin:0;
+  color:#613a55;font:500 19px/31.35px 'EB Garamond',Georgia,serif;
   overflow-wrap:break-word;
 }
+.couple-section .couple-separator{
+  margin:52px 0 0;height:99px;line-height:99px;font-size:60px;
+  font-family:'Pinyon Script',cursive;color:#815272;
+}
 .couple-section .couple-demo-note{
-  margin:24px 16px 0;font:400 11px/1.4 'EB Garamond',Georgia,serif;
+  position:absolute;top:calc(100% + 6px);margin:0 16px;font:400 11px/1.4 'EB Garamond',Georgia,serif;
   font-style:italic;color:#867085;
 }
 .couple-section .couple-floating-petals{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
@@ -114,16 +118,16 @@
   opacity:1;transform:none;
 }
 @media(max-width:350px){
-  .couple-section{min-height:1810px;padding:237px 16px 90px;}
-  .couple-section .couple-arch{left:14px;right:14px;bottom:102px;}
-  .couple-section .couple-portrait{width:min(224px,calc(100% - 30px));}
-  .couple-section .couple-profile--bride{margin-top:210px;}
-  .couple-section .couple-family{font-size:16px;}
-  .couple-section .couple-name{font-size:50px;}
+  .couple-section{min-height:1776px;padding:225px 28px 170px;}
+  .couple-section .couple-arch{left:12px;right:12px;bottom:140px;}
+  .couple-section .couple-portrait{width:72%;}
+  .couple-section .couple-profile--bride{margin-top:52px;}
+  .couple-section .couple-family{font-size:17px;line-height:29px;}
+  .couple-section .couple-name{font-size:42px;}
 }
 @media(min-width:400px){
-  .couple-section .couple-arch{left:22px;right:22px;}
-  .couple-section .couple-portrait{width:240px;}
+  .couple-section .couple-arch{left:12px;right:12px;}
+  .couple-section .couple-portrait{width:72%;}
 }
 @media(prefers-reduced-motion:reduce){
   .couple-section .couple-hanging,.couple-section .couple-floating-petals span{animation:none!important;}
