@@ -71,11 +71,11 @@ test('declining RSVP resets the guests field and supports an empty message',asyn
   await expect(section.locator('#rsvpPreview')).toBeHidden();
 });
 
-test('RSVP Section 5-to-6 transition and inputs fit four phone widths',async({page},testInfo)=>{
+test('RSVP Gift-to-RSVP transition and inputs fit four phone widths',async({page},testInfo)=>{
   const {section}=await reachRSVP(page);
   await expect(section).toHaveClass(/is-visible/);
   const stats=await section.evaluate(el=>{
-    const previous=document.getElementById('gallery');
+    const previous=document.getElementById('weddingGift');
     const card=el.querySelector('.rsvp-paper').getBoundingClientRect();
     const form=el.querySelector('#rsvpForm').getBoundingClientRect();
     return {adjacent:previous.nextElementSibling===el,
