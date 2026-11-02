@@ -102,8 +102,8 @@ test('couple scene respects Reduced Motion and disables decorative petals',async
 
 test('original floral scene parallax follows scrolling without moving cards',async({page})=>{
   const {section}=await openCouple(page);
-  const sample=async ratio=>{
-    await page.evaluate(f=>window.scrollTo({top:Math.round(innerHeight*f),behavior:'instant'}),ratio);
+  const sample=async targetY=>{
+    await page.evaluate(y=>window.scrollTo({top:Math.round(y),behavior:'instant'}),targetY);
     await expect.poll(()=>page.evaluate(()=>{
       const section=document.getElementById('couple');
       return section.style.getPropertyValue('--couple-bg-y').trim();
@@ -114,8 +114,14 @@ test('original floral scene parallax follows scrolling without moving cards',asy
       overflow:document.documentElement.scrollWidth-innerWidth
     }));
   };
-  const first=await sample(3.75);
-  const second=await sample(5);
+  // Relative section positions are used because 5H is not the same part
+  // of the Couple scene at 320x568 and 430x932.
+  const target=await section.evaluate(el=>{
+    const box=el.getBoundingClientRect();
+    return {start:box.top+scrollY,height:box.height,vh:innerHeight};
+  });
+  const first=await sample(target.start-target.vh*.25);
+  const second=await sample(target.start+target.height-target.vh*.4);
   await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-bg-y'))))
     .toBeGreaterThan(5);
   expect(first.offset).toBeLessThan(-10);
