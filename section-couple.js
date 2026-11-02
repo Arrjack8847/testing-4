@@ -27,6 +27,24 @@
   });
   motion.addEventListener?.('change',syncPetals);
   document.addEventListener('visibilitychange',syncPetals);
+  // The live reference drifts its composite garden by about -45px to +20px
+  // while the Couple section scrolls. Apply a bounded, rAF-throttled shift to
+  // our own illustration, never moving the actual content or arch.
+  let parallaxTick=false;
+  const updateParallax=()=>{
+    parallaxTick=false;
+    if(!visible||motion.matches)return;
+    const rect=section.getBoundingClientRect();
+    const progress=Math.max(0,Math.min(1,(innerHeight-rect.top)/(rect.height+innerHeight)));
+    section.style.setProperty('--couple-bg-y',((progress-.5)*128).toFixed(1)+'px');
+  };
+  const onScroll=()=>{
+    if(parallaxTick||!visible||motion.matches)return;
+    parallaxTick=true;
+    requestAnimationFrame(updateParallax);
+  };
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll,{passive:true});
   if(!('IntersectionObserver' in window)){
     const check=()=>{
       const box=section.getBoundingClientRect();
@@ -42,6 +60,7 @@
   new IntersectionObserver(entries=>{
     visible=entries.some(e=>e.isIntersecting && e.intersectionRatio>.01);
     syncPetals();
+    if(visible)onScroll();
   },{threshold:[0,.01,.1]}).observe(section);
 
   if(motion.matches){
