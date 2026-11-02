@@ -6,7 +6,7 @@
   position:relative;z-index:2;isolation:isolate;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   width:100%;min-height:762px;
-  padding:188px 22px 78px;
+  padding:187px 22px 78px;
   text-align:center;color:#fff9fa;
   background-color:#796071;
   background-image:
@@ -53,7 +53,7 @@
 #message .letter-frame{
   box-sizing:border-box;position:relative;z-index:1;
   display:flex;flex-direction:column;align-items:center;
-  width:min(100%,346px);min-height:495px;
+  width:100%;min-height:495px;
   margin:0 auto;padding:0;
   border:1px solid rgba(245,221,231,.58);border-radius:0;
   color:#fff9fa;background:transparent;
@@ -63,29 +63,33 @@
   pointer-events:none;border:1px solid rgba(246,220,231,.29);
 }
 #message .letter-frame::after{
-  content:"";position:absolute;left:50%;top:-5px;width:8px;height:8px;rotate:45deg;
-  translate:-50% 0;background:#d4bbca;border:1px solid #f3dfe5aa;
+  content:none;
 }
 #message .letter-content{
   box-sizing:border-box;position:relative;z-index:2;
   width:100%;max-width:334px;
   /* The live lead occupies 322px inside the 334px inner column. */
-  padding:34px 6px 34px;
+  padding:34px 5px 18px;
   display:flex;flex-direction:column;align-items:center;
 }
 #message .letter-content p,#message .letter-content blockquote{margin-left:auto;margin-right:auto;}
 #message .letter-bismillah{
-  margin:0 auto 34px!important;color:#fff9fa;
+  margin:0 auto 21px!important;color:#fff9fa;
   font:400 44px/1.1 'Times New Roman',serif;letter-spacing:0;
   text-align:center;direction:rtl;
 }
 #message .letter-lead{
-  max-width:324px;margin:0 auto 43px!important;
+  position:relative;max-width:324px;margin:0 auto 61px!important;
   font:400 19px/1.66 'EB Garamond',Georgia,serif;
   color:#fffafc;text-align:center;text-wrap:normal;
 }
+/* The reference has a thin separator below the lead, rather than a top-frame diamond. */
+#message .letter-lead::after{
+  content:"";position:absolute;left:50%;bottom:-27px;transform:translateX(-50%);
+  width:64px;height:1px;background:rgba(245,221,231,.45);pointer-events:none;
+}
 #message .letter-quote{
-  display:block;max-width:285px;margin:0 auto 21px!important;
+  display:block;max-width:324px;margin:0 auto 21px!important;
   color:#fff5f8;
   font:italic 400 clamp(17px,4.5vw,19px)/1.56 'EB Garamond',Georgia,serif;
   text-align:center;text-wrap:normal;
@@ -119,10 +123,11 @@
   to{transform:translate3d(40px,790px,0) rotate(195deg);opacity:0;}
 }
 @media(max-width:350px){
-  #message.invitation-letter{padding:154px 15px 60px;min-height:740px;}
-  #message .letter-frame{width:100%;min-height:510px;}
-  #message .letter-content{padding:32px 13px 40px;}
-  #message .letter-lead{font-size:18px;line-height:1.62;margin-bottom:29px!important;}
+  /* Live reference preserves the 22px side inset, 187px frame offset, and 19px lead. */
+  #message.invitation-letter{padding:187px 22px 80px;min-height:0;}
+  #message .letter-frame{width:100%;min-height:556px;}
+  #message .letter-content{padding:34px 5px 18px;}
+  #message .letter-lead{font-size:19px;line-height:1.65;margin-bottom:61px!important;}
   #message .letter-quote{font-size:17px;}
 }
 @media(prefers-reduced-motion:reduce){

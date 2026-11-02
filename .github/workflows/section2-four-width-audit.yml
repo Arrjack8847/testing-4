@@ -1,0 +1,96 @@
+name: Section 2 four-width live-reference audit
+
+on:
+  push:
+    paths:
+      - index.html
+      - tools/audit-section2-four-widths.mjs
+      - section-two.css
+      - tests/section-two.spec.mjs
+      - .github/workflows/section2-four-width-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Load reference WebPs only into ephemeral test runner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re
+          names = re.findall(r'^([a-z0-9_]+\.webp)$', Path('ASSET-MANIFEST.txt').read_text(), re.M)
+          assert len(names) == 25, f'Expected 25 assets, got {len(names)}'
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              data = urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/' + name, headers={'User-Agent':'Mozilla/5.0'}), timeout=45).read()
+              assert data[:4] == b'RIFF' and data[8:12] == b'WEBP', name
+              Path('assets', name).write_bytes(data)
+          print('Loaded test-only scene assets into the temporary CI runner.')
+          PY
+      - name: Verify Section 2 regression geometry at all four widths
+        run: npx playwright test tests/section-two.spec.mjs --workers=2
+      - name: Start local mobile prototype
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/section2-web.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/section2-web.log
+          exit 1
+      - name: Capture all four widths and four scroll checkpoints
+        run: node tools/audit-section2-four-widths.mjs
+      - name: Build side-by-side and 50-percent overlay images
+        if: always()
+        run: |
+          python3 -m pip install --user --quiet Pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageChops, ImageDraw
+          import re
+          folder = Path('section2-four-width-evidence')
+          for reference in folder.glob('*-reference-*.png'):
+              local = Path(str(reference).replace('-reference-', '-local-'))
+              if not local.exists():
+                  continue
+              with Image.open(reference) as a, Image.open(local) as b:
+                  a, b = a.convert('RGB'), b.convert('RGB')
+                  if a.size != b.size:
+                      continue
+                  w, h = a.size
+                  pair = Image.new('RGB', (w*2, h+30), 'white')
+                  pair.paste(a, (0,30))
+                  pair.paste(b, (w,30))
+                  draw = ImageDraw.Draw(pair)
+                  draw.text((8,8), 'REFERENCE', fill='black')
+                  draw.text((w+8,8), 'TESTING-4', fill='black')
+                  stem = reference.name.replace('-reference-', '-comparison-')
+                  pair.save(folder / stem)
+                  overlay = Image.blend(a,b,0.5)
+                  overlay.save(folder / stem.replace('-comparison-', '-overlay-'))
+                  diff = ImageChops.difference(a,b)
+                  diff.save(folder / stem.replace('-comparison-', '-difference-'))
+          print('Created all available screenshot pairs, overlays and differences.')
+          PY
+      - name: Upload screenshot comparisons and measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section2-reference-vs-testing4-four-phone-comparisons
+          path: section2-four-width-evidence/
+          retention-days: 7
+          if-no-files-found: warn

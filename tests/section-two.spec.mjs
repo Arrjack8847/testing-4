@@ -11,6 +11,10 @@ async function reachMessage(page) {
     document.getElementById('message').scrollIntoView({block:'start',behavior:'instant'});
   });
   await expect(section).toBeInViewport();
+  // Geometry must be measured after the 750ms entrance transform finishes.
+  // Otherwise the scaled frame yields false width/top mismatches.
+  await expect(section).toHaveClass(/is-visible/);
+  await expect.poll(()=>section.locator('.letter-frame').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
   return section;
 }
 
@@ -46,7 +50,7 @@ test('double-line message frame fits mobile viewports without overflow',async({p
   });
   expect(dims.overflow).toBeLessThanOrEqual(1);
   expect(dims.sectionHeight).toBeGreaterThanOrEqual(740);
-  expect(dims.frameWidth).toBeLessThanOrEqual(346.5);
+  expect(dims.frameWidth).toBeCloseTo(dims.viewport-44,0);
   expect(dims.frameLeft).toBeGreaterThanOrEqual(-1);
   expect(dims.frameRight).toBeLessThanOrEqual(dims.viewport+1);
   for(const p of dims.text){
@@ -159,13 +163,13 @@ test('Section 2 original textured layer is present and its reference-aligned fra
   expect(sprite.texture).toContain('section2-mauve-original.svg');
   expect(sprite.opacityText).toBe('1');
   if(await page.evaluate(()=>innerWidth)===390){
-    expect(sprite.top).toBeCloseTo(188,0);
+    expect(sprite.top).toBeCloseTo(187,0);
     expect(sprite.width).toBeCloseTo(346,0);
     // Content-based subpixel rounding may extend the 762.4px reference band slightly.
     expect(Math.abs(sprite.messageHeight-762.4)).toBeLessThan(2);
     expect(sprite.leadRelative).toBeGreaterThan(280);
     expect(sprite.leadRelative).toBeLessThan(320);
-    expect(sprite.leadWidth).toBeCloseTo(322,0);
+    expect(sprite.leadWidth).toBeCloseTo(324,0);
   }
   const textureResponse=await page.request.get('/assets/section2-mauve-original.svg');
   expect(textureResponse.ok()).toBe(true);
@@ -209,4 +213,33 @@ test('petals remain motionless under a reduced-motion preference',async({page})=
   const section=await reachMessage(page);
   await expect(section).toHaveAttribute('data-petals-active','false');
   await expect(section.locator('.letter-petal').first()).toHaveCSS('animation-name','none');
+});
+
+test('live-reference frame and 19px lead align at all four phone widths',async({page})=>{
+  const section=await reachMessage(page);
+  await expect(section).toHaveClass(/is-visible/);
+  const actual=await section.evaluate(el=>{
+    const band=el.getBoundingClientRect();
+    const frame=el.querySelector('.letter-frame').getBoundingClientRect();
+    const lead=el.querySelector('.letter-lead');
+    const b=lead.getBoundingClientRect();
+    return {
+      viewport:innerWidth,
+      top:frame.top-band.top,
+      left:frame.left-band.left,
+      width:frame.width,
+      leadTop:b.top-band.top,
+      leadWidth:b.width,
+      fontSize:getComputedStyle(lead).fontSize,
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  // Calibrated against the reference itself at 320, 360, 390, 430 CSS pixels.
+  expect(Math.abs(actual.top-187)).toBeLessThan(2);
+  expect(Math.abs(actual.left-22)).toBeLessThan(1);
+  expect(Math.abs(actual.width-(actual.viewport-44))).toBeLessThan(1);
+  expect(Math.abs(actual.leadTop-291.8)).toBeLessThan(3);
+  expect(actual.leadWidth).toBeCloseTo(Math.min(actual.viewport-56,324),0);
+  expect(actual.fontSize).toBe('19px');
+  expect(actual.overflow).toBeLessThanOrEqual(1);
 });
