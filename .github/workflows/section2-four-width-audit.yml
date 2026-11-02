@@ -6,6 +6,7 @@ on:
       - index.html
       - tools/audit-section2-four-widths.mjs
       - section-two.css
+      - assets/section2-mauve-original.svg
       - tests/section-two.spec.mjs
       - .github/workflows/section2-four-width-audit.yml
   workflow_dispatch:

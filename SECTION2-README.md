@@ -95,3 +95,17 @@ The frame remains centered at 346px; the 322px lead text column and 188px top of
 Decorative petals in Section 2 now have a visibility gate. They run only when the invitation is opened, the mauve band is actually visible, the tab is active and Reduce Motion is off. They pause when the section exits or the invitation closes. The one-time message reveal remains independent of petal motion.
 
 Focused browser QA now checks the active/paused petal state and mobile reference-position screenshots. Real-device performance and any commercial-asset rights still require independent verification.
+
+## Fine-grain artwork and petal-motion refinement (2026-11-02)
+
+The approved geometry and the 4H sticky / -1H overlap are unchanged. The latest Section 2-only iteration:
+
+- Draws an **independent, original embossed mauve relief** using SVG turbulence at three scales (surface fiber, small textile grain, and softer low-frequency folds). This is deliberately not the reference provider's `band.webp` or a derivation of its encoded assets.
+- Retains the reference-measured 22px left/right frame inset, 187px vertical offset, 19px EB Garamond invitation body, and phone-specific frame heights.
+- Adds **eight small floating petals on three independent curved trajectories**, with staggered durations and delays. Animation remains decorative, avoids pointer events, pauses when the mauve section is not visible, and honors Reduced Motion.
+- Extends the 390px read-only audit to take live petal screenshots at 3H exactly 900 milliseconds apart. Frozen screenshot differences still assess only layout; moving frames assess visible motion independently.
+- Leaves Section 1's scene camera, peacocks, butterflies, text reveals, and original art untouched.
+
+The reference screenshot still contains vendor catalogue controls not part of the guest invitation; they are excluded from UI fidelity goals. Passing mobile screenshot or geometry tests is **not** evidence of pixel-perfect background embossing or rights to the commercial reference artwork.
+
+Review: [Section 2 final-art working PR #2](https://github.com/Arrjack8847/testing-4/pull/2). Before publishing a commercial invitation, the user still needs original/licensed assets instead of any hotlinked provider art and physical device QA.

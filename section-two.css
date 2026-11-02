@@ -33,23 +33,28 @@
   clip:rect(0,0,0,0);white-space:nowrap;border:0;
 }
 #message .letter-ambient{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+/* Deliberately sparse, differently timed original petal silhouettes:
+   three gentle falling routes, each with independent horizontal reversals.
+   No animation is driven by scroll events or a continuous JavaScript loop. */
 #message .letter-petal{
-  position:absolute;top:-16px;width:9px;height:13px;opacity:.55;
-  border-radius:80% 0 80% 15%;
-  background:linear-gradient(145deg,#e7cadf,#a58cb5);
-  filter:drop-shadow(0 1px 2px #402b3a29);
-  transform:rotate(-19deg);animation:letter-petal-fall 10s linear infinite;
+  position:absolute;top:-18px;width:9px;height:13px;opacity:.48;
+  border-radius:75% 6% 80% 12%;
+  background:radial-gradient(ellipse at 30% 24%,#f1dde9 0%,#d7b7d0 48%,#b491b7 100%);
+  box-shadow:inset -1px -1px 1px #6a496b20;
+  filter:drop-shadow(0 1px 2px #402b3a20);
+  transform-origin:45% 66%;
+  animation:letter-petal-fall-a 12s linear infinite;
   animation-play-state:paused;
 }
-#message[data-petals-active="true"] .letter-petal{
-  animation-play-state:running;
-}
-#message .letter-petal-1{left:17%;animation-delay:-6s;animation-duration:11s;}
-#message .letter-petal-2{left:36%;animation-delay:-2s;animation-duration:13s;scale:.72;}
-#message .letter-petal-3{left:71%;animation-delay:-9s;animation-duration:12s;}
-#message .letter-petal-4{left:88%;animation-delay:-4s;animation-duration:10s;scale:.67;}
-#message .letter-petal-5{left:53%;animation-delay:-7s;animation-duration:15s;scale:.85;}
-#message .letter-petal-6{left:8%;animation-delay:-11s;animation-duration:14s;}
+#message[data-petals-active="true"] .letter-petal{animation-play-state:running;}
+#message .letter-petal-1{left:17%;animation-delay:-6s;animation-duration:12s;}
+#message .letter-petal-2{left:36%;animation-name:letter-petal-fall-b;animation-delay:-2s;animation-duration:14s;scale:.73;opacity:.4;}
+#message .letter-petal-3{left:71%;animation-name:letter-petal-fall-c;animation-delay:-9s;animation-duration:13s;}
+#message .letter-petal-4{left:88%;animation-name:letter-petal-fall-b;animation-delay:-4s;animation-duration:11s;scale:.68;}
+#message .letter-petal-5{left:53%;animation-name:letter-petal-fall-c;animation-delay:-7s;animation-duration:16s;scale:.84;opacity:.38;}
+#message .letter-petal-6{left:8%;animation-delay:-11s;animation-duration:15s;}
+#message .letter-petal-7{left:62%;animation-name:letter-petal-fall-b;animation-delay:-13s;animation-duration:18s;scale:.57;opacity:.34;}
+#message .letter-petal-8{left:26%;animation-name:letter-petal-fall-c;animation-delay:-16s;animation-duration:19s;scale:.60;opacity:.4;}
 #message .letter-frame{
   box-sizing:border-box;position:relative;z-index:1;
   display:flex;flex-direction:column;align-items:center;
@@ -75,7 +80,7 @@
 #message .letter-content p,#message .letter-content blockquote{margin-left:auto;margin-right:auto;}
 #message .letter-bismillah{
   margin:0 auto 21px!important;color:#fff9fa;
-  font:400 44px/1.1 'Times New Roman',serif;letter-spacing:0;
+  font:400 39px/48.4px 'Times New Roman',serif;letter-spacing:0;
   text-align:center;direction:rtl;
 }
 #message .letter-lead{
@@ -116,11 +121,34 @@
 #message .letter-content > :nth-child(2){transition-delay:220ms;}
 #message .letter-content > :nth-child(3){transition-delay:350ms;}
 #message .letter-content > :nth-child(4){transition-delay:440ms;}
-@keyframes letter-petal-fall{
-  from{transform:translate3d(-10px,-20px,0) rotate(-25deg);opacity:0;}
-  8%{opacity:.58;}
-  92%{opacity:.58;}
-  to{transform:translate3d(40px,790px,0) rotate(195deg);opacity:0;}
+/* Curved paths and soft fade-in/out approximate observed drifting petals,
+   with no synchronous diagonal conveyor-belt movement. */
+@keyframes letter-petal-fall-a{
+  0%{transform:translate3d(-8px,-20px,0) rotate(-35deg);opacity:0;}
+  9%{opacity:.45;}
+  23%{transform:translate3d(13px,185px,0) rotate(35deg);}
+  48%{transform:translate3d(-5px,400px,0) rotate(101deg);}
+  74%{transform:translate3d(21px,620px,0) rotate(151deg);}
+  92%{opacity:.44;}
+  100%{transform:translate3d(7px,875px,0) rotate(224deg);opacity:0;}
+}
+@keyframes letter-petal-fall-b{
+  0%{transform:translate3d(10px,-20px,0) rotate(40deg);opacity:0;}
+  9%{opacity:.36;}
+  28%{transform:translate3d(-15px,232px,0) rotate(-31deg);}
+  52%{transform:translate3d(4px,447px,0) rotate(-89deg);}
+  79%{transform:translate3d(-23px,681px,0) rotate(-157deg);}
+  92%{opacity:.35;}
+  100%{transform:translate3d(-12px,900px,0) rotate(-220deg);opacity:0;}
+}
+@keyframes letter-petal-fall-c{
+  0%{transform:translate3d(0,-20px,0) rotate(20deg);opacity:0;}
+  9%{opacity:.44;}
+  21%{transform:translate3d(8px,173px,0) rotate(78deg);}
+  43%{transform:translate3d(23px,354px,0) rotate(148deg);}
+  66%{transform:translate3d(-7px,552px,0) rotate(104deg);}
+  90%{transform:translate3d(17px,770px,0) rotate(190deg);opacity:.43;}
+  100%{transform:translate3d(25px,900px,0) rotate(246deg);opacity:0;}
 }
 @media(max-width:350px){
   /* Live reference preserves the 22px side inset, 187px frame offset, and 19px lead. */
