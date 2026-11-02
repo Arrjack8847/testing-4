@@ -21,8 +21,9 @@ async function at(page,ratio) {
     .toBeCloseTo(ratio,2);
   // Scroll-driven variables are set on requestAnimationFrame.
   await expect.poll(()=>page.evaluate(()=>{
-    return document.documentElement.style.getPropertyValue('--text-scroll-shift');
-  })).not.toBe('');
+    const shift=parseFloat(document.documentElement.style.getPropertyValue('--text-scroll-shift'));
+    return Math.abs(shift+(scrollY-innerHeight*2));
+  }),{timeout:5000}).toBeLessThanOrEqual(1);
   return page.evaluate(()=>{
     const toRect=el=>{
       const b=el.getBoundingClientRect();
