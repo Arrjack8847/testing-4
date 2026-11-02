@@ -243,3 +243,25 @@ test('live-reference frame and 19px lead align at all four phone widths',async({
   expect(actual.fontSize).toBe('19px');
   expect(actual.overflow).toBeLessThanOrEqual(1);
 });
+
+test('original Section 2 petals have independent curved trajectories without changing document geometry',async({page})=>{
+  const section=await reachMessage(page);
+  const petals=section.locator('.letter-petal');
+  await expect(petals).toHaveCount(8);
+  const before=await petals.evaluateAll(nodes=>nodes.map(el=>({
+    name:getComputedStyle(el).animationName,
+    duration:getComputedStyle(el).animationDuration,
+    state:getComputedStyle(el).animationPlayState,
+    transform:getComputedStyle(el).transform,
+    pointerEvents:getComputedStyle(el.parentElement).pointerEvents
+  })));
+  expect(new Set(before.map(x=>x.name))).toEqual(new Set([
+    'letter-petal-fall-a','letter-petal-fall-b','letter-petal-fall-c'
+  ]));
+  expect(before.every(x=>x.state==='running'&&x.pointerEvents==='none')).toBe(true);
+  expect(new Set(before.map(x=>x.duration)).size).toBeGreaterThanOrEqual(6);
+  await page.waitForTimeout(700);
+  const after=await petals.evaluateAll(nodes=>nodes.map(el=>getComputedStyle(el).transform));
+  expect(after.some((x,i)=>x!==before[i].transform)).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+});
