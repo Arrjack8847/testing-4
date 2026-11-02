@@ -70,17 +70,28 @@ test('couple layout has measured first-portrait geometry at 390px and never over
 });
 test('second portrait has a separate reveal, and section joins Celebration without gaps',async({page},testInfo)=>{
   const {section,errors}=await openCouple(page);
+  const first=section.locator('.couple-profile--groom .couple-portrait');
   const second=section.locator('.couple-profile--bride .couple-portrait');
+  // Wait for BOTH 900ms scroll-reveal transforms to finish. Measuring one
+  // entering card against one settled card produced misleading 22px offsets.
+  await first.scrollIntoViewIfNeeded();
+  await expect(first).toHaveClass(/in-view/);
+  await expect.poll(()=>first.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
   await second.scrollIntoViewIfNeeded();
   await expect(second).toHaveClass(/in-view/);
+  await expect.poll(()=>second.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
   const values=await section.evaluate(el=>{
     const a=el.querySelector('.couple-profile--groom .couple-portrait').getBoundingClientRect();
     const b=el.querySelector('.couple-profile--bride .couple-portrait').getBoundingClientRect();
-    return {difference:b.top-a.top,overflow:document.documentElement.scrollWidth-innerWidth};
+    const root=el.getBoundingClientRect();
+    return {difference:b.top-a.top,brideOffset:b.top-root.top,
+      overflow:document.documentElement.scrollWidth-innerWidth};
   });
   if(await page.evaluate(()=>innerWidth)===390){
-    expect(values.difference).toBeGreaterThan(748);
-    expect(values.difference).toBeLessThan(768);
+    expect(values.difference).toBeGreaterThan(756);
+    expect(values.difference).toBeLessThan(758);
+    expect(values.brideOffset).toBeGreaterThan(1115);
+    expect(values.brideOffset).toBeLessThan(1117);
   }
   expect(values.overflow).toBeLessThanOrEqual(1);
   await page.screenshot({path:testInfo.outputPath('section3-couple-second-'+testInfo.project.name+'.png'),animations:'disabled'});
