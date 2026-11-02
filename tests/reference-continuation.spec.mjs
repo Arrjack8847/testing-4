@@ -113,3 +113,33 @@ test('reduced motion and local-only guest/gift safeguards are honored',async({pa
   await expect(page.locator('#wishesWall')).toContainText('not real guest submissions');
   await expect(page.locator('#rsvpWarning')).toContainText('response will not be sent');
 });
+
+
+test('bottom navigation opens only after cover and routes touch and keyboard to real sections',async({page})=>{
+  await page.goto('/');
+  const nav=page.locator('#inviteNavigation');
+  await expect(nav).toBeHidden();
+  await expect(nav).toHaveJSProperty('inert',true);
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(nav).toBeVisible();
+  await expect(nav).toHaveJSProperty('inert',false);
+  const details=await nav.evaluate(el=>({
+    width:el.getBoundingClientRect().width,
+    overflow:document.documentElement.scrollWidth-innerWidth,
+    targets:[...el.querySelectorAll('button')].map(b=>({
+      id:b.dataset.inviteTarget,height:b.getBoundingClientRect().height,
+      exists:!!document.getElementById(b.dataset.inviteTarget)
+    }))
+  }));
+  expect(details.width).toBeLessThanOrEqual(page.viewportSize().width);
+  expect(details.overflow).toBeLessThanOrEqual(1);
+  expect(details.targets).toHaveLength(6);
+  for(const b of details.targets) {
+    expect(b.exists).toBe(true);
+    expect(b.height).toBeGreaterThanOrEqual(44);
+  }
+  await nav.getByRole('button',{name:'Go to order of the day'}).click();
+  await expect(page.locator('#runningOrder')).toBeInViewport();
+  await nav.getByRole('button',{name:'Go to RSVP'}).click();
+  await expect(page.locator('#rsvp')).toBeInViewport();
+});
