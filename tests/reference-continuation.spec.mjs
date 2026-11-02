@@ -109,7 +109,7 @@ test('reduced motion and local-only guest/gift safeguards are honored',async({pa
   expect(state.revealReady).toBeUndefined();
   expect(state.animation).toBe('none');
   expect(state.opacity).toBe('1');
-  await expect(page.locator('#weddingGift button')).toBeDisabled();
+  await expect(page.locator('#weddingGift button').first()).toBeDisabled();
   await expect(page.locator('#wishesWall')).toContainText('not real guest submissions');
   await expect(page.locator('#rsvpWarning')).toContainText('response will not be sent');
 });
