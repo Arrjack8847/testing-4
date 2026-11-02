@@ -9,6 +9,8 @@ At 390px the reference Couple section begins at document y=3294.4 and ends y=513
 ## What is implemented
 
 - An original long wisteria garden, lake/arch background at `assets/couple-garden-original.svg` and an original CSS ivory/gold arched frame.
+- **Viewport-sticky original garden:** `assets/couple-vista-sticky-original.svg` is a new 390×844 layered watercolor-style lakeside scene. `.couple-vista-sticky` remains pinned at the top of the phone while the long cream arch and two portrait cards scroll across it. A negative flow margin keeps all text/card coordinates unchanged; the long garden illustration remains as an underlay fallback.
+- The scenery is independently created and is **not** the vendor's `scene.webp`. Its parallax motion is driven by the existing `--couple-bg-y` variable with Reduced Motion respected.
 - An original exit scene at `assets/couple-lake-finish-original.svg` with stone balustrades, carved ornaments, lavender water and botanical edging. It sits behind the arch and is revealed only at the end, reducing the abrupt empty-lavender strip before the preserved Celebration section.
 - A higher-density **original** botanical overlay at `assets/couple-botanical-edges-original.svg`: hand-authored wisteria and hydrangea clusters, ivy stems, gilded side tracery and stone urns around the panel. The artwork is decorative and stays behind the couple's actual text.
 - `assets/couple-arch-relief-original.svg` adds a subtle carved cream/gold floral texture and crest over the original arch silhouette without changing its measured dimensions. Both new SVGs are authored specifically for this prototype and are not downloaded from the reference website.

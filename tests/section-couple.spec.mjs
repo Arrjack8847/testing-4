@@ -218,3 +218,48 @@ test('original botanical side art and carved arch render without covering text o
   await page.screenshot({path:testInfo.outputPath('section3-botanical-'+width+'.png'),animations:'disabled'});
   expect(errors).toEqual([]);
 });
+
+
+test('Section 3 uses a viewport-sticky original garden without moving portrait geometry',async({page},testInfo)=>{
+  const {section,errors}=await openCouple(page);
+  const start=await section.evaluate(el=>{
+    const b=el.getBoundingClientRect();
+    return {top:b.top+scrollY,height:b.height,vh:innerHeight,vw:innerWidth};
+  });
+  const viewportScene=section.locator('.couple-vista-sticky');
+  await expect(viewportScene).toHaveCount(1);
+  await page.evaluate(v=>window.scrollTo({top:Math.round(v),behavior:'instant'}),
+    start.top+Math.round(start.height*.44));
+  await expect.poll(()=>viewportScene.evaluate(el=>el.getBoundingClientRect().top)).toBeCloseTo(0,0);
+  const observed=await section.evaluate(el=>{
+    const root=el.getBoundingClientRect();
+    const plane=el.querySelector('.couple-vista-sticky');
+    const inner=el.querySelector('.couple-inner').getBoundingClientRect();
+    const arch=el.querySelector('.couple-arch').getBoundingClientRect();
+    const first=el.querySelector('.couple-profile--groom .couple-portrait').getBoundingClientRect();
+    const planeBox=plane.getBoundingClientRect();
+    return {
+      planeHeight:planeBox.height,planeTop:planeBox.top,
+      background:getComputedStyle(plane).backgroundImage,
+      overflow:getComputedStyle(el).overflowY,
+      contentOffset:inner.top-root.top,archOffset:arch.top-root.top,
+      portraitOffset:first.top-root.top,
+      horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  expect(observed.planeHeight).toBeCloseTo(start.vh,0);
+  expect(observed.planeTop).toBeCloseTo(0,0);
+  expect(observed.background).toContain('couple-vista-sticky-original.svg');
+  expect(observed.overflow).toBe('clip');
+  expect(observed.contentOffset).toBeCloseTo(225,0);
+  expect(observed.archOffset).toBeCloseTo(129,0);
+  expect(observed.horizontalOverflow).toBeLessThanOrEqual(1);
+  const loaded=await page.evaluate(async()=>{
+    const img=new Image();
+    img.src='./assets/couple-vista-sticky-original.svg';
+    try{await img.decode();return [img.naturalWidth,img.naturalHeight]}catch{return null}
+  });
+  expect(loaded).toEqual([390,844]);
+  await page.screenshot({path:testInfo.outputPath('section3-sticky-garden-'+testInfo.project.name+'.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+});
