@@ -252,3 +252,90 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
   await expect(page.locator('#groomPortrait')).toHaveAttribute('src','./assets/couple-groom-art-original.svg');
   await expect(page.locator('#bridePortrait')).toHaveAttribute('src','./assets/couple-bride-art-original.svg');
 });
+
+
+test('reference preview camera matches four measured 390px scroll checkpoints',async({page},testInfo)=>{
+  await page.goto('/?coupleReference=1');
+  const section=page.locator('#couple');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const checks=[
+    {y:2743,offset:-44.8},
+    {y:3165,offset:-26.8},
+    {y:3587,offset:-8.8},
+    {y:4220,offset:18.2}
+  ];
+  const viewport=await page.evaluate(()=>innerWidth);
+  const cameras=[];
+  for (const {y,offset} of checks){
+    const adjusted=await section.evaluate((el,point)=>{
+      const start=el.getBoundingClientRect().top+scrollY;
+      return start - 3294.4 + point;
+    },y);
+    await page.evaluate(async pos=>{
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:Math.round(pos),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },adjusted);
+    await expect.poll(()=>section.evaluate(el=>parseFloat(el.dataset.referenceCameraOffset))).toBeGreaterThan(-45);
+    const reading=await section.evaluate(el=>{
+      const root=el.getBoundingClientRect();
+      const pic=el.querySelector('.couple-reference-scene').getBoundingClientRect();
+      const scrollWithin=Math.max(0,Math.min(el.offsetHeight-innerHeight,-root.top));
+      const camera=parseFloat(el.dataset.referenceCameraOffset);
+      return {camera,visual:pic.top,expectedVisual:root.top+scrollWithin+camera,
+        overflow:document.documentElement.scrollWidth-innerWidth};
+    });
+    // Only the measured reference viewport has absolute sample values.
+    if(viewport===390){
+      expect(Math.abs(reading.camera-offset)).toBeLessThan(1.3);
+    }
+    expect(Math.abs(reading.visual-reading.expectedVisual)).toBeLessThan(1.5);
+    expect(reading.overflow).toBeLessThanOrEqual(1);
+    cameras.push(reading.camera);
+    if(viewport===390 && y===3587){
+      await page.screenshot({path:testInfo.outputPath('section3-reference-midpoint-390.png'),animations:'disabled'});
+    }
+  }
+  expect(cameras[0]).toBeLessThan(cameras[1]);
+  expect(cameras[1]).toBeLessThan(cameras[2]);
+  expect(cameras[2]).toBeLessThan(cameras[3]);
+  // Backward scroll must restore the previous camera position.
+  const start=await section.evaluate(el=>el.getBoundingClientRect().top+scrollY);
+  await page.evaluate(async y=>{
+    window.scrollTo({top:y,behavior:'instant'});
+    await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+  },start-(3294.4-3165));
+  if(viewport===390){
+    const actual=await section.evaluate(el=>parseFloat(el.dataset.referenceCameraOffset));
+    expect(Math.abs(actual-(-26.8))).toBeLessThan(1.3);
+  }
+});
+
+test('reference preview entrance matches measured 52px lift and Reduced Motion removes it',async({page})=>{
+  await page.goto('/?coupleReference=1');
+  const section=page.locator('#couple');
+  await expect(section).toHaveAttribute('data-art','reference');
+  const first=section.locator('.couple-profile--groom .couple-portrait');
+  const initial=await first.evaluate(el=>({
+    transform:getComputedStyle(el).transform,
+    opacity:getComputedStyle(el).opacity
+  }));
+  expect(initial.opacity).toBe('0');
+  expect(initial.transform).not.toBe('none');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await first.scrollIntoViewIfNeeded();
+  await expect(first).toHaveClass(/in-view/);
+  await expect.poll(()=>first.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.reload();
+  await expect(section).toHaveAttribute('data-art','reference');
+  const still=await first.evaluate(el=>({
+    transform:getComputedStyle(el).transform,
+    opacity:getComputedStyle(el).opacity
+  }));
+  expect(still).toEqual({transform:'none',opacity:'1'});
+  const camera=await section.evaluate(el=>parseFloat(el.dataset.referenceCameraOffset));
+  expect(camera).toBe(0);
+});
