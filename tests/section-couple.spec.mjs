@@ -243,7 +243,14 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
     document.documentElement.style.scrollBehavior='auto';
     document.getElementById('couple').scrollIntoView({block:'start',behavior:'instant'});
   });
-  await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-reference-y')))).toBeGreaterThan(-1);
+  await expect.poll(()=>section.evaluate(el=>{
+    const camera=parseFloat(el.dataset.referenceCameraOffset);
+    const total=parseFloat(el.style.getPropertyValue('--couple-reference-y'));
+    const root=el.getBoundingClientRect();
+    const pinned=Math.max(0,Math.min(el.offsetHeight-innerHeight,-root.top));
+    return Number.isFinite(total) && Number.isFinite(camera)
+      && Math.abs(total-(pinned+camera))<1.5;
+  })).toBe(true);
   const seam=await section.evaluate(el=>el.nextElementSibling.getBoundingClientRect().top-el.getBoundingClientRect().bottom);
   expect(Math.abs(seam)).toBeLessThanOrEqual(1);
 
