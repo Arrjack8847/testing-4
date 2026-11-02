@@ -16,6 +16,13 @@
   background:linear-gradient(180deg,rgba(230,223,223,.03) 0%,transparent 16%,
     rgba(255,248,234,.04) 77%,rgba(104,85,131,.14) 100%);
 }
+/* Decorative underlay: visible only below the ivory arch; its overlap is
+   intentionally behind the panel, never above the names or photo cards. */
+.couple-section .couple-lake-finish{
+  position:absolute;left:0;right:0;bottom:0;height:178px;z-index:0;
+  pointer-events:none;
+  background:url("./assets/couple-lake-finish-original.svg") center bottom/100% 178px no-repeat;
+}
 .couple-section .couple-arch{
   position:absolute;z-index:1;pointer-events:none;
   top:129px;left:12px;right:12px;bottom:140px;
