@@ -56,18 +56,28 @@
     profile.querySelector('.couple-family').textContent = item.family;
   }
 
-  // A reference image occupies a single viewport, pinned over Section 3.
-  // The absolute scene is translated inside the section, matching a sticky
-  // scene without inserting height or shifting the existing HTML portraits.
+  // Reference measurements at 390×844, with absolute document Y:
+  // 2743 => image offset -44.8px; 3165 => -26.8px;
+  // 3587 => -8.8px; 4220 => +18.2px.
+  // Unlike a simple sticky image, its camera drifts by ~0.0427 px per
+  // document scroll pixel. Preserve normal section boundaries at all sizes.
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
   let pending = false;
   function syncScene() {
     pending = false;
-    const rect = section.getBoundingClientRect();
-    const scrollWithin = Math.max(0, Math.min(
-      Math.max(0, rect.height - window.innerHeight),
-      -rect.top
-    ));
-    section.style.setProperty('--couple-reference-y',scrollWithin.toFixed(2)+'px');
+    const box = section.getBoundingClientRect();
+    const viewport = window.innerHeight;
+    const start = box.top + window.scrollY;
+    const pinned = clamp(-box.top, 0, Math.max(0, box.height - viewport));
+    // Reference y=2743 corresponds to ~0.653 viewport before Section 3.
+    // This conversion is independent of the phone height.
+    const referenceAnchor = start - 0.653 * viewport;
+    const camera = motion.matches ? 0 :
+      clamp(-44.8 + (window.scrollY - referenceAnchor) * 0.0427, -44.8, 20);
+    const displacement = pinned + camera;
+    section.style.setProperty('--couple-reference-y',displacement.toFixed(2)+'px');
+    section.dataset.referenceCameraOffset = camera.toFixed(2);
   }
   function scheduleSync() {
     if (pending) return;
@@ -76,5 +86,6 @@
   }
   window.addEventListener('scroll',scheduleSync,{passive:true});
   window.addEventListener('resize',scheduleSync,{passive:true});
+  motion.addEventListener?.('change',scheduleSync);
   syncScene();
 })();

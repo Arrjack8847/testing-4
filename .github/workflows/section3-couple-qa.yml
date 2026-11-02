@@ -58,6 +58,7 @@ jobs:
           name: section3-couple-320-360-390-430
           path: |
             test-results/**/*section3-couple*.png
+            test-results/**/*section3-reference*.png
             test-results/**/*section-three*.png
             test-results/**/*section2-to-3*.png
           retention-days: 7
