@@ -100,3 +100,33 @@
   .reference-continuation .ref-vine {animation:none!important;transform:none!important}
   .reference-continuation[data-reveal-ready="true"] .ref-reveal {opacity:1!important;transform:none!important;transition:none!important}
 }
+
+/* 390px reference measurements: timeline ~651px, attire ~679px,
+   gift ~990px, closing ~1109px; keep content-based growth when needed. */
+.ref-program {min-height:651px;padding-top:34px;padding-bottom:30px}
+.ref-program .ref-script {font-size:clamp(43px,12.5vw,56px);margin-bottom:7px}
+.ref-program .ref-intro {margin-bottom:8px;font-size:17px}
+.ref-program .ref-timeline {margin:8px auto 3px}
+.ref-program .ref-timeline li {min-height:63px}
+.ref-program .ref-timeline li::before {left:74px;top:12px}
+.ref-program .ref-timeline::before {left:78px;top:17px;bottom:18px}
+.ref-program .ref-timeline li>div {padding:3px 10px 8px 11px}
+.ref-program .ref-timeline time {padding-top:10px}
+.ref-program .ref-timeline strong {font-size:19px}
+.ref-program .ref-timeline span {font-size:13px;margin-top:1px}
+.ref-program .ref-disclosure {margin-top:12px}
+.ref-dress {min-height:679px;padding-top:43px;padding-bottom:44px}
+.ref-dress .ref-intro {margin-bottom:19px}
+.ref-dress .ref-palettes {gap:17px}
+.ref-dress .ref-palette {padding:23px 16px 13px}
+.ref-dress .ref-palette h3 {font-size:25px;margin:6px auto 9px}
+.ref-dress .ref-palette .ref-swatches {margin:10px auto}
+.ref-dress .ref-swatches i {width:49px;height:49px}
+.ref-dress .ref-palette p:last-child {font-size:14px;margin:8px auto 0}
+.ref-dress .ref-disclosure {margin-top:14px}
+.ref-gifts {min-height:990px}
+.ref-closing {min-height:1109px}
+@media(max-width:350px) {
+  .ref-program {padding-top:44px}
+  .ref-program .ref-timeline li {min-height:72px}
+}
