@@ -139,6 +139,33 @@ for(const phone of PHONES) {
       current.checkpoints.push({
         fraction,targetScroll:target,reference,implementation,images:[refPath,localPath]
       });
+      // Compare LIVE movement separately from frozen geometry.
+      // A static diff cannot assess drifting petals or reference timing.
+      if (phone.width===390 && fraction===3) {
+        const motion={fpsCheckpoint:'3H',frames:[],petalTransforms:[]};
+        const transforms=()=>local.locator('#message .letter-petal').evaluateAll(nodes=>
+          nodes.map(node=>getComputedStyle(node).transform));
+        for(const moment of ['start','after-900ms']) {
+          const first=path.join(OUT,phone.name+'-reference-motion-'+moment+'.png');
+          const second=path.join(OUT,phone.name+'-local-motion-'+moment+'.png');
+          motion.petalTransforms.push(await transforms());
+          await Promise.all([
+            ref.screenshot({path:first,animations:'allow'}),
+            local.screenshot({path:second,animations:'allow'})
+          ]);
+          motion.frames.push(first,second);
+          if(moment==='start')
+            await Promise.all([ref.waitForTimeout(900),local.waitForTimeout(900)]);
+        }
+        motion.changed=motion.petalTransforms[0].some((t,i)=>t!==motion.petalTransforms[1][i]);
+        motion.active=(await local.locator('#message').getAttribute('data-petals-active'))==='true';
+        current.motion=motion;
+        if(!motion.active || !motion.changed)
+          current.issues.push('Live petal animation inactive or static at 390px/3H');
+        console.log('AUDIT_PETAL_MOTION',JSON.stringify({
+          active:motion.active,changed:motion.changed,samples:motion.petalTransforms.length
+        }));
+      }
       console.log('AUDIT_CHECKPOINT',JSON.stringify({
         width:phone.width,fraction,target,refY:reference.scrollY,
         localY:implementation.scrollY,localFrame:implementation.frame,
