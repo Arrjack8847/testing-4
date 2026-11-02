@@ -1,0 +1,65 @@
+name: Tasik reference continuation focused QA
+on:
+  push:
+    branches:
+      - feat/tasik-reference-remaining-20261103
+    paths:
+      - index.html
+      - reference-continuation.css
+      - reference-continuation.js
+      - invite-navigation.css
+      - invite-navigation.js
+      - section-four.css
+      - section-four.js
+      - section-five.css
+      - section-five.js
+      - section-six.css
+      - section-six.js
+      - tests/reference-continuation.spec.mjs
+      - tests/section-four.spec.mjs
+      - tests/section-five.spec.mjs
+      - tests/section-six.spec.mjs
+      - .github/workflows/reference-continuation-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  continuation-mobile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Load reference layers into ephemeral test checkout only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen,Request
+          import re
+          names = re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              url='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name
+              data=urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(data)
+          PY
+      - name: JavaScript syntax
+        run: npm run test:syntax
+      - name: Run four-phone continuation, countdown, gallery and RSVP tests
+        run: npx playwright test tests/reference-continuation.spec.mjs tests/section-four.spec.mjs tests/section-five.spec.mjs tests/section-six.spec.mjs --workers=2
+      - name: Save screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: continuation-mobile-qa
+          path: |
+            test-results/**/*.png
+            test-results/**/*.zip
+          if-no-files-found: warn
+          retention-days: 7

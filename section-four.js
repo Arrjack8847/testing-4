@@ -60,6 +60,22 @@
     else status.textContent = 'The ' + sample + ' date has passed';
   }
   updateDays();
+  // Source preview's event time is a SAMPLE 10:00 AM Kuala Lumpur ceremony.
+  // It is not a validated customer appointment or permission to export.
+  const sampleMoment = Date.parse(DATE_CONFIG.date + 'T10:00:00+08:00');
+  const momentUnits = {
+    hours:document.getElementById('countdownHours'),
+    minutes:document.getElementById('countdownMinutes'),
+    seconds:document.getElementById('countdownSeconds')
+  };
+  function updateMoment(){
+    if (!Number.isFinite(sampleMoment)) return;
+    const seconds=Math.max(0,Math.floor((sampleMoment-Date.now())/1000));
+    if(momentUnits.hours)momentUnits.hours.textContent=String(Math.floor(seconds/3600)%24).padStart(2,'0');
+    if(momentUnits.minutes)momentUnits.minutes.textContent=String(Math.floor(seconds/60)%60).padStart(2,'0');
+    if(momentUnits.seconds)momentUnits.seconds.textContent=String(seconds%60).padStart(2,'0');
+  }
+  updateMoment();
 
   // No spurious calendar download: click works only if date is explicitly confirmed.
   button.addEventListener('click',() => {
@@ -105,12 +121,17 @@
   stateObserver.observe(invitation,{attributes:true,attributeFilter:['data-state']});
 
   let timer = null;
+  let secondTimer = null;
   function stopClock(){
     if (timer!==null){clearInterval(timer);timer=null;}
+    if (secondTimer!==null){clearInterval(secondTimer);secondTimer=null;}
   }
   function startClock(){
     updateDays();
-    if (timer===null && !document.hidden) timer=setInterval(updateDays,60000);
+    updateMoment();
+    if(document.hidden)return;
+    if (timer===null) timer=setInterval(updateDays,60000);
+    if (secondTimer===null) secondTimer=setInterval(updateMoment,1000);
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (!reduced.matches && 'IntersectionObserver' in window) {

@@ -34,10 +34,10 @@ test('Section 5 shows five honest empty photograph placeholders',async({page})=>
   expect(errors).toEqual([]);
 });
 
-test('Section 5 fits mobile viewports and preserves Section 4 transition',async({page},testInfo)=>{
+test('Gallery fits mobile viewports and preserves Dress Code transition',async({page},testInfo)=>{
   const {gallery}=await reachGallery(page);
   const bounds=await gallery.evaluate(el=>{
-    const previous=document.getElementById('saveTheDate');
+    const previous=document.getElementById('dressCode');
     const boxes=[...el.querySelectorAll('.gallery-photo')].map(node=>node.getBoundingClientRect());
     const boundary =el.getBoundingClientRect().top - previous.getBoundingClientRect().bottom;
     return {adjacent:previous.nextElementSibling===el,boundary,overflow:document.documentElement.scrollWidth-innerWidth,

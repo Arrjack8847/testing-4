@@ -16,6 +16,8 @@
   <link rel="stylesheet" href="section-four.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
+  <link rel="stylesheet" href="reference-continuation.css">
+  <link rel="stylesheet" href="invite-navigation.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-couple.js" defer></script>
@@ -24,6 +26,8 @@
   <script src="section-four.js" defer></script>
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
+  <script src="reference-continuation.js" defer></script>
+  <script src="invite-navigation.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -213,6 +217,14 @@
             <span class="save-date-orbit-ornament" aria-hidden="true">❦</span>
           </div>
         </div>
+        <div class="save-date-clock save-date-reveal" id="sampleMomentClock" role="timer" aria-label="Hours, minutes and seconds to the reference example ceremony at 10 am Malaysia time">
+          <span><b id="countdownHours">00</b><small>Hours</small></span>
+          <i aria-hidden="true">:</i>
+          <span><b id="countdownMinutes">00</b><small>Minutes</small></span>
+          <i aria-hidden="true">:</i>
+          <span><b id="countdownSeconds">00</b><small>Seconds</small></span>
+        </div>
+        <p class="save-date-clock-note">Reference sample countdown · 10:00 AM Malaysia time</p>
         <p class="save-date-status save-date-reveal" id="countdownStatus" role="status" aria-live="polite">Calculating days until the sample wedding date…</p>
         <div class="save-date-card save-date-reveal">
           <span class="save-date-small-label">Sample wedding date</span>
@@ -223,6 +235,43 @@
         </div>
         <p class="save-date-closing save-date-reveal">We can't wait to share this day with you.</p>
         <div class="save-date-ending save-date-reveal" aria-hidden="true">✧</div>
+      </div>
+    </section>
+    <!-- Reference-continuation prototype: independent artwork and SAMPLE information. -->
+    <section class="reference-continuation ref-program" id="runningOrder" aria-labelledby="runningOrderHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-a"></i></div>
+      <div class="ref-content">
+        <p class="ref-kicker ref-reveal">Running order</p>
+        <h2 class="ref-script ref-reveal" id="runningOrderHeading">Order of the Day</h2>
+        <p class="ref-intro ref-reveal">A little guide to our celebration.</p>
+        <ol class="ref-timeline">
+          <li class="ref-reveal"><time>11:00 am</time><div><strong>Guests arrive</strong><span>Welcome and refreshments</span></div></li>
+          <li class="ref-reveal"><time>12:00 pm</time><div><strong>The couple arrive</strong><span>Join us in welcoming them</span></div></li>
+          <li class="ref-reveal"><time>12:30 pm</time><div><strong>Wedding procession</strong><span>A joyful entrance</span></div></li>
+          <li class="ref-reveal"><time>1:00 pm</time><div><strong>Portraits and celebration</strong><span>Photographs with loved ones</span></div></li>
+          <li class="ref-reveal"><time>2:00 pm</time><div><strong>Lunch</strong><span>A meal shared together</span></div></li>
+          <li class="ref-reveal"><time>4:00 pm</time><div><strong>Farewell</strong><span>With thanks and warm wishes</span></div></li>
+        </ol>
+        <p class="ref-disclosure">Illustrative programme only — times require confirmation.</p>
+      </div>
+    </section>
+    <section class="reference-continuation ref-dress" id="dressCode" aria-labelledby="dressCodeHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-b"></i></div>
+      <div class="ref-content">
+        <p class="ref-kicker ref-reveal">Attire</p>
+        <h2 class="ref-script ref-reveal" id="dressCodeHeading">Dress Code</h2>
+        <p class="ref-intro ref-reveal">An invitation to celebrate in soft, garden-inspired shades.</p>
+        <div class="ref-palettes">
+          <article class="ref-palette ref-reveal"><p class="ref-palette-title">Groom's Side</p><h3>Sage &amp; Cream</h3>
+            <div class="ref-swatches" aria-label="Sage green, soft sage and cream"><i style="--swatch:#77937c"></i><i style="--swatch:#acbea7"></i><i style="--swatch:#f4ead9"></i></div>
+            <p>Sage green · muted sage · warm cream</p>
+          </article>
+          <article class="ref-palette ref-reveal"><p class="ref-palette-title">Bride's Side</p><h3>Terracotta &amp; Blush</h3>
+            <div class="ref-swatches" aria-label="Terracotta, blush and sand"><i style="--swatch:#bb8068"></i><i style="--swatch:#e6bcb7"></i><i style="--swatch:#e1c8a5"></i></div>
+            <p>Terracotta · blush · sand</p>
+          </article>
+        </div>
+        <p class="ref-disclosure">Sample palette for reference comparison, not a confirmed dress requirement.</p>
       </div>
     </section>
     <!-- Section 6: original gallery. No photos are invented or embedded. -->
@@ -265,6 +314,28 @@
         <p class="gallery-disclaimer gallery-reveal">Gallery preview — the couple's photographs have not been provided yet.</p>
         <p class="gallery-ending gallery-reveal">And so our story continues…</p>
         <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
+      </div>
+    </section>
+    <section class="reference-continuation ref-gifts" id="weddingGift" aria-labelledby="giftHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-a"></i></div>
+      <div class="ref-content">
+        <p class="ref-kicker ref-reveal">With gratitude</p>
+        <h2 class="ref-script ref-reveal" id="giftHeading">Wedding Gift</h2>
+        <p class="ref-intro ref-reveal">Your company is a gift in itself. For those who wish, a gift area can be arranged here.</p>
+        <div class="ref-gift-card ref-reveal">
+          <span aria-hidden="true" class="ref-gift-icon">❖</span>
+          <h3>Gift details</h3>
+          <p>No bank account or gift destination has been confirmed for this example invitation.</p>
+          <button type="button" disabled aria-describedby="giftUnavailable">Copy account number</button>
+          <small id="giftUnavailable">Unavailable until the couple provides verified details.</small>
+        </div>
+        <div class="ref-gift-card ref-reveal">
+          <span aria-hidden="true" class="ref-gift-icon">✧</span>
+          <h3>Gift Wishlist</h3>
+          <p>Gift reservations and store links need actual approved items and a reservation service.</p>
+          <button type="button" disabled>Reserve a gift</button>
+          <small>Preview only — no reservation is collected.</small>
+        </div>
       </div>
     </section>
     <!-- Section 7: original RSVP form preview. Nothing is submitted until a backend is configured. -->
@@ -346,11 +417,37 @@
             </div>
           </div>
         </div>
+        <div class="ref-wishes" id="wishesWall" aria-labelledby="wishesHeading">
+          <p class="ref-kicker">Messages for the couple</p>
+          <h3 class="ref-script" id="wishesHeading">Wishes &amp; Prayers</h3>
+          <p class="ref-disclosure">Sample wishes are not real guest submissions. The RSVP form above only previews your entry locally.</p>
+          <div class="ref-wish"><span aria-hidden="true">❦</span><p>May your new chapter be full of kindness, laughter and beautiful memories.</p><small>Illustrative message</small></div>
+          <div class="ref-wish"><span aria-hidden="true">❦</span><p>Wishing you a lifetime of shared joy and peace.</p><small>Illustrative message</small></div>
+        </div>
         <p class="rsvp-outro rsvp-reveal">With love, we hope to see you there.</p>
         <div class="rsvp-outro-symbol" aria-hidden="true">❦</div>
       </div>
     </section>
+    <section class="reference-continuation ref-closing" id="closingMessage" aria-labelledby="closingHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-b"></i></div>
+      <div class="ref-content">
+        <p class="ref-kicker ref-reveal">Until we meet</p>
+        <h2 class="ref-script ref-reveal" id="closingHeading">With Love &amp; Gratitude</h2>
+        <p class="ref-closing-message ref-reveal">Thank you for every prayer and thoughtful wish. We hope to share this joyful occasion with those we love.</p>
+        <p class="ref-closing-names ref-reveal">Rayyan <span>&amp;</span> Sofea</p>
+        <p class="ref-disclosure ref-reveal">Reference-recreation research prototype · Example wedding details</p>
+        <div class="ref-finish ref-reveal" aria-hidden="true">❦</div>
+      </div>
+    </section>
   </main>
+  <nav class="invite-navigation" id="inviteNavigation" aria-label="Invitation sections" aria-hidden="true" inert hidden>
+    <button type="button" data-invite-target="viewport" aria-label="Go to opening scene"><span aria-hidden="true">⌂</span><small>Home</small></button>
+    <button type="button" data-invite-target="couple" aria-label="Go to the couple"><span aria-hidden="true">♡</span><small>Couple</small></button>
+    <button type="button" data-invite-target="eventDetails" aria-label="Go to wedding events"><span aria-hidden="true">✧</span><small>Events</small></button>
+    <button type="button" data-invite-target="runningOrder" aria-label="Go to order of the day"><span aria-hidden="true">☷</span><small>Order</small></button>
+    <button type="button" data-invite-target="gallery" aria-label="Go to photo gallery"><span aria-hidden="true">▣</span><small>Gallery</small></button>
+    <button type="button" data-invite-target="rsvp" aria-label="Go to RSVP"><span aria-hidden="true">✉</span><small>RSVP</small></button>
+  </nav>
   <dialog class="gallery-dialog" id="galleryDialog" aria-label="Wedding photo viewer">
     <div class="gallery-viewer">
       <button type="button" id="galleryClose" class="gallery-viewer-close" aria-label="Close photo viewer">×</button>

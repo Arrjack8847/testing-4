@@ -113,3 +113,15 @@
   .save-date-section[data-reveal-ready="true"] .save-date-reveal{
     opacity:1!important;transform:none!important;transition:none!important;}
 }
+
+/* Additional three-unit countdown for reference example time; date-only
+   calendar semantics and disabled unconfirmed export remain unchanged. */
+.save-date-section .save-date-clock {display:flex;align-items:center;justify-content:center;gap:8px;
+  margin:16px auto 6px;color:#876a82}
+.save-date-section .save-date-clock span {display:flex;flex-direction:column;align-items:center;gap:4px;
+  min-width:55px;padding:9px 5px 6px;background:#fffcf7c9;border:1px solid #c8b2a6;border-radius:9px}
+.save-date-section .save-date-clock b {font:400 29px/1 'EB Garamond',Georgia,serif;font-variant-numeric:tabular-nums}
+.save-date-section .save-date-clock small {font:500 8px/1.4 'Cinzel',Georgia,serif;letter-spacing:.04em}
+.save-date-section .save-date-clock i {font:24px Georgia,serif;color:#baa17c;font-style:normal}
+.save-date-section .save-date-clock-note {font:400 11px/1.5 system-ui,sans-serif;
+  margin:9px auto 17px;color:#887481}
