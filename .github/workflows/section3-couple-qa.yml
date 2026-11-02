@@ -1,0 +1,59 @@
+name: Section 3 The Couple mobile QA
+on:
+  push:
+    paths:
+      - index.html
+      - section-couple.css
+      - section-couple.js
+      - assets/couple-garden-original.svg
+      - assets/couple-groom-art-original.svg
+      - assets/couple-bride-art-original.svg
+      - tests/section-couple.spec.mjs
+      - tests/section-three.spec.mjs
+      - tests/section1-2-handoff.spec.mjs
+      - .github/workflows/section3-couple-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  couple-four-phone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Load existing scene art only inside test runner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              url='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name
+              data=urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(data)
+          print('Temporary existing-scene reference art loaded into the CI runner.')
+          PY
+      - name: Test couple scene, boundaries and existing event features
+        run: npx playwright test tests/section-couple.spec.mjs tests/section-three.spec.mjs tests/section1-2-handoff.spec.mjs --workers=2
+      - name: Upload four-phone couple screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section3-couple-320-360-390-430
+          path: |
+            test-results/**/*section3-couple*.png
+            test-results/**/*section-three*.png
+            test-results/**/*section2-to-3*.png
+          retention-days: 7
+          if-no-files-found: warn
