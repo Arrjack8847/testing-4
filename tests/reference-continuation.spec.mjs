@@ -143,3 +143,20 @@ test('bottom navigation opens only after cover and routes touch and keyboard to 
   await nav.getByRole('button',{name:'Go to RSVP'}).click();
   await expect(page.locator('#rsvp')).toBeInViewport();
 });
+
+
+test('example countdown has independently updating hours, minutes and seconds',async({page})=>{
+  await open(page);
+  await goTo(page,'saveTheDate');
+  const timer=page.locator('#sampleMomentClock');
+  await expect(timer).toBeVisible();
+  for(const id of ['countdownHours','countdownMinutes','countdownSeconds']){
+    await expect(page.locator('#'+id)).toHaveText(/^\d{2}$/);
+  }
+  await expect(page.locator('#saveDateButton')).toBeDisabled();
+  await expect(page.locator('.save-date-clock-note')).toContainText('Reference sample');
+  const before=await page.locator('#countdownSeconds').textContent();
+  await page.waitForTimeout(1350);
+  const after=await page.locator('#countdownSeconds').textContent();
+  expect(before).not.toBe(after);
+});
