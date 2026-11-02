@@ -11,6 +11,10 @@ async function reachMessage(page) {
     document.getElementById('message').scrollIntoView({block:'start',behavior:'instant'});
   });
   await expect(section).toBeInViewport();
+  // Geometry must be measured after the 750ms entrance transform finishes.
+  // Otherwise the scaled frame yields false width/top mismatches.
+  await expect(section).toHaveClass(/is-visible/);
+  await expect.poll(()=>section.locator('.letter-frame').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
   return section;
 }
 
