@@ -55,7 +55,12 @@
         section.style.setProperty('--ref-camera-y','0px');
         section.removeAttribute('data-reveal-ready');
       });
-    } else schedule();
+    } else {
+      if ('IntersectionObserver' in window) sections.forEach(section=>{
+        section.dataset.revealReady='true';
+      });
+      schedule();
+    }
   }
   window.addEventListener('scroll',schedule,{passive:true});
   window.addEventListener('resize',schedule,{passive:true});
