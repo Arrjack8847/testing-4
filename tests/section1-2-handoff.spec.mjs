@@ -32,7 +32,7 @@ async function at(page,ratio) {
     const track=document.querySelector('#sceneTrack');
     const viewport=document.querySelector('#viewport');
     const band=document.querySelector('#message');
-    const next=document.querySelector('#eventDetails');
+    const next=document.querySelector('#couple');
     const invitation=document.querySelector('#invitation');
     const stage=document.querySelector('#stage');
     const style=getComputedStyle(band);
@@ -85,7 +85,7 @@ test('Section 2→3 flow has no geometry gap or overlapping horizontal edges',as
   const errors=await ready(page);
   const dims=await page.evaluate(()=>{
     const message=document.querySelector('#message').getBoundingClientRect();
-    const next=document.querySelector('#eventDetails').getBoundingClientRect();
+    const next=document.querySelector('#couple').getBoundingClientRect();
     // The frame is still in its entrance transform at scroll=0. Use its
     // layout box, not the temporary scale(.985) visual bounding box.
     const frame=document.querySelector('#message .letter-frame');
@@ -106,8 +106,7 @@ test('Section 2→3 flow has no geometry gap or overlapping horizontal edges',as
   expect(dims.overflow).toBeLessThanOrEqual(1);
   await page.evaluate(y=>window.scrollTo({top:y,behavior:'instant'}),
     Math.round(dims.messageBottom-dims.vh*.6));
-  await page.screenshot({path:testInfo.outputPath('section2-to-3-prototype-edge.png'),animations:'disabled'});
-  // The scene immediately after this seam is still an independent events prototype,
-  // NOT the reference's "The Couple" section.
+  await page.screenshot({path:testInfo.outputPath('section2-to-3-couple-edge.png'),animations:'disabled'});
+  // The scene immediately after this seam is the original Couple portrait scene.
   expect(errors).toEqual([]);
 });
