@@ -39,10 +39,9 @@
   transform:translateX(-50%) rotate(45deg);
 }
 .couple-section .couple-hanging{
-  position:absolute;top:-9px;left:0;width:100%;height:245px;z-index:3;pointer-events:none;
-  background:url("./assets/couple-garden-original.svg") center top/100% 1840px no-repeat;
-  mask-image:linear-gradient(#000 0 55%,transparent 100%);
-  -webkit-mask-image:linear-gradient(#000 0 55%,transparent 100%);
+  position:absolute;top:-11px;left:0;width:100%;height:295px;z-index:3;pointer-events:none;
+  background:url("./assets/couple-canopy-original.svg") center top/100% 295px no-repeat;
+  filter:drop-shadow(0 2px 2px rgba(58,52,76,.09));
   transform-origin:center top;animation:couple-flower-breathe 9s ease-in-out infinite alternate;
 }
 .couple-section .couple-inner{
