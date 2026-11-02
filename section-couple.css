@@ -202,3 +202,22 @@
 @media(prefers-reduced-motion:reduce){
   .couple-section[data-art="reference"] .couple-reference-scene{will-change:auto;}
 }
+
+
+/* Reference timing is opt-in and scoped only to Section 3.
+   Original-art animations and the other six sections remain untouched. */
+.couple-section[data-art="reference"][data-reveal-ready="true"] .couple-reveal{
+  opacity:0;
+  transform:translate3d(0,52px,0) scale(.955);
+  transition:opacity .85s ease, transform .95s cubic-bezier(.2,.68,.18,1);
+}
+.couple-section[data-art="reference"][data-reveal-ready="true"] .couple-reveal.in-view{
+  opacity:1;
+  transform:none;
+}
+@media(prefers-reduced-motion:reduce){
+  .couple-section[data-art="reference"] .couple-reference-scene{
+    transform:translate3d(0,var(--couple-reference-y,0px),0);
+    transition:none;
+  }
+}
