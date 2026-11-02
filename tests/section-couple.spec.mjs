@@ -142,7 +142,7 @@ test('Section 3 original lakeside edge illustration is behind arch and keeps sec
     const s=el.getBoundingClientRect();
     const next=document.getElementById('eventDetails').getBoundingClientRect();
     return {sectionWidth:s.width,footerWidth:f.width,footerHeight:f.height,
-      footerBottom:f.bottom-section.getBoundingClientRect().bottom,
+      footerBottom:f.bottom-s.bottom,
       panelBeyondFooter:a.bottom-f.top,belowPanel:f.bottom-a.bottom,
       zFooter:+getComputedStyle(foot).zIndex,zArch:+getComputedStyle(arch).zIndex,
       bg:getComputedStyle(foot).backgroundImage,
