@@ -3,6 +3,7 @@ name: Section 2 four-width live-reference audit
 on:
   push:
     paths:
+      - index.html
       - tools/audit-section2-four-widths.mjs
       - section-two.css
       - tests/section-two.spec.mjs
