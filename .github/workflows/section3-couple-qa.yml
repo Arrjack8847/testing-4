@@ -8,6 +8,8 @@ on:
       - assets/couple-garden-original.svg
       - assets/couple-canopy-original.svg
       - assets/couple-lake-finish-original.svg
+      - assets/couple-botanical-edges-original.svg
+      - assets/couple-arch-relief-original.svg
       - assets/couple-groom-art-original.svg
       - assets/couple-bride-art-original.svg
       - tests/section-couple.spec.mjs
