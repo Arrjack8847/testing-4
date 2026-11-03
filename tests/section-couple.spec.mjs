@@ -32,7 +32,7 @@ test('reference-inspired couple scene follows mauve and keeps events afterward',
     following:el.nextElementSibling?.getAttribute('data-section')
   }));
   expect(adjacency).toEqual({prior:'message',next:'eventDetails',following:'4'});
-  await expect(page.locator('#eventDetails #eventVenue')).toContainText('Venue to be announced');
+  await expect(page.locator('#eventDetails #eventVenue')).toContainText('Masjid Wilayah Persekutuan');
   expect(errors).toEqual([]);
 });
 test('couple layout has measured first-portrait geometry at 390px and never overflows',async({page},testInfo)=>{
