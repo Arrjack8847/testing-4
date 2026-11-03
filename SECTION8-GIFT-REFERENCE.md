@@ -36,3 +36,47 @@ Local review on the feature branch:
 4. npm install && npx playwright install chromium && npx playwright test tests/section-eight-gift.spec.mjs
 
 When permitted local WebP is available, compare with reference at 390×844 from Gallery exit through Gift and RSVP entry. Keep any vendor artwork privately stored.
+
+## 4 November source screenshot and geometry audit
+
+Completed run: https://github.com/Arrjack8847/testing-4/actions/runs/41696384616
+Its GitHub Actions artifact contains 390px source/local screenshots and geometry JSON.
+
+| Width | Reference height | First local height | Difference |
+|---:|---:|---:|---:|
+| 320 | 1042.52px | 1130.95px | +88.44px |
+| 360 | 1012.83px | 1137.20px | +124.38px |
+| 390 | 990.33px | 1119.84px | +129.52px |
+| 430 | 922.73px | 1119.84px | +197.11px |
+
+Both sides had the measured plum #5c264f and 96px/28px padding and zero
+horizontal overflow. The source heading is 46px/52.9px Pinyon Script 400,
+normal tracking, #f3dff0. The old local heading was 52px/59.8px with
+the wrong color/tracking and 16px bottom margin.
+
+Screenshot evidence shows source embossed floral plum art, an inset fine
+double frame, pale text, drifting decorative petals, and a closed cream
+SEND GIFT pill in the default view. The first local implementation showed
+expanded bank cards and plain gradient artwork instead. The source uses
+band_plum.webp and bfly_blush.webp, which are not licensed for distribution
+by this repository.
+
+Subsequent source-driven changes: 46px title, framed plum band, collapsed
+and accessible Send Gift disclosure, original independent botanical SVG
+fallback, responsive minimum-height calibration and reverse-scroll QA.
+The new safe source click audit records the real Send Gift interaction without
+initiating bank transfers, reservations, or checkout. Its result is pending.
+
+The earliest focused QA run logged 84 passes and 8 failures: two test
+assertions each failed on all four viewports (a strict-mode check on two
+bank-copy buttons and a reveal-state regex matching the substring "in"
+inside "heading"). Both checks were repaired after this run. Do not
+claim the latest commit passes until its own QA completes.
+
+A separate cross-engine Save the Date test fails because that legacy
+section is intentionally hidden. It is outside Section 8 ownership.
+No neighbor's content was edited to bypass it.
+
+Remaining: review latest 390px screenshot overlays, bank popup behavior,
+item geometry/typography, authorized photo/assets, petal/butterfly motion
+and source-to-local exit after Gallery and before RSVP.
