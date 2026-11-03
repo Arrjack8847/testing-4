@@ -275,3 +275,12 @@
 .gallery-section .gallery-photo[data-gallery-slot="2"] .gallery-photo-note {
   font-size:12px;
 }
+
+/* In the original frames, each WebP begins 4px inside its outer border
+   (e.g. the 390px Together frame is x28/w161, photo x32/w153). */
+.gallery-section .gallery-image {
+  inset:4px;
+  width:calc(100% - 8px);
+  height:calc(100% - 8px);
+  object-fit:cover;
+}
