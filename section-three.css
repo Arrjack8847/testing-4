@@ -576,3 +576,51 @@
   letter-spacing:.18em;
   color:#fff;
 }
+
+
+/* Independently drifting petal silhouettes use CSS only; their visual
+   density and pastel hues match observed source behavior approximately.
+   Reference vendor WebPs remain hotlinked only in comparison mode. */
+.event-section .event-petal-field {display:none;pointer-events:none;}
+.event-section[data-art="reference"] .event-petal-field {
+  display:block;position:absolute;inset:0;z-index:3;overflow:hidden;
+}
+.event-section .event-petal-field i {
+  position:absolute;
+  left:var(--px,8%);
+  top:var(--py,10%);
+  width:var(--pw,8px);
+  height:var(--ph,13px);
+  border-radius:75% 18% 72% 18%;
+  transform:rotate(-32deg);
+  background:#b590bf;
+  opacity:.35;
+  animation:event-petal-drift var(--duration,9s) ease-in-out infinite alternate;
+  animation-delay:var(--delay,0s);
+}
+.event-section .event-petal-field i:nth-child(3n+1){background:#a46ca1;}
+.event-section .event-petal-field i:nth-child(4n+2){background:#d1bee3;}
+.event-section .event-petal-field i:nth-child(5n+3){background:#fefcf9;}
+.event-section .event-petal-field i:nth-child(1){--px:6%;--py:13%;--duration:7s;--delay:-2s;}
+.event-section .event-petal-field i:nth-child(2){--px:14%;--py:20%;--pw:6px;--ph:9px;--delay:-6s;}
+.event-section .event-petal-field i:nth-child(3){--px:25%;--py:27%;--delay:-3s;}
+.event-section .event-petal-field i:nth-child(4){--px:56%;--py:16%;--delay:-9s;}
+.event-section .event-petal-field i:nth-child(5){--px:74%;--py:9%;--duration:8s;--delay:-7s;}
+.event-section .event-petal-field i:nth-child(6){--px:8%;--py:40%;--duration:11s;--delay:-2s;}
+.event-section .event-petal-field i:nth-child(7){--px:32%;--py:33%;--pw:6px;--ph:11px;--delay:-4s;}
+.event-section .event-petal-field i:nth-child(8){--px:67%;--py:37%;--delay:-8s;}
+.event-section .event-petal-field i:nth-child(9){--px:3%;--py:54%;--duration:8s;--delay:-2s;}
+.event-section .event-petal-field i:nth-child(10){--px:22%;--py:61%;--delay:-5s;}
+.event-section .event-petal-field i:nth-child(11){--px:58%;--py:50%;--duration:12s;--delay:-7s;}
+.event-section .event-petal-field i:nth-child(12){--px:80%;--py:66%;--delay:-4s;}
+.event-section .event-petal-field i:nth-child(13){--px:7%;--py:76%;--pw:7px;--ph:12px;--delay:-6s;}
+.event-section .event-petal-field i:nth-child(14){--px:40%;--py:70%;--delay:-3s;}
+.event-section .event-petal-field i:nth-child(15){--px:73%;--py:86%;--duration:10s;--delay:-8s;}
+.event-section .event-petal-field i:nth-child(16){--px:11%;--py:93%;--delay:-5s;}
+@keyframes event-petal-drift {
+  from {transform:translate3d(-6px,5px,0) rotate(-35deg);opacity:.17;}
+  to {transform:translate3d(17px,26px,0) rotate(140deg);opacity:.58;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .event-section .event-petal-field i{animation:none;}
+}
