@@ -60,8 +60,30 @@ try{
           artworkStatus:el.dataset.artworkStatus||null
         };
       });
-      const record={site:site.id,url:site.url,initial,images:[],samples:[],errors};
-      const urls=[...initial.background.matchAll(/url\(["']?([^"')]+)["']?\)/g)].map(match=>match[1]);
+      // Inventory every image-bearing CSS layer in the visible section
+      // (including split-wing sprite layers), not just the outer background.
+      // This reads CSS only and never saves vendor files.
+      const artwork=await page.locator(site.selector).evaluate(el=>{
+        const out=[];
+        for(const node of [el,...el.querySelectorAll('*')]){
+          for(const pseudo of ['', '::before','::after']){
+            const st=getComputedStyle(node,pseudo||null);
+            if(!st.backgroundImage.includes('url('))continue;
+            const r=node.getBoundingClientRect();
+            out.push({
+              tag:node.tagName,cls:typeof node.className==='string'?node.className:'',
+              pseudo,background:st.backgroundImage,backgroundSize:st.backgroundSize,
+              backgroundPosition:st.backgroundPosition,backgroundRepeat:st.backgroundRepeat,
+              opacity:st.opacity,zIndex:st.zIndex,position:st.position,
+              rect:{x:r.x,y:r.y,width:r.width,height:r.height}
+            });
+          }
+        }
+        return out.slice(0,70);
+      });
+      const record={site:site.id,url:site.url,initial,artwork,images:[],samples:[],errors};
+      const urls=[...new Set(artwork.flatMap(layer=>
+        [...layer.background.matchAll(/url\(["']?([^"')]+)["']?\)/g)].map(match=>match[1])))];
       for(const url of urls){
         const dimensions=await page.evaluate(async url=>{
           const image=new Image();
