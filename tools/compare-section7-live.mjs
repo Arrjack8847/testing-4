@@ -71,14 +71,17 @@ async function capture(type,url,viewport){
           opacity:cs.opacity,transform:cs.transform,
           display:cs.display,position:cs.position,padding:cs.padding,margin:cs.margin};
       };
-      const sampleImage=label=>{
+      const sampleImage=(label,index)=>{
+        const localFrame=document.querySelector('#gallery [data-gallery-slot="'+index+'"]');
         const img=[...document.querySelectorAll('img')].find(node=>node.alt===label);
-        if(!img)return {label,found:false};
+        if(!img)return {label,found:Boolean(localFrame),image:null,
+          frame:fmt(localFrame),src:null,natural:null};
         const chain=[];
         let el=img;
         for(let i=0;el&&i<4;i++,el=el.parentElement)chain.push(fmt(el));
+        const frame=img.parentElement;
         return {label,found:true,src:img.currentSrc||img.src,
-          natural:[img.naturalWidth,img.naturalHeight],ancestors:chain};
+          natural:[img.naturalWidth,img.naturalHeight],image:fmt(img),frame:fmt(frame),ancestors:chain};
       };
       const section=heading?.closest('section');
       const hint=[...document.querySelectorAll('p,span,div')].find(el=>{
@@ -101,7 +104,9 @@ async function capture(type,url,viewport){
       kind:type,width:viewport.width,found:record.metrics.photos.filter(p=>p.found).length,
       frames:record.metrics.photos.map(p=>({
         label:p.label,src:p.src,
-        image:p.ancestors?.[0]?.rect,frame:p.ancestors?.[1]?.rect
+        image:p.image?.rect,frame:p.frame?.rect,
+        styles:p.frame?{radius:p.frame.borderRadius,border:p.frame.border,
+          shadow:p.frame.boxShadow,padding:p.frame.padding}:null
       })),
       heading:record.metrics.heading?.rect,font:record.metrics.heading?.fontSize,
       overflow:record.metrics.horizontalOverflow
