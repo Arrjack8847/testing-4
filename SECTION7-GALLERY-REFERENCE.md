@@ -178,3 +178,28 @@ viewports, with isolated cross-engine accessibility checks.
 This improves animation similarity, but exact easing curves, crop positions
 and neighboring-section transitions still need final review. Third-party
 reference photos are not present in this Git branch.
+
+## Phase 6 — refined source easing
+
+The second motion audit [41680976298](https://github.com/Arrjack8847/testing-4/actions/runs/41680976298)
+confirmed independent reveal/reversal now behaves like the reference, but
+our photo opacity and movement were too slow/fast respectively.
+
+The follow-up source computed-style audit
+[41681301439](https://github.com/Arrjack8847/testing-4/actions/runs/41681301439)
+identified:
+- Heading easing: `ease, cubic-bezier(0.22, 0.9, 0.24, 1)`,
+  with durations `1s, 1.1s`.
+- Photo frames: transform uses `ease` over `1.1s`,
+  with per-frame delays `0, .15, .3, .45, .6s`.
+- Photo opacity appears immediately when the respective source frame is
+  activated; the frame transform then continues over time.
+
+Section 7 now models those distinct visual behaviors. This is a visual
+reconstruction of observed source animations, not source code copied from
+the vendor. The original Gallery photographs remain *local-WebP-only* in
+both customer and comparison modes; no URLs are loaded by this section.
+
+Remaining: validate exact photos/crops once authorized assets are available,
+and ensure adjacent Sections 6 and 8 have coordinated backgrounds and
+scroll continuity. Do not merge other workers' branches blindly.
