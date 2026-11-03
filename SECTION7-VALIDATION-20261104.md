@@ -159,3 +159,62 @@ reference WebPs *only on localhost*, otherwise uses licensed files or
 placeholders. The strict reference-only QA mode is
 `http://localhost:8000/?galleryReference=1`.
 Never run the reference download script without appropriate permission.
+
+## Captured four-viewport findings (Actions run 41696827091)
+
+The read-only source/local audit **successfully captured** 320, 360, 390
+and 430px screenshots, including the full motion timeline, even though
+the subsequent PNG-comparison step failed due an off-screen image-mask
+bounds bug (fixed in the next commit). Its QA report says:
+
+| Width | Source-vs-local frame geometry within 1px | Source photos loaded | Local original photos loaded |
+|---|---|---|---|
+| 320 | 5/5 | yes | no |
+| 360 | 5/5 | yes | no |
+| 390 | 5/5 | yes | no |
+| 430 | 5/5 | yes | no |
+
+At 390px, the source Gallery frame x/width/height matches the previously
+recorded layout; all 5 local frames were within a 1px geometry tolerance.
+The **reference photographs were present**, but none were present in
+the GitHub Actions local checkout.
+
+**Actual source image inventory, verified through the browser:**
+
+- `scene.webp` — 1080 × 1920, decorative scene image within
+  the Gallery DOM.
+- `moody.webp` (Together) — 820 × 1098.
+- `moody-bride.webp` — 820 × 1098.
+- `moody-groom.webp` — 820 × 1098.
+- `moody-garden.webp` — 1000 × 747.
+- `moody-lake.webp` — 1000 × 747.
+
+All six are WebP images. The Gallery DOM contains **0 SVG** and
+**0 canvas** elements. The reference's paper color is solid `#faf7fb`,
+but screenshots show its ornate `scene.webp` architecture, floral
+side edges and a persistent navigation/order overlay. **Our CI preview
+cannot show those because neither the original Gallery photos nor the
+25 Section 1 layer WebPs are supplied in Git.** These are substantial
+artwork and cross-section-shell differences, not mistakes in the five
+CSS frame rectangles.
+
+At 320px, reference Gallery height measured 940.58px versus 1214.84px
+locally; the extra local height includes development-only photo
+placeholders and disclaimer content. At 390px the reference height was
+1094.58px versus 1419.7px locally. Do not compare final heights until
+the five WebPs are actually installed and the development disclaimers
+are hidden.
+
+**Neighboring evidence:** source Dress Code and Gallery share `#faf7fb`.
+Source transitions immediately to a plum `Wedding Gift` section.
+Local code has a different Dress Code gradient and an RSVP section next.
+Both source and local DOM boundary gaps are 0px; *continuity of artwork*
+still fails. This must be resolved by the integration owner, not a
+silent change to another worker's file.
+
+The test environment does **not** establish that the user's Windows
+machine is missing locally permitted WebPs; it only establishes those
+files are absent in the GitHub Actions checkout. Visual similarity
+must be reassessed on a complete authorized local installation.
+
+Evidence: [captured screenshot run](https://github.com/Arrjack8847/testing-4/actions/runs/41696827091).
