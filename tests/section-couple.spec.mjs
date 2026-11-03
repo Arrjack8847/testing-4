@@ -32,13 +32,17 @@ test('default reference couple scene follows mauve and keeps events afterward',a
     following:el.nextElementSibling?.getAttribute('data-section')
   }));
   expect(adjacency).toEqual({prior:'message',next:'eventDetails',following:'4'});
-  await expect(page.locator('#eventDetails #eventVenue')).toContainText('Venue to be announced');
+  await expect(page.locator('#eventDetails #eventVenue')).toContainText('Masjid Wilayah Persekutuan');
   expect(errors).toEqual([]);
 });
 test('couple layout has measured first-portrait geometry at 390px and never overflows',async({page},testInfo)=>{
   const {section,errors}=await openCouple(page);
   await section.locator('.couple-portrait').first().scrollIntoViewIfNeeded();
   await expect(section.locator('.couple-portrait').first()).toHaveClass(/in-view/);
+  // Let the individual text reveal settle before measuring geometry.
+  await expect.poll(() => section.locator('.couple-intro').evaluate(
+    element => getComputedStyle(element).transform
+  ), {timeout:5000}).toBe('none');
   const sizes=await section.evaluate(el=>{
     const band=el.getBoundingClientRect(),intro=el.querySelector('.couple-intro').getBoundingClientRect();
     const arch=el.querySelector('.couple-arch').getBoundingClientRect();
