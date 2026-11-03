@@ -184,8 +184,9 @@ enabled (using tools/section4-motion-audit.mjs):
 
 Paired screenshot comparison (source vs current branch, Chromium 390×844,
 three scroll positions) found details that DOM geometry alone missed:
-- The Events background image must preserve its full painting edges;
-  in comparison mode its image object-fit is set for this experiment.
+- The source Events paper uses object-fit:cover and object-position 50% 50%;
+  those values were confirmed by computed-style audit after the
+  initial screenshot-based experiment.
   The source rendered image is 390×1960; the paper itself is a
   provider-owned 1080×1920 WebP.
 - Both venue names are 600-weight EB Garamond. Time and map directions
