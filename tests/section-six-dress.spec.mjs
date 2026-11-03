@@ -225,3 +225,79 @@ test('Section 6 uses the source-measured stagger and scroll camera',async({page}
   }
   expect(errors).toEqual([]);
 });
+
+
+test('Section 6 uses only original Section 6 paper and paired local wings by default',async({page})=>{
+  const {dress,errors}=await openDress(page);
+  const art=await dress.evaluate(el=>{
+    const paper=el.querySelector('.dress-art-original');
+    const src=el.querySelector('#dressSourceScene');
+    const flight=el.querySelector('#dressFlight');
+    return {
+      paperBackground:getComputedStyle(paper).backgroundImage,
+      sourceUrl:src?.getAttribute('src')||'',
+      wingCount:flight?.querySelectorAll('.dress-flight-wing').length||0,
+      flightHidden:getComputedStyle(flight).opacity,
+      loaded:el.dataset.flightReady,
+      bodyCount:flight?.querySelectorAll('.dress-flight-thorax').length||0
+    };
+  });
+  expect(art.paperBackground).toContain('dress-paper-original.svg');
+  expect(art.sourceUrl).toBe('');
+  expect(art.wingCount).toBe(2);
+  expect(art.bodyCount).toBe(1);
+  expect(art.loaded).toBe('true');
+  expect(Number(art.flightHidden)).toBeGreaterThan(.8);
+  const fileResponse=await page.request.get('/assets/dress-paper-original.svg');
+  expect(fileResponse.status()).toBe(200);
+  expect((await fileResponse.text()).includes('<svg')).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('Section 6 original butterfly follows measured upper-right flight path',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const {dress,errors}=await openDress(page);
+  const samples=[{sectionY:0,wingX:352.21,wingY:57.83},
+    {sectionY:240,wingX:381.89,wingY:46.51},
+    {sectionY:-200,wingX:327.98,wingY:65.85}];
+  for(const point of samples){
+    await page.evaluate(sectionY=>{
+      const sec=document.getElementById('dressCode');
+      document.documentElement.style.scrollBehavior='auto';
+      const target=Math.max(0,scrollY+sec.getBoundingClientRect().top-sectionY);
+      scrollTo({top:target,behavior:'instant'});
+    },point.sectionY);
+    await page.waitForTimeout(160);
+    const actual=await dress.evaluate(sec=>{
+      const r=sec.getBoundingClientRect();
+      const wing=sec.querySelector('#dressFlight').getBoundingClientRect();
+      return {sectionY:r.top,wingX:wing.left,wingY:wing.top-r.top,
+        width:r.width,wingWidth:wing.width,wingHeight:wing.height,
+        leftWing:getComputedStyle(sec.querySelector('.dress-flight-wing-left')).animationName,
+        rightWing:getComputedStyle(sec.querySelector('.dress-flight-wing-right')).animationName};
+    });
+    // Reference readings were at 390px. Preserve their relative X on all mobile widths.
+    expect(Math.abs(actual.wingX-point.wingX*actual.width/390)).toBeLessThanOrEqual(2);
+    expect(Math.abs(actual.wingY-point.wingY)).toBeLessThanOrEqual(2);
+    expect(actual.wingWidth).toBe(52);
+    expect(actual.wingHeight).toBe(41);
+    expect(actual.leftWing).toBe('dress-wing-flight-left');
+    expect(actual.rightWing).toBe('dress-wing-flight-right');
+  }
+  expect(errors).toEqual([]);
+});
+
+test('Section 6 butterfly respects reduced-motion preferences',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {dress}=await openDress(page);
+  const result=await dress.evaluate(el=>{
+    const wing=el.querySelector('.dress-flight-wing-left'),flight=el.querySelector('#dressFlight');
+    return {animation:getComputedStyle(wing).animationName,
+      x:flight.getBoundingClientRect().left,
+      opacity:getComputedStyle(flight).opacity,
+      width:el.getBoundingClientRect().width};
+  });
+  expect(result.animation).toBe('none');
+  expect(Math.abs(result.x-(result.width-64))).toBeLessThanOrEqual(2);
+  expect(Number(result.opacity)).toBeGreaterThan(.8);
+});
