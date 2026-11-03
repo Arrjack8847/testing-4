@@ -3,6 +3,9 @@ on:
   push:
     branches: [feat/section5-order-of-day-reference-20261103]
     paths:
+      - order-program.css
+      - order-program.js
+      - index.html
       - tools/compare-section5-live.mjs
       - .github/workflows/section5-order-live-compare.yml
   workflow_dispatch:
