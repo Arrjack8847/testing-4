@@ -1,0 +1,57 @@
+name: Sections 3–5 seam visual audit
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/section4-events-reference-prototype-20261103
+    paths:
+      - tools/section345-seam-audit.mjs
+      - .github/workflows/section345-seam-audit.yml
+      - section-couple.css
+      - section-three.css
+      - section-four.css
+permissions:
+  contents: read
+jobs:
+  visual-seams:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Load reference scene assets ephemerally for complete edge rendering
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              data=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(data)
+          PY
+      - name: Start development preview on localhost
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/seam-server.log 2>&1 &
+          for i in 1 2 3 4 5 6 7 8; do
+            curl -fsS http://127.0.0.1:8000/ >/dev/null && exit 0
+            sleep 1
+          done
+          exit 1
+      - name: Measure and capture 320, 360, 390, 430px seams
+        run: node tools/section345-seam-audit.mjs
+      - name: Upload section-boundary screenshots and RGB metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section345-four-phone-seam-audit
+          path: section345-seam-audit/
+          if-no-files-found: warn
+          retention-days: 7
