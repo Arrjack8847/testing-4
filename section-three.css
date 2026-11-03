@@ -508,3 +508,71 @@
 .event-section[data-art="reference"] .event-countdown-grid {
   display:none;
 }
+
+
+/* Screenshot-guided fixes: source paper is fitted to the 390x1960 image
+   rectangle without center-cropping, preserving both edge botanicals.
+   The visible source ALSO includes four plum countdown blocks (dynamic
+   content was absent from the text-only audit; verified by screenshots). */
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  object-fit:fill;
+  object-position:center;
+}
+.event-section[data-art="reference"] .event-card-time {
+  letter-spacing:.20em;
+}
+.event-section[data-art="reference"] .event-card-place {
+  font-weight:600;
+}
+.event-section[data-art="reference"] .event-map-link,
+.event-section[data-art="reference"] .event-calendar-link {
+  text-transform:uppercase;
+  letter-spacing:.20em;
+}
+.event-section[data-art="reference"] .event-card-diamond {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:15px;
+  width:180px;
+  max-width:100%;
+}
+.event-section[data-art="reference"] .event-card-diamond::before,
+.event-section[data-art="reference"] .event-card-diamond::after {
+  content:"";
+  display:block;
+  flex:1;
+  height:1px;
+  background:#8c7183;
+  opacity:.6;
+}
+.event-section[data-art="reference"] .event-countdown {
+  margin:32px auto 0;
+}
+.event-section[data-art="reference"] .event-countdown-grid {
+  display:grid;
+  width:310px;
+  max-width:100%;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin:0 auto 20px;
+}
+.event-section[data-art="reference"] .event-countdown-grid span {
+  height:75px;
+  min-height:75px;
+  border:0;
+  border-radius:11px;
+  background:#612852;
+  padding:10px 3px 8px;
+  box-shadow:0 5px 15px rgba(69,28,61,.11);
+}
+.event-section[data-art="reference"] .event-countdown-grid strong {
+  font:600 30px/1 'EB Garamond',Georgia,serif;
+  color:#fff;
+  letter-spacing:0;
+}
+.event-section[data-art="reference"] .event-countdown-grid small {
+  font:500 10px/1.45 'EB Garamond',Georgia,serif;
+  letter-spacing:.18em;
+  color:#fff;
+}
