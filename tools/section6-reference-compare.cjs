@@ -53,7 +53,7 @@ async function readMetrics(page,isLocal){
       if(!el)return null;
       const r=el.getBoundingClientRect(),s=getComputedStyle(el);
       return {
-        text:(el.textContent||'').trim().replace(/\\s+/g,' ').slice(0,145),
+        text:(el.textContent||'').trim().replace(/\s+/g,' ').slice(0,145),
         x:+r.left.toFixed(2),
         y:+(r.top+scrollY-top).toFixed(2),
         width:+r.width.toFixed(2),
