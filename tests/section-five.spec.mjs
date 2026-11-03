@@ -171,6 +171,43 @@ test('Five downloaded local WebPs remove placeholder footer and preserve referen
   expect(errors).toEqual([]);
 });
 
+test('Gallery reveals each frame independently and resets on reverse scroll',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const {gallery,errors}=await reachGallery(page);
+  await expect(gallery).toHaveAttribute('data-reveal-ready','true');
+  const heading=gallery.locator('.gallery-heading');
+  const together=gallery.locator('[data-gallery-slot="0"]');
+  const bride=gallery.locator('[data-gallery-slot="1"]');
+  const groom=gallery.locator('[data-gallery-slot="2"]');
+  const lake=gallery.locator('[data-gallery-slot="4"]');
+  const y=await heading.evaluate(el=>el.getBoundingClientRect().top+scrollY);
+  await page.evaluate(y=>scrollTo({top:Math.max(0,y-innerHeight*1.85),behavior:'instant'}),y);
+  await expect(heading).not.toHaveClass(/\\bin\\b/);
+  await expect(together).not.toHaveClass(/\\bin\\b/);
+  await page.evaluate(y=>scrollTo({top:y-innerHeight*.65,behavior:'instant'}),y);
+  await expect(heading).toHaveClass(/\\bin\\b/);
+  await expect(together).toHaveClass(/\\bin\\b/);
+  await expect(bride).toHaveClass(/\\bin\\b/);
+  await expect(groom).not.toHaveClass(/\\bin\\b/);
+  const initialStyle=await together.evaluate(el=>({
+    d:getComputedStyle(el).transitionDuration,
+    delay:getComputedStyle(el).transitionDelay
+  }));
+  expect(initialStyle.d).toContain('1s');
+  expect(initialStyle.d).toContain('1.1s');
+  expect(initialStyle.delay).toBe('0s');
+  await page.evaluate(y=>scrollTo({top:y+220,behavior:'instant'}),y);
+  await expect(groom).toHaveClass(/\\bin\\b/);
+  await expect(lake).toHaveClass(/\\bin\\b/);
+  await page.evaluate(y=>scrollTo({top:Math.max(0,y-innerHeight*1.85),behavior:'instant'}),y);
+  await expect(heading).not.toHaveClass(/\\bin\\b/);
+  await expect(together).not.toHaveClass(/\\bin\\b/);
+  await page.evaluate(y=>scrollTo({top:y-innerHeight*.65,behavior:'instant'}),y);
+  await expect(heading).toHaveClass(/\\bin\\b/);
+  await expect(together).toHaveClass(/\\bin\\b/);
+  expect(errors).toEqual([]);
+});
+
 test('Section 7 honors reduced-motion without hiding the gallery',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const {gallery}=await reachGallery(page);
