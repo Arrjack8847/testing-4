@@ -52,7 +52,13 @@ test('Section 8 is between Gallery and RSVP with no gap or mobile overflow',asyn
 test('Section 8 uses the actual source content order without unsafe fake transactions',async({page})=>{
   const {gift,faults}=await openGift(page);
   await expect(gift.getByRole('heading',{name:'Wedding Gift'})).toBeVisible();
-  await expect(gift.getByRole('heading',{name:'Send Gift'})).toBeVisible();
+  const trigger=gift.getByRole('button',{name:/Send Gift/i});
+  await expect(trigger).toBeVisible();
+  await expect(trigger).toHaveAttribute('aria-expanded','false');
+  await expect(gift.locator('#giftEightBanks')).toBeHidden();
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded','true');
+  await expect(gift.locator('#giftEightBanks')).toBeVisible();
   await expect(gift.getByRole('heading',{name:'Gift Wishlist'})).toBeVisible();
   await expect(gift.locator('.gift-eight-bank')).toHaveCount(2);
   await expect(gift.locator('.gift-eight-bank-name')).toHaveText(['Maybank','CIMB']);
@@ -65,6 +71,9 @@ test('Section 8 uses the actual source content order without unsafe fake transac
   for(const button of await gift.locator('.gift-eight-copy').all()) await expect(button).toBeDisabled();
   expect(await gift.locator('button:not(:disabled)').count()).toBe(0);
   expect(await gift.locator('a[href]').count()).toBe(0);
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded','false');
+  await expect(gift.locator('#giftEightBanks')).toBeHidden();
   await expect(gift.locator('.gift-eight-disclaimer')).toContainText('not enabled');
   expect(faults).toEqual([]);
 });
