@@ -90,3 +90,42 @@ http://localhost:8000/?eventsReference=1 to compare provider artwork.
     npx playwright test tests/section-three.spec.mjs tests/section-four.spec.mjs tests/section-couple.spec.mjs
 
 No edits to Sections 1–3 or 5 onward are required.
+
+
+## Measured fidelity pass (3 November 2026)
+
+Read-only GitHub Actions Chromium measurement:
+https://github.com/Arrjack8847/testing-4/actions/runs/41661557880
+
+- On source mobile 390x844, Events starts at document Y3446.1 in the
+  sampled session (absolute Y varies with loading/other sections) and
+  extends 1580.9px.
+- Source has **ONE** long cgv-arch wrapper, not two separate card
+  borders. Arch rectangle: x26, relative y120, width338, height1163.6.
+  The ceremony blocks are x32/w326 and have relative y120 and 666.5.
+- Source first event title (Akad Nikah) x62,y224,font42/69.3 Pinyon
+  Script; Reception title x62,y770.5,font42, wraps into two lines.
+- Source date is **22px/36.3px semibold** EB Garamond; time is
+  **14px/23.1px light** EB Garamond; venue 19px/31.35px EB Garamond.
+- Source first Maps button at x117,relative y534.5,w156,h44;
+  source Calendar x82.5,relative y1413.1,w225,h47.8.
+- Source paper.webp natural 1080x1920, rendered image element
+  y=-189.7 relative to Events and height1960.4px on the measured page.
+- Corrected prototype uses a single shared arch, matching relative
+  heading positions, size, line height and date/time typography. The
+  reference paper image now uses the measured tall placement in explicit
+  ?eventsReference=1 mode. Its WebP loads successfully in the
+  GitHub Actions browser comparison (natural 1080x1920).
+- Early calibrations showed an extra **58px** from a wrapping Maps+Waze
+  row; the Waze width has been reduced to keep the two buttons inline.
+- Source uses no distinct butterfly img inside the measured Events
+  viewport; the earlier optional comparison butterfly is hidden.
+
+Re-measure with:
+https://github.com/Arrjack8847/testing-4/actions/workflows/section4-reference-measure.yml
+and re-test four widths with:
+https://github.com/Arrjack8847/testing-4/actions/workflows/section4-events-qa.yml
+
+This is a measured structural comparison; screenshots/per-pixel comparison
+and licensing clearance remain separate tasks. main has not received
+this draft PR's changes.
