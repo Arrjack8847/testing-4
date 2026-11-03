@@ -7,7 +7,7 @@
   const invitation = document.getElementById('invitation');
   if (!section || !invitation) return;
 
-  const sampleDate = '2027-01-23T10:00:00+08:00'; // Example Akad Nikah, Malaysia
+  const sampleDate = '2027-01-23T19:30:00+08:00'; // Example Wedding Reception, Malaysia
   const eventTime = new Date(sampleDate).getTime();
   const fields = {
     days: document.getElementById('eventCountDays'),
