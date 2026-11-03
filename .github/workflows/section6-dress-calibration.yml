@@ -9,6 +9,7 @@ on:
       - dress-code.js
       - tools/section6-reference-compare.cjs
       - tools/section6-motion-audit.cjs
+      - tools/section6-flight-compare.cjs
       - tests/section-six-dress.spec.mjs
       - package.json
       - .github/workflows/section6-dress-calibration.yml
@@ -70,6 +71,8 @@ jobs:
         run: npm run compare:section6
       - name: Measure source and local scroll animations
         run: node tools/section6-motion-audit.cjs
+      - name: Compare butterfly path at four phone widths
+        run: node tools/section6-flight-compare.cjs
       - name: Upload measurements only (never commercial reference screenshots)
         if: always()
         uses: actions/upload-artifact@v4
@@ -84,5 +87,13 @@ jobs:
         with:
           name: section6-motion-measurements
           path: artifacts/section6-motion/motion.json
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Upload butterfly measurements only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-flight-measurements
+          path: artifacts/section6-flight/flight.json
           retention-days: 7
           if-no-files-found: warn
