@@ -3,7 +3,7 @@
   overflow:hidden;margin:0;padding:96px 28px;background:#5c264f;color:#fdf4ea;
   font:400 18px/1.65 'EB Garamond',Georgia,serif;text-align:center}
 .gift-eight *, .gift-eight *::before,.gift-eight *::after{box-sizing:border-box}
-.gift-eight-art{position:absolute;inset:0;z-index:-1;pointer-events:none;
+.gift-eight-art{position:absolute;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse at 22% 10%,#ffe4cf18,transparent 33%),
   radial-gradient(ellipse at 83% 65%,#f8c7e014,transparent 38%),
   linear-gradient(180deg,#5c264f,#612b54 54%,#5c264f)}
