@@ -259,7 +259,9 @@ test('390px timeline text and six row baselines match measured source geometry',
       timeStyle:style(time),eyebrowStyle:style(eyebrow)};
   });
   const near=(actual,target,limit=1)=>expect(Math.abs(actual-target)).toBeLessThanOrEqual(limit);
+  near(m.eyebrow.x,28);
   near(m.eyebrow.y,96);
+  near(m.eyebrow.w,334);
   near(m.eyebrow.h,18.14);
   near(m.heading.y,126.14);
   near(m.heading.x,28);
