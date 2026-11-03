@@ -102,7 +102,15 @@ and five local WebP file paths unchanged. A focused Playwright regression
 test now asserts these frame measurements at the four configured phone
 viewports.
 
-**Remaining verification:** exact photo focal points, frame border radii,
-botanical decoration, overall section entrance/exit scroll behavior and
-source animation timing. The Gallery is not yet a certified exact
-replica. Default placeholders remain until authorized WebP files arrive.
+**Newly verified:** a second source-vs-local browser audit at 320px and
+390px (Actions run 41676330125) confirms all five local frame positions
+and sizes match the public source measurements within 0.1px.
+The source frames use `border-radius:14px`, `border:4px solid white`,
+`box-shadow:0 14px 36px rgba(120,95,70,.2)` and `padding:0`.
+These values now replace the earlier arched-frame styling. The 4px
+white border also gives the downloaded WebP an exact 4px inset.
+
+**Remaining verification:** exact photo focal points, background decorations,
+overall section entrance/exit scroll behavior and source animation timing.
+The Gallery is not yet a certified exact replica. Default placeholders
+remain until authorized WebP files arrive.
