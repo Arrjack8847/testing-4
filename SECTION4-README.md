@@ -1,46 +1,92 @@
-# Section 4 — Save the Date
+# Section 4 — Tasik Kayangan Events reference-recreation prototype
 
-Section 4 is an **original mobile-first continuation** of the existing invitation. It is not claimed to reproduce the commercial reference's fourth section exactly; that content was not accessible for reliable inspection.
+**Reference:** https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en  
+**GitHub:** https://github.com/Arrjack8847/testing-4  
+**Section:** HTML #eventDetails, data-section="4". The original source files are
+named section-three.css / section-three.js for historical reasons.
 
-## Experience
+## Current implementation (3 November 2026)
 
-- An ivory-and-lavender date scene following Section 3, with CSS-only floral ornaments, subtle halo lighting and a circular countdown portal.
-- Live **calendar-days-remaining** number for the existing demonstration date, **Saturday, 23 January 2027**. This deliberately does NOT count hours/minutes to an unknown ceremony time.
-- The browser's local calendar date determines the number of days; UTC calendar-day differences avoid daylight-saving shifts affecting the day count.
-- A sample-date disclaimer and **disabled Save to Calendar** button. No event time or venue is fabricated.
-- When a real date is verified, setting `DATE_CONFIG.confirmed = true` in `section-four.js` enables a client-side downloadable `.ics` **all-day date reminder**, not a timed ceremony appointment. Update the date across Sections 1–3 too, and change the date's display text if it differs.
-- No backend, user tracking, network dependency, external images or extra fonts were added in this scene.
+The previous one-card "The Celebration" layout has been replaced **only in
+Section 4** with two stacked reference-example event cards and an H:M:S
+countdown, using the publicly observed source text:
 
-## Files
+1. Akad Nikah — Saturday, 23 January 2027, 10:00 AM–12:00 PM;
+   Masjid Wilayah Persekutuan, Jalan Tuanku Abdul Halim, 50480 Kuala Lumpur.
+   Official source sample Google Maps URL retained.
+2. Wedding Reception — same day, 7:30 PM–10:30 PM; Grand Ballroom,
+   St. Regis Kuala Lumpur, 6, Jalan Stesen Sentral 2, 50470 Kuala Lumpur.
+   Official source sample Google Maps and Waze URLs retained.
+3. Count down to **example** Akad Nikah 2027-01-23 10:00 +08:00 in
+   Days, Hours, Mins, Secs. The timer refreshes while the section is visible
+   and the cover is open, and pauses when the tab is hidden.
+4. Add to Calendar opens the reference **example** Google Calendar draft;
+   the visible disclosure makes clear it is not a confirmed customer's event.
 
-- `index.html` — semantic Section 4 markup, including `<time>`, sample disclosures, and initially inert/hidden-from-screen-readers state.
-- `section-four.css` — isolated layout, transitions, decorative atmosphere, and reduced-motion rules.
-- `section-four.js` — validated date-only arithmetic, one-minute updates only while visible, cover accessibility gating, scroll reveal and disabled-by-default calendar export.
-- `tests/section-four.spec.mjs` — viewport checks across 320/360/390/430px and screenshots.
-- `tests/cross-browser.spec.mjs` — updated three-engine smoke test.
+All event details and links are **source example data**, not an invitation
+for an actual customer. Never treat this prototype as a confirmed wedding,
+or replace it with invented dates, venues, names or addresses.
 
-## Release and customization
+## Art and animation
 
-The wedding date and all wedding names displayed in the current prototype are **examples**, not real customer details. Calendar export must not be enabled merely to demonstrate a button. Only publish after verifying actual couple, date, ceremony time (if presented), and venue details. For an all-day reminder, do not falsely label it as the ceremony time.
+- The default site uses independently authored scene gradients and **existing**
+  original Couple botanical/garden/lake SVG assets. No new vendor asset files
+  were copied into the repo. These backgrounds are decorative only.
+- To compare the actual provider artwork, visit **?eventsReference=1**.
+  Only this explicit development comparison loads the provider's
+  tasik-kayangan/paper.webp (events background) and
+  anggerik-nirmala/bfly_white.webp (decorative butterfly) through their
+  existing public source URLs. The page records
+  data-reference-paper and data-reference-butterfly with loading/loaded/failed
+  outcomes, rather than assuming remote hotlinking will succeed.
+- Two semantic HTML cards remain on top of the pinned one-viewport scene.
+  The scene camera follows bounded scroll position forward and backward,
+  with extra drift limited to -20…24 CSS px.
+- Card reveal animation uses 52px initial translateY, .955 scale and
+  approximately one-second opacity/transform transitions; reduced-motion
+  users see all content without entrances.
+- At 390×844 the reference Events region was observed at document Y
+  5134.1–6715 (height about **1581px**). We set min-height 1581px but
+  allow content to grow naturally on narrower phones rather than clipping text.
+  The implementation's exact artwork positions, card border radii, timings,
+  and pixel similarity are **not verified** as matching the original DOM.
 
-The provider's Section 1 artwork is still loaded through the reference host as a fallback; independent commercial rights and replacement/self-hosting remain release blockers.
+## Files modified
 
-## Local testing
+- index.html (Section 4 markup only)
+- section-three.css (historically named file but Section 4 scoped)
+- section-three.js (historically named file but Section 4 scoped)
+- tests/section-three.spec.mjs (Section 4 phone/scroll/content tests)
+- tests/cross-browser.spec.mjs and tests/section-couple.spec.mjs
+  (update assumptions about Section 4; Section 3 code unchanged)
+- .github/workflows/section4-events-qa.yml
 
-```powershell
-git pull origin main
-powershell -ExecutionPolicy Bypass -File .\start.ps1
-```
+## QA acceptance
 
-Open `http://localhost:8000`, tap **Open Invitation**, and swipe through all four mobile sections.
+Verify 320×568, 360×740, 390×844 and 430×932. Check:
+two events, real sample URLs, calendar draft, opt-in WebP URL assignment,
+reported load/fallback state, countdown tick, reduced motion, reversible
+pinned camera, no overflow or text clipping, no gap at Section 3→4 seam,
+and 4→5 continuity. Compare captured screenshots against the **live**
+reference at equivalent scroll states before claiming visual parity.
 
-In another terminal, after installing Node and Playwright browsers:
-```powershell
-npm install
-npx playwright install chromium firefox webkit
-npm run test:syntax
-npm run test:mobile
-npm run test:crossbrowser
-```
+The source artwork and commercial photographs remain owned by the source
+provider. Public URLs and a research preview do **not** convey commercial
+reuse or distribution permission. Production needs separately authorized
+artwork and verified customer data.
 
-Automated browser checks don't certify real-device animation smoothness, actual invitation content, or commercial artwork rights.
+## Local test (Windows PowerShell)
+
+    git fetch origin
+    git checkout feat/section4-events-reference-prototype-20261103
+    powershell -ExecutionPolicy Bypass -File .\start.ps1
+
+Open http://localhost:8000/ normally or
+http://localhost:8000/?eventsReference=1 to compare provider artwork.
+
+    npm install
+    npx playwright install chromium
+    npm run test:syntax
+    npx playwright test tests/section-three.spec.mjs tests/section-four.spec.mjs tests/section-couple.spec.mjs
+
+No edits to Sections 1–3 or 5 onward are required.
