@@ -37,6 +37,18 @@ async function gather(page,name){
         box:r,font:style.fontFamily,fontSize:style.fontSize,lineHeight:style.lineHeight,weight:style.fontWeight,
         color:style.color,background:style.backgroundImage.slice(0,300),transform:style.transform,opacity:style.opacity,letterSpacing:style.letterSpacing};
     });
+    const backgrounds=[...document.querySelectorAll('*')].flatMap(el=>{
+      const vals=[];
+      for(const pseudo of ['', '::before', '::after']){
+        const st=getComputedStyle(el,pseudo||null);
+        if(!st.backgroundImage.includes('band_plum'))continue;
+        vals.push({tag:el.tagName,class:typeof el.className==='string'?el.className.slice(0,120):'',pseudo,
+          box:fmtRect(el),backgroundImage:st.backgroundImage,backgroundSize:st.backgroundSize,
+          backgroundPosition:st.backgroundPosition,backgroundRepeat:st.backgroundRepeat,
+          transform:st.transform,opacity:st.opacity});
+      }
+      return vals;
+    }).slice(0,12);
     const matches=[...document.images].filter(img=>(img.currentSrc||img.src).includes('band_plum')||(img.currentSrc||img.src).includes('bfly_blush')).map(img=>({
       src:img.currentSrc||img.src,natural:[img.naturalWidth,img.naturalHeight],box:fmtRect(img),opacity:getComputedStyle(img).opacity,
       visible:getComputedStyle(img).display!=='none'}));
@@ -44,7 +56,7 @@ async function gather(page,name){
       backgroundColor:st.backgroundColor,position:st.position,transform:st.transform,font:st.fontFamily}});
     return {name,found:true,title:document.title,scrollY,scrollHeight:document.documentElement.scrollHeight,
       headingAbs,parentAbs,headingDocumentY:+(headingAbs.y+scrollY).toFixed(1),
-      parentDocumentY:+(parentAbs.y+scrollY).toFixed(1),nodes:sampleNodes,art:matches,styles};
+      parentDocumentY:+(parentAbs.y+scrollY).toFixed(1),nodes:sampleNodes,art:matches,backgrounds,styles};
   },name);
 }
 try{
