@@ -33,9 +33,13 @@ def limit_box(rect: dict, offset: float, width: int, height: int):
         return None
     x = rect["x"]
     y = rect["docY"] - offset
-    return (max(0, int(x)), max(0, int(y)),
-            min(width, int(x + rect["width"] + .99)),
-            min(height, int(y + rect["height"] + .99)))
+    x0 = max(0, min(width, int(x)))
+    y0 = max(0, min(height, int(y)))
+    x1 = max(0, min(width, int(x + rect["width"] + .99)))
+    y1 = max(0, min(height, int(y + rect["height"] + .99)))
+    if x1 <= x0 or y1 <= y0:
+        return None
+    return (x0, y0, x1, y1)
 
 def make_mask(reference: dict, local: dict, stage: str, size: tuple[int, int]):
     width, height = size
@@ -48,9 +52,11 @@ def make_mask(reference: dict, local: dict, stage: str, size: tuple[int, int]):
         scroll = scroll_y(record, stage)
         top = max(top, gallery["docY"] - scroll)
         bottom = min(bottom, gallery["docY"] + gallery["height"] - scroll)
+    top = max(0, min(height, int(top)))
+    bottom = max(0, min(height, int(bottom)))
     if bottom <= top:
         return mask, 0
-    d.rectangle((0, max(0, int(top)), width, min(height, int(bottom))), fill=255)
+    d.rectangle((0, top, width-1, bottom-1), fill=255)
     # Exclude the photo frames and their shadows: those pixels cannot be
     # meaningfully compared without the authorized exact five source WebPs.
     for record in (reference, local):
