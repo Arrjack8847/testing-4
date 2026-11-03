@@ -1,0 +1,45 @@
+name: Section 7 Gallery focused mobile and interaction QA
+on:
+  push:
+    branches:
+      - feat/section7-gallery-reference-20261103
+    paths:
+      - index.html
+      - section-five.js
+      - section-five.css
+      - tests/section-five.spec.mjs
+      - tests/cross-browser.spec.mjs
+      - .github/workflows/section7-gallery-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gallery:
+    name: Four-phone Gallery QA and three-engine accessibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Verify JavaScript syntax
+        run: npm run test:syntax
+      - name: Run Section 7 mobile tests on 320, 360, 390 and 430 px viewports
+        run: npx playwright test tests/section-five.spec.mjs
+      - name: Run isolated Section 7 accessibility on three browser engines
+        run: npx playwright test --config playwright.crossbrowser.config.mjs --grep 'Section 7 provides an accessible gallery'
+      - name: Upload Gallery screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-gallery-focused-qa
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 10
