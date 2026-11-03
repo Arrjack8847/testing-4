@@ -101,11 +101,10 @@ test('reduced-motion preserves legible timeline without animation or camera move
   expect(Math.abs(Number(cam))).toBeLessThan(.01);
 });
 
-test('root URL uses the reference layout and attempts only permission-cleared local WebPs',async({page})=>{
+test('reference comparison requests only locally staged WebPs and degrades safely if missing',async({page})=>{
   const {section}=await toOrder(page);
-  await expect(section).toHaveAttribute('data-art','reference');
-  await expect(section).toHaveAttribute('data-asset-source','local-webp');
-  await expect(section.locator('#orderSourceBand')).toHaveAttribute('src','./assets/reference-dev/band_plum.webp');
+  await expect(section).not.toHaveAttribute('data-art','reference');
+  expect(await section.locator('#orderSourceBand').getAttribute('src')).toBeNull();
   await page.route('**/assets/reference-dev/*.webp',route=>route.fulfill({status:404,body:'Developer image not supplied'}));
   await page.goto('/?orderReference=1');
   await expect(section).toHaveAttribute('data-art','reference');
@@ -176,7 +175,7 @@ test('source-like fixed canvas paints rose petals only while timeline is visible
   expect(errors).toEqual([]);
 });
 
-test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',async({page})=>{
+test('sprite butterfly traverses right-to-left along lower panel with mirrored 3D wing flaps',async({page})=>{
   const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:fixture}));
@@ -192,16 +191,20 @@ test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',asyn
       return {width:css.width,height:css.height,bg:css.backgroundSize,
         position:css.backgroundPosition,transform:css.transform};
     });
-    return {x:Number(el.dataset.x),direction:el.dataset.direction,
+    return {x:Number(el.dataset.x),y:Number(el.dataset.y),direction:el.dataset.direction,
       width:getComputedStyle(el).width,height:getComputedStyle(el).height,wing};
   });
   const before=await getState();
   await page.waitForTimeout(1150);
   const after=await getState();
-  expect(before.direction).toBe('right');
-  expect(after.direction).toBe('right');
-  expect(after.x-before.x).toBeGreaterThan(28);
-  expect(after.x-before.x).toBeLessThan(66);
+  expect(before.direction).toBe('left');
+  expect(after.direction).toBe('left');
+  expect(after.x-before.x).toBeLessThan(-28);
+  expect(after.x-before.x).toBeGreaterThan(-65);
+  expect(before.y).toBeGreaterThan(540);
+  expect(before.y).toBeLessThan(625);
+  expect(after.y).toBeGreaterThan(540);
+  expect(after.y).toBeLessThan(625);
   expect(after.width).toBe('46px');
   expect(after.height).toBe('35px');
   expect(after.wing[0].width).toBe('23px');
@@ -283,5 +286,58 @@ test('390px timeline text and six row baselines match measured source geometry',
   expect(m.timeStyle.textAlign).toBe('right');
   expect(m.titleStyle.size).toBe('17px');
   expect(m.eyebrowStyle.size).toBe('11px');
+  expect(errors).toEqual([]);
+});
+
+test('fallback butterfly remains visible and follows one-way source motion without a vendor image',async({page})=>{
+  const {section,errors}=await toOrder(page);
+  const flight=section.locator('#orderButterflyFlight');
+  await expect(flight).toBeVisible();
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  const before=await flight.evaluate(el=>({
+    x:Number(el.dataset.x),y:Number(el.dataset.y),
+    bg:getComputedStyle(el.querySelector('.order-bf-left')).backgroundImage
+  }));
+  await page.waitForTimeout(950);
+  const after=await flight.evaluate(el=>({
+    x:Number(el.dataset.x),y:Number(el.dataset.y),
+    bg:getComputedStyle(el.querySelector('.order-bf-left')).backgroundImage
+  }));
+  expect(before.bg).toContain('gradient');
+  expect(before.bg).not.toContain('undangankahwin.com');
+  expect(after.x).toBeLessThan(before.x-22);
+  expect(after.x).toBeGreaterThan(before.x-60);
+  for(const y of [before.y,after.y]){
+    expect(y).toBeGreaterThan(540);
+    expect(y).toBeLessThan(625);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('reference-density petal canvas paints original transparent particles',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Measured 390x844 source coverage');
+  const {section,errors}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  await page.waitForTimeout(220);
+  const coverage=await section.locator('#orderPetalCanvas').evaluate(el=>{
+    const d=el.getContext('2d').getImageData(0,0,el.width,el.height).data;
+    let visible=0,sum=0;
+    for(let i=3;i<d.length;i+=4){
+      if(d[i]>0){visible++;sum+=d[i];}
+    }
+    // Source capture uses deviceScaleFactor=1, but the phone projects
+    // in this suite can use a 2x canvas backing store. Normalize raw
+    // backing pixels to CSS pixels before checking source density.
+    const rect=el.getBoundingClientRect();
+    const pixelsPerCssPixel=(el.width/rect.width)*(el.height/rect.height);
+    return {visible:visible/pixelsPerCssPixel,
+      averageAlpha:visible?sum/visible:0};
+  });
+  // The source's observed 390px canvas had ~1000 nontransparent pixels and
+  // mean alpha ~118. These generous bands avoid timer-phase flakiness.
+  expect(coverage.visible).toBeGreaterThan(650);
+  expect(coverage.visible).toBeLessThan(1900);
+  expect(coverage.averageAlpha).toBeGreaterThan(70);
+  expect(coverage.averageAlpha).toBeLessThan(185);
   expect(errors).toEqual([]);
 });
