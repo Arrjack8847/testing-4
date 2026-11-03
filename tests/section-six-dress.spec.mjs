@@ -266,6 +266,7 @@ test('Section 6 butterfly flies autonomously while scroll position is fixed',asy
     x:parseFloat(sec.style.getPropertyValue('--dress-flight-x')),
     y:parseFloat(sec.style.getPropertyValue('--dress-flight-y')),
     angle:parseFloat(sec.style.getPropertyValue('--dress-flight-rotate')),
+    height:sec.getBoundingClientRect().height,
     top:sec.getBoundingClientRect().top,
     active:sec.dataset.flightReady,
     leftWing:getComputedStyle(sec.querySelector('.dress-flight-wing-left')).animationName,
@@ -285,6 +286,8 @@ test('Section 6 butterfly flies autonomously while scroll position is fixed',asy
   expect(second.x-first.x).toBeLessThan(-17);
   expect(second.x-first.x).toBeGreaterThan(-38);
   expect(first.angle).toBeLessThan(-50);
+  // The first autonomous pass now glides near the lower decorative border.
+  expect(Math.abs(first.y-(first.height-80))).toBeLessThanOrEqual(15);
   expect(first.leftWing).toBe('dress-wing-flight-left');
   expect(first.rightWing).toBe('dress-wing-flight-right');
   expect(errors).toEqual([]);
