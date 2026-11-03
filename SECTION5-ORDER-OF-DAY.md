@@ -24,9 +24,9 @@ text entrances and a plum floral band (`band_plum.webp`).
 ## Changes
 
 - Insert `#runningOrder[data-section=5]` **directly after** `#eventDetails`.
-- Implement original floral CSS/artwork by default, with explicit
-  `?orderReference=1` **development-only** requests for the reference host's
-  `band_plum.webp` and `bfly_blush.webp`. No vendor artwork embedded.
+- Implement original floral CSS/artwork by default. Explicit
+  `?orderReference=1` uses **local WebP files** under
+  `assets/reference-dev/`. No vendor artwork is embedded or hotlinked.
 - Preserve original 6-stop timeline typography/sequence at four mobile sizes.
 - Scroll-aware layered stage with bounded, reversible camera displacement,
   stagger-free observed 52px/0.955 reveal envelope, and Reduced Motion.
@@ -56,8 +56,18 @@ git switch feat/section5-order-of-day-reference-20261103
 powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
-Visit `http://localhost:8000` (or add `?orderReference=1`
-to inspect source art only for development comparison).
+Visit `http://localhost:8000` for original art. With appropriate permission,
+stage reference artwork **locally**, then open `?orderReference=1`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\\download-section5-reference.ps1 -IHavePermission
+```
+
+The downloader verifies WebP RIFF headers and never commits assets.
+`.gitignore` excludes `assets/reference-dev/`. Without local files, the
+comparison mode keeps original artwork instead of silently hotlinking
+or breaking the layout. Commercial redistribution is **not licensed** by
+a public download URL.
 
 ```powershell
 npm install
@@ -94,3 +104,14 @@ sparse butterfly flight and the following *Dress Code* section.
 The current isolated branch intentionally does not replace global
 navigation or build the following Dress Code section. Neither
 full-page nor animation-timeline pixel parity has been certified.
+
+## Next refinement — local WebP source discipline
+
+The 4 November iteration replaces all Section 5 **runtime hotlinks** with
+locally staged `band_plum.webp` and `bfly_blush.webp`. The source image in
+`order-program.css` is not requested unless `data-band-status=loaded`,
+which is set only after the local file decodes. Tests verify a missing file
+is harmless and a valid local WebP becomes the full-height `cover` background.
+No source binaries were pushed. Existing visual comparisons remain useful as
+historical evidence, but new comparisons require the developer's local images
+or an explicitly permitted private test environment.
