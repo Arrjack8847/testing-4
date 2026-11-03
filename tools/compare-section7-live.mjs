@@ -68,7 +68,10 @@ async function capture(type,url,viewport){
           weight:cs.fontWeight,color:cs.color,background:cs.backgroundColor,
           border:cs.border,borderRadius:cs.borderRadius,boxShadow:cs.boxShadow,
           objectFit:cs.objectFit,objectPosition:cs.objectPosition,
-          opacity:cs.opacity,transform:cs.transform,
+          opacity:cs.opacity,transform:cs.transform,translate:cs.translate,
+          animationName:cs.animationName,animationDuration:cs.animationDuration,
+          transitionDuration:cs.transitionDuration,letterSpacing:cs.letterSpacing,
+          backgroundImage:cs.backgroundImage.slice(0,500),textShadow:cs.textShadow,
           display:cs.display,position:cs.position,padding:cs.padding,margin:cs.margin};
       };
       const sampleImage=(label,index)=>{
@@ -108,7 +111,15 @@ async function capture(type,url,viewport){
         styles:p.frame?{radius:p.frame.borderRadius,border:p.frame.border,
           shadow:p.frame.boxShadow,padding:p.frame.padding}:null
       })),
-      heading:record.metrics.heading?.rect,font:record.metrics.heading?.fontSize,
+      heading:record.metrics.heading,
+      eyebrow:record.metrics.eyebrow,
+      hint:record.metrics.hint,
+      section:record.metrics.section,
+      photoStyle:record.metrics.photos[0]?.image?{
+        objectFit:record.metrics.photos[0].image.objectFit,
+        objectPosition:record.metrics.photos[0].image.objectPosition,
+        animationName:record.metrics.photos[0].image.animationName,
+        transitionDuration:record.metrics.photos[0].image.transitionDuration}:null,
       overflow:record.metrics.horizontalOverflow
     }));
   } catch (e){
