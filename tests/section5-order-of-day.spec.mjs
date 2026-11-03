@@ -146,7 +146,7 @@ test('old standalone date-only demo remains available via an explicit legacy URL
 });
 
 
-test('source-like fixed canvas paints rose petals only while timeline is visible',async({page})=>{
+test('source-like fixed canvas paints rose petals only while timeline is visible',async({page},testInfo)=>{
   const {section,errors}=await toOrder(page);
   await expect(section).toHaveAttribute('data-petal-renderer','canvas');
   await expect(section).toHaveAttribute('data-petal-motion','running');
@@ -167,6 +167,9 @@ test('source-like fixed canvas paints rose petals only while timeline is visible
   expect(stats.height).toBe(page.viewportSize().height);
   expect(stats.position).toBe('fixed');
   expect(stats.pixels).toBeGreaterThan(30);
+  if(testInfo.project.name==='iphone-390'){
+    await page.screenshot({path:testInfo.outputPath('section5-live-canvas-petals-390.png'),animations:'disabled'});
+  }
   await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
   await expect(section).toHaveAttribute('data-petal-motion','paused');
   expect(errors).toEqual([]);
