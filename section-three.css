@@ -378,3 +378,8 @@
 /* The measured reference Events page has a tall paper illustration but no
    free-standing butterfly IMG in the Events viewport. Avoid inventing one. */
 .event-section[data-art="reference"] .event-source-butterfly {display:none!important;}
+
+/* The second source event places Maps and Waze on ONE line.
+   Keep Maps 156px wide, but let Waze stay compact inside the 266px column;
+   two 156px buttons wrapped, adding exactly ~58px of unwanted height. */
+.event-section .event-waze-link {min-width:80px;padding-inline:12px;}
