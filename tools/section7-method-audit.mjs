@@ -46,7 +46,9 @@ function sampleGallery(){
   };
   const findText=(txt)=>[...section.querySelectorAll('p,div,span')]
     .find(el=>el.children.length===0&&(el.textContent||'').trim().toLowerCase()===txt.toLowerCase());
-  const frames=LABELS.map((label,index)=>{
+  // Browser-side functions cannot reference Node-side globals.
+  const labels=['Together','The Bride','The Groom','The Garden','The Lake'];
+  const frames=labels.map((label,index)=>{
     const img=[...section.querySelectorAll('img')]
       .find(x=>(x.alt||'').toLowerCase()===label.toLowerCase()||
         (index===0&&(x.alt||'').toLowerCase()==='wedding couple together')||
