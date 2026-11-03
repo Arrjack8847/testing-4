@@ -19,10 +19,10 @@ async function reachGallery(page){
   return {gallery,errors};
 }
 
-test('Section 5 shows five honest empty photograph placeholders',async({page})=>{
+test('Section 7 shows five honest empty photograph placeholders',async({page})=>{
   const {gallery,errors}=await reachGallery(page);
   await expect(gallery).toHaveClass(/is-visible/);
-  await expect(page.getByRole('heading',{name:'Our Memories',level:2})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Our Gallery',level:2})).toBeVisible();
   const slots=gallery.locator('[data-gallery-slot]');
   await expect(slots).toHaveCount(5);
   for(let i=0;i<5;i++){
@@ -30,11 +30,13 @@ test('Section 5 shows five honest empty photograph placeholders',async({page})=>
     await expect(slots.nth(i).locator('.gallery-photo-placeholder')).toBeVisible();
   }
   await expect(gallery.locator('.gallery-disclaimer')).toContainText('have not been provided');
+  await expect(gallery.locator('.gallery-slot-label')).toHaveText(['Together','The Bride','The Groom','The Garden','The Lake']);
+  await expect(gallery.locator('.gallery-intro')).toHaveText('Tap a frame to view');
   await expect(page.locator('#galleryDialog')).not.toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test('Section 5 fits mobile viewports and preserves Section 4 transition',async({page},testInfo)=>{
+test('Section 7 fits mobile viewports and preserves Section 4 transition',async({page},testInfo)=>{
   const {gallery}=await reachGallery(page);
   const bounds=await gallery.evaluate(el=>{
     const previous=document.getElementById('dressCode');
@@ -54,7 +56,7 @@ test('Section 5 fits mobile viewports and preserves Section 4 transition',async(
   await gallery.screenshot({path:testInfo.outputPath('section-five-empty-gallery.png'),animations:'disabled'});
 });
 
-test('Section 5 honors reduced-motion without hiding the gallery',async({page})=>{
+test('Section 7 honors reduced-motion without hiding the gallery',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const {gallery}=await reachGallery(page);
   const title=gallery.locator('.gallery-heading');
@@ -91,13 +93,13 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
   const dialog=page.getByRole('dialog',{name:'Wedding photo viewer'});
   await expect(dialog).toBeVisible();
   await expect(page.locator('#galleryPosition')).toHaveText('1 / 2');
-  await expect(page.locator('#galleryViewCaption')).toHaveText('Photo 01');
+  await expect(page.locator('#galleryViewCaption')).toHaveText('Together');
   await expect(page.getByRole('button',{name:'Close photo viewer'})).toBeFocused();
   await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#galleryViewCaption')).toHaveText('Photo 02');
+  await expect(page.locator('#galleryViewCaption')).toHaveText('The Bride');
   await expect(page.locator('#galleryPosition')).toHaveText('2 / 2');
   await page.getByRole('button',{name:'Next photo'}).click();
-  await expect(page.locator('#galleryViewCaption')).toHaveText('Photo 01');
+  await expect(page.locator('#galleryViewCaption')).toHaveText('Together');
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(first).toBeFocused();
