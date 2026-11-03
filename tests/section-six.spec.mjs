@@ -20,7 +20,7 @@ async function reachRSVP(page) {
 
 test('RSVP is an honest preview with no destination configured',async({page})=>{
   const {section,errors}=await reachRSVP(page);
-  await expect(section).toHaveAttribute('data-section','7');
+  await expect(section).toHaveAttribute('data-section','8');
   await expect(page.getByRole('heading',{level:2,name:'Kindly Respond'})).toBeVisible();
   await expect(section.locator('#rsvpWarning')).toContainText('will not be sent');
   await expect(section.locator('.rsvp-preview')).toBeHidden();
