@@ -20,7 +20,7 @@
     else schedule();
   }
   syncCover();
-  new MutationObserver(syncCover).observe(invite,{attributes:true,attributeFilter:['data-state']});
+  new MutationObserver(()=>{syncCover();updateAmbient();}).observe(invite,{attributes:true,attributeFilter:['data-state']});
 
   if (query.get('orderReference')==='1') {
     // Development preview only. Reference artwork must be supplied locally by
@@ -52,12 +52,129 @@
   if(observer)reveals.forEach(el=>observer.observe(el));
   else reveals.forEach(el=>el.classList.add('order-in-view'));
 
-  if ('IntersectionObserver' in window) {
+  // Source observation: the timeline butterfly is a 46×35px paired-wing
+  // WebP with two 23px halves. It traverses left-to-right (~44px/second),
+  // then returns. The source's petals are drawn on a fixed 300px-wide canvas.
+  // This is an independent implementation, not copied vendor animation code.
+  const butterfly=section.querySelector('#orderButterflyFlight');
+  const wings=butterfly ? [...butterfly.querySelectorAll('.order-bf-wing')] : [];
+  const canvas=section.querySelector('#orderPetalCanvas');
+  const ctx=canvas?.getContext('2d', {alpha:true}) || null;
+  let petalVisible=false;
+  let petalFrame=0;
+  let lastFrame=0;
+  let elapsed=0;
+  let canvasWidth=0;
+  let canvasHeight=0;
+  const colors=['#e4cadd','#f5e4e9','#ac8baa','#d7b0cb','#ead8e6'];
+  // Each petal has a fixed deterministic seed; no random jitter or
+  // new particle allocation is performed on individual animation frames.
+  const particles=Array.from({length:11},(_,i)=>({
+    x:((i*0.61803398875+.13)%1),y:((i*.38196601125+.26)%1),
+    speed:11+(i%4)*5,phase:i*2.17,size:2+(i%3)*.75,
+    color:colors[i%colors.length]
+  }));
+  if(ctx)section.dataset.petalRenderer='canvas';
+
+  function resizeCanvas(){
+    if(!canvas || !ctx)return;
+    const w=Math.min(300,Math.max(1,Math.round(innerWidth)));
+    const h=Math.max(1,Math.round(innerHeight));
+    const ratio=Math.min(devicePixelRatio||1,2);
+    if(w===canvasWidth && h===canvasHeight && canvas.width===Math.round(w*ratio))return;
+    canvasWidth=w;canvasHeight=h;
+    canvas.style.width=w+'px';canvas.style.height=h+'px';
+    canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    ctx.clearRect(0,0,w,h);
+  }
+  function paintPetals(t){
+    if(!ctx)return;
+    ctx.clearRect(0,0,canvasWidth,canvasHeight);
+    const range=canvasHeight+90;
+    for(const petal of particles){
+      const x=petal.x*canvasWidth+Math.sin(t*.85+petal.phase)*14;
+      const y=((petal.y*range+t*petal.speed)%range)-40;
+      const a=.28+.22*(.5+.5*Math.sin(t*1.25+petal.phase));
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(Math.sin(t*1.8+petal.phase)*1.1+petal.phase*.3);
+      ctx.globalAlpha=a;
+      ctx.fillStyle=petal.color;
+      ctx.beginPath();
+      ctx.moveTo(0,-petal.size*2.0);
+      ctx.bezierCurveTo(petal.size*2,-petal.size*.7,petal.size*1.4,petal.size*1.3,0,petal.size*2.3);
+      ctx.bezierCurveTo(-petal.size*1.5,petal.size*.7,-petal.size*1.8,-petal.size*.5,0,-petal.size*2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  function paintButterfly(t){
+    if(!butterfly)return;
+    // Source measurements: x=-68 -> -30 -> +44 over ~3s while entering,
+    // then near the far-right edge later; use a smooth reversing traversal.
+    const left=-70;
+    const right=section.clientWidth+70;
+    const span=right-left;
+    const travel=(t*44)%(span*2);
+    const outbound=travel<=span;
+    const x=outbound?left+travel:right-(travel-span);
+    const y=54+Math.sin(t*1.18)*7+Math.sin(t*2.6)*3;
+    const rotation=(outbound?1.27:-1.43)+Math.sin(t*2.05)*.16;
+    butterfly.style.transform='translate3d('+x.toFixed(2)+'px,'+y.toFixed(2)+'px,0) translate(-50%,-50%) rotate('+rotation.toFixed(4)+'rad) scale(.82)';
+    butterfly.dataset.x=x.toFixed(2);
+    butterfly.dataset.direction=outbound?'right':'left';
+    const flap=17+54*Math.abs(Math.sin(t*17.5));
+    if(wings[0])wings[0].style.transform='perspective(110px) rotateY('+flap.toFixed(2)+'deg)';
+    if(wings[1])wings[1].style.transform='perspective(110px) rotateY('+(-flap).toFixed(2)+'deg)';
+  }
+  function animateAmbient(now){
+    petalFrame=0;
+    if(!canAnimateAmbient())return;
+    const dt=lastFrame?Math.min((now-lastFrame)/1000,.06):0;
+    lastFrame=now;
+    elapsed+=dt;
+    paintPetals(elapsed);
+    paintButterfly(elapsed);
+    petalFrame=requestAnimationFrame(animateAmbient);
+  }
+  function canAnimateAmbient(){
+    return petalVisible && invite.dataset.state==='opened'
+      && !document.hidden && !reduced.matches;
+  }
+  function updateAmbient(){
+    const active=canAnimateAmbient();
+    section.classList.toggle('order-visible',petalVisible && invite.dataset.state==='opened');
+    section.dataset.petalMotion=active?'running':(reduced.matches?'still':'paused');
+    section.dataset.butterflyMotion=active?'running':'paused';
+    if(active){
+      if(!petalFrame){
+        lastFrame=0;
+        petalFrame=requestAnimationFrame(animateAmbient);
+      }
+    }else{
+      if(petalFrame){cancelAnimationFrame(petalFrame);petalFrame=0;}
+      lastFrame=0;
+      if(ctx){
+        if(reduced.matches && petalVisible && invite.dataset.state==='opened')paintPetals(elapsed);
+        else ctx.clearRect(0,0,canvasWidth,canvasHeight);
+      }
+    }
+  }
+  resizeCanvas();
+  paintButterfly(0);
+  if('IntersectionObserver' in window){
     const ambientObserver=new IntersectionObserver(entries=>{
-      section.classList.toggle('order-visible',entries.some(entry=>entry.isIntersecting));
-    },{threshold:0,rootMargin:'70px 0px'});
+      petalVisible=entries.some(entry=>entry.isIntersecting);
+      updateAmbient();
+    },{threshold:0,rootMargin:'80px 0px'});
     ambientObserver.observe(section);
-  } else section.classList.add('order-visible');
+  }else{petalVisible=true;}
+  addEventListener('resize',()=>{resizeCanvas();updateAmbient();},{passive:true});
+  document.addEventListener('visibilitychange',updateAmbient);
+  reduced.addEventListener?.('change',updateAmbient);
+  updateAmbient();
 
   let frame=0;
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
