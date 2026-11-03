@@ -1,0 +1,40 @@
+name: Section 5 Gift reference prototype QA
+on:
+  push:
+    branches: [feat/section5-gifts-reference-prototype-20261103]
+    paths:
+      - index.html
+      - gift-reference.js
+      - gift-reference.css
+      - tests/section5-gifts-reference.spec.mjs
+      - tests/section-six.spec.mjs
+      - tests/section-five.spec.mjs
+      - package.json
+      - .github/workflows/section5-gifts-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gift-mobile-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:syntax
+      - name: Check Gift, Gallery and RSVP on four phones
+        run: npx playwright test tests/section5-gifts-reference.spec.mjs tests/section-five.spec.mjs tests/section-six.spec.mjs --workers=2
+      - name: Store screenshots and test traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-gift-mobile-qa
+          path: |
+            test-results/**/*.png
+            test-results/**/*.zip
+          if-no-files-found: warn
+          retention-days: 7
