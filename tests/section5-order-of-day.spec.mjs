@@ -101,30 +101,40 @@ test('reduced-motion preserves legible timeline without animation or camera move
   expect(Math.abs(Number(cam))).toBeLessThan(.01);
 });
 
-test('root URL uses the reference layout and attempts only permission-cleared local WebPs',async({page})=>{
+test('root URL shows a clear warning when reference WebPs are missing (never substitute SVG)',async({page})=>{
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.fulfill({status:404,body:'Permission-cleared file not installed'}));
   const {section}=await toOrder(page);
   await expect(section).toHaveAttribute('data-art','reference');
   await expect(section).toHaveAttribute('data-asset-source','local-webp');
   await expect(section.locator('#orderSourceBand')).toHaveAttribute('src','./assets/reference-dev/band_plum.webp');
-  await page.route('**/assets/reference-dev/*.webp',route=>route.fulfill({status:404,body:'Developer image not supplied'}));
-  await page.goto('/?orderReference=1');
-  await expect(section).toHaveAttribute('data-art','reference');
-  await expect(section).toHaveAttribute('data-asset-source','local-webp');
-  const source=await section.locator('#orderSourceBand').getAttribute('src');
-  expect(source).toBe('./assets/reference-dev/band_plum.webp');
   await expect(section).toHaveAttribute('data-band-status','failed');
-  await expect(section.locator('.order-heading')).toBeAttached();
-  expect(await section.evaluate(el=>getComputedStyle(el).backgroundImage)).not.toContain('undangankahwin.com');
+  await expect(section).toHaveAttribute('data-butterfly-status','failed');
+  await expect(section).toHaveAttribute('data-artwork-status','missing');
+  await expect(section.locator('#orderArtworkNotice')).toBeVisible();
+  await expect(section.locator('#orderArtworkNotice')).toContainText('band_plum.webp, bfly_blush.webp');
+  const state=await section.evaluate(el=>({
+    background:getComputedStyle(el).backgroundImage,
+    notice:getComputedStyle(el.querySelector('#orderArtworkNotice')).display,
+    sourceUrl:el.querySelector('#orderSourceBand').src
+  }));
+  expect(state.background).not.toContain('order-plum-emboss-original.svg');
+  expect(state.background).not.toContain('undangankahwin.com');
+  expect(state.notice).not.toBe('none');
+  expect(state.sourceUrl).toContain('/assets/reference-dev/band_plum.webp');
+  await expect(section.locator('.order-entry')).toHaveCount(6);
 });
 
-test('valid local WebPs use section-level background-size cover with zero vendor hotlinks',async({page})=>{
+test('plain root uses exact local WebPs with cover geometry and no vendor hotlinks',async({page})=>{
   // Synthetic fixture from existing image QA; never distributed as a wedding asset.
   const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:fixture}));
-  const {section,errors}=await toOrder(page,'/?orderReference=1');
+  const {section,errors}=await toOrder(page);
   await expect(section).toHaveAttribute('data-band-status','loaded');
   await expect(section).toHaveAttribute('data-butterfly-status','loaded');
+  await expect(section).toHaveAttribute('data-artwork-status','ready');
+  await expect(section.locator('#orderArtworkNotice')).toBeHidden();
   const result=await section.evaluate(el=>{
     const style=getComputedStyle(el);
     return {background:style.backgroundImage,position:style.backgroundPosition,size:style.backgroundSize,
@@ -136,6 +146,25 @@ test('valid local WebPs use section-level background-size cover with zero vendor
   expect(result.position).toContain('50% 50%');
   expect(result.image).toBe('./assets/reference-dev/band_plum.webp');
   expect(errors).toEqual([]);
+});
+
+test('missing butterfly is reported while a valid local background remains active',async({page})=>{
+  const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.request().url().endsWith('band_plum.webp')
+      ?route.fulfill({status:200,contentType:'image/webp',body:fixture})
+      :route.fulfill({status:404,body:'Butterfly not installed'}));
+  const {section}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-band-status','loaded');
+  await expect(section).toHaveAttribute('data-butterfly-status','failed');
+  await expect(section).toHaveAttribute('data-artwork-status','partial');
+  const msg=section.locator('#orderArtworkNotice');
+  await expect(msg).toBeVisible();
+  await expect(msg).toContainText('bfly_blush.webp');
+  await expect(msg).not.toContainText('band_plum.webp');
+  const art=await section.evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(art).toContain('band_plum.webp');
+  expect(art).not.toContain('order-plum-emboss-original.svg');
 });
 
 test('old standalone date-only demo remains available via an explicit legacy URL',async({page})=>{
@@ -180,7 +209,7 @@ test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',asyn
   const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:fixture}));
-  const {section,errors}=await toOrder(page,'/?orderReference=1');
+  const {section,errors}=await toOrder(page);
   await expect(section).toHaveAttribute('data-butterfly-status','loaded');
   await expect(section).toHaveAttribute('data-butterfly-motion','running');
   const sprite=section.locator('#orderButterflyFlight');
@@ -217,7 +246,7 @@ test('canvas and butterfly stop when invitation closes or reduced motion is enab
   const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:fixture}));
-  const {section}=await toOrder(page,'/?orderReference=1');
+  const {section}=await toOrder(page);
   await expect(section).toHaveAttribute('data-petal-motion','running');
   await expect(section).toHaveAttribute('data-butterfly-motion','running');
   await page.evaluate(()=>document.getElementById('invitation').dataset.state='cover');
