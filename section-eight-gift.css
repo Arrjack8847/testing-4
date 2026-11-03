@@ -61,3 +61,75 @@
   .gift-eight-bank{padding-inline:10px}}
 @media(prefers-reduced-motion:reduce){.gift-eight .gift-eight-reveal{
   opacity:1!important;transform:none!important;transition:none!important;animation:none!important}}
+
+
+/* Source-calibrated Gift presentation, 2026-11-04 read-only four-width audit.
+   Original SVG is a substitute; official vendor WebP is private/licensed-only. */
+.gift-eight{
+  min-height:990px;
+  padding:96px 28px;
+}
+.gift-eight-art{
+  background:
+    linear-gradient(180deg,rgba(35,10,30,.11),rgba(35,10,30,.13)),
+    url("./assets/section8-plum-botanical-original.svg") center top / cover no-repeat,
+    #5c264f;
+}
+.gift-eight::before,.gift-eight::after{
+  content:"";position:absolute;pointer-events:none;z-index:1;
+  border:1px solid rgba(250,226,243,.78);
+}
+.gift-eight::before{inset:70px 22px;}
+.gift-eight::after{inset:74px 26px;opacity:.22;}
+.gift-eight-content{z-index:2;}
+.gift-eight-heading{
+  margin:0;
+  font-family:'Pinyon Script',cursive;
+  font-size:46px;
+  font-weight:400;
+  line-height:1.15;
+  letter-spacing:normal;
+  color:#f3dff0;
+  text-shadow:none;
+}
+.gift-eight-intro{
+  margin:18px auto 24px;
+  font:400 18px/1.65 'EB Garamond',Georgia,serif;
+  max-width:34ch;
+  color:#f4e4ee;
+}
+.gift-eight-trigger{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  min-height:48px;min-width:184px;padding:11px 25px;
+  background:#fffaf4;border:0;border-radius:50px;color:#6b3159;
+  font:600 11px/1.4 'EB Garamond',Georgia,serif;
+  letter-spacing:3.2px;text-transform:uppercase;
+  box-shadow:0 6px 18px rgba(20,6,18,.2);
+  cursor:pointer;
+}
+.gift-eight-trigger span{font:17px/1 system-ui,sans-serif}
+.gift-eight-trigger:focus-visible{outline:3px solid #f7d4e7;outline-offset:4px}
+.gift-eight-bank-list[hidden]{display:none!important}
+.gift-eight-bank-list:not([hidden]){margin-top:18px}
+.gift-eight-wishlist{margin-top:56px}
+.gift-eight-wishlist h3{
+  font:500 14px/1.6 'EB Garamond',Georgia,serif;
+  letter-spacing:3.3px;text-transform:uppercase;color:#f3dff0;
+}
+.gift-eight-wishlist-intro{
+  color:#f4e4ee;font:400 15px/1.55 'EB Garamond',Georgia,serif;
+}
+.gift-eight-items{gap:13px}
+.gift-eight-item{
+  background:rgba(253,239,250,.1);
+  border:1px solid rgba(245,216,239,.2);
+  color:#fff1f9;box-shadow:none;
+}
+.gift-eight-item h4,.gift-eight-item p,.gift-eight-actions span{color:#f7e6f0}
+.gift-eight-actions button:disabled{background:#e7cbdc;color:#5b294d}
+.gift-eight-disclaimer{color:#e2c2d4}
+@media(max-width:350px){.gift-eight{min-height:1043px}}
+@media(min-width:351px) and (max-width:374px){.gift-eight{min-height:1013px}}
+@media(min-width:375px) and (max-width:414px){.gift-eight{min-height:991px}}
+@media(min-width:415px){.gift-eight{min-height:923px}}
+@media(prefers-reduced-motion:reduce){.gift-eight-art{animation:none!important}}
