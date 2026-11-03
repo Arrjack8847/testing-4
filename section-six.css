@@ -1,4 +1,4 @@
-/* Section 6 — RSVP preview. Scoped styles, independent of prior five sections. */
+/* Section 7 — RSVP preview. Scoped styles, independent of Sections 1–6. */
 .rsvp-section {
   position:relative;z-index:2;isolation:isolate;overflow:hidden;
   min-height:100dvh;padding:clamp(84px,11dvh,125px) clamp(13px,4.4vw,25px) clamp(100px,13dvh,145px);
@@ -117,4 +117,50 @@
  .rsvp-section .rsvp-flower,.rsvp-section .rsvp-glimmer{animation:none!important;}
  .rsvp-section[data-reveal-ready="true"] .rsvp-reveal{
    opacity:1!important;translate:none!important;transition:none!important;}
+}
+
+
+/* Section 7 reference-structured RSVP & Wishes prototype.
+   Source verifies field order and wishes wall, not pixel-level visual geometry.
+   Keep the mauve edge matched to Section 6's closing #e3d3e1. */
+.rsvp-section .rsvp-kicker{font-family:'EB Garamond',Georgia,serif;font-size:14px;
+  font-weight:400;letter-spacing:.035em;text-transform:none;color:#927982;}
+.rsvp-section h2.rsvp-heading{font:400 clamp(42px,11.8vw,56px)/1.09 'EB Garamond',Georgia,serif;
+  color:#785d75;letter-spacing:.01em;text-shadow:0 3px 15px #fffbf5b0;}
+.rsvp-section .rsvp-intro{max-width:28ch;margin-bottom:32px;}
+.rsvp-section .rsvp-paper{background:linear-gradient(160deg,#fffbf7f6 0%,#f7eef0f2 100%);}
+.rsvp-section .rsvp-paper-inner{padding-top:clamp(48px,11.5vw,62px);}
+.rsvp-section .rsvp-paper-label{font-size:11px;letter-spacing:.17em;margin-bottom:19px;}
+.rsvp-section .rsvp-warning{margin-bottom:29px;}
+.rsvp-section .rsvp-form{gap:21px;}
+.rsvp-section .rsvp-field>span{margin-bottom:2px;}
+.rsvp-section #rsvpAttendance{appearance:auto;-webkit-appearance:menulist;}
+.rsvp-section .rsvp-wishes-wall{position:relative;margin:49px auto 0;max-width:400px;
+  padding:31px clamp(15px,5vw,24px) 35px;
+  border:1px solid #c9af9a88;border-radius:145px 145px 12px 12px / 70px 70px 12px 12px;
+  background:linear-gradient(180deg,#fff9f2dd 0%,#f6ebf1d6 100%);
+  box-shadow:0 12px 32px #6b52781a,inset 0 0 0 7px #fff7ee40;}
+.rsvp-section .rsvp-wishes-flourish{margin:6px auto 18px;}
+.rsvp-section .rsvp-wishes-wall h3{margin:0 auto 12px;
+  font:400 clamp(31px,9vw,41px)/1.14 'EB Garamond',Georgia,serif;color:#80647a;}
+.rsvp-section .rsvp-wishes-caption{max-width:31ch;margin:0 auto 23px;
+  font:400 13px/1.55 'EB Garamond',Georgia,serif;color:#826e80;}
+.rsvp-section .rsvp-wishes-list{display:flex;flex-direction:column;gap:13px;min-width:0;}
+.rsvp-section .rsvp-wish{position:relative;padding:18px 17px 16px;text-align:left;min-width:0;
+  border:1px solid #ccb9af88;border-radius:12px;
+  background:#fffcf7e8;box-shadow:0 4px 14px #705c7920;}
+.rsvp-section .rsvp-wish::before{content:"❧";position:absolute;top:12px;right:14px;
+  font:17px Georgia,serif;color:#b5a083;opacity:.7;}
+.rsvp-section .rsvp-wish-name{margin:0 20px 6px 0;color:#866c80;
+  font:500 12px/1.5 'Cinzel',Georgia,serif;letter-spacing:.025em;overflow-wrap:anywhere;}
+.rsvp-section .rsvp-wish-text{margin:0;color:#715b70;
+  font:400 18px/1.45 'EB Garamond',Georgia,serif;overflow-wrap:anywhere;}
+.rsvp-section .rsvp-outro{font:italic 400 33px/1.16 'EB Garamond',Georgia,serif;
+  margin-top:52px;margin-bottom:7px;}
+.rsvp-section .rsvp-farewell{font:400 13px/1.45 'Cinzel',Georgia,serif;color:#947a79;
+  letter-spacing:.09em;margin:0 auto 15px;}
+@media(max-width:350px){
+  .rsvp-section h2.rsvp-heading{font-size:39px;}
+  .rsvp-section .rsvp-wishes-wall{padding-inline:12px;}
+  .rsvp-section .rsvp-wish{padding-inline:13px;}
 }
