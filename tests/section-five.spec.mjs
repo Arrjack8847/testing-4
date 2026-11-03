@@ -100,6 +100,61 @@ test('Section 7 matches measured 320px and 390px source grid geometry',async({pa
   near(font,52,'Our Gallery font size');
 });
 
+test('Section 7 matches source background, heading placement and small hint type',async({page})=>{
+  const {gallery}=await reachGallery(page);
+  const metrics=await gallery.evaluate(el=>{
+    const cs=getComputedStyle(el);
+    const heading=el.querySelector('h2.gallery-heading');
+    const h=getComputedStyle(heading);
+    const r=el.getBoundingClientRect(),hr=heading.getBoundingClientRect();
+    const note=getComputedStyle(el.querySelector('.gallery-intro'));
+    return {
+      background:cs.backgroundColor,
+      image:cs.backgroundImage,
+      topPadding:cs.paddingTop,bottomPadding:cs.paddingBottom,
+      sidePadding:cs.paddingLeft,
+      titleTop:hr.top-r.top,
+      titleColor:h.color,titleShadow:h.textShadow,
+      titleFont:h.fontSize,titleLineHeight:h.lineHeight,
+      hintSize:note.fontSize,hintLineHeight:note.lineHeight,
+      hintWeight:note.fontWeight,hintColor:note.color
+    };
+  });
+  expect(metrics.background).toBe('rgb(250, 247, 251)');
+  expect(metrics.image).toBe('none');
+  expect(metrics.topPadding).toBe('96px');
+  expect(metrics.bottomPadding).toBe('96px');
+  expect(metrics.sidePadding).toBe('28px');
+  expect(Math.abs(metrics.titleTop-126.1)).toBeLessThanOrEqual(1.5);
+  expect(metrics.titleColor).toBe('rgb(123, 61, 110)');
+  expect(metrics.titleShadow).toBe('none');
+  expect(metrics.titleFont).toBe('52px');
+  expect(metrics.titleLineHeight).toBe('59.8px');
+  expect(metrics.hintSize).toBe('12px');
+  expect(metrics.hintLineHeight).toBe('19.8px');
+  expect(metrics.hintWeight).toBe('300');
+  expect(metrics.hintColor).toBe('rgb(111, 90, 108)');
+});
+
+test('Five downloaded local WebPs remove placeholder footer and preserve reference section height',async({page})=>{
+  await page.route('**/assets/gallery/photo-*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:testImage}));
+  const {gallery,errors}=await reachGallery(page);
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
+  await expect(gallery.locator('.gallery-disclaimer')).toBeHidden();
+  await expect(gallery.locator('.gallery-reference-note')).toBeHidden();
+  const observed=await gallery.evaluate(el=>el.getBoundingClientRect().height);
+  const width=await page.evaluate(()=>innerWidth);
+  const full=width-56;
+  const small=(full-12)/2;
+  const grid=small*(246.9/161)+(small-1)*(213.3/160)
+    +2*full*(249.4/334)+3*12;
+  const target=96+16.5+13.5+59.8+40+grid+22+19.8+96;
+  expect(Math.abs(observed-target),`Section 7 height ${observed} vs ${target}`)
+    .toBeLessThanOrEqual(2);
+  expect(errors).toEqual([]);
+});
+
 test('Section 7 honors reduced-motion without hiding the gallery',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const {gallery}=await reachGallery(page);
