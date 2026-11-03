@@ -77,7 +77,7 @@ try{
                   width:+b.width.toFixed(1),height:+b.height.toFixed(1)},
                 position:s.position,z:s.zIndex,opacity:s.opacity,
                 transform:s.transform,font:s.fontFamily,
-                fontSize:s.fontSize});
+                fontSize:s.fontSize};
             });
           const section=document.getElementById('couple');
           const scene=section?.querySelector('.couple-reference-scene');
@@ -102,7 +102,8 @@ try{
     }catch(error){
       results.errors.push({site:label,message:String(error)});
     }finally{
-      results[label].errors=errors;
+      if(!results[label])results[label]={opened:false,errors};
+      else results[label].errors=errors;
       await page.close();
     }
   }
