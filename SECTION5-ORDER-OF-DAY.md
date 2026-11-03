@@ -115,3 +115,35 @@ is harmless and a valid local WebP becomes the full-height `cover` background.
 No source binaries were pushed. Existing visual comparisons remain useful as
 historical evidence, but new comparisons require the developer's local images
 or an explicitly permitted private test environment.
+
+
+## Section 5 ambient-motion calibration (4 November 2026)
+
+A new read-only Chromium audit of the live reference at 390×844 captured
+three timeline scroll checkpoints and timed samples. It found:
+
+- The **timeline** owns a `cgv-bf-layer` that fills its approximately 651px
+  height. A butterfly moves horizontally from approximately x=-68px to
+  x=44px in 3 seconds during the entering scene, with a gently varying y
+  near 50–70px from the section top.
+- The source butterfly DOM is a 46×35px `cgv-bf` with
+  `scale(.82)`, composed of **two 23×35px halves** of
+  `bfly_blush.webp`, each using `background-size:200% 100%`.
+  Wings flap around their inner edges with `perspective(110px) rotateY(...)`.
+  Source motion is updated by script (not a CSS keyframe on the butterfly).
+- The source has a **fixed 300×viewport canvas** (`cgv-petals`) for
+  drifting petals. It is not a set of static CSS decorations.
+
+The independent implementation now uses a 46×35px two-wing sprite with
+continuous approximately 44px/sec left/right traversal, reversible direction
+and small y flutter. Rendering uses only a locally supplied, authorized
+`bfly_blush.webp` (never vendor hotlinks). The ambient petals now use an
+independently drawn 300px-wide, fixed-position canvas with eleven
+deterministically seeded petals. Animation is paused when offscreen,
+closed, hidden, or Reduce Motion is enabled, and does not create multiple
+animation loops.
+
+The measured trajectory and wing structure are substantially closer to
+the source, but the exact proprietary JS motion curve and canvas particle
+path have **not** been reproduced byte-for-byte or certified pixel-perfect.
+The work remains draft, limited strictly to Section 5.
