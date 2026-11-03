@@ -66,6 +66,55 @@ async function readMetrics(page,isLocal){
     };
     const findText=needle=>[...document.querySelectorAll('h1,h2,h3,h4,p,strong,small,span')]
       .find(el=>(el.textContent||'').trim()===needle);
+    const ownText=el=>[...el.childNodes].filter(n=>n.nodeType===3)
+      .map(n=>n.textContent).join(' ').replace(/\s+/g,' ').trim();
+    const exactLeaf=needle=>[...document.querySelectorAll('*')].find(el=>ownText(el)===needle);
+    const styleOf=el=>{
+      if(!el)return null;
+      const st=getComputedStyle(el),rect=el.getBoundingClientRect();
+      const pseudo=target=>{
+        const p=getComputedStyle(el,target);
+        return {content:p.content,background:p.backgroundImage?.slice(0,360),
+          width:p.width,height:p.height,opacity:p.opacity,border:p.border,
+          borderRadius:p.borderRadius,boxShadow:p.boxShadow};
+      };
+      return {
+        tag:el.tagName,class:typeof el.className==='string'?el.className.slice(0,135):'',
+        box:{x:+rect.x.toFixed(2),y:+(rect.y+scrollY-top).toFixed(2),
+          w:+rect.width.toFixed(2),h:+rect.height.toFixed(2)},
+        style:{position:st.position,display:st.display,padding:st.padding,margin:st.margin,
+          backgroundColor:st.backgroundColor,backgroundImage:st.backgroundImage.slice(0,520),
+          backgroundSize:st.backgroundSize,backgroundPosition:st.backgroundPosition,
+          border:st.border,borderRadius:st.borderRadius,boxShadow:st.boxShadow,
+          backdropFilter:st.backdropFilter,opacity:st.opacity,filter:st.filter,
+          overflow:st.overflow,transform:st.transform,
+          animationName:st.animationName,animationDuration:st.animationDuration,
+          animationTimingFunction:st.animationTimingFunction,animationDelay:st.animationDelay,
+          transition:st.transition},
+        before:pseudo('::before'),after:pseudo('::after')
+      };
+    };
+    const ancestors=(el,cap=6)=>{
+      const result=[];for(let i=0;el&&i<cap;i++,el=el.parentElement)result.push(styleOf(el));
+      return result;
+    };
+    const groom=exactLeaf("Groom's Side"),bride=exactLeaf("Bride's Side");
+    const cards=[groom,bride].map(el=>{
+      const cardsUp=ancestors(el,5);
+      return {label:ownText(el),ancestors:cardsUp};
+    });
+    const rootParents=ancestors(root||header,6);
+    const visualCandidates=[...new Set([...(root?.parentElement?.querySelectorAll('*')||[]),
+      ...(root?.parentElement?.parentElement?.querySelectorAll('img')||[])])]
+      .filter(el=>{
+        const st=getComputedStyle(el),bg=st.backgroundImage,rect=el.getBoundingClientRect();
+        return (el.tagName==='IMG'||bg.includes('url('))&&rect.height>16&&rect.width>16;
+      }).slice(0,28).map(el=>{
+        const st=styleOf(el);
+        return {...st,image:el.tagName==='IMG'?{src:el.currentSrc||el.src,
+          loaded:el.complete&&el.naturalWidth>0,naturalWidth:el.naturalWidth,
+          naturalHeight:el.naturalHeight}:undefined};
+      });
     const swatchNodes=root?[...root.querySelectorAll('*')].filter(el=>{
       const s=getComputedStyle(el),r=el.getBoundingClientRect();
       return r.width>=23&&r.width<=110&&r.height>=23&&r.height<=110&&
@@ -88,6 +137,7 @@ async function readMetrics(page,isLocal){
       brideTitle:box(findText('Terracotta & Blush')),
       brideColours:box(findText('Terracotta, blush, sand')),
       swatches:swatchNodes.map(el=>({position:box(el),background:getComputedStyle(el).backgroundColor})),
+      surface:{rootAncestors:rootParents,cards,visualCandidates},
       selectedImages:root?[...root.querySelectorAll('img')].map(el=>({
         source:el.currentSrc||el.src,loaded:el.complete&&el.naturalWidth>0
       })):[],
