@@ -17,7 +17,7 @@ countdown, using the publicly observed source text:
 2. Wedding Reception — same day, 7:30 PM–10:30 PM; Grand Ballroom,
    St. Regis Kuala Lumpur, 6, Jalan Stesen Sentral 2, 50470 Kuala Lumpur.
    Official source sample Google Maps and Waze URLs retained.
-3. Count down to **example** Akad Nikah 2027-01-23 10:00 +08:00 in
+3. Count down to **example** Wedding Reception 2027-01-23 19:30 +08:00 in
    Days, Hours, Mins, Secs. The timer refreshes while the section is visible
    and the cover is open, and pauses when the tab is hidden.
 4. Add to Calendar opens the reference **example** Google Calendar draft;
@@ -42,7 +42,7 @@ or replace it with invented dates, venues, names or addresses.
 - Two semantic HTML cards remain on top of the pinned one-viewport scene.
   The scene camera follows bounded scroll position forward and backward,
   with extra drift limited to -20…24 CSS px.
-- Card reveal animation uses 52px initial translateY, .955 scale and
+- Individual text-line reveal animation uses 52px initial translateY, .955 scale and
   approximately one-second opacity/transform transitions; reduced-motion
   users see all content without entrances.
 - At 390×844 the reference Events region was observed at document Y
@@ -160,11 +160,12 @@ enabled (using tools/section4-motion-audit.mjs):
    1.0–1.1-second transitions. The prototype now animates these
    child lines individually, not entire cards, and restores their
    resting state on scroll-out.
-5. The reference Events block has no visible four-box countdown;
-   its Events calendar CTA is the concluding action.
-   Reference comparison mode therefore hides our prototype's extra
-   countdown display and demonstration label, while original mode
-   keeps the functional countdown and its disclosure.
+5. Screenshot comparison confirms the reference DOES include four plum
+   countdown blocks above the calendar CTA. Earlier text-only scraping
+   missed the timer. The opt-in comparison mode now renders the same
+   four-unit plum countdown and hides only our demonstration label,
+   which remains visible in original mode. The countdown targets the
+   7:30 PM wedding reception; previously our timer used 10 AM Akad Nikah.
 
 ### Verification
 
@@ -177,3 +178,28 @@ enabled (using tools/section4-motion-audit.mjs):
   only for research, not bundled in this repo or licensed for sale.
   For commercial invitations, replace it with your own original or
   properly licensed artwork. Keep this PR as draft until reviewed.
+
+
+## Screenshot-derived correction (2026-11-03)
+
+Paired screenshot comparison (source vs current branch, Chromium 390×844,
+three scroll positions) found details that DOM geometry alone missed:
+- The Events background image must preserve its full painting edges;
+  in comparison mode its image object-fit is set for this experiment.
+  The source rendered image is 390×1960; the paper itself is a
+  provider-owned 1080×1920 WebP.
+- Both venue names are 600-weight EB Garamond. Time and map directions
+  use tracked letter spacing, map and calendar buttons uppercase.
+- Each diamond divider has fine horizontal lines on both sides.
+- Four dark-plum timer tiles show Days, Hours, Mins, Secs.
+- Pastel moving petals are now approximated with original CSS shapes.
+- Provider navigation and purchase overlays are NOT part of this
+  invitation prototype and are deliberately excluded from it.
+- The remaining screenshot pixel difference is measurable, and the
+  version is still a research replica, not an authorized commercial
+  asset pack.
+
+The previous visual-diff run improved from bottom-frame mean RGB
+difference 29.426 to 19.899 out of 255 after the paper/countdown
+fixes. CI reference comparisons can vary slightly because animations
+and sample timers are not deterministic across two page loads.
