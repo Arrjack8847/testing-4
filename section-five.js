@@ -1,7 +1,7 @@
 'use strict';
-// Reference-structured Section 7 gallery. Guest mode uses only local, consented photographs.
-// ?galleryReference=1 is an explicit QA-only opt-in to display the reference site's original
-// remote photographs without storing or redistributing them in this repository.
+// Section 7 uses downloaded WebP files only: no remote image hosts or silent fallback.
+// Normal mode uses licensed couple photos. ?galleryReference=1 uses locally downloaded
+// comparison files (never bundled or committed unless the owner permits redistribution).
 (() => {
   const section = document.getElementById('gallery');
   const invitation = document.getElementById('invitation');
@@ -16,9 +16,12 @@
     {src:'./assets/gallery/photo-05.webp', alt:'The lakeside scene', caption:'The Lake'}
   ]);
   const referenceMode = new URLSearchParams(window.location.search).get('galleryReference') === '1';
-  const REFERENCE_BASE = 'https://undangankahwin.com/images/concierge/couples/';
   const REFERENCE_FILES = Object.freeze([
-    'moody.webp','moody-bride.webp','moody-groom.webp','moody-garden.webp','moody-lake.webp'
+    './assets/gallery/reference/moody.webp',
+    './assets/gallery/reference/moody-bride.webp',
+    './assets/gallery/reference/moody-groom.webp',
+    './assets/gallery/reference/moody-garden.webp',
+    './assets/gallery/reference/moody-lake.webp'
   ]);
   section.dataset.galleryArt = referenceMode ? 'reference-comparison' : 'local';
   const referenceNote = section.querySelector('.gallery-reference-note');
@@ -48,9 +51,9 @@
     attributes:true,attributeFilter:['data-state']
   });
 
-  // Remote images are never requested unless galleryReference=1 is set explicitly.
+  // Local relative URLs only. Reject absolute, root-relative, data:, and external schemes.
   function safeLocalUrl(src) {
-    return /^\.\/assets\/gallery\/[a-z0-9_-]+\.(webp|png|jpe?g)$/i.test(src) ? src : '';
+    return /^\.\/assets\/gallery\/(?:reference\/)?[a-z0-9_-]+\.webp$/i.test(src) ? src : '';
   }
   function loadPhotos() {
     if (assetsRequested) return;
@@ -58,7 +61,7 @@
     PHOTOS.forEach((photo,index) => {
       const button = buttons.find(b => Number(b.dataset.gallerySlot) === index);
       const local = safeLocalUrl(photo.src);
-      const photoUrl = referenceMode ? REFERENCE_BASE + REFERENCE_FILES[index] : local;
+      const photoUrl = safeLocalUrl(referenceMode ? REFERENCE_FILES[index] : local);
       if (!button || !photoUrl) return;
       const image = document.createElement('img');
       image.className = 'gallery-image';
@@ -74,7 +77,7 @@
         if (placeholder) placeholder.hidden = true;
         available.add(index);
         disclaimer.textContent = referenceMode
-          ? 'Reference-only comparison: original photographs are hosted by Undangan Kahwin, not included in this repository.'
+          ? 'Local comparison only — the reference files are loaded from assets/gallery/reference/.'
           : available.size === PHOTOS.length
             ? 'Tap any photograph to view it in full.'
             : 'Tap an available photograph to view it. Other images are awaiting approval.';
@@ -82,7 +85,7 @@
       image.onerror = () => {
         image.remove();
         if (referenceMode && available.size === 0) {
-          disclaimer.textContent = 'Reference image could not load. The design placeholders remain available for comparison.';
+          disclaimer.textContent = 'Local reference WebP missing. Add the files in assets/gallery/reference/ to compare.';
         }
       };
       button.prepend(image);
