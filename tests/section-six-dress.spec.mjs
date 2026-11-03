@@ -227,32 +227,52 @@ test('Section 6 uses the source-measured stagger and scroll camera',async({page}
 });
 
 
-test('Section 6 uses only original Section 6 paper and paired local wings by default',async({page})=>{
+test('Section 6 uses actual locally bundled paper and butterfly WebPs by default',async({page})=>{
   const {dress,errors}=await openDress(page);
-  // The reference-inspired autonomous flight has a short entrance delay.
+  await expect.poll(()=>dress.getAttribute('data-scene-status'),{timeout:5000}).toBe('loaded');
   await expect.poll(()=>dress.getAttribute('data-flight-ready'),{timeout:5000}).toBe('true');
   const art=await dress.evaluate(el=>{
-    const paper=el.querySelector('.dress-art-original');
-    const src=el.querySelector('#dressSourceScene');
+    const img=el.querySelector('#dressSourceScene');
+    const wingLeft=el.querySelector('.dress-flight-wing-left');
+    const wingRight=el.querySelector('.dress-flight-wing-right');
     const flight=el.querySelector('#dressFlight');
     return {
-      paperBackground:getComputedStyle(paper).backgroundImage,
-      sourceUrl:src?.getAttribute('src')||'',
+      artMode:el.dataset.art,
+      sourceUrl:img?.getAttribute('src')||'',
+      sourceWidth:img?.naturalWidth||0,
+      sourceHeight:img?.naturalHeight||0,
+      sceneVisibility:getComputedStyle(img).display,
+      paperFallbackOpacity:getComputedStyle(el.querySelector('.dress-art-original')).opacity,
+      leftImage:getComputedStyle(wingLeft).backgroundImage,
+      rightImage:getComputedStyle(wingRight).backgroundImage,
+      leftSize:getComputedStyle(wingLeft).backgroundSize,
+      rightSize:getComputedStyle(wingRight).backgroundSize,
+      leftPosition:getComputedStyle(wingLeft).backgroundPosition,
+      rightPosition:getComputedStyle(wingRight).backgroundPosition,
       wingCount:flight?.querySelectorAll('.dress-flight-wing').length||0,
-      flightHidden:getComputedStyle(flight).opacity,
-      loaded:el.dataset.flightReady,
-      bodyCount:flight?.querySelectorAll('.dress-flight-thorax').length||0
+      flightOpacity:Number(getComputedStyle(flight).opacity),
     };
   });
-  expect(art.paperBackground).toContain('dress-paper-original.svg');
-  expect(art.sourceUrl).toBe('');
+  expect(art.artMode).toBe('local-webp');
+  expect(art.sourceUrl).toBe('./assets/section6/paper.webp');
+  expect([art.sourceWidth,art.sourceHeight]).toEqual([1080,1920]);
+  expect(art.sceneVisibility).toBe('block');
+  expect(art.paperFallbackOpacity).toBe('0');
+  expect(art.leftImage).toContain('/assets/section6/bfly_1.webp');
+  expect(art.rightImage).toContain('/assets/section6/bfly_1.webp');
+  expect(art.leftSize).toBe('200% 100%');
+  expect(art.rightSize).toBe('200% 100%');
+  expect(art.leftPosition).toBe('0px 0px');
+  expect(art.rightPosition).toBe('100% 0px');
   expect(art.wingCount).toBe(2);
-  expect(art.bodyCount).toBe(1);
-  expect(art.loaded).toBe('true');
-  expect(Number(art.flightHidden)).toBeGreaterThan(.8);
-  const fileResponse=await page.request.get('/assets/dress-paper-original.svg');
-  expect(fileResponse.status()).toBe(200);
-  expect((await fileResponse.text()).includes('<svg')).toBe(true);
+  expect(art.flightOpacity).toBeGreaterThan(.8);
+  for(const name of ['paper.webp','bfly_1.webp']){
+    const response=await page.request.get('/assets/section6/'+name);
+    expect(response.status()).toBe(200);
+    const bytes=await response.body();
+    expect(bytes.subarray(0,4).toString()).toBe('RIFF');
+    expect(bytes.subarray(8,12).toString()).toBe('WEBP');
+  }
   expect(errors).toEqual([]);
 });
 
