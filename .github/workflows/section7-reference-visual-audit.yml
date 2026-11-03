@@ -1,0 +1,39 @@
+name: Section 7 live-reference visual audit
+on:
+  push:
+    branches:
+      - feat/section7-gallery-reference-20261103
+    paths:
+      - tools/compare-section7-live.mjs
+      - .github/workflows/section7-reference-visual-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-gallery:
+    name: Measure reference Gallery and local Section 7
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium browser and dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Measure reference and local on two mobile widths
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/gallery-server.log 2>&1 &
+          node tools/compare-section7-live.mjs
+      - name: Upload reference/local Gallery screenshots and metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-reference-vs-local-evidence
+          path: section7-live-evidence/
+          if-no-files-found: warn
+          retention-days: 7
