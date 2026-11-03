@@ -160,8 +160,18 @@
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   if (!reduced.matches && 'IntersectionObserver' in window) {
+    // The source observes each heading/frame independently, rather than
+    // revealing the entire Gallery once. Entries reset when they leave view,
+    // so scrolling back up produces a fresh entrance.
     section.dataset.revealReady = 'true';
+    const revealObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        entry.target.classList.toggle('in', entry.isIntersecting);
+      }
+    }, {threshold:0.08});
+    section.querySelectorAll('.gallery-reveal').forEach(node => revealObserver.observe(node));
   }
+  // Image loading remains lazy and independent of reveal/reverse motion.
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry=>entry.isIntersecting)) return;
