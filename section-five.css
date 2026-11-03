@@ -1,4 +1,4 @@
-/* Section 5: image-optional gallery, intentionally independent of Section 1–4. */
+/* Section 7: image-optional Gallery, following Dress Code. */
 .gallery-section {
   position:relative;z-index:2;isolation:isolate;overflow:hidden;
   min-height:100dvh;padding:clamp(82px,11dvh,118px) clamp(14px,4.4vw,25px) clamp(100px,13dvh,138px);
@@ -127,4 +127,56 @@
   .gallery-section .gallery-spark,.gallery-section .gallery-photo::after{animation:none!important;}
   .gallery-section[data-reveal-ready="true"] .gallery-reveal{
     opacity:1!important;translate:none!important;transition:none!important;}
+}
+
+
+/* Section 7: five-frame Gallery visual study.
+   Live reference confirms order and captions; dimensions remain unverified.
+   The top background matches Dress Code's bottom #ded0e1 exactly. */
+.gallery-section .gallery-atmosphere::before{
+  content:"";position:absolute;inset:-22px -3% -20px;opacity:.22;pointer-events:none;
+  background:url("./assets/couple-botanical-edges-original.svg") center / 100% 100% no-repeat;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 11%,#000 87%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 11%,#000 87%,transparent);
+}
+.gallery-section .gallery-eyebrow{
+  font:500 11px/1.5 'Cinzel',Georgia,serif;letter-spacing:.15em;color:#9b7c8d;
+}
+.gallery-section h2.gallery-heading{
+  font:400 clamp(51px,14vw,66px)/1.08 'Pinyon Script','Alex Brush',cursive;
+  letter-spacing:0;margin-bottom:12px;
+}
+.gallery-section .gallery-intro{
+  font:400 clamp(15px,4.2vw,18px)/1.4 'EB Garamond',Georgia,serif;
+  margin-bottom:25px;color:#7c687c;
+}
+.gallery-section .gallery-photo{
+  border-color:#bda58c;box-shadow:0 12px 27px #66506a29,inset 0 0 0 5px #fffdf4b0;
+}
+.gallery-section .gallery-photo:has(.gallery-image){
+  background:#e8dce3;
+}
+.gallery-section .gallery-photo-feature{
+  aspect-ratio:4/4.7;min-height:285px;
+}
+.gallery-section .gallery-photo-small{
+  aspect-ratio:4/5.5;min-height:195px;
+}
+.gallery-section .gallery-photo:not(.has-image) .gallery-frame-caption{display:none;}
+.gallery-section .gallery-frame-caption{
+  position:absolute;z-index:5;left:0;right:0;bottom:0;
+  min-height:63px;display:flex;align-items:end;justify-content:center;
+  padding:25px 8px 12px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(36,24,45,.62));
+  color:#fffaf2;text-shadow:0 1px 3px #231d29b8;
+  font:500 clamp(14px,3.8vw,18px)/1.2 'EB Garamond',Georgia,serif;
+}
+.gallery-section .gallery-photo-note{font-size:15px;}
+.gallery-section .gallery-disclaimer{
+  max-width:35ch;margin-top:25px;font:400 12px/1.5 system-ui,sans-serif;
+}
+@media(max-width:350px){
+  .gallery-section .gallery-photo-feature{min-height:260px;}
+  .gallery-section .gallery-photo-small{min-height:185px;}
+  .gallery-section h2.gallery-heading{font-size:48px;}
 }
