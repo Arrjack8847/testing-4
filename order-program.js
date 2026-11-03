@@ -48,6 +48,13 @@
   if(observer)reveals.forEach(el=>observer.observe(el));
   else reveals.forEach(el=>el.classList.add('order-in-view'));
 
+  if ('IntersectionObserver' in window) {
+    const ambientObserver=new IntersectionObserver(entries=>{
+      section.classList.toggle('order-visible',entries.some(entry=>entry.isIntersecting));
+    },{threshold:0,rootMargin:'70px 0px'});
+    ambientObserver.observe(section);
+  } else section.classList.add('order-visible');
+
   let frame=0;
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   function paint(){
