@@ -68,7 +68,9 @@ test('Section 6 stays between running order and gallery without horizontal overf
   for(const swatch of data.swatches){
     expect(swatch.left).toBeGreaterThanOrEqual(-1);
     expect(swatch.right).toBeLessThanOrEqual(data.windowWidth+1);
-    expect(swatch.width).toBeGreaterThanOrEqual(35);
+    // Entrance reveal starts at 0.955 scale; a 30px swatch can briefly be 28.65px.
+    expect(swatch.width).toBeGreaterThanOrEqual(28);
+    expect(swatch.width).toBeLessThanOrEqual(31);
   }
   expect(errors).toEqual([]);
 });
