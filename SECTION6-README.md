@@ -1,6 +1,6 @@
-# Section 6 — Guest RSVP and Attendance Preview
+# Section 8 — Guest RSVP and Attendance Preview (legacy file names)
 
-Section 6 is a **mobile-first RSVP interface**. It is a functional local preview, **not a production RSVP collection service**. It follows the five existing invitation scenes without changing their animation files.
+The RSVP scene is a **mobile-first RSVP interface**. It is a functional local preview, **not a production RSVP collection service**. It follows the Dress Code and Gallery, without changing previous animation files.
 
 ## What guests can do in the prototype
 
@@ -36,7 +36,7 @@ git pull origin main
 powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
-At `http://localhost:8000`, tap **Open Invitation**, scroll past the first five sections to **Kindly Respond**, then try both attendance options and the preview. No message will be submitted.
+At `http://localhost:8000`, tap **Open Invitation**, scroll past **Dress Code** and **Our Memories** to **Kindly Respond**, then try both attendance options and the preview. No message will be submitted.
 
 For automated tests, after installing the Playwright dependencies:
 
@@ -46,4 +46,4 @@ npm run test:mobile
 npm run test:crossbrowser
 ```
 
-This section is an original design and has not been verified as a pixel-accurate counterpart of the commercial reference. Section 1 artwork licensing and authentic wedding details are still required for commercial release.
+This RSVP section is an original design and has not been verified as a pixel-accurate counterpart of the commercial reference. Section 1 artwork licensing and authentic wedding details are still required for commercial release.
