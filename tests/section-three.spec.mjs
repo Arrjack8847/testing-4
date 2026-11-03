@@ -101,22 +101,27 @@ test('Section 4 source-art is the development default and leaves earlier section
   await expect(section.locator('.event-reference-card')).toHaveCount(2);
   // Local/remote image outcome is checked, never presumed (hotlink blocking).
   await expect(section).toHaveAttribute('data-reference-paper',/^(loading|loaded|failed)$/);
-  await expect(page.locator('#couple')).not.toHaveAttribute('data-art','reference');
+  // main already approved the Couple reference as the default; integrating
+  // Events must preserve that approved rendering.
+  await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
   await expect(page.locator('#message')).toHaveAttribute('data-section','2');
 });
 
 test('Section 4 pin-camera stays bounded, returns on backward scroll, and respects Reduced Motion',async({page})=>{
   const {section}=await openEvents(page);
   const top=await section.evaluate(el=>el.getBoundingClientRect().top+scrollY);
-  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+150);
-  await expect.poll(()=>section.getAttribute('data-event-camera')).not.toBeNull();
-  const at150=Number(await section.getAttribute('data-event-camera'));
-  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+500);
-  await page.waitForTimeout(80);
-  const at500=Number(await section.getAttribute('data-event-camera'));
-  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+150);
-  await page.waitForTimeout(80);
-  const back=Number(await section.getAttribute('data-event-camera'));
+  // Camera updates on requestAnimationFrame; wait for the measured
+  // 0.0427px/scroll-pixel target rather than reading a stale value.
+  async function sampleAt(offset) {
+    await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+offset);
+    const expected=Number(Math.min(24,Math.max(-20,offset*.0427)).toFixed(2));
+    await expect.poll(async()=>Number(await section.getAttribute('data-event-camera')),
+      {timeout:5000}).toBeCloseTo(expected,1);
+    return Number(await section.getAttribute('data-event-camera'));
+  }
+  const at150=await sampleAt(150);
+  const at500=await sampleAt(500);
+  const back=await sampleAt(150);
   expect(at500).toBeGreaterThan(at150);
   expect(Math.abs(back-at150)).toBeLessThan(.5);
   expect(Math.abs(at500)).toBeLessThanOrEqual(24);
