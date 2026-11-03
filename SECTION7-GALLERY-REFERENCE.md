@@ -147,3 +147,34 @@ The isolated Section 7 tests check the values above at 320, 360, 390 and
 No actual third-party wedding photographs were committed. Source motion,
 edge transitions and photographic cropping remain to be compared once
 consented WebPs are available.
+
+## Phase 5 — reference-measured scrolling and reverse replay
+
+Read-only motion audit [41680303237](https://github.com/Arrjack8847/testing-4/actions/runs/41680303237)
+compared the public reference and this branch at 390×844, normal motion.
+Measurements captured the initial hidden state, timed entry, deeper scroll,
+reverse scroll, and re-entry without downloading source photographs.
+
+- Reference elements begin at `opacity:0`,
+  `transform:translate3d(0,52px,0) scale(.955)`.
+- Source CSS reports an opacity transition of `1s` and a transform
+  transition of `1.1s`, and its heading has a `150ms` delay.
+- The five photo frames have delays of `0ms,150ms,300ms,450ms,600ms`.
+- The source uses **independent in-viewport reveal flags**. At the first
+  heading checkpoint the first two frames appear while the Groom, Garden
+  and Lake remain hidden until scrolled into view.
+- The source removes those flags when elements leave the screen, so the
+  entrance runs again when scrolling back.
+
+The implementation now uses a per-item IntersectionObserver to add and
+remove `.in` rather than a one-time section-wide animation. Photo loading
+continues separately and still uses **local WebP files only**. Reduced-motion
+settings remove the transforms/transitions.
+
+Run `npx playwright test tests/section-five.spec.mjs` to check both geometry
+and reversible reveal. GitHub Actions focused QA executes it in four mobile
+viewports, with isolated cross-engine accessibility checks.
+
+This improves animation similarity, but exact easing curves, crop positions
+and neighboring-section transitions still need final review. Third-party
+reference photos are not present in this Git branch.
