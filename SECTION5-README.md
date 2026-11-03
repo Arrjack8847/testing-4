@@ -1,11 +1,11 @@
-# Section 5 — Our Memories Gallery
+# Section 7 — Our Memories Gallery (legacy file names)
 
-The fifth mobile section is an **original gallery design**, not an exact or verified reproduction of the commercial template's fifth section.
+The gallery section is an **original gallery design**, not an exact or verified reproduction of the commercial template's fifth section.
 
 ## Behavior
 
 - One large portrait frame and four smaller frames in a balanced two-column arrangement.
-- Continuity with Section 4's lilac–ivory–gold palette, drawn entirely in CSS.
+- Continuity with the preceding Dress Code scene's lilac–ivory–gold palette, drawn entirely in CSS.
 - Five clearly labeled photo placeholders. **No sample people or fictional couple photographs** are inserted into the site.
 - A card is disabled unless its corresponding local image successfully loads.
 - Once a real image loads, tapping the frame opens a native accessible photo dialog with previous/next, Arrow keys, Escape to close, touch swipe, and focus restoration.
@@ -47,6 +47,6 @@ git pull origin main
 powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
-Open `http://localhost:8000`, tap **Open Invitation**, and scroll through Section 5. Missing photos do not prevent layout testing.
+Open `http://localhost:8000`, tap **Open Invitation**, and scroll through Dress Code to Our Memories. Missing photos do not prevent layout testing.
 
 The original reference-provider artwork in Section 1 still requires redistribution/commercial-use clearance. The new gallery does not change or resolve that restriction. Photos and actual wedding data must be verified before public release.
