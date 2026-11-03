@@ -8,6 +8,7 @@ on:
       - dress-code.css
       - dress-code.js
       - tools/section6-reference-compare.cjs
+      - tools/section6-motion-audit.cjs
       - tests/section-six-dress.spec.mjs
       - package.json
       - .github/workflows/section6-dress-calibration.yml
@@ -59,11 +60,21 @@ jobs:
           exit 1
       - name: Compare four widths against live reference
         run: npm run compare:section6
+      - name: Measure source and local scroll animations
+        run: node tools/section6-motion-audit.cjs
       - name: Upload measurements only (never commercial reference screenshots)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: section6-calibration-measurements
           path: artifacts/section6-compare/measurements.json
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Upload motion measurements only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-motion-measurements
+          path: artifacts/section6-motion/motion.json
           retention-days: 7
           if-no-files-found: warn
