@@ -242,3 +242,30 @@
 }
 .order-section[data-art="reference"][data-band-status="loaded"]::before{display:none}
 .order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{display:none}
+
+
+/* Sparse drifting petals observed crossing the plum panel in the live source.
+   Original CSS shapes; never vendor image copies. */
+.order-section .order-petals {
+  position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;
+}
+.order-section .order-petals span {
+  position:absolute;left:var(--px);top:var(--py);
+  width:5px;height:9px;border-radius:75% 5% 65% 9%;
+  background:rgba(242,216,237,.65);
+  box-shadow:0 0 3px rgba(255,236,255,.25);
+  transform:rotate(var(--r));
+  animation:order-petal-drift var(--pt) linear var(--pd) infinite;
+  animation-play-state:paused;
+}
+.order-section.order-visible .order-petals span {animation-play-state:running}
+@keyframes order-petal-drift {
+  0% {translate:-16px -48px;rotate:-12deg;opacity:0}
+  12% {opacity:.72}
+  49% {translate:18px 14px;rotate:72deg;opacity:.57}
+  88% {opacity:.45}
+  100% {translate:-32px 96px;rotate:170deg;opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .order-section .order-petals span {animation:none!important;opacity:.45}
+}
