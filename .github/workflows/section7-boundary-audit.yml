@@ -1,0 +1,35 @@
+name: Section 7 boundary versus reference
+on:
+  push:
+    branches:
+      - feat/section7-gallery-reference-20261103
+    paths:
+      - tools/compare-section7-boundary.mjs
+      - .github/workflows/section7-boundary-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    name: Gallery and following section boundary at 320 and 390px
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Audit read-only source and local boundaries
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/gallery-boundary-server.log 2>&1 &
+          node tools/compare-section7-boundary.mjs
+      - name: Preserve boundary measurements and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-boundary-comparison
+          path: section7-boundary-evidence/
+          if-no-files-found: warn
+          retention-days: 7
