@@ -5,6 +5,8 @@ on:
       - feat/section7-gallery-reference-20261103
     paths:
       - tools/measure-section7-motion.mjs
+      - section-five.js
+      - section-five.css
       - .github/workflows/section7-motion-audit.yml
   workflow_dispatch:
 permissions:
