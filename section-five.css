@@ -131,7 +131,7 @@
 
 
 /* Section 7: five-frame Gallery visual study.
-   Live reference confirms order and captions; dimensions remain unverified.
+   Live reference confirms order and captions; see the source-measured grid override below.
    The top background matches Dress Code's bottom #ded0e1 exactly. */
 .gallery-section .gallery-atmosphere::before{
   content:"";position:absolute;inset:-22px -3% -20px;opacity:.22;pointer-events:none;
