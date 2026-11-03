@@ -1,0 +1,22 @@
+name: Inspect live Section 5 butterfly structure
+on:
+  push:
+    branches: [feat/section5-order-of-day-reference-20261103]
+    paths:
+      - tools/inspect-section5-butterfly.mjs
+      - .github/workflows/section5-butterfly-inspection.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/inspect-section5-butterfly.mjs

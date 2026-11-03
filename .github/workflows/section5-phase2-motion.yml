@@ -1,0 +1,33 @@
+name: Section 5 timed motion comparison
+on:
+  push:
+    branches: [feat/section5-order-of-day-reference-20261103]
+    paths:
+      - order-program.js
+      - order-program.css
+      - index.html
+      - tools/phase2-section5-motion-compare.mjs
+      - .github/workflows/section5-phase2-motion.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Capture reference and independent animation at aligned scroll positions
+        run: node tools/phase2-section5-motion-compare.mjs
+      - name: Save timed screenshot and motion measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-phase2-motion-evidence
+          path: section5-phase2-motion-evidence/
+          retention-days: 7
+          if-no-files-found: warn
