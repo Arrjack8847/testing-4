@@ -63,6 +63,43 @@ test('Section 7 fits mobile viewports and preserves Dress Code transition',async
   await gallery.screenshot({path:testInfo.outputPath('section-five-empty-gallery.png'),animations:'disabled'});
 });
 
+test('Section 7 matches measured 320px and 390px source grid geometry',async({page})=>{
+  const {gallery}=await reachGallery(page);
+  const width=await page.evaluate(()=>innerWidth);
+  const frames=await gallery.locator('[data-gallery-slot]').evaluateAll(nodes=>nodes.map(el=>{
+    const b=el.getBoundingClientRect();
+    return {x:b.x,y:b.y,width:b.width,height:b.height,bottom:b.bottom};
+  }));
+  expect(frames).toHaveLength(5);
+  const inset=28;
+  const total=width-2*inset;
+  const small=(total-12)/2;
+  const near=(actual,want,why,tolerance=1.2)=>{
+    expect(Math.abs(actual-want),why+': '+actual+' vs '+want).toBeLessThanOrEqual(tolerance);
+  };
+  near(frames[0].x,inset,'Together left');
+  near(frames[1].x,inset+small+12,'Bride left');
+  near(frames[0].width,small,'Together width');
+  near(frames[1].width,small,'Bride width');
+  near(frames[0].height,small*(246.9/161),'Together height');
+  near(frames[1].height,small*(214.7/161),'Bride height');
+  near(frames[0].y,frames[1].y,'Top row alignment');
+  near(frames[2].width,small-1,'Groom centered width');
+  near(frames[2].x,(width-(small-1))/2,'Groom centered x');
+  near(frames[2].y,frames[0].bottom+12,'Groom row gap');
+  near(frames[2].height,(small-1)*(213.3/160),'Groom height');
+  for(const frame of frames.slice(3)){
+    near(frame.x,inset,'Full-width frame left');
+    near(frame.width,total,'Full-width frame width');
+    near(frame.height,total*(249.4/334),'Full-width frame height');
+  }
+  near(frames[3].y,frames[2].bottom+12,'Garden row gap');
+  near(frames[4].y,frames[3].bottom+12,'Lake row gap');
+  const title=gallery.locator('h2.gallery-heading');
+  const font=await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+  near(font,52,'Our Gallery font size');
+});
+
 test('Section 7 honors reduced-motion without hiding the gallery',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const {gallery}=await reachGallery(page);
