@@ -230,3 +230,50 @@ test('canvas and butterfly stop when invitation closes or reduced motion is enab
   await expect(section.locator('#orderButterflyFlight')).toBeHidden();
   await expect(section).not.toHaveAttribute('data-reveal-ready');
 });
+
+
+test('390px timeline text and six row baselines match measured source geometry',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Source baseline measured at 390 x 844');
+  const {section,errors}=await toOrder(page);
+  await expect(section).toBeInViewport();
+  const m=await section.evaluate(el=>{
+    const a=el.getBoundingClientRect();
+    const pos=e=>{
+      const r=e.getBoundingClientRect();
+      return {x:r.x-a.x,y:r.y-a.y,w:r.width,h:r.height};
+    };
+    const heading=el.querySelector('.order-heading');
+    const eyebrow=el.querySelector('.order-eyebrow');
+    const rows=[...el.querySelectorAll('.order-entry')];
+    const first=rows[0];
+    const time=first.querySelector('.order-time');
+    const title=first.querySelector('strong');
+    const sub=first.querySelector('small');
+    const style=e=>{
+      const s=getComputedStyle(e);
+      return {font:s.fontFamily,size:s.fontSize,lineHeight:s.lineHeight,color:s.color,
+        letterSpacing:s.letterSpacing};
+    };
+    return {heading:pos(heading),eyebrow:pos(eyebrow),time:pos(time),
+      title:pos(title),sub:pos(sub),rows:rows.map(pos),titleStyle:style(title),
+      timeStyle:style(time),eyebrowStyle:style(eyebrow)};
+  });
+  const near=(actual,target,limit=1)=>expect(Math.abs(actual-target)).toBeLessThanOrEqual(limit);
+  near(m.eyebrow.y,96);
+  near(m.eyebrow.h,18.14);
+  near(m.heading.y,126.14);
+  near(m.heading.x,28);
+  near(m.heading.w,334);
+  const baseline=[213.03,280.16,332.16,399.28,451.28,503.28];
+  m.rows.forEach((r,i)=>{near(r.x,28);near(r.y,baseline[i]);near(r.w,334);});
+  near(m.time.x,28);
+  near(m.time.w,74);
+  near(m.title.x,136);
+  near(m.title.y,213.03);
+  near(m.sub.y,238.97);
+  expect(m.timeStyle.font).toContain('EB Garamond');
+  expect(m.timeStyle.size).toBe('12px');
+  expect(m.titleStyle.size).toBe('17px');
+  expect(m.eyebrowStyle.size).toBe('11px');
+  expect(errors).toEqual([]);
+});
