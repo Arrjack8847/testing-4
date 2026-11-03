@@ -119,7 +119,13 @@ test('Section 7 matches source background, heading placement and small hint type
       titleColor:h.color,titleShadow:h.textShadow,
       titleFont:h.fontSize,titleLineHeight:h.lineHeight,
       hintSize:note.fontSize,hintLineHeight:note.lineHeight,
-      hintWeight:note.fontWeight,hintColor:note.color
+      hintWeight:note.fontWeight,hintColor:note.color,
+      eyebrow:(()=>{
+        const x=getComputedStyle(el.querySelector('.gallery-eyebrow'));
+        return {family:x.fontFamily,size:x.fontSize,lineHeight:x.lineHeight,
+          weight:x.fontWeight,color:x.color,tracking:x.letterSpacing,
+          bottomMargin:x.marginBottom};
+      })()
     };
   });
   expect(metrics.background).toBe('rgb(250, 247, 251)');
@@ -136,6 +142,13 @@ test('Section 7 matches source background, heading placement and small hint type
   expect(metrics.hintLineHeight).toBe('19.8px');
   expect(metrics.hintWeight).toBe('300');
   expect(metrics.hintColor).toBe('rgb(111, 90, 108)');
+  expect(metrics.eyebrow.size).toBe('11px');
+  expect(metrics.eyebrow.lineHeight).toBe('18.15px');
+  expect(metrics.eyebrow.weight).toBe('400');
+  expect(metrics.eyebrow.color).toBe('rgb(126, 100, 121)');
+  expect(metrics.eyebrow.tracking).toBe('4.95px');
+  expect(metrics.eyebrow.bottomMargin).toBe('12px');
+  expect(metrics.eyebrow.family).toContain('EB Garamond');
 });
 
 test('Five downloaded local WebPs remove placeholder footer and preserve reference section height',async({page})=>{
