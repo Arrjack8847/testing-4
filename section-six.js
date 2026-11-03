@@ -9,6 +9,7 @@
 
   const nameInput = document.getElementById('rsvpName');
   const guestCount = document.getElementById('rsvpGuests');
+  const attendanceSelect = document.getElementById('rsvpAttendance');
   const messageInput = document.getElementById('rsvpMessage');
   const preview = document.getElementById('rsvpPreview');
   const copyButton = document.getElementById('rsvpCopyButton');
@@ -22,7 +23,7 @@
   let previewText = '';
 
   function choice() {
-    return form.querySelector('input[name="attendance"]:checked')?.value || '';
+    return attendanceSelect.value;
   }
   function hidePreview() {
     preview.hidden = true;
@@ -50,9 +51,7 @@
     attributes:true,attributeFilter:['data-state']
   });
 
-  form.querySelectorAll('input[name="attendance"]').forEach(input => {
-    input.addEventListener('change', () => {syncGuestCount();hidePreview();});
-  });
+  attendanceSelect.addEventListener('change', () => {syncGuestCount();hidePreview();});
   nameInput.addEventListener('input', () => {
     nameInput.setCustomValidity('');
     hidePreview();
@@ -62,7 +61,7 @@
 
   form.addEventListener('submit', event => {
     event.preventDefault();
-    // Native required validation handles an unselected attendance radio.
+    // Native required validation handles an unselected attendance option.
     const cleanName = nameInput.value.trim().replace(/\s+/g,' ');
     if (!cleanName) {
       nameInput.setCustomValidity('Please enter your name.');
