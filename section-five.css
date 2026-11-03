@@ -284,3 +284,26 @@
   height:calc(100% - 8px);
   object-fit:cover;
 }
+
+/* Source-confirmed photo-frame finish from the 390px and 320px DOM audit:
+   radius 14px; 4px solid white; 0 14px 36px rgba(120,95,70,.2);
+   image content sits INSIDE that border, not an additional 4px inward. */
+.gallery-section .gallery-photo,
+.gallery-section .gallery-photo:not(:disabled):hover {
+  border:4px solid #fff;
+  border-radius:14px;
+  padding:0;
+  background:#e8dce3;
+  box-shadow:0 14px 36px rgba(120,95,70,.2);
+}
+.gallery-section .gallery-photo::before,
+.gallery-section .gallery-photo::after {
+  content:none;
+}
+.gallery-section .gallery-image {
+  inset:0;
+  width:100%;
+  height:100%;
+  border-radius:10px;
+  object-fit:cover;
+}
