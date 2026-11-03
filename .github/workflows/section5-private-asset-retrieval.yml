@@ -1,0 +1,49 @@
+name: Section 5 temporary reference-art retrieval (private test only)
+on:
+  push:
+    branches: [tooling/section5-private-asset-retrieval-20261104]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  download-reference-webp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve and validate source WebPs into runner's temporary folder
+        run: |
+          python3 - <<'PY'
+          import hashlib, pathlib, urllib.request
+          from PIL import Image
+          assets = {
+            'band_plum.webp': 'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/band_plum.webp',
+            'bfly_blush.webp': 'https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_blush.webp',
+          }
+          out = pathlib.Path('section5-private-reference-assets')
+          out.mkdir(exist_ok=True)
+          with (out / 'inventory.txt').open('w') as inventory:
+            for name,url in assets.items():
+              request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://undangankahwin.com/'})
+              data=urllib.request.urlopen(request,timeout=45).read()
+              if not(data[:4]==b'RIFF' and data[8:12]==b'WEBP'):
+                raise RuntimeError('Not a valid WebP: '+name)
+              dest=out/name
+              dest.write_bytes(data)
+              with Image.open(dest) as image:
+                image.verify()
+              with Image.open(dest) as image:
+                size=image.size
+                mode=image.mode
+              inventory.write(f'{name}\t{size[0]}x{size[1]}\t{mode}\t{len(data)} bytes\tSHA256 {hashlib.sha256(data).hexdigest()}\t{url}\n')
+          print((out/'inventory.txt').read_text())
+          PY
+      - name: Upload assets only as a short-lived, login-gated workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-reference-webps-for-local-private-comparison
+          path: section5-private-reference-assets/
+          retention-days: 1
+          if-no-files-found: error
