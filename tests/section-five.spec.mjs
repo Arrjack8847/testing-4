@@ -316,6 +316,43 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
 });
 
 
+test('Ordinary localhost preview uses downloaded reference WebPs when present',async({page})=>{
+  const filenames=['moody.webp','moody-bride.webp','moody-groom.webp','moody-garden.webp','moody-lake.webp'];
+  const requested=[];
+  const guestPhotos=[];
+  page.on('request',req=>{
+    if (/\/assets\/gallery\/photo-0[1-5]\.webp/.test(req.url())) guestPhotos.push(req.url());
+  });
+  await page.route('**/assets/gallery/reference/*.webp', route=>{
+    requested.push(new URL(route.request().url()).pathname.split('/').at(-1));
+    return route.fulfill({status:200,contentType:'image/webp',body:testImage});
+  });
+  const {gallery,errors}=await reachGallery(page);
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
+  await expect(gallery).toHaveAttribute('data-gallery-art','local-reference-preview');
+  await expect(gallery.locator('.gallery-disclaimer')).toBeHidden();
+  await expect(gallery.locator('.gallery-reference-note')).toBeHidden();
+  const src=await gallery.locator('.gallery-image').evaluateAll(nodes=>nodes.map(img=>img.getAttribute('src')));
+  expect(src).toEqual(filenames.map(file=>'./assets/gallery/reference/'+file));
+  expect(requested.sort()).toEqual([...filenames].sort());
+  expect(guestPhotos).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test('Normal localhost Gallery falls back to customer WebPs when reference files are missing',async({page})=>{
+  await page.route('**/assets/gallery/reference/*.webp',route=>route.fulfill({status:404,body:'Not installed'}));
+  await page.route('**/assets/gallery/photo-*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:testImage}));
+  const {gallery,errors}=await reachGallery(page);
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
+  await expect(gallery).toHaveAttribute('data-gallery-art','local');
+  await expect(gallery.locator('.gallery-reference-note')).toBeHidden();
+  await expect(gallery.locator('.gallery-disclaimer')).toBeHidden();
+  const src=await gallery.locator('.gallery-image').evaluateAll(nodes=>nodes.map(img=>img.getAttribute('src')));
+  expect(src).toEqual([1,2,3,4,5].map(i=>'./assets/gallery/photo-0'+i+'.webp'));
+  expect(errors).toEqual([]);
+});
+
 test('Gallery QA mode loads only five downloaded local WebPs and displays captions',async({page})=>{
   const filenames=['moody.webp','moody-bride.webp','moody-groom.webp','moody-garden.webp','moody-lake.webp'];
   const requested=[];
