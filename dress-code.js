@@ -110,6 +110,10 @@
       section.removeAttribute('data-flight-ready');
       stopFlight();
     }else{
+      if(reduced.matches){
+        const rect=section.getBoundingClientRect();
+        setFlight(Math.max(0,rect.width-64),58,0,1);
+      }
       scheduleCamera();
     }
   }
