@@ -28,7 +28,7 @@ for(const [kind,url] of Object.entries(urls)){
    w:+r.width.toFixed(1),h:+r.height.toFixed(1)};};
  const sty=(el,pseudo=null)=>{
   const c=getComputedStyle(el,pseudo);
-  const keys=['content','display','position','zIndex','opacity','visibility','filter','transform','transition','animation','animationName','animationDuration','animationDelay','animationTimingFunction','border','borderImage','borderRadius','boxShadow','background','backgroundImage','backgroundSize','backgroundPosition','backgroundRepeat','maskImage','clipPath','padding','margin','gap','font','fontFamily','fontSize','fontWeight','lineHeight','color','textShadow'];
+  const keys=['content','display','position','zIndex','opacity','visibility','filter','transform','transition','animation','animationName','animationDuration','animationDelay','animationTimingFunction','border','borderImage','borderRadius','boxShadow','background','backgroundImage','backgroundSize','backgroundPosition','backgroundRepeat','objectFit','objectPosition','imageRendering','top','right','bottom','left','maskImage','clipPath','padding','margin','gap','font','fontFamily','fontSize','fontWeight','lineHeight','color','textShadow'];
   return Object.fromEntries(keys.map(key=>[key,String(c[key]??'').slice(0,850)]).filter(x=>x[1]&&x[1]!=='none'&&x[1]!=='normal'&&x[1]!=='0px'&&x[1]!=='auto'));
  };
  const rows=[section,...section.querySelectorAll('*')];
