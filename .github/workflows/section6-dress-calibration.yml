@@ -49,6 +49,14 @@ jobs:
         run: npm run test:syntax
       - name: Verify Dress Code at four mobile viewports
         run: npx playwright test tests/section-six-dress.spec.mjs
+      - name: Save local original Section 6 screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-original-mobile-screenshots
+          path: test-results/**/*section-six-dress.png
+          retention-days: 7
+          if-no-files-found: warn
       - name: Start local website server
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/section6-http.log 2>&1 &
