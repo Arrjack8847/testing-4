@@ -190,12 +190,25 @@ test('Gallery reveals each frame independently and resets on reverse scroll',asy
   await expect(bride).toHaveClass(/\bin\b/);
   await expect(groom).not.toHaveClass(/\bin\b/);
   const initialStyle=await together.evaluate(el=>({
-    d:getComputedStyle(el).transitionDuration,
+    duration:getComputedStyle(el).transitionDuration,
+    delay:getComputedStyle(el).transitionDelay,
+    easing:getComputedStyle(el).transitionTimingFunction,
+    property:getComputedStyle(el).transitionProperty,
+    opacity:getComputedStyle(el).opacity
+  }));
+  expect(initialStyle.duration).toBe('1.1s');
+  expect(initialStyle.delay).toBe('0s');
+  expect(initialStyle.easing).toBe('ease');
+  expect(initialStyle.property).toBe('transform');
+  expect(initialStyle.opacity).toBe('1');
+  const headingMotion=await heading.evaluate(el=>({
+    duration:getComputedStyle(el).transitionDuration,
+    easing:getComputedStyle(el).transitionTimingFunction,
     delay:getComputedStyle(el).transitionDelay
   }));
-  expect(initialStyle.d).toContain('1s');
-  expect(initialStyle.d).toContain('1.1s');
-  expect(initialStyle.delay).toBe('0s');
+  expect(headingMotion.duration).toBe('1s, 1.1s');
+  expect(headingMotion.easing).toBe('ease, cubic-bezier(0.22, 0.9, 0.24, 1)');
+  expect(headingMotion.delay).toBe('0.15s');
   await page.evaluate(y=>scrollTo({top:y+220,behavior:'instant'}),y);
   await expect(groom).toHaveClass(/\bin\b/);
   await expect(lake).toHaveClass(/\bin\b/);
