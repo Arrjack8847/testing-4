@@ -175,6 +175,7 @@
   box-shadow:0 0 0 1px rgba(255,237,232,.06) inset;
 }
 .order-section .order-eyebrow{
+  width:100%;max-width:334px;
   color:rgba(255,248,238,.88);font:400 11px/1.65 'EB Garamond',Georgia,serif;
   letter-spacing:.45em;text-transform:uppercase;margin:0 0 12px;
 }
