@@ -47,7 +47,7 @@
 .section-ten[data-artwork="licensed-local"] .ref-light {display:none;}
 .section-ten .closing10-inner {
   position:relative;z-index:2;box-sizing:border-box;
-  width:100%;max-width:334px;min-height:664px;margin:0 auto;
+  width:100%;max-width:334px;height:664px;margin:0 auto;
   padding-top:52px;
 }
 .section-ten .closing10-inner::before {
