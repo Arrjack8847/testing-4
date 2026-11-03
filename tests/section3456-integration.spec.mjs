@@ -77,7 +77,7 @@ test('Order of the Day is the original plum fallback, Dress Code matches measure
   };
  });
  expect(metrics.plum).toContain('linear-gradient');
- expect(metrics.sourceOriginalArt).toContain('order-plum-emboss-original.svg');
+ expect(metrics.plum).toContain('order-plum-emboss-original.svg');
  expect(metrics.cards).toHaveLength(2);
  for(const card of metrics.cards){
   expect(card.color).toBe('rgba(255, 255, 255, 0.5)');
