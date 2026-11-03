@@ -1,0 +1,6 @@
+# Development-only captures (may contain reference-provider imagery)
+artifacts/
+test-results/
+playwright-report/
+node_modules/
+.DS_Store
