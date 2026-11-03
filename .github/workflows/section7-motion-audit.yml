@@ -1,0 +1,37 @@
+name: Section 7 Gallery motion comparison
+on:
+  push:
+    branches:
+      - feat/section7-gallery-reference-20261103
+    paths:
+      - tools/measure-section7-motion.mjs
+      - .github/workflows/section7-motion-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    name: Reference versus local scroll-motion metrics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Inspect both animations without copying third-party images
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/gallery-server.log 2>&1 &
+          node tools/measure-section7-motion.mjs
+      - name: Save measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-motion-metrics
+          path: section7-motion-evidence/measurements.json
+          if-no-files-found: warn
+          retention-days: 10
