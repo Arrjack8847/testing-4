@@ -57,7 +57,7 @@
   const observer='IntersectionObserver' in window
     ? new IntersectionObserver(entries=>{
         entries.forEach(entry=>entry.target.classList.toggle('dress-in-view',entry.isIntersecting));
-      },{threshold:.02,rootMargin:'24px 0px 0px 0px'})
+      },{threshold:.02,rootMargin:'0px'})
     : null;
   if(observer)reveals.forEach(el=>observer.observe(el));
   else reveals.forEach(el=>el.classList.add('dress-in-view'));
