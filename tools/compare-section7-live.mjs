@@ -84,7 +84,7 @@ async function capture(type,url,viewport){
         for(let i=0;el&&i<4;i++,el=el.parentElement)chain.push(fmt(el));
         const frame=img.parentElement;
         return {label,found:true,src:img.currentSrc||img.src,
-          natural:[img.naturalWidth,img.naturalHeight],image:fmt(img),frame:fmt(frame),ancestors:chain,frameText:(frame?.innerText||'').slice(0,80),parentText:(frame?.parentElement?.innerText||'').slice(0,120)};
+          natural:[img.naturalWidth,img.naturalHeight],image:fmt(img),frame:fmt(frame),ancestors:chain,frameText:(frame?.innerText||'').slice(0,80),parentText:(frame?.parentElement?.innerText||'').slice(0,120),caption:fmt([...frame.querySelectorAll('*')].find(el=>el.children.length===0&&(el.textContent||'').trim().toUpperCase()===label.toUpperCase()))};
       };
       const section=heading?.closest('section');
       const hint=[...document.querySelectorAll('p,span,div')].find(el=>{
@@ -107,7 +107,7 @@ async function capture(type,url,viewport){
     console.log('SECTION7_AUDIT '+JSON.stringify({
       kind:type,width:viewport.width,found:record.metrics.photos.filter(p=>p.found).length,
       frames:record.metrics.photos.map(p=>({
-        label:p.label,src:p.src,frameText:p.frameText,parentText:p.parentText,
+        label:p.label,src:p.src,frameText:p.frameText,parentText:p.parentText,caption:p.caption,
         image:p.image?.rect,frame:p.frame?.rect,
         styles:p.frame?{radius:p.frame.borderRadius,border:p.frame.border,
           shadow:p.frame.boxShadow,padding:p.frame.padding}:null
