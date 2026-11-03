@@ -9,6 +9,7 @@ on:
       - section-three.css
       - section-three.js
       - tools/section4-visual-metrics.mjs
+      - tools/section4-motion-audit.mjs
       - .github/workflows/section4-reference-measure.yml
 permissions:
   contents: read
@@ -33,11 +34,15 @@ jobs:
           exit 1
       - name: Read-only 390px live reference and 4-phone prototype layout audit
         run: node tools/section4-visual-metrics.mjs
+      - name: Audit shared arch, pseudo elements and artwork scroll behavior
+        run: node tools/section4-motion-audit.mjs
       - name: Upload numerical layout metadata (not reference screenshots)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: section4-reference-computed-layout
-          path: section4-reference-metrics.json
+          path: |
+            section4-reference-metrics.json
+            section4-motion-audit.json
           retention-days: 7
           if-no-files-found: warn
