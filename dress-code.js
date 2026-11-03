@@ -13,7 +13,7 @@
     section.dataset.art='reference';
     const sources=[
       [document.getElementById('dressSourceScene'),'sceneStatus',
-       'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/scene.webp'],
+       'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp'],
       [document.getElementById('dressSourceButterfly'),'butterflyStatus',
        'https://undangankahwin.com/images/concierge/packs/serambi-ungu/bfly_1.webp']
     ];
