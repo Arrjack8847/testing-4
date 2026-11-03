@@ -21,9 +21,11 @@ async function reachRSVP(page) {
 test('RSVP is an honest preview with no destination configured',async({page})=>{
   const {section,errors}=await reachRSVP(page);
   await expect(section).toHaveAttribute('data-section','7');
-  await expect(page.getByRole('heading',{level:2,name:'Kindly Respond'})).toBeVisible();
+  await expect(page.getByRole('heading',{level:2,name:'RSVP & Wishes'})).toBeVisible();
   await expect(section.locator('#rsvpWarning')).toContainText('will not be sent');
   await expect(section.locator('.rsvp-preview')).toBeHidden();
+  await expect(section.locator('.rsvp-wishes-list .rsvp-wish')).toHaveCount(3);
+  await expect(section.locator('.rsvp-wishes-caption')).toContainText('example wishes');
   await expect(section.locator('#rsvpGuests')).toBeDisabled();
   const preview=section.getByRole('button',{name:'Preview RSVP — not sent'});
   await expect(preview).toBeEnabled();
@@ -35,7 +37,7 @@ test('RSVP is an honest preview with no destination configured',async({page})=>{
 test('accepting RSVP shows correct guest count and never claims submission',async({page},testInfo)=>{
   const {section,errors}=await reachRSVP(page);
   await section.locator('#rsvpName').fill('  Dana   Test  ');
-  await section.getByRole('radio',{name:'Joyfully accepts'}).check();
+  await section.locator('#rsvpAttendance').selectOption('yes');
   const guests=section.locator('#rsvpGuests');
   await expect(guests).toBeEnabled();
   await guests.selectOption('3');
@@ -57,9 +59,9 @@ test('accepting RSVP shows correct guest count and never claims submission',asyn
 test('declining RSVP resets the guests field and supports an empty message',async({page})=>{
   const {section}=await reachRSVP(page);
   await section.locator('#rsvpName').fill('Guest Example');
-  await section.getByRole('radio',{name:'Joyfully accepts'}).check();
+  await section.locator('#rsvpAttendance').selectOption('yes');
   await section.locator('#rsvpGuests').selectOption('5');
-  await section.getByRole('radio',{name:'Regretfully declines'}).check();
+  await section.locator('#rsvpAttendance').selectOption('no');
   await expect(section.locator('#rsvpGuests')).toBeDisabled();
   await expect(section.locator('#rsvpGuests')).toHaveValue('1');
   await section.getByRole('button',{name:'Preview RSVP — not sent'}).click();
@@ -71,7 +73,7 @@ test('declining RSVP resets the guests field and supports an empty message',asyn
   await expect(section.locator('#rsvpPreview')).toBeHidden();
 });
 
-test('RSVP Section 5-to-6 transition and inputs fit four phone widths',async({page},testInfo)=>{
+test('RSVP Section 6-to-7 transition and inputs fit four phone widths',async({page},testInfo)=>{
   const {section}=await reachRSVP(page);
   await expect(section).toHaveClass(/is-visible/);
   const stats=await section.evaluate(el=>{
@@ -102,7 +104,7 @@ test('RSVP uses reduced-motion readable content and resets when closed',async({p
   expect(state.opacity).toBe('1');
   expect(['none','0px','0px 0px']).toContain(state.translate);
   await section.locator('#rsvpName').fill('Guest Example');
-  await section.getByRole('radio',{name:'Joyfully accepts'}).check();
+  await section.locator('#rsvpAttendance').selectOption('yes');
   await section.getByRole('button',{name:'Preview RSVP — not sent'}).click();
   await expect(section.locator('#rsvpPreview')).toBeVisible();
   await page.evaluate(()=>{document.getElementById('invitation').dataset.state='cover';});
