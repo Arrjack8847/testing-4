@@ -496,3 +496,15 @@
     will-change:auto;
   }
 }
+
+
+/* The inspected reference has no four-unit countdown grid between its two
+   ceremonies and the Add to Calendar button. Keep our functional example
+   countdown in original mode, but omit it from fidelity comparison mode. */
+.event-section[data-art="reference"] .event-countdown {
+  margin:129px auto 0;
+  padding:0;
+}
+.event-section[data-art="reference"] .event-countdown-grid {
+  display:none;
+}
