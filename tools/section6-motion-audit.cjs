@@ -7,7 +7,7 @@ const path=require('node:path');
 const out=path.resolve(__dirname,'../artifacts/section6-motion');
 const references=[
   {name:'reference',url:'https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en',selector:'.cgv-dress'},
-  {name:'local',url:'http://127.0.0.1:8000/',selector:'#dressCode'}
+  {name:'local',url:'http://127.0.0.1:8000/?dressReference=1',selector:'#dressCode'}
 ];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
@@ -34,7 +34,7 @@ async function capture(page,selector){
     const cards=local?sec.querySelectorAll('.dress-palette'):sec.querySelectorAll('.cgv-dress-card');
     const paper=local?sec.querySelector('#dressSourceScene'):
       sec.querySelector('img[src*="paper.webp"]');
-    const butterfly=local?sec.querySelector('.dress-butterfly'):
+    const butterfly=local?sec.querySelector('.dress-source-butterfly'):
       sec.querySelector('.cgv-bf-w');
     const scene=local?sec.querySelector('.dress-art'):
       (paper?.parentElement||null);
