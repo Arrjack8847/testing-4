@@ -1,0 +1,57 @@
+name: Section 8 Wedding Gift reference and four-phone QA
+on:
+  push:
+    branches:
+      - feat/section8-wedding-gift-reference-20261104
+  pull_request:
+    paths:
+      - index.html
+      - section-eight-gift.css
+      - section-eight-gift.js
+      - tests/section-eight-gift.spec.mjs
+      - tests/section-six.spec.mjs
+      - tools/audit-section8-live.mjs
+      - .github/workflows/section8-gift-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gift:
+    name: Four viewport QA and source geometry evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: JavaScript syntax
+        run: |
+          npm run test:syntax
+          node --check section-eight-gift.js
+          node --check tools/audit-section8-live.mjs
+      - name: Four-phone Section 8, Gallery and RSVP regression
+        run: npx playwright test tests/section-eight-gift.spec.mjs tests/section-five.spec.mjs tests/section-six.spec.mjs --workers=2
+      - name: Start local preview for source audit
+        if: always()
+        run: python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/gift-server.log 2>&1 &
+      - name: Reference vs local screenshots and measured geometry
+        if: always()
+        continue-on-error: true
+        run: node tools/audit-section8-live.mjs
+      - name: Upload test traces and source/local evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section8-gift-visual-and-functional-evidence
+          path: |
+            section8-evidence/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 10
