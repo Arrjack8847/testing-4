@@ -50,28 +50,34 @@
     if(!flightStart)flightStart=now;
     const seconds=(now-flightStart)/1000;
     const initialDelay=.7;
-    const rightDuration=17,leftDuration=17,rest=.8,cycle=rightDuration+leftDuration+rest*2;
+    const travel=17,rest=.8,passLength=travel+rest,cycle=passLength*4;
     if(seconds<initialDelay){
       section.removeAttribute('data-flight-ready');
     }else{
       const p=(seconds-initialDelay)%cycle;
+      const pass=Math.floor(p/passLength);
+      const t=p-pass*passLength;
       const scale=clamp(.82*rect.width/390,.65,.94);
+      // The reference alternates high flights (~50px from the top) and
+      // low flights (~600–625px at 390/320 widths), with either direction.
+      const lowerLane=pass===0||pass===3;
+      const rightToLeft=pass%2===0;
       let x,y,angle;
-      if(p<rightDuration){
-        // First pass: fly in from the upper-right toward the left.
-        x=rect.width+36-(rect.width+101)*p/rightDuration;
-        y=38+(.7*p)+5*Math.sin(p*1.9);
-        angle=-67+6*Math.sin(p*.85);
-      }else if(p<rightDuration+rest){
-        x=-100;y=42;angle=-67;
-      }else if(p<rightDuration+rest+leftDuration){
-        // Second pass: return from the left, slightly higher at the end.
-        const t=p-(rightDuration+rest);
-        x=-85+(rect.width+143)*t/leftDuration;
-        y=62-3.1*t+6*Math.sin(t*2.1);
-        angle=69+7*Math.sin(t*.8);
+      if(t<travel){
+        if(rightToLeft){
+          x=rect.width+36-(rect.width+101)*t/travel;
+          angle=-67+6*Math.sin(t*.85);
+        }else{
+          x=-85+(rect.width+143)*t/travel;
+          angle=69+7*Math.sin(t*.8);
+        }
+        y=lowerLane
+          ?rect.height-81+7*Math.sin(t*1.9)+.35*t
+          :55-1.4*t+6*Math.sin(t*2.1);
       }else{
-        x=rect.width+80;y=36;angle=69;
+        x=rightToLeft?-100:rect.width+80;
+        y=lowerLane?rect.height-78:45;
+        angle=rightToLeft?-67:69;
       }
       setFlight(x,y,angle,scale);
     }
