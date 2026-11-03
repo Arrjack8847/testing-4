@@ -20,7 +20,8 @@ function sampleExpr() {
     return {tag:el.tagName,class:String(el.className||'').slice(0,160),
       rect:rect(el),opacity:st.opacity,transform:st.transform,translate:st.translate,
       transition:st.transitionProperty,transitionDuration:st.transitionDuration,
-      transitionDelay:st.transitionDelay,animation:st.animationName,
+      transitionDelay:st.transitionDelay,transitionEasing:st.transitionTimingFunction,
+      animation:st.animationName,
       animationDuration:st.animationDuration,animationDelay:st.animationDelay};};
   const words=[...gallery?.querySelectorAll('p,span,div')||[]];
   const kicker=words.find(e=>e.children.length===0&&(e.textContent||'').trim().toUpperCase()==='MOMENTS');
@@ -68,7 +69,7 @@ async function measure(name,url){
       record.samples.push({label,...result});
       const short={name,label,heading:result.heading,frames:result.frames.map(f=>f&&{
         opacity:f.opacity,transform:f.transform,translate:f.translate,
-        dur:f.transitionDuration,delay:f.transitionDelay,
+        dur:f.transitionDuration,delay:f.transitionDelay,ease:f.transitionEasing,
         animation:f.animation,class:f.class,
         y:f.rect?.y})};
       console.log('SECTION7_MOTION '+JSON.stringify(short));
