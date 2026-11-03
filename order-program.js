@@ -35,8 +35,8 @@
     for (const [img,key,url] of images) {
       if (!img) continue;
       section.dataset[key]='loading';
-      img.addEventListener('load',()=>{section.dataset[key]=img.naturalWidth>0?'loaded':'failed';},{once:true});
-      img.addEventListener('error',()=>{section.dataset[key]='failed';},{once:true});
+      img.addEventListener('load',()=>{section.dataset[key]=img.naturalWidth>0?'loaded':'failed';updateAmbient();},{once:true});
+      img.addEventListener('error',()=>{section.dataset[key]='failed';updateAmbient();},{once:true});
       img.src=url;
     }
   }
@@ -147,7 +147,8 @@
     const active=canAnimateAmbient();
     section.classList.toggle('order-visible',petalVisible && invite.dataset.state==='opened');
     section.dataset.petalMotion=active?'running':(reduced.matches?'still':'paused');
-    section.dataset.butterflyMotion=active?'running':'paused';
+    section.dataset.butterflyMotion=section.dataset.butterflyStatus==='loaded'
+      ? (active?'running':'paused') : 'unavailable';
     if(active){
       if(!petalFrame){
         lastFrame=0;
