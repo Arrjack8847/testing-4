@@ -36,8 +36,10 @@
     if(reduced.matches || invitation.dataset.state!=='opened')return;
     const rect=section.getBoundingClientRect();
     if(rect.bottom<0 || rect.top>innerHeight)return;
-    const progress=Math.max(0,Math.min(1,(innerHeight-rect.top)/(innerHeight+rect.height)));
-    const offset=(progress-.5)*25;
+    // Source-measured paper offset = -12% of section height plus
+    // approximately (3.5px - 0.0427 * section screen-top). Keep the
+    // illustration's movement bounded outside visible scroll positions.
+    const offset=Math.max(-45,Math.min(45,3.5-rect.top*.0427));
     section.style.setProperty('--dress-camera-y',offset.toFixed(2)+'px');
   }
   function schedule(){if(!frame)frame=requestAnimationFrame(paint)}
