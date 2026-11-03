@@ -128,20 +128,68 @@ test('default reference garden camera follows scrolling without moving cards',as
     return section.evaluate(el=>({
       camera:parseFloat(el.dataset.referenceCameraOffset),
       total:parseFloat(el.style.getPropertyValue('--couple-reference-y')),
-      background:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
+      background:getComputedStyle(el.querySelector('.couple-reference-scene'),'::before').backgroundImage,
       overflow:document.documentElement.scrollWidth-innerWidth
     }));
   };
   const first=await sample(.10);
   const second=await sample(.80);
   expect(first.camera).toBeLessThan(second.camera);
-  expect(second.background).toContain('tasik-kayangan/scene.webp');
+  expect(second.background).toMatch(/(?:assets\/scene\.webp|tasik-kayangan\/scene\.webp)/);
   expect(first.overflow).toBeLessThanOrEqual(1);
   expect(second.overflow).toBeLessThanOrEqual(1);
   expect(Number.isFinite(second.total)).toBe(true);
   expect(errors).toEqual([]);
 });
 
+
+test('Section 3 uses the local Section 1 painting with enough overscan at every scroll position',async({page})=>{
+  await page.goto('/');
+  await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
+  // CI installs the 25 first-scene WebPs in assets/ before starting browsers.
+  await expect.poll(()=>page.locator('#couple').getAttribute('data-reference-scene-source')).toBe('local');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const section=page.locator('#couple');
+  const geom=await section.evaluate(el=>({
+    start:el.getBoundingClientRect().top+scrollY,
+    travel:Math.max(0,el.offsetHeight-innerHeight)
+  }));
+  for(const fraction of [0,.15,.50,.85,1]){
+    await page.evaluate(async y=>{
+      document.documentElement.style.scrollBehavior='auto';
+      scrollTo({top:Math.round(y),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },geom.start+geom.travel*fraction);
+    const actual=await section.evaluate(el=>{
+      const image=el.querySelector('.couple-reference-scene');
+      const sectionBox=el.getBoundingClientRect();
+      const view=innerHeight;
+      const camera=parseFloat(el.dataset.referenceCameraOffset);
+      const pinned=Math.max(0,Math.min(el.offsetHeight-view,-sectionBox.top));
+      const computed=getComputedStyle(image,'::before');
+      const marginTop=parseFloat(computed.top);
+      const marginBottom=parseFloat(computed.bottom);
+      const pictureTop=sectionBox.top+pinned+camera+marginTop;
+      const pictureBottom=sectionBox.top+pinned+camera+view-marginBottom;
+      return {
+        local:el.dataset.referenceSceneSource,
+        originalHidden:getComputedStyle(el).backgroundImage==='none',
+        source:computed.backgroundImage,
+        marginTop,marginBottom,pictureTop,pictureBottom,view,
+        overflow:document.documentElement.scrollWidth-innerWidth
+      };
+    });
+    expect(actual.local).toBe('local');
+    expect(actual.originalHidden).toBe(true);
+    expect(actual.source).toContain('assets/scene.webp');
+    expect(actual.marginTop).toBe(-64);
+    expect(actual.marginBottom).toBe(-64);
+    expect(actual.pictureTop).toBeLessThanOrEqual(0);
+    expect(actual.pictureBottom).toBeGreaterThanOrEqual(actual.view);
+    expect(actual.overflow).toBeLessThanOrEqual(1);
+  }
+});
 
 test('default reference replaces original illustrations and keeps section 4 seam intact',async({page})=>{
   const {section,errors}=await openCouple(page);
@@ -180,7 +228,7 @@ test('default reference arch, paper tint, portraits and text preserve mobile lay
       washZ:Number(getComputedStyle(el,'::before').zIndex),
       archZ:Number(getComputedStyle(arch).zIndex),
       innerZ:Number(getComputedStyle(details).zIndex),
-      garden:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
+      garden:getComputedStyle(el.querySelector('.couple-reference-scene'),'::before').backgroundImage,
       archImage:getComputedStyle(arch).borderImageSource,
       footer:next.id,
       seam:next.getBoundingClientRect().top-el.getBoundingClientRect().bottom,
@@ -191,7 +239,7 @@ test('default reference arch, paper tint, portraits and text preserve mobile lay
   expect(report.washOpacity).toBe('0.1');
   expect(report.archZ).toBeGreaterThan(report.washZ);
   expect(report.innerZ).toBeGreaterThan(report.archZ);
-  expect(report.garden).toContain('tasik-kayangan/scene.webp');
+  expect(report.garden).toMatch(/(?:assets\/scene\.webp|tasik-kayangan\/scene\.webp)/);
   expect(report.archImage).toContain('arch_panel.svg');
   expect(report.footer).toBe('eventDetails');
   expect(Math.abs(report.seam)).toBeLessThanOrEqual(1);
@@ -215,7 +263,7 @@ test('both plain / and old flag URL show identical approved Section 3 artwork',a
   await expect(section.locator('#bridePortrait')).toHaveAttribute('data-reference-url',/couples\/moody-bride\.webp$/);
   const style=await section.evaluate(el=>({
     arch:getComputedStyle(el.querySelector('.couple-arch')).borderImageSource,
-    garden:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
+    garden:getComputedStyle(el.querySelector('.couple-reference-scene'),'::before').backgroundImage,
     clouds:getComputedStyle(el.querySelector('.couple-hanging')).display,
     width:document.documentElement.scrollWidth-window.innerWidth,
     washOpacity:getComputedStyle(el,'::before').opacity,
@@ -225,7 +273,7 @@ test('both plain / and old flag URL show identical approved Section 3 artwork',a
   expect(style.washOpacity).toBe('0.1');
   expect(style.archZ).toBeGreaterThan(style.washZ);
   expect(style.arch).toContain('arch_panel.svg');
-  expect(style.garden).toContain('tasik-kayangan/scene.webp');
+  expect(style.garden).toMatch(/(?:assets\/scene\.webp|tasik-kayangan\/scene\.webp)/);
   expect(style.clouds).toBe('none');
   expect(style.width).toBeLessThanOrEqual(1);
   await page.getByRole('button',{name:'Open Invitation'}).click();
