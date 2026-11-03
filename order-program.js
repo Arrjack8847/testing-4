@@ -204,7 +204,7 @@
     const ambientObserver=new IntersectionObserver(entries=>{
       petalVisible=entries.some(entry=>entry.isIntersecting);
       updateAmbient();
-    },{threshold:0,rootMargin:'80px 0px'});
+    },{threshold:0,rootMargin:'0px 0px'});
     ambientObserver.observe(section);
   }else{petalVisible=true;}
   addEventListener('resize',()=>{resizeCanvas();updateAmbient();},{passive:true});
