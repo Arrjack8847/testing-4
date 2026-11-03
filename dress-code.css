@@ -203,3 +203,73 @@
     transition:none!important;transition-delay:0s!important;
   }
 }
+
+
+/* Section 6 original butterfly flight layer, measured against the reference path.
+   This artwork is constructed from CSS rather than third-party image files. */
+.dress-section .dress-art-original{
+  opacity:1;
+  background: url("./assets/dress-paper-original.svg") center / 100% 100% no-repeat;
+}
+.dress-section .dress-art-original::after{display:none}
+.dress-section[data-art="reference"][data-scene-status="loaded"] .dress-art-original{opacity:0}
+.dress-section .dress-butterfly,
+.dress-section .dress-source-butterfly{display:none!important}
+.dress-section .dress-flight{
+  position:absolute;z-index:1;left:0;top:0;width:52px;height:41px;
+  pointer-events:none;user-select:none;opacity:0;
+  transform:translate3d(var(--dress-flight-x,-80px),var(--dress-flight-y,58px),0);
+  transform-style:preserve-3d;perspective:135px;
+  will-change:transform;
+}
+.dress-section[data-flight-ready="true"] .dress-flight{opacity:.92}
+.dress-section .dress-flight-wing{
+  position:absolute;top:0;width:26px;height:41px;
+  display:block;backface-visibility:hidden;transform-style:preserve-3d;
+  background:
+    radial-gradient(ellipse at 63% 26%,#fff5e4d9 0 8%,transparent 28%),
+    radial-gradient(ellipse at 58% 62%,#b8a6c8 0 11%,transparent 45%),
+    linear-gradient(135deg,#dfc5dd 1%,#f4e3ed 39%,#baa8ca 72%,#876f9b 100%);
+  filter:drop-shadow(0 1px 1px #694e7945);
+  border:1px solid #a284b0b8;
+}
+.dress-section .dress-flight-wing-left{
+  left:0;transform-origin:100% 43%;
+  border-radius:93% 33% 67% 19%;
+  clip-path:polygon(100% 46%,82% 17%,66% 0,28% 5%,9% 22%,0 56%,21% 72%,38% 74%,26% 98%,66% 85%,100% 60%);
+  animation:dress-wing-flight-left .38s ease-in-out infinite;
+}
+.dress-section .dress-flight-wing-right{
+  right:0;transform-origin:0 43%;
+  border-radius:33% 93% 19% 67%;
+  clip-path:polygon(0 46%,18% 17%,34% 0,72% 5%,91% 22%,100% 56%,79% 72%,62% 74%,74% 98%,34% 85%,0 60%);
+  animation:dress-wing-flight-right .38s ease-in-out infinite;
+}
+.dress-section .dress-flight-thorax{
+  position:absolute;top:13px;left:24.5px;width:3px;height:23px;
+  border-radius:50% 50% 60% 60%;
+  background:linear-gradient(180deg,#6e5878 0%,#9f7d9d 44%,#584365 100%);
+  box-shadow:0 1px 2px #59445b66;transform:translateZ(2px);
+}
+.dress-section .dress-flight-antenna{
+  position:absolute;top:7px;left:25px;width:1px;height:11px;
+  background:#856a83;transform-origin:50% 100%;
+  border-radius:50%;transform:rotate(-26deg);
+}
+.dress-section .dress-flight-antenna-right{
+  transform:rotate(26deg);left:26px;
+}
+@keyframes dress-wing-flight-left{
+  0%,100%{transform:rotateY(-16deg)}
+  50%{transform:rotateY(-77deg)}
+}
+@keyframes dress-wing-flight-right{
+  0%,100%{transform:rotateY(16deg)}
+  50%{transform:rotateY(77deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .dress-section .dress-flight{will-change:auto}
+  .dress-section .dress-flight-wing{animation:none!important}
+  .dress-section .dress-flight-wing-left{transform:rotateY(-24deg)}
+  .dress-section .dress-flight-wing-right{transform:rotateY(24deg)}
+}
