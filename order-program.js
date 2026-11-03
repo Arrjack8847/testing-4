@@ -193,6 +193,7 @@
     if(reduced.matches){
       section.removeAttribute('data-reveal-ready');
       section.style.setProperty('--order-stage-y','0px');
+      section.dataset.orderCamera='0.00';
       if(frame){cancelAnimationFrame(frame);frame=0;}
     }else{
       if(observer)section.dataset.revealReady='true';
