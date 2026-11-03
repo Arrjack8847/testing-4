@@ -296,3 +296,38 @@
     rotate(var(--dress-flight-rotate,0deg)) scale(var(--dress-flight-scale,1));
   transform-origin:50% 43%;
 }
+
+
+/* Path A: authorized source WebPs are local repository artwork. */
+/* Keep the paper image's reference 1080:1920 composition, 124%-tall
+   background frame, object-fit cover, and measured section parallax. */
+.dress-section[data-art="local-webp"][data-scene-status="loaded"] .dress-source-scene {
+  display:block;position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover;object-position:center;
+  opacity:1;
+}
+.dress-section[data-art="local-webp"][data-scene-status="loaded"] .dress-art-original {
+  opacity:0;
+}
+.dress-section[data-art="local-webp"]::before,
+.dress-section[data-art="local-webp"]::after { display:none; }
+/* The 256x204 WebP is one butterfly spread: the reference itself splits
+   it into two 26x41 CSS wings using 200% background sizing. */
+.dress-section .dress-flight-wing {
+  background-image:url("./assets/section6/bfly_1.webp");
+  background-size:200% 100%;
+  background-repeat:no-repeat;
+  border:0;
+  border-radius:0;
+  clip-path:none;
+  filter:none;
+}
+.dress-section .dress-flight-wing-left {
+  background-position:0 0;
+}
+.dress-section .dress-flight-wing-right {
+  background-position:100% 0;
+}
+.dress-section .dress-flight-thorax,
+.dress-section .dress-flight-antenna { display:none; }
+.dress-section[data-flight-ready="true"] .dress-flight { opacity:1; }
