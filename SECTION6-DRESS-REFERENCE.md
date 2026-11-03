@@ -176,41 +176,44 @@ original replacement.
 
 ## Original butterfly flight and paper art — follow-up
 
-The default Section 6 now has its own original `assets/dress-paper-original.svg`
-(soft botanical/fiber texture with edge blossoms); it no longer relies on
-re-using the couple illustration for this section. Original-art mode gently
-blends into the purple edges of Sections 5 and 7, while preserving the measured
-text and card geometry.
+The default Section 6 now has an original
+`assets/dress-paper-original.svg` (pale embossed-paper texture with botanical
+edges), rather than re-using the earlier couple illustration. Short
+background-only gradients blend the original-art scene into the lavender
+edges of adjacent sections, without affecting measured card geometry.
 
-A new `#dressFlight` consists of **two independent, original CSS wings**,
-thorax and antennae with 3D flapping. Its section-relative flight path is based
-on samples from the live reference (left wing at 390px width):
+A new `#dressFlight` consists of independently drawn CSS wings, body and
+antennae with 3D flapping. The earlier four-point scroll trajectory was a
+**time/scroll confound**, not an exact representation of the source's behaviour.
+A follow-up browser audit held Section 6 at a **fixed scroll position** while
+sampling the reference every 500ms for seven seconds:
 
-| Section top (screen px) | Wing X | Wing Y relative to section |
-| ---: | ---: | ---: |
-| -240 | 323.16 | 67.45 |
-| 0 | 352.21 | 57.83 |
-| 240 | 381.89 | 46.51 |
-| 580 | 413.66 | 46.05 |
+- At 390px, a left-to-right flight shifted from about X=-65px to X=140px
+  (approximately 31px per second), with vertical bobbing and 3D wing rotation.
+- At 320px, a later right-to-left pass shifted from about X=336px to X=250px
+  over 3.5 seconds (approximately 25px per second).
+- The live reference can start its flight at different delays, and some
+  preliminary frames show an uninitialized wing at 0,0; they should never
+  be treated as valid flight-path measurements.
 
-The JavaScript interpolates those positions and scales X for mobile widths,
-while respecting prefers-reduced-motion with a static wing. The paper artwork
-continues to follow its separately calibrated parallax curve.
+The local butterfly now uses a **time-driven, alternating left/right flight**,
+rather than moving only with scrolling. It has independent 3D-flapping
+wings and a responsive scale. The background paper retains its *separate*
+scroll-camera parallax. Reduced-motion mode shows a stationary butterfly,
+with no wing-flap animation.
 
-The old single remote butterfly image from an unrelated source pack has been
-removed. The only third-party source still requested in explicit
-`?dressReference=1` comparison mode is `paper.webp`; it is never packaged
-into this repository by the Section 6 implementation.
+Evidence: [source and local fixed-scroll telemetry](https://github.com/Arrjack8847/testing-4/actions/runs/41685387495).
+The read-only script `tools/section6-flight-timeline.cjs` captures fixed-scroll
+motion. The four-width comparator excludes reference placeholder frames and
+is diagnostic, not a claim of pixel-identical animation.
 
-Verification scripts:
-- `tests/section-six-dress.spec.mjs`: new original-paper, wing and reduced-motion
-  checks added to the existing layout tests.
-- `tools/section6-flight-compare.cjs`: compares the live-source and local
-  wing coordinates at 320/360/390/430px and three section positions.
-- The dedicated workflow captures only local original-art screenshots for
-  internal inspection; reference screenshots are not redistributed.
+The old vendor butterfly from an unrelated source pack has been removed.
+Only the reference-hosted `paper.webp` may be loaded when the explicit
+`?dressReference=1` comparison parameter is present. No vendor butterfly
+image is bundled. `tests/section-six-dress.spec.mjs` covers original
+paper, butterfly activity without scroll, and reduced-motion behaviour.
 
-**Fidelity boundary:** This recreates the reference motion concept without
-copying its butterfly illustration. The two images will not be pixel-identical
-without rights to the original artwork. Do not claim the entire section is exact
-based on geometry metrics alone.
+**Fidelity boundary:** The mechanics now follow the reference's autonomous
+flight pattern, but the illustrated butterfly and paper art are original.
+Their pixels and exact randomized source flight cycles are not identical
+to the commercial reference.
