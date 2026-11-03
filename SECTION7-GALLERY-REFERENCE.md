@@ -114,3 +114,36 @@ white border also gives the downloaded WebP an exact 4px inset.
 overall section entrance/exit scroll behavior and source animation timing.
 The Gallery is not yet a certified exact replica. Default placeholders
 remain until authorized WebP files arrive.
+
+## Phase 4 — exact measured Gallery typography and photo tags
+
+Read-only source measurements at 390px and 320px in GitHub Actions runs
+41677514420, 41678693281 and 41678980077 confirmed:
+
+| Item | Measured source styling |
+|---|---|
+| Gallery background | solid `#faf7fb` |
+| Section padding | `96px 28px` |
+| Base color/font | `#4a2a45`, 18px/29.7px EB Garamond |
+| MOMENTS | 11px/18.15px EB Garamond 400, `#7e6479`, 4.95px letter-spacing, margin-bottom 12px |
+| Our Gallery | 52px/59.8px Pinyon Script 400, `#7b3d6e`, no shadow |
+| Heading-to-first-frame space | 40px |
+| Tap a frame to view | 12px/19.8px EB Garamond 300, `#6f5a6c`, margin-top 22px |
+| Photograph | `object-fit:cover`, `object-position:center` |
+| Label text | uppercase, white, EB Garamond 10px/16.5px 400, 2.8px letter-spacing, shadow `0 1px 10px rgba(60,45,30,.7)` |
+| Label position | 16px from outside frame left, 14px above outside frame bottom |
+
+The Gallery's former decorative section gradient, sparkle layer and star
+divider were removed to match the source's solid paper and simpler layout.
+Caption styling was changed from a centered gradient bar to the source's
+small bottom-left labels. The local-photo behavior remains unchanged.
+
+A complete five-WebP local Gallery now hides the development-only missing-photo
+disclaimer. This preserves the reference section's lower 96px padding.
+When files are missing, the explanatory placeholders remain for debugging.
+
+The isolated Section 7 tests check the values above at 320, 360, 390 and
+430px; live-source audits so far explicitly sampled 320 and 390px.
+No actual third-party wedding photographs were committed. Source motion,
+edge transitions and photographic cropping remain to be compared once
+consented WebPs are available.
