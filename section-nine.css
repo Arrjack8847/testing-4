@@ -29,7 +29,7 @@
 .s9-frame i:nth-child(4){right:-10px;bottom:-46px;border-width:0 1px 1px 0}
 .s9-eyebrow{max-width:250px;margin:0 auto 12px;color:#7e6479;
   font:400 11px/1.65 'EB Garamond',Georgia,serif;letter-spacing:4.95px;text-transform:uppercase}
-.s9-heading{font:400 52px/1.15 'Pinyon Script',cursive;color:#7b3d6e;margin:0 0 30px}
+.s9-heading{font:400 52px/1.15 'Pinyon Script',cursive;color:#7b3d6e;margin:0 0 36px}
 .s9-form{display:flex;flex-direction:column;gap:24px;max-width:100%;margin:0 auto}
 .s9-field{text-align:left;min-width:0}
 .s9-field label{display:block;font:400 11px/1.65 'EB Garamond',Georgia,serif;
