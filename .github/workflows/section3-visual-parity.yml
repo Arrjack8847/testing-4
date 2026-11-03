@@ -1,0 +1,51 @@
+name: Section 3 visual parity — live vs prototype
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tools/section3-visual-parity.mjs
+      - .github/workflows/section3-visual-parity.yml
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Download existing reference scene artwork in the temporary runner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25, 'Expected exactly 25 scene artworks'
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              url='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name
+              body=urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert body[:4]==b'RIFF' and body[8:12]==b'WEBP',f'Invalid {name}'
+              Path('assets',name).write_bytes(body)
+          PY
+      - name: Start independent local prototype
+        run: |
+          nohup python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/tasik-local.log 2>&1 &
+          sleep 2
+      - name: Capture matched live/reference checkpoints
+        run: node tools/section3-visual-parity.mjs
+      - name: Upload live and local screenshots plus measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section3-live-vs-local-390px
+          path: artifacts/section3-parity/
+          retention-days: 3
+          if-no-files-found: warn
