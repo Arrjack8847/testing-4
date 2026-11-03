@@ -122,10 +122,11 @@ or an explicitly permitted private test environment.
 A new read-only Chromium audit of the live reference at 390×844 captured
 three timeline scroll checkpoints and timed samples. It found:
 
-- The **timeline** owns a `cgv-bf-layer` that fills its approximately 651px
-  height. A butterfly moves horizontally from approximately x=-68px to
-  x=44px in 3 seconds during the entering scene, with a gently varying y
-  near 50–70px from the section top.
+- The **timeline** owns a `cgv-bf-layer` that fills its approximately
+  651px height. A later section-scoped audit distinguished this butterfly
+  from the separate flight in the preceding Events section. The *timeline*
+  butterfly crosses near y=540–610px relative to its own section, in two
+  separately timed horizontal passes.
 - The source butterfly DOM is a 46×35px `cgv-bf` with
   `scale(.82)`, composed of **two 23×35px halves** of
   `bfly_blush.webp`, each using `background-size:200% 100%`.
@@ -134,14 +135,14 @@ three timeline scroll checkpoints and timed samples. It found:
 - The source has a **fixed 300×viewport canvas** (`cgv-petals`) for
   drifting petals. It is not a set of static CSS decorations.
 
-The independent implementation now uses a 46×35px two-wing sprite with
-continuous approximately 44px/sec left/right traversal, reversible direction
-and small y flutter. Rendering uses only a locally supplied, authorized
-`bfly_blush.webp` (never vendor hotlinks). The ambient petals now use an
-independently drawn 300px-wide, fixed-position canvas with eleven
-deterministically seeded petals. Animation is paused when offscreen,
-closed, hidden, or Reduce Motion is enabled, and does not create multiple
-animation loops.
+The latest independent implementation uses a 46×35px two-wing sprite
+with a ~39px/s right-to-left passage and a later ~44px/s return, with
+offscreen holds instead of an immediate bounce. A small original
+gradient butterfly is displayed by default; locally permitted
+`bfly_blush.webp` replaces its wings only in comparison mode. The
+transparent 300px-wide, fixed canvas renders sixteen deterministically
+seeded petals. Motion pauses when offscreen, closed, hidden, or Reduced
+Motion is enabled, without duplicate animation loops.
 
 The measured trajectory and wing structure are substantially closer to
 the source, but the exact proprietary JS motion curve and canvas particle
@@ -191,3 +192,39 @@ preview and a finer-grained embossed floral texture; those are not
 part of Section 5's isolated code scope. The live copyrighted WebP
 has not been committed. Visual parity beyond layout and typography
 must not be claimed from geometry tests alone.
+
+## Phase 2 — timed live motion audit and corrections (4 November 2026)
+
+A dedicated read-only Playwright 390×844 audit measured source and local
+at matched timeline start, middle and exit scroll offsets and multiple
+delays. It demonstrated the actual section-specific butterfly motion:
+
+| Direction | Source transform center x | Approximate speed | Source y |
+| --- | --- | --- | --- |
+| Right → left | 427.9 → 387.5 → 320 → -54.6px | 39px/s | 570–610px |
+| Left → right (separate pass) | -32.1 → 14.5 → 101.9 → 444.6px | 44px/s | 540–575px |
+
+The source held at the left end in one capture and the right end in
+another. Our first implementation bounced immediately and traversed
+too high; a subsequent iteration incorrectly assumed only one passage.
+The corrected Section 5 flight now runs two separately directed legs
+with terminal holds and direction-specific angles, while preserving
+the mirrored 3D wing flap. The exact proprietary delays remain
+approximations. The flight resets when this section becomes visible
+again; this is a local lifecycle choice, not a proven source behavior.
+
+The source's 300×844 transparent petal canvas typically contained
+~1,000–1,240 nontransparent pixels with mean alpha ~114–124.
+The first local canvas contained only ~260–420 pixels at alpha ~44.
+After revising particle density and opacity, a second comparison
+measured ~870–1,368 local pixels at alpha ~122–138. We subsequently
+reduced the local particle count to sixteen and opacity slightly to
+better center that observed source range; the final timed comparison
+determines how close it remains.
+
+No vendor artwork binaries or source scripts were copied. Remaining
+gaps include exact WebP texture, proprietary butterfly timing and
+particle trajectories, fixed reference preview controls and the
+following Dress Code section (owned by the Section 6 worker). The
+current isolated branch still renders the legacy Gallery after this
+section; integration must reconcile that sequence before merging.
