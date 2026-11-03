@@ -82,6 +82,18 @@ try{
       await heading.waitFor({state:'attached',timeout:10000});
       const top=await heading.evaluate(el=>el.getBoundingClientRect().top+scrollY);
       one.headingDocTop=top;
+      if(spec.name==='local-art-comparison'){
+        one.referenceAssets=await page.evaluate(()=>{
+          const el=document.getElementById('runningOrder');
+          return {mode:el?.dataset.assetSource||'not-configured',
+            plum:el?.dataset.bandStatus||'not-requested',
+            butterfly:el?.dataset.butterflyStatus||'not-requested'};
+        });
+        if(one.referenceAssets.plum!=='loaded'){
+          one.note='Local reference WebP unavailable; screenshot is FALLBACK ART, not a source-art parity result.';
+          console.warn('REFERENCE_ART_UNAVAILABLE',JSON.stringify(one.referenceAssets));
+        }
+      }
       for(const [key,delta] of [['start',-130],['middle',180],['exit',380]]){
         const y=Math.max(0,Math.round(top+delta));
         await page.evaluate(y=>{document.documentElement.style.scrollBehavior='auto';scrollTo({top:y,behavior:'instant'});},y);
