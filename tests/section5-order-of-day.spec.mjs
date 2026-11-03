@@ -144,3 +144,86 @@ test('old standalone date-only demo remains available via an explicit legacy URL
   await expect(demo.locator('#saveDateButton')).toBeDisabled();
   await expect(demo).toHaveAttribute('data-section','legacy-save-date');
 });
+
+
+test('source-like fixed canvas paints rose petals only while timeline is visible',async({page})=>{
+  const {section,errors}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-petal-renderer','canvas');
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  const canvas=section.locator('#orderPetalCanvas');
+  await expect(canvas).toBeAttached();
+  await page.waitForTimeout(180);
+  const stats=await canvas.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const bytes=el.getContext('2d').getImageData(0,0,el.width,el.height).data;
+    let alphaPixels=0;
+    for(let i=3;i<bytes.length;i+=4)if(bytes[i]>0)alphaPixels++;
+    return {x:r.x,y:r.y,width:r.width,height:r.height,
+      pixels:alphaPixels,position:getComputedStyle(el).position};
+  });
+  expect(stats.x).toBe(0);
+  expect(stats.y).toBe(0);
+  expect(stats.width).toBe(300);
+  expect(stats.height).toBe(page.viewportSize().height);
+  expect(stats.position).toBe('fixed');
+  expect(stats.pixels).toBeGreaterThan(30);
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+  await expect(section).toHaveAttribute('data-petal-motion','paused');
+  expect(errors).toEqual([]);
+});
+
+test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',async({page})=>{
+  const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:fixture}));
+  const {section,errors}=await toOrder(page,'/?orderReference=1');
+  await expect(section).toHaveAttribute('data-butterfly-status','loaded');
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  const sprite=section.locator('#orderButterflyFlight');
+  await expect(sprite).toBeVisible();
+  await expect(sprite.locator('.order-bf-wing')).toHaveCount(2);
+  const getState=()=>sprite.evaluate(el=>{
+    const wing=[...el.querySelectorAll('i')].map(x=>{
+      const css=getComputedStyle(x);
+      return {width:css.width,height:css.height,bg:css.backgroundSize,
+        position:css.backgroundPosition,transform:css.transform};
+    });
+    return {x:Number(el.dataset.x),direction:el.dataset.direction,
+      width:getComputedStyle(el).width,height:getComputedStyle(el).height,wing};
+  });
+  const before=await getState();
+  await page.waitForTimeout(1150);
+  const after=await getState();
+  expect(before.direction).toBe('right');
+  expect(after.direction).toBe('right');
+  expect(after.x-before.x).toBeGreaterThan(28);
+  expect(after.x-before.x).toBeLessThan(66);
+  expect(after.width).toBe('46px');
+  expect(after.height).toBe('35px');
+  expect(after.wing[0].width).toBe('23px');
+  expect(after.wing[1].width).toBe('23px');
+  expect(after.wing[0].bg).toBe('200% 100%');
+  expect(after.wing[1].bg).toBe('200% 100%');
+  expect(after.wing[0].position).not.toBe(after.wing[1].position);
+  expect(after.wing[0].transform).not.toBe(after.wing[1].transform);
+  expect(errors).toEqual([]);
+});
+
+test('canvas and butterfly stop when invitation closes or reduced motion is enabled',async({page})=>{
+  const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:fixture}));
+  const {section}=await toOrder(page,'/?orderReference=1');
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  await page.evaluate(()=>document.getElementById('invitation').dataset.state='cover');
+  await expect(section).toHaveAttribute('data-petal-motion','paused');
+  await expect(section).toHaveAttribute('data-butterfly-motion','paused');
+  await expect(section).toHaveJSProperty('inert',true);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.evaluate(()=>document.getElementById('invitation').dataset.state='opened');
+  await expect(section).toHaveAttribute('data-petal-motion','still');
+  await expect(section).toHaveAttribute('data-butterfly-motion','paused');
+  await expect(section.locator('#orderButterflyFlight')).toBeHidden();
+  await expect(section).not.toHaveAttribute('data-reveal-ready');
+});
