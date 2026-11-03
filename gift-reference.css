@@ -1,0 +1,88 @@
+/* Wedding Gift reference-recreation prototype — source-inspired, original CSS art only.
+   The reference region was measured near 990px tall at 390x844; content may grow. */
+.gift-reference-section {
+  position:relative; isolation:isolate; z-index:2; overflow:hidden;
+  min-height:990px; padding:clamp(56px,8dvh,84px) clamp(13px,4.2vw,25px) 84px;
+  color:#6e5670; text-align:center;
+  background:
+    radial-gradient(ellipse at 50% 18%,#fff9eebd 0%,transparent 56%),
+    radial-gradient(ellipse at -18% 53%,#c9b7d055 0%,transparent 52%),
+    radial-gradient(ellipse at 120% 73%,#cbb8d45e 0%,transparent 52%),
+    linear-gradient(180deg,#e3d3e1 0%,#f8eeed 28%,#faf3ee 70%,#e3d3e1 100%);
+}
+.gift-reference-section::before {content:"";position:absolute;inset:0;opacity:.19;pointer-events:none;
+  background:url("./assets/couple-botanical-edges-original.svg") center top / 100% 100% no-repeat;}
+.gift-reference-section::after {content:"";position:absolute;inset:0;pointer-events:none;opacity:.27;
+  background-image:radial-gradient(#fffdfa 1px,transparent 1.4px);background-size:38px 47px;}
+.gift-reference-section .gift-env{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.gift-reference-section .gift-vine{position:absolute;top:9%;height:71%;width:120px;left:-65px;opacity:.46;
+  background:radial-gradient(ellipse at 75% 14%,#998ba17a 0%,transparent 27%),
+    radial-gradient(ellipse at 15% 48%,#b1a08c90 0%,transparent 31%),
+    radial-gradient(ellipse at 81% 80%,#8b9c898a 0%,transparent 32%);
+  transform:translate3d(0,var(--gift-camera-y,0px),0);
+  animation:gift-breathe 9s ease-in-out infinite alternate;}
+.gift-reference-section .gift-vine-right{left:auto;right:-65px;scale:-1 1;animation-delay:-4.5s}
+.gift-reference-section .gift-arch{position:absolute;left:50%;top:27px;width:min(94%,385px);height:330px;
+  transform:translateX(-50%);border:1px solid #c5a88a66;border-radius:48% 48% 0 0 / 70% 70% 0 0;
+  box-shadow:0 0 0 12px #fffaf31c,0 0 0 13px #cbb49f1b;}
+.gift-reference-section .gift-spark{position:absolute;color:#bb9e79;font:26px Georgia,serif;
+  animation:gift-spark 7s ease-in-out infinite alternate;opacity:.58}
+.gift-reference-section .gift-spark-a{left:13%;top:18%}
+.gift-reference-section .gift-spark-b{right:11%;top:66%;animation-delay:-3s}
+.gift-reference-section .gift-content{position:relative;z-index:2;max-width:390px;margin:auto}
+.gift-reference-section .gift-kicker{margin:0 0 9px;font:500 10px/1.4 'Cinzel',Georgia,serif;
+  text-transform:uppercase;letter-spacing:.2em;color:#a08673}
+.gift-reference-section .gift-script{font:400 clamp(51px,14.4vw,71px)/1.05 'Pinyon Script',cursive;
+  margin:0 0 14px;color:#856480;text-shadow:0 2px 12px #ffffffba}
+.gift-reference-section .gift-intro{max-width:31ch;margin:0 auto 24px;
+  font:400 clamp(16px,4.2vw,19px)/1.5 'EB Garamond',Georgia,serif;color:#785e75}
+.gift-reference-section .gift-ornament{display:flex;align-items:center;justify-content:center;gap:12px;
+  color:#b99b78;font:20px Georgia,serif;margin:0 auto 16px}
+.gift-reference-section .gift-ornament span{width:49px;height:1px;background:linear-gradient(90deg,transparent,#bda284,transparent)}
+.gift-reference-section .gift-panel{border:1px solid #d0b8a5;border-radius:16px;
+  background:#fffbf4d6;box-shadow:0 13px 30px #765b7b1b;padding:17px 14px 18px}
+.gift-reference-section .gift-panel h3{font:400 28px/1.2 'EB Garamond',Georgia,serif;
+  color:#795f79;margin:0 0 10px}
+.gift-reference-section .gift-bank-list{display:grid;gap:9px}
+.gift-reference-section .gift-bank{border:1px solid #dccabc;background:#fffaf1b3;border-radius:11px;
+  padding:12px 12px 13px;display:grid;gap:3px;text-align:left}
+.gift-reference-section .gift-bank strong{font:600 11px/1.4 'Cinzel',Georgia,serif;letter-spacing:.07em;color:#95767e}
+.gift-reference-section .gift-bank .gift-account{font:400 18px/1.5 'EB Garamond',Georgia,serif;color:#67556c}
+.gift-reference-section .gift-bank .gift-holder{font:400 14px/1.3 'EB Garamond',Georgia,serif;color:#89788c}
+.gift-reference-section .gift-bank button{justify-self:start;margin-top:7px}
+.gift-reference-section button{min-height:40px;max-width:100%;border:1px solid #c6adab;border-radius:24px;
+  padding:8px 17px;background:#f3e8ef;color:#735a75;font:500 10px/1.5 'Cinzel',Georgia,serif}
+.gift-reference-section button:disabled{opacity:.66;cursor:not-allowed}
+.gift-reference-section button:focus-visible{outline:3px solid #785b86;outline-offset:3px}
+.gift-reference-section .gift-wishlist{margin-top:26px}
+.gift-reference-section .gift-wishlist h3{font:400 31px/1.2 'EB Garamond',Georgia,serif;margin:0 0 3px}
+.gift-reference-section .gift-wishlist-intro{font:400 15px/1.4 'EB Garamond',Georgia,serif;margin:0 0 16px}
+.gift-reference-section .gift-items{display:grid;gap:10px;text-align:left}
+.gift-reference-section .gift-item{display:grid;grid-template-columns:67px minmax(0,1fr);gap:12px;align-items:center;
+  border:1px solid #d5c0ae;border-radius:12px;padding:11px;background:#fffcf8d6;min-width:0}
+.gift-reference-section .gift-thumb{display:grid;place-items:center;width:67px;height:72px;border-radius:9px;
+  overflow:hidden;background:linear-gradient(140deg,#f6e9e8,#dfd0e1);color:#a58c9a;font:28px/1 Georgia,serif}
+.gift-reference-section .gift-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.gift-reference-section .gift-item h4{font:500 15px/1.24 'EB Garamond',Georgia,serif;
+  margin:0 0 3px;color:#745b73;overflow-wrap:anywhere}
+.gift-reference-section .gift-item p{font:400 11px/1.4 system-ui,sans-serif;color:#887586;margin:0 0 7px}
+.gift-reference-section .gift-item button{min-height:33px;padding:5px 12px}
+.gift-reference-section .gift-disclosure{max-width:36ch;font:400 11px/1.55 system-ui,sans-serif;
+  color:#7b6878;margin:20px auto 0}
+.gift-reference-section .gift-end{font:26px Georgia,serif;color:#b69a76;margin:17px auto 0}
+.gift-reference-section[data-reveal-ready="true"] .gift-reveal{opacity:0;transform:translate3d(0,52px,0) scale(.955);
+  transition:opacity .9s ease,transform 1.05s cubic-bezier(.2,.7,.16,1)}
+.gift-reference-section[data-reveal-ready="true"] .gift-reveal.gift-in-view{opacity:1;transform:none}
+@keyframes gift-breathe{from{opacity:.3}to{opacity:.52}}
+@keyframes gift-spark{from{translate:0 -4px;opacity:.3}to{translate:0 7px;opacity:.66}}
+@media(max-width:350px) {
+  .gift-reference-section{padding-inline:10px}
+  .gift-reference-section .gift-panel{padding-inline:11px}
+  .gift-reference-section .gift-item{grid-template-columns:58px minmax(0,1fr);gap:9px;padding:9px}
+  .gift-reference-section .gift-thumb{width:58px;height:64px}
+  .gift-reference-section .gift-item h4{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .gift-reference-section .gift-vine,.gift-reference-section .gift-spark{animation:none!important;transform:none!important}
+  .gift-reference-section[data-reveal-ready="true"] .gift-reveal{opacity:1!important;transform:none!important;transition:none!important}
+}
