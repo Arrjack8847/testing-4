@@ -307,3 +307,37 @@
   border-radius:10px;
   object-fit:cover;
 }
+
+/* Section 7 source typography and paper measured at 390x844 and 320x568,
+   GitHub Actions visual audit 41677514420:
+   section #faf7fb, 96px vertical & 28px horizontal padding, 18/29.7px
+   EB Garamond #4a2a45; heading 52/59.8px #7b3d6e, no text shadow;
+   hint 12/19.8px EB Garamond 300 #6f5a6c, 22px top margin.
+   The extra star divider, layered gradients and glitter are not part of
+   the source's measured Gallery section design. */
+.gallery-section {
+  padding:96px 28px;
+  color:#4a2a45;
+  font:400 18px/1.65 'EB Garamond',Georgia,serif;
+  background:#faf7fb;
+}
+.gallery-section::before,
+.gallery-section::after {content:none;}
+.gallery-section .gallery-atmosphere {display:none;}
+.gallery-section .gallery-flourish {display:none;}
+.gallery-section .gallery-eyebrow {
+  margin:0 0 13.5px;
+}
+.gallery-section h2.gallery-heading {
+  color:#7b3d6e;
+  text-shadow:none;
+  margin:0 0 40px;
+  font-size:52px;
+  line-height:1.15;
+}
+.gallery-section .gallery-intro {
+  max-width:none;
+  margin:22px 0 0;
+  color:#6f5a6c;
+  font:300 12px/1.65 'EB Garamond',Georgia,serif;
+}
