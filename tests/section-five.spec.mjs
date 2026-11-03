@@ -64,6 +64,7 @@ test('Section 7 fits mobile viewports and preserves Dress Code transition',async
 });
 
 test('Section 7 matches measured 320px and 390px source grid geometry',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
   const {gallery}=await reachGallery(page);
   const width=await page.evaluate(()=>innerWidth);
   const frames=await gallery.locator('[data-gallery-slot]').evaluateAll(nodes=>nodes.map(el=>{
@@ -101,6 +102,7 @@ test('Section 7 matches measured 320px and 390px source grid geometry',async({pa
 });
 
 test('Section 7 matches source background, heading placement and small hint type',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
   const {gallery}=await reachGallery(page);
   const metrics=await gallery.evaluate(el=>{
     const cs=getComputedStyle(el);
@@ -137,6 +139,7 @@ test('Section 7 matches source background, heading placement and small hint type
 });
 
 test('Five downloaded local WebPs remove placeholder footer and preserve reference section height',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
   await page.route('**/assets/gallery/photo-*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:testImage}));
   const {gallery,errors}=await reachGallery(page);
