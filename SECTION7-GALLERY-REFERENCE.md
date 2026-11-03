@@ -203,3 +203,39 @@ both customer and comparison modes; no URLs are loaded by this section.
 Remaining: validate exact photos/crops once authorized assets are available,
 and ensure adjacent Sections 6 and 8 have coordinated backgrounds and
 scroll continuity. Do not merge other workers' branches blindly.
+
+## Phase 7 — exact downloaded reference photographs on plain localhost
+
+The normal local development address `http://localhost:8000/` now
+**automatically prefers the five original locally downloaded WebP files**
+under `assets/gallery/reference/` for private visual comparison:
+
+```text
+moody.webp
+moody-bride.webp
+moody-groom.webp
+moody-garden.webp
+moody-lake.webp
+```
+
+To install them **only if you have permission to download and use them**, run
+`powershell -ExecutionPolicy Bypass -File .\download-gallery-reference.ps1 -IHaveRights`
+from the repository root, then start `start.ps1` and open plain
+`http://localhost:8000/`.
+
+- The existing `?galleryReference=1` address remains a strict QA mode:
+  it loads only reference WebPs and displays no fallback customer photos.
+- If no reference WebPs are installed, plain localhost gracefully falls
+  back to `assets/gallery/photo-01.webp` through `photo-05.webp`.
+- On non-loopback hosts (including Vercel and public domains), only those
+  customer-authorized `photo-0N.webp` files are considered. No remote
+  image requests are issued by Section 7 in either mode.
+- The reference WebPs remain Git-ignored and are not in GitHub. Localhost
+  shows the exact photographs only **after the permitted copies are actually
+  downloaded**; this code change alone does not supply image data.
+- Automated tests assert exact URL selection, fallback behavior, and absence
+  of reference-mode banners on plain localhost.
+
+No third-party artwork has been committed or published. This is a
+development-comparison workflow, not permission to reuse vendor photos in
+a commercial wedding invitation.
