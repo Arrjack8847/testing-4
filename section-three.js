@@ -1,7 +1,7 @@
 'use strict';
 // Section 4 Events — Tasik Kayangan reference-recreation prototype.
 // Venue, couple and date are publicly observed EXAMPLE details, not user data.
-// Source art is hotlinked only in the explicit ?eventsReference=1 preview.
+// Public vendor art is hotlinked in this research prototype, never committed or licensed for commercial reuse.
 (() => {
   const section = document.getElementById('eventDetails');
   const invitation = document.getElementById('invitation');
@@ -59,30 +59,28 @@
   });
 
   // The sole reference-asset switch is explicit and independently scoped.
-  const referenceMode = new URLSearchParams(location.search).get('eventsReference') === '1';
-  if (referenceMode) {
-    section.dataset.art = 'reference';
-    const paper = document.getElementById('eventSourcePaper');
-    const butterfly = document.getElementById('eventSourceButterfly');
-    const artRoot = 'https://undangankahwin.com/images/concierge/';
-    if (paper) {
-      section.dataset.referencePaper = 'loading';
-      paper.addEventListener('load', () => {
-        section.dataset.referencePaper = paper.naturalWidth > 0 ? 'loaded' : 'failed';
-      }, {once:true});
-      paper.addEventListener('error', () => { section.dataset.referencePaper = 'failed'; }, {once:true});
-      paper.src = artRoot + 'packs/tasik-kayangan/paper.webp';
-    }
-    if (butterfly) {
-      section.dataset.referenceButterfly = 'loading';
-      butterfly.addEventListener('load', () => {
-        section.dataset.referenceButterfly = butterfly.naturalWidth > 0 ? 'loaded' : 'failed';
-      }, {once:true});
-      butterfly.addEventListener('error', () => {
-        section.dataset.referenceButterfly = 'failed';
-      }, {once:true});
-      butterfly.src = artRoot + 'packs/anggerik-nirmala/bfly_white.webp';
-    }
+  // The research reference is now the default at / (legacy query still works).
+  section.dataset.art = 'reference';
+  const paper = document.getElementById('eventSourcePaper');
+  const butterfly = document.getElementById('eventSourceButterfly');
+  const artRoot = 'https://undangankahwin.com/images/concierge/';
+  if (paper) {
+    section.dataset.referencePaper = 'loading';
+    paper.addEventListener('load', () => {
+      section.dataset.referencePaper = paper.naturalWidth > 0 ? 'loaded' : 'failed';
+    }, {once:true});
+    paper.addEventListener('error', () => { section.dataset.referencePaper = 'failed'; }, {once:true});
+    paper.src = artRoot + 'packs/tasik-kayangan/paper.webp';
+  }
+  if (butterfly) {
+    section.dataset.referenceButterfly = 'loading';
+    butterfly.addEventListener('load', () => {
+      section.dataset.referenceButterfly = butterfly.naturalWidth > 0 ? 'loaded' : 'failed';
+    }, {once:true});
+    butterfly.addEventListener('error', () => {
+      section.dataset.referenceButterfly = 'failed';
+    }, {once:true});
+    butterfly.src = artRoot + 'packs/anggerik-nirmala/bfly_white.webp';
   }
 
   // Four-phone comparison mode: pin the illustrated plane within Events
