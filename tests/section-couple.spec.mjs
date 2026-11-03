@@ -39,6 +39,12 @@ test('couple layout has measured first-portrait geometry at 390px and never over
   const {section,errors}=await openCouple(page);
   await section.locator('.couple-portrait').first().scrollIntoViewIfNeeded();
   await expect(section.locator('.couple-portrait').first()).toHaveClass(/in-view/);
+  // Section 3's approved reveal animation can be midway through its transform
+  // when scrollIntoViewIfNeeded() resolves. Measure after it settles, not
+  // during the temporary 24px/0.985 entrance transform.
+  await expect.poll(() => section.locator('.couple-intro').evaluate(
+    element => getComputedStyle(element).transform
+  ), {timeout:5000}).toBe('none');
   const sizes=await section.evaluate(el=>{
     const band=el.getBoundingClientRect(),intro=el.querySelector('.couple-intro').getBoundingClientRect();
     const arch=el.querySelector('.couple-arch').getBoundingClientRect();
