@@ -241,6 +241,9 @@ test('Section 7 honors reduced-motion without hiding the gallery',async({page})=
 const testImage = Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
 
 test('Uploaded local gallery files enable image viewer, keyboard arrows and Escape',async({page})=>{
+  // Measure photo-border/caption geometry only in a settled state. The
+  // normal scroll-animation test below checks moving/scaling transforms.
+  await page.emulateMedia({reducedMotion:'reduce'});
   await page.route('**/assets/gallery/*.webp',route=>{
     if(/photo-0[12]\.webp$/.test(route.request().url())){
       return route.fulfill({status:200,contentType:'image/webp',body:testImage});
