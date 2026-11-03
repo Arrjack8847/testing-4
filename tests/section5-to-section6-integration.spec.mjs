@@ -61,7 +61,9 @@ test('Section 5 → 6 preserves reference sequence with no visible legacy scene 
   expect(data.orderHeight).toBeGreaterThanOrEqual(651);
   expect(data.dressHeight).toBeGreaterThanOrEqual(679);
   expect(data.orderBackground).toContain('order-plum-emboss-original.svg');
-  expect(data.dressBackground).toContain('linear-gradient');
+  // The Dress Code worker owns the paper/gradient skin; do not tie this
+  // cross-section seam test to a specific background-image declaration.
+  await expect(dress.locator('.dress-art')).toHaveCount(1);
   await expect(order.locator('.order-entry')).toHaveCount(6);
   await expect(dress.locator('.dress-palette')).toHaveCount(2);
   if(testInfo.project.name==='iphone-390'){
