@@ -165,7 +165,7 @@
 .order-section .order-leaf{opacity:.11;color:#e0b5c7;top:13%;font-size:125px;}
 .order-section .order-leaf-right{top:58%;}
 .order-section .order-inner{
-  padding:96px 28px 70px;
+  padding:106px 28px 70px;
   min-height:651px;
 }
 .order-section .order-inner::before {
@@ -176,11 +176,11 @@
 }
 .order-section .order-eyebrow{
   color:#d4b8ca;font:500 9px/1.4 'Cinzel',Georgia,serif;
-  letter-spacing:.35em;text-transform:uppercase;margin:0 0 20px;
+  letter-spacing:.35em;text-transform:uppercase;margin:0 0 8px;
 }
 .order-section h2.order-heading{
   color:rgb(243,223,240);font-size:46px;line-height:1.15;
-  margin:0 auto 39px;text-shadow:0 2px 7px rgba(23,8,19,.35);
+  margin:0 auto 29px;text-shadow:0 2px 7px rgba(23,8,19,.35);
   white-space:nowrap;
 }
 .order-section .order-timeline{max-width:334px;padding-left:0;}
