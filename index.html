@@ -267,7 +267,7 @@
         <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
-    <!-- Section 7: original RSVP form preview. Nothing is submitted until a backend is configured. -->
+    <!-- Section 7: reference-structured RSVP & Wishes. This branch is a local-only functional demo, not a submission service. -->
     <section class="rsvp-section" id="rsvp" data-section="7"
       aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="rsvp-atmosphere" aria-hidden="true">
@@ -277,40 +277,32 @@
         <span class="rsvp-glimmer rsvp-glimmer-b">✦</span>
       </div>
       <div class="rsvp-content">
-        <p class="rsvp-kicker rsvp-reveal">The pleasure of your company</p>
+        <p class="rsvp-kicker rsvp-reveal">Kindly respond by 31 December 2026</p>
         <div class="rsvp-flourish rsvp-reveal" aria-hidden="true"><span></span>✦<span></span></div>
-        <h2 id="rsvpHeading" class="rsvp-heading rsvp-reveal">Kindly Respond</h2>
-        <p class="rsvp-intro rsvp-reveal">It would mean so much to celebrate with you.</p>
+        <h2 id="rsvpHeading" class="rsvp-heading rsvp-reveal">RSVP &amp; Wishes</h2>
+        <p class="rsvp-intro rsvp-reveal">We would love to know if you can celebrate with us.</p>
 
         <div class="rsvp-paper rsvp-reveal">
           <div class="rsvp-paper-inner">
-            <p class="rsvp-paper-label">Répondez s'il vous plaît</p>
-            <h3>Attendance</h3>
+            <p class="rsvp-paper-label">A note from you</p>
             <p class="rsvp-warning" id="rsvpWarning">Interactive preview only. No RSVP recipient is connected, and your response will not be sent.</p>
 
             <form id="rsvpForm" class="rsvp-form">
               <label class="rsvp-field" for="rsvpName">
                 <span>Your name <span aria-hidden="true">*</span></span>
                 <input id="rsvpName" name="guestName" type="text" autocomplete="name"
-                  maxlength="80" minlength="1" required placeholder="Enter your full name">
+                  maxlength="80" minlength="1" required placeholder="e.g. Aiman">
               </label>
-
-              <fieldset class="rsvp-attendance">
-                <legend>Will you attend? <span aria-hidden="true">*</span></legend>
-                <label class="rsvp-choice">
-                  <input type="radio" name="attendance" value="yes" required>
-                  <span class="rsvp-choice-symbol" aria-hidden="true">✧</span>
-                  <span>Joyfully accepts</span>
-                </label>
-                <label class="rsvp-choice">
-                  <input type="radio" name="attendance" value="no" required>
-                  <span class="rsvp-choice-symbol" aria-hidden="true">✧</span>
-                  <span>Regretfully declines</span>
-                </label>
-              </fieldset>
-
+              <label class="rsvp-field" for="rsvpAttendance">
+                <span>Attendance <span aria-hidden="true">*</span></span>
+                <select id="rsvpAttendance" name="attendance" required>
+                  <option value="" selected disabled>Please select</option>
+                  <option value="yes">Joyfully accepts</option>
+                  <option value="no">Regretfully declines</option>
+                </select>
+              </label>
               <label class="rsvp-field" for="rsvpGuests">
-                <span>Number of guests</span>
+                <span>Guests</span>
                 <select id="rsvpGuests" name="guestCount" disabled>
                   <option value="1">1 guest</option>
                   <option value="2">2 guests</option>
@@ -318,16 +310,14 @@
                   <option value="4">4 guests</option>
                   <option value="5">5 guests</option>
                 </select>
-                <small id="rsvpGuestHint">Available if you accept the invitation. Guest limits are a demo setting.</small>
+                <small id="rsvpGuestHint">Choose a guest count when attending; the five-person limit is for this demo.</small>
               </label>
-
               <label class="rsvp-field" for="rsvpMessage">
-                <span>Message for the couple <span class="rsvp-optional">(optional)</span></span>
+                <span>Your wish for the couple <span class="rsvp-optional">(optional)</span></span>
                 <textarea id="rsvpMessage" name="message" rows="3" maxlength="300"
-                  placeholder="Share a wish or a kind note…"></textarea>
+                  placeholder="Share a kind wish…"></textarea>
                 <small>Up to 300 characters</small>
               </label>
-
               <button type="submit" class="rsvp-preview-button">Preview RSVP — not sent</button>
             </form>
 
@@ -338,7 +328,7 @@
                 <dt>Name</dt><dd id="rsvpPreviewName"></dd>
                 <dt>Response</dt><dd id="rsvpPreviewAttendance"></dd>
                 <dt>Guests</dt><dd id="rsvpPreviewGuests"></dd>
-                <dt>Message</dt><dd id="rsvpPreviewMessage"></dd>
+                <dt>Wish</dt><dd id="rsvpPreviewMessage"></dd>
               </dl>
               <p class="rsvp-preview-disclosure">This is a local preview. Your RSVP has not been submitted or saved.</p>
               <button type="button" id="rsvpCopyButton" class="rsvp-copy-button">Copy RSVP text</button>
@@ -346,7 +336,19 @@
             </div>
           </div>
         </div>
-        <p class="rsvp-outro rsvp-reveal">With love, we hope to see you there.</p>
+
+        <div class="rsvp-wishes-wall rsvp-reveal" aria-label="Sample wedding wishes">
+          <div class="rsvp-flourish rsvp-wishes-flourish" aria-hidden="true"><span></span>❧<span></span></div>
+          <h3>Wishes for the Couple</h3>
+          <p class="rsvp-wishes-caption">These are example wishes for the design preview. Guest messages are not stored or published.</p>
+          <div class="rsvp-wishes-list">
+            <article class="rsvp-wish"><p class="rsvp-wish-name">A family friend</p><p class="rsvp-wish-text">May your home always be full of kindness, joy and laughter.</p></article>
+            <article class="rsvp-wish"><p class="rsvp-wish-name">The wedding party</p><p class="rsvp-wish-text">Wishing you two many beautiful adventures together.</p></article>
+            <article class="rsvp-wish"><p class="rsvp-wish-name">Loved ones</p><p class="rsvp-wish-text">Congratulations, and may every year bring you closer.</p></article>
+          </div>
+        </div>
+        <p class="rsvp-outro rsvp-reveal">Until we meet</p>
+        <p class="rsvp-farewell rsvp-reveal">With love and gratitude</p>
         <div class="rsvp-outro-symbol" aria-hidden="true">❦</div>
       </div>
     </section>
