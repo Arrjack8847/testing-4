@@ -1,95 +1,156 @@
-import {test, expect} from '@playwright/test';
+import {test,expect} from '@playwright/test';
 
-async function reachEvents(page) {
-  await page.goto('/');
-  const event = page.locator('#eventDetails');
-  await expect(event).toHaveAttribute('aria-hidden','true');
-  await expect(event).toHaveJSProperty('inert',true);
+// Repo names this spec "section-three" for historical reasons; the DOM's
+// #eventDetails[data-section=4] is the Events section AFTER The Couple.
+async function openEvents(page,query='') {
+  const errors=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('/'+query);
+  const section=page.locator('#eventDetails');
+  await expect(section).toHaveAttribute('aria-hidden','true');
+  await expect(section).toHaveJSProperty('inert',true);
   await page.getByRole('button',{name:'Open Invitation'}).click();
-  await expect(event).toHaveAttribute('aria-hidden','false');
-  await expect(event).toHaveJSProperty('inert',false);
-  await page.evaluate(() => {
-    document.documentElement.style.scrollBehavior = 'auto';
-    const target = document.getElementById('eventDetails');
-    window.scrollTo(0, Math.round(window.scrollY + target.getBoundingClientRect().top));
+  await expect(section).toHaveAttribute('aria-hidden','false');
+  await expect(section).toHaveJSProperty('inert',false);
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('eventDetails').scrollIntoView({block:'start',behavior:'instant'});
   });
-  await expect(event).toBeInViewport();
-  return event;
+  await expect(section).toBeInViewport();
+  return {section,errors};
 }
 
-test('wedding event section follows reference-style Couple portraits and preserves demo disclosures',async({page}) => {
-  const errors=[];
-  page.on('pageerror',e => errors.push(e.message));
-  const event = await reachEvents(page);
-  await expect(event).toHaveAttribute('data-section','4');
-  await expect(page.getByRole('heading',{name:'The Celebration',level:2})).toBeVisible();
-  await expect(event.locator('.event-date-day')).toHaveText('23');
-  await expect(event.locator('.event-date-month')).toHaveText('JANUARY');
-  await expect(event.locator('.event-demo-note')).toContainText('Sample date');
-  await expect(event.locator('#eventTime')).toHaveText('To be confirmed');
-  await expect(event.locator('#eventVenue')).toHaveText('Venue to be announced');
-  await expect(event.locator('#eventDirections')).toBeHidden();
-  await expect(event.locator('#eventDirections')).not.toHaveAttribute('href');
+test('Section 4 shows TWO reference-example ceremonies, source venue links and clear demo disclosure',async({page})=>{
+  const {section,errors}=await openEvents(page);
+  await expect(section).toHaveAttribute('data-section','4');
+  await expect(section).toHaveAttribute('data-art','original');
+  await expect(section.getByRole('heading',{name:'Akad Nikah',level:2})).toBeVisible();
+  await expect(section.getByRole('heading',{name:'Wedding Reception',level:2})).toBeVisible();
+  await expect(section.locator('.event-reference-card')).toHaveCount(2);
+  await expect(section.locator('.event-card-date')).toHaveCount(2);
+  await expect(section.locator('.event-card-date').first()).toHaveAttribute('datetime','2027-01-23');
+  await expect(section.locator('#eventTime')).toContainText('10:00 AM');
+  await expect(section.locator('#eventTime')).toContainText('12:00 PM');
+  await expect(section.locator('#eventVenue')).toHaveText('Masjid Wilayah Persekutuan');
+  await expect(section.locator('.event-card-reception')).toContainText('7:30 PM');
+  await expect(section.locator('.event-card-reception')).toContainText('St. Regis Kuala Lumpur');
+  await expect(section.locator('.event-map-link')).toHaveCount(3);
+  await expect(section.locator('#eventDirections')).toHaveAttribute('href',/www.google.com\/maps\/search/);
+  await expect(section.locator('.event-waze-link')).toHaveAttribute('href',/waze.com\/ul/);
+  await expect(section.getByRole('link',{name:'Add to Calendar'})).toHaveAttribute('href',/calendar\/render/);
+  await expect(section.locator('.event-demo-note')).toContainText('Demonstration only');
+  await expect(section.locator('#eventSourcePaper')).not.toHaveAttribute('src');
+  await expect(section.locator('#eventSourceButterfly')).not.toHaveAttribute('src');
   expect(errors).toEqual([]);
 });
 
-test('Celebration event details fit each mobile size without horizontal overflow',async({page},testInfo)=>{
-  const event = await reachEvents(page);
-  await expect(event).toHaveClass(/is-visible/);
-  const geometry = await event.evaluate(section => {
-    const viewport=innerWidth;
-    const info=section.querySelector('.event-info-panel').getBoundingClientRect();
-    const calendar=section.querySelector('.event-date-card').getBoundingClientRect();
-    return {
-      viewport, overflow:document.documentElement.scrollWidth-viewport,
-      infoLeft:info.left, infoRight:info.right, calendarLeft:calendar.left,calendarRight:calendar.right
-    };
+test('Section 4 event cards, countdown and edge positions fit each phone viewport',async({page},testInfo)=>{
+  const {section,errors}=await openEvents(page);
+  await expect(section.locator('.event-card-nikah')).toBeVisible();
+  await expect(section.locator('.event-card-reception')).toBeVisible();
+  const geometry=await section.evaluate(el=>{
+    const sectionBox=el.getBoundingClientRect();
+    const body=el.querySelector('.event-body').getBoundingClientRect();
+    const cards=[...el.querySelectorAll('.event-reference-card')].map(x=>x.getBoundingClientRect());
+    const links=[...el.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
+    return {width:innerWidth,height:sectionBox.height,
+      overflow:document.documentElement.scrollWidth-innerWidth,
+      body:{left:body.left,right:body.right},
+      cards:cards.map(x=>({left:x.left,right:x.right,height:x.height,top:x.top,bottom:x.bottom})),
+      links:links.map(x=>({width:x.width,height:x.height,left:x.left,right:x.right}))};
   });
   expect(geometry.overflow).toBeLessThanOrEqual(1);
-  for(const side of [geometry.infoLeft,geometry.calendarLeft]) expect(side).toBeGreaterThanOrEqual(-1);
-  for(const side of [geometry.infoRight,geometry.calendarRight]) expect(side).toBeLessThanOrEqual(geometry.viewport+1);
-  await event.screenshot({path:testInfo.outputPath('section-three-full-details.png'),animations:'disabled'});
+  expect(geometry.height).toBeGreaterThanOrEqual(1581);
+  expect(geometry.body.left).toBeGreaterThanOrEqual(-1);
+  expect(geometry.body.right).toBeLessThanOrEqual(geometry.width+1);
+  expect(geometry.cards).toHaveLength(2);
+  for(const card of geometry.cards){
+    expect(card.left).toBeGreaterThanOrEqual(-1);
+    expect(card.right).toBeLessThanOrEqual(geometry.width+1);
+    expect(card.height).toBeGreaterThan(400);
+  }
+  expect(geometry.cards[1].top).toBeGreaterThan(geometry.cards[0].bottom);
+  for(const link of geometry.links){
+    expect(link.height).toBeGreaterThanOrEqual(43);
+    expect(link.left).toBeGreaterThanOrEqual(-1);
+    expect(link.right).toBeLessThanOrEqual(geometry.width+1);
+  }
+  await section.screenshot({path:testInfo.outputPath('section4-events-full.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
 });
 
-test('reduced-motion event details remain legible',async({page})=>{
+test('Section 4 countdown changes every second and does not claim real wedding details',async({page})=>{
+  const {section}=await openEvents(page);
+  for(const id of ['eventCountDays','eventCountHours','eventCountMinutes','eventCountSeconds']){
+    await expect(section.locator('#'+id)).toHaveText(/^\d{2,3}$/);
+  }
+  const before=await section.locator('#eventCountSeconds').textContent();
+  await page.waitForTimeout(1400);
+  const after=await section.locator('#eventCountSeconds').textContent();
+  expect(after).not.toBe(before);
+  await expect(section.locator('.event-demo-note')).toContainText('not a confirmed invitation');
+});
+
+test('Section 4 source-art comparison is opt-in and leaves earlier sections unchanged',async({page})=>{
+  const {section}=await openEvents(page,'?eventsReference=1');
+  await expect(section).toHaveAttribute('data-art','reference');
+  await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
+    'src','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp');
+  await expect(section.locator('#eventSourceButterfly')).toHaveAttribute(
+    'src','https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp');
+  await expect(section.locator('.event-reference-card')).toHaveCount(2);
+  // Local/remote image outcome is checked, never presumed (hotlink blocking).
+  await expect(section).toHaveAttribute('data-reference-paper',/^(loading|loaded|failed)$/);
+  await expect(page.locator('#couple')).not.toHaveAttribute('data-art','reference');
+  await expect(page.locator('#message')).toHaveAttribute('data-section','2');
+});
+
+test('Section 4 pin-camera stays bounded, returns on backward scroll, and respects Reduced Motion',async({page})=>{
+  const {section}=await openEvents(page);
+  const top=await section.evaluate(el=>el.getBoundingClientRect().top+scrollY);
+  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+150);
+  await expect.poll(()=>section.getAttribute('data-event-camera')).not.toBeNull();
+  const at150=Number(await section.getAttribute('data-event-camera'));
+  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+500);
+  await page.waitForTimeout(80);
+  const at500=Number(await section.getAttribute('data-event-camera'));
+  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),top+150);
+  await page.waitForTimeout(80);
+  const back=Number(await section.getAttribute('data-event-camera'));
+  expect(at500).toBeGreaterThan(at150);
+  expect(Math.abs(back-at150)).toBeLessThan(.5);
+  expect(Math.abs(at500)).toBeLessThanOrEqual(24);
   await page.emulateMedia({reducedMotion:'reduce'});
-  const event=await reachEvents(page);
-  const title=event.locator('.event-title');
-  await expect(title).toBeVisible();
-  const motion=await title.evaluate(el=>({opacity:getComputedStyle(el).opacity,transform:getComputedStyle(el).transform}));
-  expect(motion).toEqual({opacity:'1',transform:'none'});
-  await expect(event.locator('#eventDirectionsNote')).toBeVisible();
+  await expect.poll(async()=>Number(await section.getAttribute('data-event-camera'))).toBe(0);
+  await expect(section.locator('.event-card-title').first()).toBeVisible();
+  const title=await section.locator('.event-card-title').first().evaluate(el=>getComputedStyle(el).opacity);
+  expect(title).toBe('1');
 });
 
-
-test('Section 3 Couple to Celebration transition remains contiguous and visually bridged',async({page},testInfo)=>{
+test('Section 3 Couple → Section 4 Events preserves an exact seam and Section 3 geometry',async({page},testInfo)=>{
   await page.goto('/');
   await page.getByRole('button',{name:'Open Invitation'}).click();
-  const seam=await page.evaluate(()=>{
+  const geometry=await page.evaluate(()=>{
+    const couple=document.getElementById('couple');
+    const events=document.getElementById('eventDetails');
+    const body=document.getElementById('invitation');
+    const coupleBox=couple.getBoundingClientRect(),eventBox=events.getBoundingClientRect();
     document.documentElement.style.scrollBehavior='auto';
-    const letter=document.getElementById('message');
-    const event=document.getElementById('eventDetails');
-    const continuous=letter.nextElementSibling?.id==='couple' && document.getElementById('couple').nextElementSibling===event;
-    const point=event.getBoundingClientRect().top+scrollY-innerHeight/2;
-    window.scrollTo(0,Math.round(point));
-    return {continuous};
+    window.scrollTo(0,Math.round(scrollY+eventBox.top-innerHeight*.5));
+    return {adjacent:couple.nextElementSibling===events,
+      gap:eventBox.top-coupleBox.bottom,
+      coupleHeight:coupleBox.height,
+      overflow:document.documentElement.scrollWidth-innerWidth,
+      coverOpen:body.dataset.state==='opened'};
   });
-  expect(seam.continuous).toBe(true);
-  await expect(page.locator('#eventDetails')).toBeInViewport();
+  expect(geometry.adjacent).toBe(true);
+  expect(Math.abs(geometry.gap)).toBeLessThanOrEqual(1);
+  expect(geometry.coupleHeight).toBeGreaterThan(1750);
+  expect(geometry.overflow).toBeLessThanOrEqual(1);
+  expect(geometry.coverOpen).toBe(true);
   await expect(page.locator('#couple')).toBeInViewport();
-  const position=await page.evaluate(()=>{
-    const couple=document.getElementById('couple').getBoundingClientRect();
-    const event=document.getElementById('eventDetails').getBoundingClientRect();
-    const transition=getComputedStyle(document.getElementById('eventDetails'),'::after');
-    return {gap:event.top-couple.bottom,
-      gradient:transition.backgroundImage,
-      pointerEvents:transition.pointerEvents,
-      pageOverflow:document.documentElement.scrollWidth-innerWidth};
-  });
-  expect(Math.abs(position.gap)).toBeLessThanOrEqual(1);
-  expect(position.gradient).toContain('linear-gradient');
-  expect(position.pointerEvents).toBe('none');
-  expect(position.pageOverflow).toBeLessThanOrEqual(1);
-  await page.screenshot({path:testInfo.outputPath('section-three-transition-seam.png'),
-    animations:'disabled'});
+  await expect(page.locator('#eventDetails')).toBeInViewport();
+  if(testInfo.project.name==='iphone-390') {
+    await page.screenshot({path:testInfo.outputPath('section3-to-4-events-seam.png'),animations:'disabled'});
+  }
 });
