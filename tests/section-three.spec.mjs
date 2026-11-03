@@ -284,7 +284,7 @@ test('390px source visual mode keeps full paper edges, true arch SVG and four pu
       guideLine:getComputedStyle(el.querySelector('.event-card-diamond'),'::before').content
     };
   });
-  expect(visuals.paperFit).toBe('fill');
+  expect(visuals.paperFit).toBe('cover');
   expect(visuals.paperSize).toEqual([1080,1920]);
   expect(visuals.archLoaded).toBe(true);
   expect(visuals.tileCount).toBe(4);
