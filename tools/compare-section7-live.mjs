@@ -84,7 +84,7 @@ async function capture(type,url,viewport){
         for(let i=0;el&&i<4;i++,el=el.parentElement)chain.push(fmt(el));
         const frame=img.parentElement;
         return {label,found:true,src:img.currentSrc||img.src,
-          natural:[img.naturalWidth,img.naturalHeight],image:fmt(img),frame:fmt(frame),ancestors:chain};
+          natural:[img.naturalWidth,img.naturalHeight],image:fmt(img),frame:fmt(frame),ancestors:chain,frameText:(frame?.innerText||'').slice(0,80),parentText:(frame?.parentElement?.innerText||'').slice(0,120)};
       };
       const section=heading?.closest('section');
       const hint=[...document.querySelectorAll('p,span,div')].find(el=>{
@@ -99,6 +99,7 @@ async function capture(type,url,viewport){
         scrollHeight:document.documentElement.scrollHeight,
         horizontalOverflow:document.documentElement.scrollWidth-innerWidth,
         heading:fmt(heading),eyebrow:fmt(eyebrow),hint:fmt(hint),section:fmt(section),
+        preHeading:{text:(heading?.previousElementSibling?.innerText||'').slice(0,80),style:fmt(heading?.previousElementSibling)},
         photos:labels.map(sampleImage)
       };
     },LABELS);
@@ -106,13 +107,14 @@ async function capture(type,url,viewport){
     console.log('SECTION7_AUDIT '+JSON.stringify({
       kind:type,width:viewport.width,found:record.metrics.photos.filter(p=>p.found).length,
       frames:record.metrics.photos.map(p=>({
-        label:p.label,src:p.src,
+        label:p.label,src:p.src,frameText:p.frameText,parentText:p.parentText,
         image:p.image?.rect,frame:p.frame?.rect,
         styles:p.frame?{radius:p.frame.borderRadius,border:p.frame.border,
           shadow:p.frame.boxShadow,padding:p.frame.padding}:null
       })),
       heading:record.metrics.heading,
       eyebrow:record.metrics.eyebrow,
+      preHeading:record.metrics.preHeading,
       hint:record.metrics.hint,
       section:record.metrics.section,
       photoStyle:record.metrics.photos[0]?.image?{
