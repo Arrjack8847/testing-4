@@ -97,6 +97,41 @@ async function inspect(label,viewport){
           animations:'allow',timeout:18000});
       }
     }
+
+    // Safe inspection of the Send Gift disclosure: no bank copy, purchase,
+    // reservation, form submission, or transaction is performed.
+    report.interaction={status:'not-found'};
+    try{
+      const btn=page.getByRole('button',{name:/send gift/i}).first();
+      if(await btn.count()){
+        await btn.scrollIntoViewIfNeeded();
+        report.interaction.before=await btn.evaluate(b=>({
+          label:b.textContent?.trim(),
+          expanded:b.getAttribute('aria-expanded'),
+          html:b.outerHTML.slice(0,800)
+        }));
+        await btn.click({timeout:8000});
+        await page.waitForTimeout(650);
+        report.interaction.after=await page.evaluate(()=>{
+          const elements=[...document.querySelectorAll('button')];
+          const copy=elements.filter(x=>/copy account number/i.test(x.textContent||''));
+          return {
+            dialogs:[...document.querySelectorAll('dialog,[role="dialog"],[aria-modal]')]
+              .map(el=>({html:el.outerHTML.slice(0,700),visible:getComputedStyle(el).display!=='none',
+                rect:(()=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()})),
+            copy:copy.map(x=>({visible:getComputedStyle(x).display!=='none',
+              rect:(()=>{const r=x.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()})),
+            active:document.activeElement?.outerHTML.slice(0,400)
+          };
+        });
+        report.interaction.status='captured';
+        if(viewport.width===390){
+          await page.screenshot({path:folder+'/'+label+'-390-sendgift-open.png',
+            animations:'allow',timeout:18000});
+        }
+      }
+    }catch(e){report.interaction.status='error';report.interaction.error=String(e).slice(0,400);}
+    if(viewport.width===390)console.log('SECTION8_INTERACTION_'+label.toUpperCase()+' '+JSON.stringify(report.interaction).slice(0,2100));
     report.status='captured';
     console.log('SECTION8_'+label.toUpperCase()+'_'+viewport.width+' '+JSON.stringify({
       top:round(report.initial.docY),height:round(report.initial.height),
