@@ -114,10 +114,14 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
 });
 
 
-test('Gallery reference QA mode requests only the five verified source photographs and displays captions',async({page})=>{
+test('Gallery QA mode loads only five downloaded local WebPs and displays captions',async({page})=>{
   const filenames=['moody.webp','moody-bride.webp','moody-groom.webp','moody-garden.webp','moody-lake.webp'];
   const requested=[];
-  await page.route('https://undangankahwin.com/images/concierge/couples/**', route => {
+  const externalRequests=[];
+  page.on('request',req=>{
+    if (/undangankahwin\.com\/images\/concierge\/couples\//.test(req.url())) externalRequests.push(req.url());
+  });
+  await page.route('**/assets/gallery/reference/*.webp', route => {
     const uri=new URL(route.request().url());
     requested.push(uri.pathname.split('/').at(-1));
     return route.fulfill({status:200,contentType:'image/webp',body:testImage});
@@ -125,23 +129,24 @@ test('Gallery reference QA mode requests only the five verified source photograp
   const {gallery,errors}=await reachGallery(page,'?galleryReference=1');
   await expect(gallery).toHaveAttribute('data-gallery-art','reference-comparison');
   await expect(gallery.locator('.gallery-reference-note')).toBeVisible();
-  await expect(gallery.locator('.gallery-reference-note')).toContainText('Not licensed');
+  await expect(gallery.locator('.gallery-reference-note')).toContainText('Local comparison');
   await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
   expect(requested.sort()).toEqual([...filenames].sort());
+  expect(externalRequests).toEqual([]);
   const urls = await gallery.locator('.gallery-image').evaluateAll(nodes=>nodes.map(el=>el.getAttribute('src')));
-  expect(urls).toEqual(filenames.map(name=>'https://undangankahwin.com/images/concierge/couples/'+name));
+  expect(urls).toEqual(filenames.map(name=>'./assets/gallery/reference/'+name));
   await gallery.locator('[data-gallery-slot="4"]').click();
   await expect(page.locator('#galleryViewCaption')).toHaveText('The Lake');
   await page.keyboard.press('Escape');
   expect(errors).toEqual([]);
 });
 
-test('Gallery reference QA mode fails visibly but safely if third-party photos cannot load',async({page})=>{
-  await page.route('https://undangankahwin.com/images/concierge/couples/**',route=>route.fulfill({status:404,body:'Unavailable'}));
+test('Gallery local reference mode retains placeholders if downloaded WebPs are missing',async({page})=>{
+  await page.route('**/assets/gallery/reference/*.webp',route=>route.fulfill({status:404,body:'Unavailable'}));
   const {gallery,errors}=await reachGallery(page,'?galleryReference=1');
   await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(0);
   await expect(gallery.locator('[data-gallery-slot="0"]')).toBeDisabled();
   await expect(gallery.locator('.gallery-photo-placeholder').first()).toBeVisible();
-  await expect(gallery.locator('.gallery-disclaimer')).toContainText('could not load');
+  await expect(gallery.locator('.gallery-disclaimer')).toContainText('Local reference WebP missing');
   expect(errors).toEqual([]);
 });
