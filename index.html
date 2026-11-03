@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="section-couple.css">
   <link rel="stylesheet" href="section-three.css">
   <link rel="stylesheet" href="section-four.css">
+  <link rel="stylesheet" href="order-program.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
   <script src="scene.js" defer></script>
@@ -22,6 +23,7 @@
   <script src="section-couple-reference.js" defer></script>
   <script src="section-three.js" defer></script>
   <script src="section-four.js" defer></script>
+  <script src="order-program.js" defer></script>
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
 </head>
@@ -202,8 +204,51 @@
         </div>
       </div>
     </section>
-    <!-- Section 5: original date-only countdown. No unconfirmed ceremony time is implied. -->
-    <section class="save-date-section" id="saveTheDate" data-section="5"
+    <!-- Tasik Kayangan reference Section 5: Order of the Day.
+         Source sequence follows Events. No separate Save the Date scene appears here. -->
+    <section class="order-section" id="runningOrder" data-section="5"
+      aria-labelledby="runningOrderHeading" aria-hidden="true" inert>
+      <div class="order-stage" aria-hidden="true">
+        <div class="order-stage-original"></div>
+        <img class="order-art-image" id="orderSourceBand" alt="">
+        <img class="order-butterfly" id="orderSourceButterfly" alt="">
+        <span class="order-leaf">❧</span><span class="order-leaf order-leaf-right">❧</span>
+      </div>
+      <div class="order-inner">
+        <p class="order-eyebrow order-reveal">Running order</p>
+        <h2 id="runningOrderHeading" class="order-heading order-reveal">Order of the Day</h2>
+        <ol class="order-timeline" aria-label="Illustrative wedding running order">
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="11:00">11:00 am</time>
+            <div class="order-event-text"><strong>Guests arrive</strong><small>Lunch service opens</small></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="12:00">12:00 pm</time>
+            <div class="order-event-text"><strong>The couple arrive</strong></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="12:30">12:30 pm</time>
+            <div class="order-event-text"><strong>Wedding procession</strong><small>Led by kompang from the main entrance</small></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="13:00">1:00 pm</time>
+            <div class="order-event-text"><strong>Bersanding &amp; photographs</strong></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="14:00">2:00 pm</time>
+            <div class="order-event-text"><strong>Lunch is served</strong></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="16:00">4:00 pm</time>
+            <div class="order-event-text"><strong>Celebration ends</strong></div>
+          </li>
+        </ol>
+        <span class="order-bottom-mark" aria-hidden="true">❦</span>
+        <p class="order-disclosure">Reference wedding schedule is an example, not a verified customer schedule.</p>
+      </div>
+    </section>
+    <!-- Legacy date-only countdown, opt-in via ?legacySaveDate=1; source Events has its own live clock. -->
+    <section class="save-date-section" id="saveTheDate" data-section="legacy-save-date" hidden
              aria-labelledby="saveDateHeading" aria-hidden="true" inert>
       <div class="save-date-atmosphere" aria-hidden="true">
         <span class="save-date-halo save-date-halo-a"></span>
