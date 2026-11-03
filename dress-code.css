@@ -117,3 +117,61 @@
   .dress-section[data-reveal-ready="true"] .dress-reveal{
     opacity:1!important;transform:none!important;transition:none!important}
 }
+
+
+/* Section 6 reference-surface calibration: measured 390×844 composition. */
+/* Source audit: section padding 96px 28px, cards 22px 18px, 16px radius,
+   half-white paper panels. No arch treatment or floating circular halo. */
+.dress-section {
+  min-height:0;
+  background:#faf7fb;
+}
+.dress-section::before,.dress-section::after{display:none}
+.dress-section .dress-art{
+  top:-82px;left:0;right:0;bottom:auto;height:calc(100% + 164px);
+}
+.dress-section .dress-art-original{
+  opacity:.22;
+  background:linear-gradient(180deg,#faf7fbba,#f5f0f5a1 44%,#faf7fbba),
+    url("./assets/couple-botanical-edges-original.svg") center/100% 100% no-repeat;
+}
+.dress-section .dress-art-original::after{opacity:.16}
+.dress-section[data-art="reference"][data-scene-status="loaded"] .dress-source-scene{
+  opacity:1;
+}
+.dress-section[data-art="reference"][data-scene-status="loaded"] .dress-art-original{
+  opacity:0;
+}
+.dress-section[data-art="reference"][data-butterfly-status="loaded"] .dress-source-butterfly{
+  top:82px;left:3%;right:auto;width:52px;height:41px;
+}
+.dress-section .dress-flora,.dress-section .dress-orbit,.dress-section .dress-butterfly-small{
+  display:none;
+}
+.dress-section .dress-butterfly{top:82px;left:3%}
+.dress-section .dress-inner{
+  display:block;width:100%;max-width:none;min-height:0;
+  padding:96px 28px;
+}
+.dress-section .dress-body{
+  display:flex;flex-direction:column;align-items:center;
+  width:100%;min-width:0;margin:0 auto;
+}
+.dress-section .dress-eyebrow{margin:0 0 12px}
+.dress-section .dress-intro{margin-bottom:26px}
+.dress-section .dress-palettes{gap:14px;width:100%;max-width:none}
+.dress-section .dress-palette{
+  padding:22px 18px;
+  background:rgba(255,255,255,.5);
+  border:1px solid rgba(126,100,121,.3);
+  border-radius:16px;
+  box-shadow:none;
+}
+.dress-section .dress-palette::before,.dress-section .dress-finish{
+  display:none;
+}
+@media(max-width:350px){
+  .dress-section .dress-inner{padding:96px 28px}
+  .dress-section .dress-palettes{gap:14px}
+  .dress-section .dress-palette{padding:22px 18px}
+}
