@@ -9,6 +9,9 @@ const outputs=[];
 const browser=await chromium.launch({headless:true, args:['--no-sandbox']});
 const targetTexts=[
   'Akad Nikah','Wedding Reception',
+  'Saturday, 23 January 2027','10:00 AM — 12:00 PM','7:30 PM — 10:30 PM',
+  'Jalan Tuanku Abdul Halim, 50480 Kuala Lumpur',
+  '6, Jalan Stesen Sentral 2, 50470 Kuala Lumpur',
   'Masjid Wilayah Persekutuan',
   'Grand Ballroom, St. Regis Kuala Lumpur',
   'Open in Maps','Waze','Add to Calendar'
@@ -80,6 +83,11 @@ async function inspect(url,kind,width,height) {
   return {url:location.href,title:document.title,viewport:{w:innerWidth,h:innerHeight,
     documentHeight:document.documentElement.scrollHeight,overflowX:document.documentElement.scrollWidth-innerWidth},
     hasOpened:document.getElementById('invitation')?.dataset.state,
+    eventArt:document.getElementById('eventDetails')?.dataset.art,
+    paperState:document.getElementById('eventDetails')?.dataset.referencePaper,
+    butterflyState:document.getElementById('eventDetails')?.dataset.referenceButterfly,
+    paperSrc:document.getElementById('eventSourcePaper')?.currentSrc,
+    paperNaturalSize:[document.getElementById('eventSourcePaper')?.naturalWidth,document.getElementById('eventSourcePaper')?.naturalHeight],
     section:section?compactRect(section):null,
     elements,media,parentChain};
  },targetTexts);
