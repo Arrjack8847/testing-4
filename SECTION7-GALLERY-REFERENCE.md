@@ -1,99 +1,81 @@
-# Section 7 — Our Gallery (Tasik Kayangan reference study)
+# Section 7 — Our Gallery: local WebP workflow
 
-**Branch:** `feat/section7-gallery-reference-20261103`
-**Parent:** `feat/section6-dress-code-reference-20261103`
+Branch: `feat/section7-gallery-reference-20261103` (not merged into main).
+Parent branch: `feat/section6-dress-code-reference-20261103`.
 
-## Reference order and confirmed content
+## Local asset paths (no image hotlinks in this section)
 
-The indexed public source at
-https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en
-confirms the order: Section 4 Events → Section 5 Order of the Day →
-Section 6 Dress Code → **Section 7 Our Gallery** → later Wedding Gift →
-RSVP & Wishes → closing.
+The reference content is `Moments`, `Our Gallery`, five image frames
+(`Together`, `The Bride`, `The Groom`, `The Garden`, `The Lake`),
+then `Tap a frame to view`. Section 7 immediately follows Dress Code.
 
-Section 7 specifically shows `Moments`, `Our Gallery`, and five named
-frames: `Together`, `The Bride`, `The Groom`, `The Garden`,
-`The Lake`; the reference invites guests to tap a frame to view.
+Normal guest mode (`http://localhost:8000/`) loads only these local images:
 
-## Implementation in this isolated branch
+| Frame | Local file to provide |
+|---|---|
+| Together | `assets/gallery/photo-01.webp` |
+| The Bride | `assets/gallery/photo-02.webp` |
+| The Groom | `assets/gallery/photo-03.webp` |
+| The Garden | `assets/gallery/photo-04.webp` |
+| The Lake | `assets/gallery/photo-05.webp` |
 
-- `index.html`: renamed the five original placeholders and gallery heading
-  to verified reference content and retained their position after Dress Code.
-- `section-five.js`: accessible alt text, matching caption text in the
-  existing modal, keyboard arrows, Escape and touch-swipe navigation.
-- `section-five.css`: scoped frame captions for real images, uses existing
-  original botanical artwork to blend with Dress Code, and preserves the
-  matching mauve boundary color.
-- `tests/section-five.spec.mjs`: checks reference heading and five labels
-  alongside existing mobile bounds, accessibility and modal behavior.
+The files must be valid WebP images and must be yours or properly licensed.
+You may upload/commit those five photos once licensed; the code already supports
+them, no JavaScript edits needed. Missing images display honest, disabled
+placeholders; no automatic third-party fallback.
 
-No existing Section 1–6 markup or animation was intentionally changed.
-No gallery photographs have been fabricated or embedded; the five local
-image slots are `assets/gallery/photo-01.webp` through `photo-05.webp`,
-which remain optional until authorized real images are supplied. Without
-them, the frames are clearly labeled placeholders and disabled.
+## Optional locally downloaded reference WebPs — testing only
 
-## Important visual limitation
+The separate comparison mode (`?galleryReference=1`) now uses ONLY
+these local files:
 
-This prototype matches the reference's **verified content and frame count**.
-The reference's exact photograph files, their crop/focal points, pixel
-dimensions, camera movement and animations were not available for
-side-by-side screenshot comparison. The visual geometry is therefore
-**not certified pixel-perfect**.
+```text
+assets/gallery/reference/moody.webp
+assets/gallery/reference/moody-bride.webp
+assets/gallery/reference/moody-groom.webp
+assets/gallery/reference/moody-garden.webp
+assets/gallery/reference/moody-lake.webp
+```
 
-Before production: obtain consented images for all five frames, inspect
-the original reference at 320×568, 360×740, 390×844 and 430×932,
-and compare frame sizes, typography and section entrance/exit on forward
-and reverse scroll. Preserve the zero-gap Dress Code → Gallery transition.
+The original URLs are in `download-gallery-reference.ps1` for users
+who hold the necessary rights. **The script never runs automatically.**
 
-## Test locally
+If you have rights to download and use the reference pictures, run:
 
 ```powershell
 cd D:\testing-4
-git fetch origin
-git switch feat/section7-gallery-reference-20261103
-git pull origin feat/section7-gallery-reference-20261103
+powershell -ExecutionPolicy Bypass -File .\download-gallery-reference.ps1 -IHaveRights
 powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
-Visit `http://localhost:8000`, open the invitation and scroll past
-**Dress Code** to **Our Gallery**. Do not merge this branch into main
-until the focused visual and browser tests pass.
+Then visit `http://localhost:8000/?galleryReference=1`.
 
-## Phase 2 — verified reference URLs and opt-in photo comparison
+The comparison folder `assets/gallery/reference/` is excluded by
+`.gitignore`; the images are not embedded in this branch and not uploaded
+by the script. Do not commit/distribute portraits without permission. To
+publish your own photos, provide the five `photo-0N.webp` files instead.
 
-All five image links were verified from the live public Tasik Kayangan page
-HTML image references (not guessed):
+## Testing
 
-| Caption | Original URL |
-|---|---|
-| Together | https://undangankahwin.com/images/concierge/couples/moody.webp |
-| The Bride | https://undangankahwin.com/images/concierge/couples/moody-bride.webp |
-| The Groom | https://undangankahwin.com/images/concierge/couples/moody-groom.webp |
-| The Garden | https://undangankahwin.com/images/concierge/couples/moody-garden.webp |
-| The Lake | https://undangankahwin.com/images/concierge/couples/moody-lake.webp |
+`tests/section-five.spec.mjs` asserts that all gallery photos use local
+`./assets/gallery/` URLs, are accessible when supplied, and leave
+placeholders when absent. It also checks captions, viewer keyboard controls,
+reduced motion and mobile overflow. Dedicated workflow:
+`.github/workflows/section7-gallery-qa.yml`.
 
-The public HTML order places **Tap a frame to view after the five frames**;
-the local section now uses the same DOM order.
+`tools/compare-section7-live.mjs` is a read-only Playwright geometry/screenshot
+audit comparing the public source website to our local gallery. Without local
+reference photos, its local screenshot captures placeholders; it cannot
+certify photo cropping. It does not store source images in the repository.
 
-Normal guest mode uses only local
-`./assets/gallery/photo-01.webp` through `photo-05.webp`. To compare
-with source photos temporarily, open:
+Section 1 remains a separate system: it prefers downloaded local WebPs in
+`assets/` but still falls back to external links if missing. Its existing
+`download-assets.ps1` handles 25 scene files (subject to permission).
+Do not remove Section 1's fallback until those real files are available
+and the first-scene browser tests pass.
 
-```text
-http://localhost:8000/?galleryReference=1
-```
+## Visual status
 
-These source photos are remote, never downloaded or committed by this
-branch, and are **not licensed for inclusion in commercial customer work**.
-A distinct on-page notice identifies the comparison mode; if hotlinking
-fails, placeholders remain instead of broken interactive frames.
-
-The comparison mode verifies content and photo identities, **not** exact
-CSS dimensions, crop positions, colors, camera motion, or timings. Do not
-declare the gallery pixel-perfect until side-by-side mobile screenshots
-have been measured and manual device testing has been completed.
-
-Focused CI uses `.github/workflows/section7-gallery-qa.yml`, testing
-four mobile sizes, image viewer, remote-image mock, keyboard use, fallback,
-reduced motion, and three browser engines.
+Layout, frame cropping, type metrics, motion and scene transitions are not
+yet certified pixel-perfect against Tasik Kayangan. The repo is not production
+ready until images are licensed/provided and device screenshots validated.
