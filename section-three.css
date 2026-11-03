@@ -284,21 +284,21 @@
 .event-section .event-card-title {
   width:100%;
   max-width:none;
-  margin:0 0 4px;
+  margin:0 0 12px;
   color:#5c264f;
   font:400 42px/69.3px 'Pinyon Script',cursive;
   overflow-wrap:normal;
   text-shadow:none;
 }
 .event-section .event-card-date {
-  margin:0 0 10px;
+  margin:0 0 4px;
   color:#4a2a45;
-  font:400 18px/29.7px 'EB Garamond',Georgia,serif;
+  font:600 22px/36.3px 'EB Garamond',Georgia,serif;
 }
 .event-section .event-card-time {
   margin:0 0 21px;
-  color:#4a2a45;
-  font:400 18px/29.7px 'EB Garamond',Georgia,serif;
+  color:#6f5a6c;
+  font:300 14px/23.1px 'EB Garamond',Georgia,serif;
   letter-spacing:0;
 }
 .event-section .event-card-diamond {
@@ -314,7 +314,7 @@
 }
 .event-section .event-card-address {
   max-width:100%;
-  margin:0 auto 13px;
+  margin:0 auto 11px;
   color:#715368;
   font:400 15px/24.75px 'EB Garamond',Georgia,serif;
 }
@@ -369,7 +369,8 @@
   .event-section .event-shared-arch {padding:0 5px;}
   .event-section .event-reference-card {padding:104px 17px 53px;}
   .event-section .event-card-title {font-size:40px;line-height:66px;}
-  .event-section .event-card-date,.event-section .event-card-time {font-size:16px;}
+  .event-section .event-card-date {font-size:20px;}
+  .event-section .event-card-time {font-size:13px;}
   .event-section .event-card-place {font-size:18px;}
   .event-section .event-map-link {font-size:11px;padding:11px 18px;}
 }
