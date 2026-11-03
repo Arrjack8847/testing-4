@@ -196,11 +196,14 @@ sampling the reference every 500ms for seven seconds:
   preliminary frames show an uninitialized wing at 0,0; they should never
   be treated as valid flight-path measurements.
 
-The local butterfly now uses a **time-driven, alternating left/right flight**,
-rather than moving only with scrolling. It has independent 3D-flapping
-wings and a responsive scale. The background paper retains its *separate*
-scroll-camera parallax. Reduced-motion mode shows a stationary butterfly,
-with no wing-flap animation.
+The local butterfly now uses a **time-driven four-pass loop**,
+rather than moving only with scrolling. It alternates direction and flight
+height: lower-right to lower-left, upper-left to upper-right, upper-right to
+upper-left, then lower-left to lower-right. The lower lane is calculated as
+approximately 80px above the section bottom (around Y600–625 at the
+measured phone widths). It has independent 3D-flapping wings and a responsive
+scale. The paper retains its *separate* scroll-camera parallax. Reduced-motion
+mode shows a stationary butterfly with no wing-flap animation.
 
 Evidence: [source and local fixed-scroll telemetry](https://github.com/Arrjack8847/testing-4/actions/runs/41685387495).
 The read-only script `tools/section6-flight-timeline.cjs` captures fixed-scroll
