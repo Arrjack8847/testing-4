@@ -92,12 +92,12 @@ test('Reveals in each viewport and resets when scrolled away',async({page})=>{
   const {gift}=await openGift(page);
   await expect(gift).toHaveAttribute('data-gift-reveal-ready','true');
   const heading=gift.locator('.gift-eight-heading');
-  await expect(heading).toHaveClass(/in/);
+  await expect(heading).toHaveClass(/\bin\b/);
   const pos=await gift.evaluate(el=>el.getBoundingClientRect().top+scrollY);
   await page.evaluate(y=>scrollTo({top:Math.max(0,y-innerHeight*2),behavior:'instant'}),pos);
-  await expect(heading).not.toHaveClass(/in/);
+  await expect(heading).not.toHaveClass(/\bin\b/);
   await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),pos);
-  await expect(heading).toHaveClass(/in/);
+  await expect(heading).toHaveClass(/\bin\b/);
 });
 
 test('Reduced Motion eliminates gift entrance transforms',async({page})=>{
@@ -123,4 +123,33 @@ test('Copy is activated only by explicit verified customer configuration',async(
     .toHaveText('Example Bank');
   await expect(gift.locator('.gift-eight-copy').first()).toBeEnabled();
   await expect(gift.locator('.gift-eight-copy').last()).toBeDisabled();
+});
+
+
+test('Gallery to Wedding Gift to RSVP scrolls forward and backward without changing neighbors',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  const sequence=['gallery','weddingGift','rsvp','weddingGift','gallery'];
+  const states=[];
+  for(const id of sequence){
+    await page.evaluate(id=>{
+      document.getElementById(id).scrollIntoView({block:'start',behavior:'instant'});
+    },id);
+    const data=await page.evaluate(id=>{
+      const node=document.getElementById(id);
+      const r=node.getBoundingClientRect();
+      return {id,top:r.top,bottom:r.bottom,height:r.height,viewport:innerHeight,
+        overflow:document.documentElement.scrollWidth-innerWidth};
+    },id);
+    expect(data.height).toBeGreaterThan(0);
+    expect(data.top).toBeGreaterThanOrEqual(-2);
+    expect(data.top).toBeLessThanOrEqual(2);
+    expect(data.overflow).toBeLessThanOrEqual(1);
+    states.push(data.id);
+  }
+  expect(states).toEqual(sequence);
+  await expect(gift).toHaveAttribute('data-section','8');
+  await expect(page.locator('#rsvp')).toHaveAttribute('data-section','9');
+  await expect(gift).toHaveAttribute('aria-hidden','false');
+  expect(faults).toEqual([]);
 });
