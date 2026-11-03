@@ -132,3 +132,43 @@ The CI calibration workflow uploads only measurements in JSON; third-party
 reference screenshots stay ephemeral on the runner and are never committed
 or uploaded as artifacts. A new automated regression check locks in these
 core measurements in `tests/section-six-dress.spec.mjs`.
+
+
+## Measured card and motion parity — 4 November 2026
+
+The reference's actual card and framing CSS was measured through the read-only
+browser in CI, then matched in this branch.
+
+- Reference section background: #faf7fb.
+- Reference section padding: 96px top/bottom, 28px left/right.
+- Content height: 507.09px (320/360 widths), 487.30px (390/430 widths).
+- Each palette card: full available width, 168.78px high, 22px 18px padding,
+  16px corner radius, transparent-white 50% background, and 1px
+  rgba(126,100,121,.3) border with no shadow.
+- Gap between palette cards: 14px.
+- All source/local content, cards and swatches matched at 320/360/390/430px in
+  successful CI: https://github.com/Arrjack8847/testing-4/actions/runs/41680565079
+
+The reference dress artwork is **paper.webp**, not scene.webp; the paper
+image overlaps its section by 12% top and bottom (124% section height).
+Source-hosted paper only loads when the developer explicitly adds
+`?dressReference=1`; the original mode uses independently created SVG art.
+
+Reference-reported text motion: 52px downward + 0.955 initial scale,
+opacity 1s ease; transform 1.1s cubic-bezier(.22,.9,.24,1).
+Delays: eyebrow 0s, heading .15s, intro .30s, first card .45s,
+second card .60s. These values are now implemented as CSS transitions.
+
+The source paper's parallax moved approximately -0.0427px per one pixel
+change in the section's top screen coordinate, with an additional
+3.5px offset in normal-motion mode. The local scene uses this same calibrated
+camera curve. A dedicated no-reduced-motion comparison script
+`tools/section6-motion-audit.cjs` captures seven scroll states and uploads
+a *measurements-only* artifact from GitHub Actions.
+
+The source butterfly uses paired 3D-flapping image wings and a larger
+cross-section flight trajectory. Local mode still renders an independently
+drawn CSS butterfly instead of republishing that vendor artwork. The
+illustrated background and butterfly cannot be described as pixel-identical;
+commercial redistribution would require source artwork rights or an approved
+original replacement.
