@@ -79,3 +79,30 @@ and the first-scene browser tests pass.
 Layout, frame cropping, type metrics, motion and scene transitions are not
 yet certified pixel-perfect against Tasik Kayangan. The repo is not production
 ready until images are licensed/provided and device screenshots validated.
+
+## Phase 3 — source-measured Gallery grid
+
+Read-only browser measurements of the public reference at 390×844 and
+320×568 (see GitHub Actions run 41672622274) showed the old gallery
+arrangement was incorrect. The new CSS grid preserves this source layout:
+
+- Top row: Together (left), The Bride (right).
+- Second row: The Groom centered beneath the first row.
+- Third row: The Garden full width.
+- Fourth row: The Lake full width.
+- Keep a 12px gap between columns and rows, with 28px side margins.
+- At 390px: full width 334px, columns 161px; Together 246.9px tall,
+  The Bride 214.7px tall, Groom 160×213.3px, Garden/Lake 334×249.4px.
+- At 320px: full width 264px, columns 126px; Together 193.2px tall,
+  The Bride 168px tall, Groom 125×166.7px, Garden/Lake 264×197.2px.
+- The source heading is 52px on both audited mobile widths.
+
+This was implemented with HTML/CSS only, leaving the existing interaction
+and five local WebP file paths unchanged. A focused Playwright regression
+test now asserts these frame measurements at the four configured phone
+viewports.
+
+**Remaining verification:** exact photo focal points, frame border radii,
+botanical decoration, overall section entrance/exit scroll behavior and
+source animation timing. The Gallery is not yet a certified exact
+replica. Default placeholders remain until authorized WebP files arrive.
