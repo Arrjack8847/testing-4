@@ -23,10 +23,14 @@
   new MutationObserver(syncCover).observe(invite,{attributes:true,attributeFilter:['data-state']});
 
   if (query.get('orderReference')==='1') {
+    // Development preview only. Reference artwork must be supplied locally by
+    // a user with permission. Never hotlink or silently fetch vendor images.
     section.dataset.art='reference';
+    section.dataset.assetSource='local-webp';
+    const assetRoot='./assets/reference-dev/';
     const images=[
-      [document.getElementById('orderSourceBand'),'bandStatus','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/band_plum.webp'],
-      [document.getElementById('orderSourceButterfly'),'butterflyStatus','https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_blush.webp']
+      [document.getElementById('orderSourceBand'),'bandStatus',assetRoot+'band_plum.webp'],
+      [document.getElementById('orderSourceButterfly'),'butterflyStatus',assetRoot+'bfly_blush.webp']
     ];
     for (const [img,key,url] of images) {
       if (!img) continue;
