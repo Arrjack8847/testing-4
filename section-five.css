@@ -180,3 +180,16 @@
   .gallery-section .gallery-photo-small{min-height:185px;}
   .gallery-section h2.gallery-heading{font-size:48px;}
 }
+
+/* Reference copy appears after the image grid in the source DOM. */
+.gallery-section .gallery-intro{max-width:32ch;margin:22px auto 0;font-size:16px;line-height:1.4;}
+.gallery-section .gallery-reference-note{
+  max-width:35ch;margin:18px auto 0;padding:11px 12px;
+  border:1px solid #bd9f9b66;border-radius:10px;
+  background:#fff9f0d9;color:#765d75;
+  font:400 12px/1.5 system-ui,sans-serif;
+}
+.gallery-section .gallery-reference-note[hidden]{display:none!important;}
+.gallery-section[data-gallery-art="reference-comparison"] .gallery-disclaimer{
+  max-width:36ch;margin-top:10px;
+}
