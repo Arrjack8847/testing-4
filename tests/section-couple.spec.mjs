@@ -111,6 +111,25 @@ test('couple scene respects Reduced Motion and disables decorative petals',async
   await expect(section.locator('.couple-floating-petals span').first()).toHaveCSS('animation-name','none');
 });
 
+
+test('Section 3 original parallax clears and resumes when Reduced Motion changes while scrolled',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const start=await section.evaluate(el=>el.getBoundingClientRect().top+scrollY);
+  await page.evaluate(y=>window.scrollTo({top:y,behavior:'instant'}),start+800);
+  await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-bg-y'))))
+    .toBeGreaterThan(5);
+
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect.poll(()=>section.evaluate(el=>el.style.getPropertyValue('--couple-bg-y'))).toBe('');
+  await expect(section).toHaveAttribute('data-petals-active','false');
+  await expect(section.locator('.couple-hanging')).toHaveCSS('animation-name','none');
+
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-bg-y'))))
+    .toBeGreaterThan(5);
+  expect(errors).toEqual([]);
+});
+
 test('original floral scene parallax follows scrolling without moving cards',async({page})=>{
   const {section}=await openCouple(page);
   const sample=async targetY=>{

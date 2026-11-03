@@ -25,7 +25,6 @@
   new MutationObserver(syncPetals).observe(invite,{
     attributes:true,attributeFilter:['data-state']
   });
-  motion.addEventListener?.('change',syncPetals);
   document.addEventListener('visibilitychange',syncPetals);
   // The live reference drifts its composite garden by about -45px to +20px
   // while the Couple section scrolls. Apply a bounded, rAF-throttled shift to
@@ -45,6 +44,17 @@
   };
   window.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',onScroll,{passive:true});
+  // A user can toggle Reduced Motion after the page has already scrolled.
+  // Clear any previously painted camera offset instead of leaving it frozen.
+  const syncMotion=()=>{
+    syncPetals();
+    if(motion.matches){
+      section.style.removeProperty('--couple-bg-y');
+    } else if(visible){
+      onScroll();
+    }
+  };
+  motion.addEventListener?.('change',syncMotion);
   if(!('IntersectionObserver' in window)){
     const check=()=>{
       const box=section.getBoundingClientRect();
