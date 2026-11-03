@@ -48,11 +48,35 @@
       .filter(([,state]) => state === 'failed' || state === 'fallback')
       .map(([name]) => name).join(',');
   };
+  // Section 1 already resolves the SAME reference scene.webp from the local
+  // artwork pack. Reuse that local asset in Section 3 rather than making the
+  // browser depend on a second cross-origin scene request. Keep the provider
+  // URL as a fallback for environments without locally installed artwork.
+  const sceneSources = [
+    './assets/scene.webp',
+    artRoot + 'packs/tasik-kayangan/scene.webp'
+  ];
   const sceneProbe = new Image();
-  sceneProbe.onload = () => {webpStatus.scene='loaded';syncWebpStatus();};
-  sceneProbe.onerror = () => {webpStatus.scene='failed';syncWebpStatus();};
+  let sceneSourceIndex = 0;
+  sceneProbe.onload = () => {
+    const imageUrl = sceneProbe.currentSrc || sceneProbe.src;
+    section.style.setProperty('--couple-reference-image', 'url("' + imageUrl + '")');
+    section.dataset.referenceSceneSource = sceneSourceIndex === 0 ? 'local' : 'remote';
+    webpStatus.scene = 'loaded';
+    syncWebpStatus();
+  };
+  sceneProbe.onerror = () => {
+    sceneSourceIndex++;
+    if (sceneSourceIndex < sceneSources.length) {
+      sceneProbe.src = sceneSources[sceneSourceIndex];
+      return;
+    }
+    section.dataset.referenceSceneSource = 'unavailable';
+    webpStatus.scene = 'failed';
+    syncWebpStatus();
+  };
   syncWebpStatus();
-  sceneProbe.src = artRoot + 'packs/tasik-kayangan/scene.webp';
+  sceneProbe.src = sceneSources[sceneSourceIndex];
   for (const item of portraitData) {
     const img = section.querySelector(item.selector);
     if (!img) continue;
