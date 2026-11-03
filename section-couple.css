@@ -168,7 +168,13 @@
 .couple-section[data-art="reference"]{
   background:#f2ecf3;
 }
-.couple-section[data-art="reference"]::before{display:none;}
+/* The live Couple section places a subtle paper tint above its sticky
+   backdrop and beneath its arched panel. Keep the same stacking order here,
+   scoped strictly to the reference-recreation preview. */
+.couple-section[data-art="reference"]::before{
+  display:block;z-index:1;pointer-events:none;
+  background:#f8f1ec;opacity:.1;
+}
 .couple-section[data-art="reference"] .couple-reference-scene{
   display:block;position:absolute;inset:0 auto auto 0;
   width:100%;height:100dvh;min-height:480px;
@@ -186,6 +192,7 @@
 /* Use the original arch panel border slices only in the opted-in local
    reference mode. The dimensions/position remain those of Section 3. */
 .couple-section[data-art="reference"] .couple-arch{
+  z-index:2;
   border:solid transparent;
   border-width:200px 28px 26px;
   border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_panel.svg");
@@ -199,6 +206,14 @@
 .couple-section[data-art="reference"] .couple-arch::before,
 .couple-section[data-art="reference"] .couple-arch::after{display:none;}
 .couple-section[data-art="reference"] .couple-demo-note{display:none;}
+/* The live reference groom image fills its unchanged 240.5 x 332.7 frame
+   with a measured 1.05 inner-image zoom at the 390px groom checkpoint.
+   Zoom ONLY the comparison portrait, not the card or original-art mode. */
+.couple-section[data-art="reference"] .couple-profile--groom .couple-portrait img{
+  transform:scale(1.05);
+  transform-origin:center center;
+}
+
 @media(prefers-reduced-motion:reduce){
   .couple-section[data-art="reference"] .couple-reference-scene{will-change:auto;}
 }

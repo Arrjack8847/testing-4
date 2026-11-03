@@ -17,6 +17,7 @@
   const artRoot = 'https://undangankahwin.com/images/concierge/';
   const portraitData = [
     {
+      key: 'groom',
       selector: '#groomPortrait',
       url: artRoot + 'couples/moody-groom.webp',
       name: 'Muhammad Rayyan bin Bujang',
@@ -25,6 +26,7 @@
       alt: 'Reference website example groom portrait (development comparison only)'
     },
     {
+      key: 'bride',
       selector: '#bridePortrait',
       url: artRoot + 'couples/moody-bride.webp',
       name: 'Nur Sofea binti Dzulkharnain',
@@ -35,15 +37,43 @@
   ];
 
   section.dataset.art = 'reference';
+  // Report whether the three known WebPs actually loaded, rather than
+  // confusing CSS/HTML URLs with successful network image responses.
+  // This diagnostic exists only in the opt-in prototype and never downloads
+  // third-party files into the repository.
+  const webpStatus = {scene:'loading',groom:'loading',bride:'loading'};
+  const syncWebpStatus = () => {
+    const states = Object.values(webpStatus);
+    section.dataset.referenceWebpCount = String(states.filter(state => state === 'loaded').length);
+    section.dataset.referenceWebpState = states.every(state => state === 'loaded')
+      ? 'ready' : states.some(state => state === 'loading') ? 'loading' : 'partial';
+    section.dataset.referenceWebpMissing = Object.entries(webpStatus)
+      .filter(([,state]) => state === 'failed' || state === 'fallback')
+      .map(([name]) => name).join(',');
+  };
+  const sceneProbe = new Image();
+  sceneProbe.onload = () => {webpStatus.scene='loaded';syncWebpStatus();};
+  sceneProbe.onerror = () => {webpStatus.scene='failed';syncWebpStatus();};
+  syncWebpStatus();
+  sceneProbe.src = artRoot + 'packs/tasik-kayangan/scene.webp';
   for (const item of portraitData) {
     const img = section.querySelector(item.selector);
     if (!img) continue;
     const fallback = img.getAttribute('src');
+    img.addEventListener('load', () => {
+      webpStatus[item.key] = img.currentSrc === item.url ? 'loaded' : 'fallback';
+      syncWebpStatus();
+    });
     img.addEventListener('error', () => {
       // Network / hotlink restrictions do not leave a broken-image box.
       if (img.getAttribute('src') !== fallback) {
+        webpStatus[item.key] = 'fallback';
+        syncWebpStatus();
         img.src = fallback;
         section.dataset.referencePhotoFallback = 'true';
+      } else {
+        webpStatus[item.key] = 'failed';
+        syncWebpStatus();
       }
     });
     img.dataset.referenceUrl = item.url;

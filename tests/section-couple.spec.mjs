@@ -224,6 +224,11 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
   await page.goto('/?coupleReference=1');
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
+  // Three known WebP URLs (garden, groom, bride) are actively observed,
+  // not merely referenced in markup. Third-party hosting may block them.
+  await expect(section).toHaveAttribute('data-reference-webp-state',/^(loading|ready|partial)$/);
+  await expect.poll(()=>section.getAttribute('data-reference-webp-count'))
+    .toMatch(/^[0-3]$/);
   await expect(section.locator('.couple-name').first()).toHaveText('Muhammad Rayyan bin Bujang');
   await expect(section.locator('.couple-name').nth(1)).toHaveText('Nur Sofea binti Dzulkharnain');
   await expect(section.locator('#groomPortrait')).toHaveAttribute('data-reference-url',/couples\/moody-groom\.webp$/);
@@ -232,8 +237,13 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
     arch:getComputedStyle(el.querySelector('.couple-arch')).borderImageSource,
     garden:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
     clouds:getComputedStyle(el.querySelector('.couple-hanging')).display,
-    width:document.documentElement.scrollWidth-window.innerWidth
+    width:document.documentElement.scrollWidth-window.innerWidth,
+    washOpacity:getComputedStyle(el,'::before').opacity,
+    washZ:Number(getComputedStyle(el,'::before').zIndex),
+    archZ:Number(getComputedStyle(el.querySelector('.couple-arch')).zIndex)
   }));
+  expect(style.washOpacity).toBe('0.1');
+  expect(style.archZ).toBeGreaterThan(style.washZ);
   expect(style.arch).toContain('arch_panel.svg');
   expect(style.garden).toContain('tasik-kayangan/scene.webp');
   expect(style.clouds).toBe('none');
@@ -300,9 +310,14 @@ test('reference preview camera matches four measured 390px scroll checkpoints',a
     expect(Math.abs(reading.visual-reading.expectedVisual)).toBeLessThan(1.5);
     expect(reading.overflow).toBeLessThanOrEqual(1);
     cameras.push(reading.camera);
-    if(viewport===390 && y===3587){
-      await page.screenshot({path:testInfo.outputPath('section3-reference-midpoint-390.png'),animations:'disabled'});
-    }
+    // Save reference-art evidence at entry, groom, bride and lower garden
+    // on EVERY configured phone, not only 390px. This makes visual alignment
+    // review possible without assuming all widths crop the same artwork.
+    const stage={2743:'entry',3165:'groom',3587:'middle',4220:'bride'}[y];
+    await page.screenshot({
+      path:testInfo.outputPath('section3-reference-'+viewport+'-'+stage+'.png'),
+      animations:'disabled'
+    });
   }
   expect(cameras[0]).toBeLessThan(cameras[1]);
   expect(cameras[1]).toBeLessThan(cameras[2]);
@@ -317,6 +332,85 @@ test('reference preview camera matches four measured 390px scroll checkpoints',a
     const actual=await section.evaluate(el=>parseFloat(el.dataset.referenceCameraOffset));
     expect(Math.abs(actual-(-26.8))).toBeLessThan(1.3);
   }
+});
+
+
+test('reference garden camera moves continuously forwards and backwards across Section 3',async({page})=>{
+  await page.goto('/?coupleReference=1');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const section=page.locator('#couple');
+  const geometry=await section.evaluate(el=>({
+    start:el.getBoundingClientRect().top+window.scrollY,
+    travel:Math.max(0,el.offsetHeight-window.innerHeight)
+  }));
+  const samples=[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1,.7,.4,.1];
+  let previous=null;
+  for(const fraction of samples){
+    const target=Math.round(geometry.start+geometry.travel*fraction);
+    await page.evaluate(async y=>{
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:y,behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },target);
+    const reading=await section.evaluate(el=>({
+      y:window.scrollY,
+      camera:Number(el.dataset.referenceCameraOffset),
+      total:Number.parseFloat(el.style.getPropertyValue('--couple-reference-y')),
+      top:el.getBoundingClientRect().top,
+      height:el.offsetHeight,
+      screen:window.innerHeight
+    }));
+    const pinned=Math.max(0,Math.min(reading.height-reading.screen,-reading.top));
+    expect(Number.isFinite(reading.camera)).toBe(true);
+    expect(Math.abs(reading.total-(pinned+reading.camera))).toBeLessThan(1.5);
+    expect(reading.camera).toBeGreaterThanOrEqual(-44.81);
+    expect(reading.camera).toBeLessThanOrEqual(20.01);
+    if(previous){
+      // Drift rate must remain at or below the calibrated 0.0427 px per
+      // scroll pixel: no discontinuity when reversing in the same section.
+      const allowed=Math.abs(reading.y-previous.y)*.0427+.5;
+      expect(Math.abs(reading.camera-previous.camera)).toBeLessThanOrEqual(allowed);
+    }
+    previous=reading;
+  }
+});
+
+
+test('reference groom image uses measured 5% zoom without resizing the portrait frame',async({page})=>{
+  await page.goto('/?coupleReference=1');
+  const section=page.locator('#couple');
+  await expect(section).toHaveAttribute('data-art','reference');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const groom=section.locator('.couple-profile--groom .couple-portrait');
+  await groom.scrollIntoViewIfNeeded();
+  await expect(groom).toHaveClass(/in-view/);
+  await expect.poll(()=>groom.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+  const report=await groom.evaluate(el=>{
+    const image=el.querySelector('img');
+    const frame=el.getBoundingClientRect();
+    const picture=image.getBoundingClientRect();
+    const scale=getComputedStyle(image).transform;
+    return {
+      frameWidth:frame.width,frameHeight:frame.height,
+      zoomedWidth:picture.width,zoomedHeight:picture.height,
+      unscaledWidth:image.clientWidth,unscaledHeight:image.clientHeight,
+      scale,overflow:getComputedStyle(el).overflow,
+      horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  expect(report.scale).toBe('matrix(1.05, 0, 0, 1.05, 0, 0)');
+  expect(report.zoomedWidth/report.unscaledWidth).toBeCloseTo(1.05,2);
+  expect(report.zoomedHeight/report.unscaledHeight).toBeCloseTo(1.05,2);
+  expect(report.overflow).toBe('hidden');
+  expect(report.horizontalOverflow).toBeLessThanOrEqual(1);
+  if(await page.evaluate(()=>innerWidth)===390){
+    expect(report.frameWidth).toBeCloseTo(240.5,0);
+    expect(report.frameHeight).toBeCloseTo(332.7,0);
+  }
+  // The original-art preview is unaffected by the reference-only crop.
+  await page.goto('/');
+  await expect(page.locator('#groomPortrait')).toHaveCSS('transform','none');
 });
 
 test('reference preview entrance matches measured 52px lift and Reduced Motion removes it',async({page})=>{

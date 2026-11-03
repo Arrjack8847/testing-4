@@ -36,6 +36,49 @@ To compare the approved layout against the actual vendor artwork, open `http://l
 
 This preview mode is for visual comparison, **not production or redistribution**. Referenced artwork, photography, and example identities require appropriate permission before commercial use. Sections 1–2 and Sections 4–7 are unchanged by the flag.
 
+## Verified Section 3 source-image inventory (3 November 2026)
+
+A read-only browser inventory of the live Tasik Kayangan **Couple** DOM,
+computed CSS and scroll resource requests found **three distinct active WebP
+URLs plus one SVG arch** in Section 3:
+
+| Asset | Source URL | Role | Connected in comparison mode |
+| --- | --- | --- | --- |
+| Garden | `https://undangankahwin.com/images/concierge/packs/tasik-kayangan/scene.webp` | Sticky shared lake/garden scene | Yes |
+| Groom | `https://undangankahwin.com/images/concierge/couples/moody-groom.webp` | Groom card photograph | Yes |
+| Bride | `https://undangankahwin.com/images/concierge/couples/moody-bride.webp` | Bride card photograph | Yes |
+| Arch (SVG, not WebP) | `https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_panel.svg` | Arched border image | Yes |
+
+The reference's `arch_event.svg`, `band.webp`, and `band_plum.webp` were
+present among shared style variables but **not actively rendered by this
+Section 3** in the inspected view. The flowerbed container contained no
+additional image sources. This is an observed inventory, not a guarantee
+that the upstream provider will never add assets.
+
+In `?coupleReference=1`, the three WebPs are assigned without embedding
+or rehosting third-party images. Open DevTools and inspect the
+`#couple` element attributes:
+
+- `data-reference-webp-count`: number of the three WebPs that actually loaded (0–3)
+- `data-reference-webp-state`: `loading`, `ready` or `partial`
+- `data-reference-webp-missing`: keys of missing / fallback assets, if any
+
+This distinguishes **URL implementation** from real image decoding. The
+source returned HTTP 200 during the read-only inspection, but the cloud
+browser's image proxy failed decoding, so HTTP 200 alone is insufficient
+to certify all images render in every environment. Source-photo fallback
+continues to use our illustration rather than showing a broken box.
+
+The source layers a faint paper-colored wash at 0.1 opacity between the
+scene and the arched panel. Our reference-only CSS now adds the same
+layering order without touching original-art mode. Its backdrop is still
+implemented as a CSS scene with calibrated camera transform, rather than
+the source's DOM `img` and sticky wrapper; parity of all source DOM
+mechanics is therefore **not claimed**.
+
+These assets are for development comparison; their appearance in a
+prototype does not grant commercial licensing or redistribution rights.
+
 ## Reference-mode animation calibration (3 November 2026)
 
 The opt-in reference scene is a one-viewport composite image positioned over the 1,840px Couple section. It now reproduces the reference's *measured* background camera offset, rather than holding the image perfectly fixed. At 390×844, the four source checkpoints are document scroll Y=2743 (-44.8px), Y=3165 (-26.8px), Y=3587 (-8.8px) and Y=4220 (+18.2px). The preview computes a clamped linear interpolation (0.0427px of camera displacement per scroll pixel) while retaining the correct sticky frame and full section height. Reverse scrolling recalculates the camera in both directions. Reduced Motion sets the extra camera shift to zero. The reference preview also uses a 52px/95.5% opacity reveal, while normal original-art mode retains its own previous animation.
