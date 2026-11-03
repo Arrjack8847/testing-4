@@ -69,9 +69,9 @@
   const colors=['#e4cadd','#f5e4e9','#ac8baa','#d7b0cb','#ead8e6'];
   // Each petal has a fixed deterministic seed; no random jitter or
   // new particle allocation is performed on individual animation frames.
-  const particles=Array.from({length:11},(_,i)=>({
+  const particles=Array.from({length:8},(_,i)=>({
     x:((i*0.61803398875+.13)%1),y:((i*.38196601125+.26)%1),
-    speed:11+(i%4)*5,phase:i*2.17,size:2+(i%3)*.75,
+    speed:11+(i%4)*5,phase:i*2.17,size:1.8+(i%3)*.55,
     color:colors[i%colors.length]
   }));
   if(ctx)section.dataset.petalRenderer='canvas';
@@ -95,7 +95,7 @@
     for(const petal of particles){
       const x=petal.x*canvasWidth+Math.sin(t*.85+petal.phase)*14;
       const y=((petal.y*range+t*petal.speed)%range)-40;
-      const a=.28+.22*(.5+.5*Math.sin(t*1.25+petal.phase));
+      const a=.16+.15*(.5+.5*Math.sin(t*1.25+petal.phase));
       ctx.save();
       ctx.translate(x,y);
       ctx.rotate(Math.sin(t*1.8+petal.phase)*1.1+petal.phase*.3);
