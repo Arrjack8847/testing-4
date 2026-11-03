@@ -1,7 +1,11 @@
 import {chromium} from '@playwright/test';
 import fs from 'node:fs';
+import {spawn} from 'node:child_process';
 const OUT='section5-live-evidence';
 fs.mkdirSync(OUT,{recursive:true});
+// Serve the checked-out commit while comparing it with the public source.
+const server=spawn('python3',['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
+await new Promise(resolve=>setTimeout(resolve,900));
 const browser=await chromium.launch({headless:true});
 const config={viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,reducedMotion:'no-preference'};
 const pages=[
@@ -80,4 +84,4 @@ try{
   }
   fs.writeFileSync(OUT+'/measurements.json',JSON.stringify(report,null,2));
   if(report.results.some(r=>r.status!=='captured'))process.exitCode=1;
-}finally{await browser.close();}
+}finally{await browser.close();server.kill('SIGTERM');}
