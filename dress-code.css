@@ -1,0 +1,119 @@
+/* Tasik Kayangan study: Section 6 Dress Code.
+   Original illustration by default; source comparisons are opt-in and never bundled. */
+.dress-section{
+  box-sizing:border-box;position:relative;z-index:2;isolation:isolate;overflow:hidden;
+  width:100%;min-height:679px;margin:0;text-align:center;color:#745b75;
+  background:
+    radial-gradient(ellipse 70% 52% at 50% 48%,#fff9efda,transparent 79%),
+    radial-gradient(ellipse 54% 43% at -12% 45%,#d1bed8a1,transparent 82%),
+    radial-gradient(ellipse 52% 43% at 113% 67%,#cab4cf8a,transparent 82%),
+    linear-gradient(180deg,#e1d2e2 0%,#f4e8ed 29%,#fcf7ee 65%,#ded0e1 100%);
+}
+.dress-section *, .dress-section *::before, .dress-section *::after{box-sizing:border-box}
+.dress-section::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  opacity:.34;background-image:radial-gradient(#fff8f0 1px,transparent 1.6px);
+  background-size:35px 43px}
+.dress-section::after{content:"";position:absolute;z-index:1;top:0;left:0;right:0;
+  height:96px;pointer-events:none;
+  background:linear-gradient(180deg,#e1d2e2,rgba(225,210,226,0))}
+.dress-section .dress-art{position:absolute;inset:-28px 0;z-index:0;pointer-events:none;
+  transform:translate3d(0,var(--dress-camera-y,0px),0);
+  will-change:transform}
+.dress-section .dress-art-original{position:absolute;inset:0;opacity:.27;
+  background:linear-gradient(180deg,#eee2e8ab,#fff9ed99 44%,#e3d3e6ab),
+    url("./assets/couple-botanical-edges-original.svg") center/100% 100% no-repeat;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 87%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 14%,#000 87%,transparent)}
+.dress-section .dress-art-original::after{content:"";position:absolute;inset:16% -12% 8%;
+  opacity:.26;background:url("./assets/couple-garden-original.svg") center/100% auto no-repeat}
+.dress-section .dress-source-scene,.dress-section .dress-source-butterfly{display:none}
+.dress-section[data-art="reference"][data-scene-status="loaded"] .dress-source-scene{
+  position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;
+  object-position:center;opacity:.65}
+.dress-section[data-art="reference"][data-scene-status="loaded"] .dress-art-original{opacity:.05}
+.dress-section[data-art="reference"][data-butterfly-status="loaded"] .dress-source-butterfly{
+  display:block;position:absolute;top:18%;right:6%;width:51px;height:48px;
+  object-fit:contain;animation:dress-butterfly-float 7.8s ease-in-out infinite alternate}
+.dress-section .dress-flora{position:absolute;z-index:1;color:#aa91aa;opacity:.2;
+  font:140px/1 Georgia,serif;transform-origin:30% 70%;
+  animation:dress-sway 11s ease-in-out infinite alternate}
+.dress-section .dress-flora-left{left:-51px;top:10%}
+.dress-section .dress-flora-right{right:-49px;bottom:1%;rotate:180deg;animation-delay:-5.2s}
+.dress-section .dress-orbit{position:absolute;left:50%;top:22%;width:290px;height:290px;
+  transform:translateX(-50%);border-radius:50%;opacity:.22;
+  border:1px solid #b39b9f;box-shadow:0 0 0 22px #fffcf323}
+.dress-section .dress-butterfly{position:absolute;left:9%;top:21%;width:33px;height:29px;
+  opacity:.5;transform-origin:center;
+  animation:dress-butterfly-float 8s ease-in-out infinite alternate}
+.dress-section .dress-butterfly::before,.dress-section .dress-butterfly::after{
+  content:"";position:absolute;top:3px;width:16px;height:23px;
+  background:linear-gradient(35deg,#d6bacf,#eee0e6 75%);border:1px solid #b594b2;
+  border-radius:90% 18% 75% 20%;transform-origin:100% 78%;
+  animation:dress-wing-left 1.15s ease-in-out infinite alternate}
+.dress-section .dress-butterfly::before{left:0;transform:rotate(-26deg)}
+.dress-section .dress-butterfly::after{right:0;border-radius:18% 90% 20% 75%;
+  transform-origin:0 78%;animation-name:dress-wing-right}
+.dress-section .dress-butterfly-small{left:auto;right:8%;top:72%;
+  width:23px;height:24px;scale:.72;animation-delay:-4s}
+.dress-section .dress-inner{position:relative;z-index:2;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  width:100%;max-width:390px;min-height:679px;margin:0 auto;
+  padding:43px clamp(17px,5.3vw,26px) 40px}
+.dress-section .dress-eyebrow{margin:0 0 4px;color:#977d8c;
+  font:500 10px/1.4 'Cinzel',Georgia,serif;letter-spacing:.14em}
+.dress-section h2.dress-heading{margin:0 0 6px;color:#865f7e;
+  font:400 clamp(48px,13.5vw,60px)/1.06 'Pinyon Script','Alex Brush',cursive;
+  letter-spacing:0;text-shadow:0 2px 10px #fffaf2d9}
+.dress-section .dress-intro{width:100%;max-width:35ch;margin:0 auto 22px;
+  color:#796679;font:400 clamp(16px,4.1vw,18px)/1.32 'EB Garamond',Georgia,serif}
+.dress-section .dress-palettes{display:grid;gap:14px;width:100%;max-width:334px}
+.dress-section .dress-palette{position:relative;isolation:isolate;min-width:0;
+  display:flex;flex-direction:column;align-items:center;
+  padding:17px 12px 14px;background:linear-gradient(150deg,#fffdf9e8,#fbf3ebdb);
+  border:1px solid #c7ae9b;border-radius:58px 58px 12px 12px / 30px 30px 12px 12px;
+  box-shadow:0 7px 21px #674d6e1c,inset 0 0 0 5px #fffcf56d}
+.dress-section .dress-palette::before{content:"";position:absolute;inset:5px;
+  border:1px solid #dcc9ad82;border-radius:inherit;pointer-events:none}
+.dress-section .dress-side{position:relative;margin:0;color:#9c7d80;
+  text-transform:none;letter-spacing:.01em;font:500 11px/1.3 'Cinzel',Georgia,serif}
+.dress-section .dress-palette-name{position:relative;margin:5px 0 9px;
+  font:500 clamp(22px,6.2vw,25px)/1.12 'EB Garamond',Georgia,serif;color:#775b74}
+.dress-section .dress-swatches{position:relative;display:flex;justify-content:center;
+  align-items:center;gap:14px;min-width:0;margin:0 0 9px}
+.dress-section .dress-swatch{display:block;width:42px;height:42px;flex:none;
+  border:3px solid #fff9ef;border-radius:50%;background:var(--dress-colour);
+  box-shadow:0 0 0 1px #b49c97a6,0 2px 5px #6d526b26}
+.dress-section .dress-colour-label{position:relative;margin:0;color:#867485;
+  font:400 15px/1.2 'EB Garamond',Georgia,serif}
+.dress-section .dress-finish{margin:13px 0 0;color:#ae9277;font:24px/1 Georgia,serif}
+.dress-section .dress-disclosure{position:absolute;width:1px;height:1px;padding:0;
+  margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.dress-section[data-reveal-ready="true"] .dress-reveal{
+  opacity:0;transform:translate3d(0,52px,0) scale(.955);
+  transition:opacity .84s ease,transform .96s cubic-bezier(.2,.7,.17,1)}
+.dress-section[data-reveal-ready="true"] .dress-reveal.dress-in-view{
+  opacity:1;transform:none}
+@keyframes dress-sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+@keyframes dress-butterfly-float{
+  from{transform:translate3d(-7px,-6px,0) rotate(-7deg)}
+  to{transform:translate3d(8px,8px,0) rotate(9deg)}}
+@keyframes dress-wing-left{from{transform:rotate(-22deg) scaleX(.9)}
+  to{transform:rotate(-7deg) scaleX(.35)}}
+@keyframes dress-wing-right{from{transform:rotate(22deg) scaleX(.9)}
+  to{transform:rotate(7deg) scaleX(.35)}}
+@media(max-width:350px){
+  .dress-section .dress-inner{padding-inline:12px}
+  .dress-section .dress-palettes{gap:11px}
+  .dress-section .dress-palette{padding-inline:9px}
+  .dress-section .dress-swatches{gap:12px}
+  .dress-section .dress-swatch{width:39px;height:39px}
+  .dress-section .dress-intro{max-width:29ch}
+}
+@media(prefers-reduced-motion:reduce){
+  .dress-section .dress-art{will-change:auto}
+  .dress-section .dress-flora,.dress-section .dress-butterfly,
+  .dress-section .dress-butterfly::before,.dress-section .dress-butterfly::after,
+  .dress-section .dress-source-butterfly{animation:none!important}
+  .dress-section[data-reveal-ready="true"] .dress-reveal{
+    opacity:1!important;transform:none!important;transition:none!important}
+}
