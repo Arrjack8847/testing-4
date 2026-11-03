@@ -32,7 +32,8 @@ async function readMetrics(page,isLocal){
     const header=[...document.querySelectorAll('h1,h2,h3,h4')]
       .find(el=>(el.textContent||'').trim().toLowerCase()==='dress code');
     if(!header)return {error:'Dress Code heading not present',url:location.href};
-    let root=isLocal?document.getElementById('dressCode'):null;
+    // Match the reference cgv-inner content box, not the padded SECTION.
+    let root=isLocal?document.querySelector('#dressCode .dress-body'):null;
     if(!root){
       for(let p=header.parentElement;p&&p!==document.body;p=p.parentElement){
         const text=p.textContent||'';
