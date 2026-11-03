@@ -129,3 +129,51 @@ https://github.com/Arrjack8847/testing-4/actions/workflows/section4-events-qa.ym
 This is a measured structural comparison; screenshots/per-pixel comparison
 and licensing clearance remain separate tasks. main has not received
 this draft PR's changes.
+
+
+## Source motion and artwork audit, second pass
+
+Measured from the live source on a 390x844 viewport with ordinary motion
+enabled (using tools/section4-motion-audit.mjs):
+
+1. cgv-arch is a layout wrapper **without a decorative border**.
+   Each cgv-ev element individually paints
+   .../tasik-kayangan/arch_event.svg using a border-image
+   200 28 26 fill / 200px 28px 26px, plus an inset pale-gold line.
+   The previous comparison incorrectly used arch_panel.svg on the
+   shared wrapper. The correct artwork is now applied to each article
+   in the opt-in comparison mode only.
+2. A pale wash sits over paper.webp at 0.22 opacity and the contents
+   are softened by a 90% × 80% radial white gradient centered at
+   50% / 47%. The opt-in comparison layers now reproduce these values.
+3. paper.webp moves relative to its section at a rate of about
+   **0.0427px per scroll pixel**:
+   reference measured paper Y relative to Events:
+   - arrival: -211.7px; prototype -212.0px
+   - top: -205.4px; prototype -205.7px
+   - 25%: -197.6px; prototype -197.9px
+   - 50%: -189.7px; prototype -190.0px
+   - 75%: -181.8px; prototype -182.1px
+   - end: -174.0px; prototype -174.3px.
+4. Source text animates **per heading, date, time, address, and link**,
+   with scroll-reversible 52px Y entrance, scale .955, and approximately
+   1.0–1.1-second transitions. The prototype now animates these
+   child lines individually, not entire cards, and restores their
+   resting state on scroll-out.
+5. The reference Events block has no visible four-box countdown;
+   its Events calendar CTA is the concluding action.
+   Reference comparison mode therefore hides our prototype's extra
+   countdown display and demonstration label, while original mode
+   keeps the functional countdown and its disclosure.
+
+### Verification
+
+- Geometry and paper motion are highly aligned to one measured phone
+  viewport. This is **not** a claim of pixel-perfect visual parity.
+- Compare paired screenshots and numeric image differences from the
+  Section 4 source layout measurement Actions artifact before
+  declaring the visual recreation complete.
+- Vendor SVG/WebP artwork is fetched from the vendor's website
+  only for research, not bundled in this repo or licensed for sale.
+  For commercial invitations, replace it with your own original or
+  properly licensed artwork. Keep this PR as draft until reviewed.
