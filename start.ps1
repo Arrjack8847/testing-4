@@ -32,10 +32,10 @@ if ($stillMissing.Count -gt 0) {
 $py = Get-Command py -ErrorAction SilentlyContinue
 if ($null -ne $py) {
   Write-Host 'Visit http://localhost:8000 (or http://localhost:8000/?debug=1).' -ForegroundColor Green
-  & py -m http.server 8000 --bind 0.0.0.0
+  & py -B (Join-Path $PSScriptRoot 'tools\dev-server.py')
 } elseif (Get-Command python -ErrorAction SilentlyContinue) {
   Write-Host 'Visit http://localhost:8000 (or http://localhost:8000/?debug=1).' -ForegroundColor Green
-  & python -m http.server 8000 --bind 0.0.0.0
+  & python -B (Join-Path $PSScriptRoot 'tools\dev-server.py')
 } else {
   throw 'Python not found. Install Python or serve this directory with a different static web server.'
 }
