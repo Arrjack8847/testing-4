@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
   <link rel="stylesheet" href="reference-continuation.css">
+  <link rel="stylesheet" href="section-ten.css">
   <link rel="stylesheet" href="invite-navigation.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
@@ -27,6 +28,7 @@
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
   <script src="reference-continuation.js" defer></script>
+  <script src="section-ten.js" defer></script>
   <script src="invite-navigation.js" defer></script>
 </head>
 <body>
@@ -428,15 +430,33 @@
         <div class="rsvp-outro-symbol" aria-hidden="true">❦</div>
       </div>
     </section>
-    <section class="reference-continuation ref-closing" id="closingMessage" aria-labelledby="closingHeading" aria-hidden="true" inert>
-      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-b"></i></div>
-      <div class="ref-content">
-        <p class="ref-kicker ref-reveal">Until we meet</p>
-        <h2 class="ref-script ref-reveal" id="closingHeading">With Love &amp; Gratitude</h2>
-        <p class="ref-closing-message ref-reveal">Thank you for every prayer and thoughtful wish. We hope to share this joyful occasion with those we love.</p>
-        <p class="ref-closing-names ref-reveal">Rayyan <span>&amp;</span> Sofea</p>
-        <p class="ref-disclosure ref-reveal">Reference-recreation research prototype · Example wedding details</p>
-        <div class="ref-finish ref-reveal" aria-hidden="true">❦</div>
+    <!-- Section 10: final gratitude and contact/footer (independent source-measured implementation). -->
+    <section class="reference-continuation ref-closing section-ten" id="closingMessage"
+      data-section="10" data-artwork="original" aria-labelledby="closingHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true">
+        <div class="closing10-sticky-art"><img class="closing10-source-scene" alt=""></div>
+        <i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i>
+        <i class="ref-light ref-light-b"></i>
+      </div>
+      <div class="closing10-inner">
+        <div class="closing10-frame closing10-reveal" aria-hidden="true">
+          <i class="closing10-corner closing10-corner-bl"></i>
+          <i class="closing10-corner closing10-corner-br"></i>
+        </div>
+        <h2 class="closing10-label closing10-reveal" id="closingHeading">Until we meet</h2>
+        <p class="closing10-message closing10-reveal">It would be the greatest honour of our lives to have you beside us as two families become one. Thank you — for every prayer, every wish, and every mile travelled.</p>
+        <div class="closing10-rule closing10-reveal" aria-hidden="true"></div>
+        <p class="closing10-label closing10-signoff closing10-reveal">With love &amp; gratitude,</p>
+        <p class="closing10-names closing10-reveal"><span>Rayyan</span><span class="closing10-ampersand">&amp;</span><span>Sofea</span></p>
+        <div class="closing10-contacts closing10-reveal" aria-label="Contact information">
+          <p class="closing10-contacts-title">Contact Us</p>
+          <div class="closing10-contact-row">
+            <button type="button" disabled title="Contact number not supplied">Call</button>
+            <button type="button" disabled title="WhatsApp number not supplied">WhatsApp</button>
+          </div>
+        </div>
+        <p class="closing10-credit closing10-reveal">✦ Celestial Lake invitation study ✦</p>
+        <p class="closing10-disclosure closing10-reveal">Example wedding details · Contact links are unavailable until verified.</p>
       </div>
     </section>
   </main>
