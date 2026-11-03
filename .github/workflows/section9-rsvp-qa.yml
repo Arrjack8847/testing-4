@@ -1,0 +1,44 @@
+name: Section 9 RSVP and Wishes QA
+on:
+  push:
+    branches:
+      - feat/section9-rsvp-wishes-reference-20261104
+    paths:
+      - index.html
+      - section-nine.css
+      - section-nine.js
+      - tests/section-nine.spec.mjs
+      - tests/section-six.spec.mjs
+      - .github/workflows/section9-rsvp-qa.yml
+  pull_request:
+    paths:
+      - index.html
+      - section-nine.css
+      - section-nine.js
+      - tests/section-nine.spec.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  section9:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Check isolated JavaScript syntax
+        run: node --check section-nine.js
+      - name: Four-phone Section 9 geometry, flow, form and motion
+        run: npx playwright test tests/section-nine.spec.mjs tests/section-six.spec.mjs --workers=2
+      - name: Upload Section 9 test screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section9-four-phone-qa
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 7
