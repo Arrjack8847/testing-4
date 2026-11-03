@@ -5,6 +5,9 @@ on:
     branches:
       - feat/section4-events-reference-prototype-20261103
     paths:
+      - index.html
+      - section-three.css
+      - section-three.js
       - tools/section4-visual-metrics.mjs
       - .github/workflows/section4-reference-measure.yml
 permissions:
