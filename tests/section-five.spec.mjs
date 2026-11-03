@@ -37,10 +37,10 @@ test('Section 5 shows five honest empty photograph placeholders',async({page})=>
 test('Section 5 fits mobile viewports and preserves Section 4 transition',async({page},testInfo)=>{
   const {gallery}=await reachGallery(page);
   const bounds=await gallery.evaluate(el=>{
-    const previous=document.getElementById('saveTheDate');
+    const previous=document.getElementById('runningOrder');
     const boxes=[...el.querySelectorAll('.gallery-photo')].map(node=>node.getBoundingClientRect());
     const boundary =el.getBoundingClientRect().top - previous.getBoundingClientRect().bottom;
-    return {adjacent:previous.nextElementSibling===el,boundary,overflow:document.documentElement.scrollWidth-innerWidth,
+    return {adjacent:previous.nextElementSibling?.hidden===true && previous.nextElementSibling?.nextElementSibling===el,boundary,overflow:document.documentElement.scrollWidth-innerWidth,
       width:innerWidth,boxes:boxes.map(b=>({left:b.left,right:b.right,width:b.width}))};
   });
   expect(bounds.adjacent).toBe(true);
