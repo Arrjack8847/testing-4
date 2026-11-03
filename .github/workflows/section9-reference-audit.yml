@@ -1,0 +1,32 @@
+name: Section 9 read-only reference measurement
+on:
+  push:
+    branches:
+      - feat/section9-rsvp-wishes-reference-20261104
+    paths:
+      - tools/measure-section9-reference.mjs
+      - .github/workflows/section9-reference-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Inspect live Section 9 at 390 × 844 (read-only)
+        run: node tools/measure-section9-reference.mjs
+      - name: Save source screenshots and geometry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section9-reference-390-evidence
+          path: section9-evidence/
+          if-no-files-found: warn
+          retention-days: 7
