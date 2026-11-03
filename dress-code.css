@@ -273,3 +273,18 @@
   .dress-section .dress-flight-wing-left{transform:rotateY(-24deg)}
   .dress-section .dress-flight-wing-right{transform:rotateY(24deg)}
 }
+
+
+/* Section 6 neighbour-edge continuity in original-art mode. */
+/* Keep content measurements intact; fade only the very top and bottom
+   to the existing lavender edges of Sections 5 and 7. */
+.dress-section:not([data-art="reference"])::before{
+  display:block;content:"";position:absolute;z-index:1;pointer-events:none;
+  left:0;right:0;top:0;bottom:auto;height:88px;
+  opacity:1;background:linear-gradient(180deg,#e1d2e2 0%,rgba(225,210,226,0) 100%);
+}
+.dress-section:not([data-art="reference"])::after{
+  display:block;content:"";position:absolute;z-index:1;pointer-events:none;
+  left:0;right:0;top:auto;bottom:0;height:90px;
+  opacity:1;background:linear-gradient(0deg,#ded0e1 0%,rgba(222,208,225,0) 100%);
+}
