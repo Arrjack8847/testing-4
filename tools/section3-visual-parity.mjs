@@ -7,16 +7,17 @@ await mkdir(base, {recursive:true});
 const viewport = {width:390,height:844};
 const sourceUrl='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en';
 const localUrl='http://127.0.0.1:8000/';
-const checkpointY = [
-  {name:'entry',referenceY:2743},
-  {name:'groom',referenceY:3165},
-  {name:'middle',referenceY:3587},
-  {name:'bride',referenceY:4220},
-  {name:'exit',referenceY:5134}
+const checkpoints = [
+  {name:'entry',offset:-250},
+  {name:'intro',offset:40},
+  {name:'groom',offset:450},
+  {name:'middle',offset:800},
+  {name:'bride',offset:1200},
+  {name:'exit',offset:1650}
 ];
 const browser=await chromium.launch({headless:true});
 const results={viewport,sourceUrl,localUrl,checkpoints:[],errors:[]};
-const context=await browser.newContext({viewport,deviceScaleFactor:1,isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+const context=await browser.newContext({viewport,deviceScaleFactor:1,isMobile:true,hasTouch:true,reducedMotion:'no-preference'});
 try{
   for(const [label,url] of [['reference',sourceUrl],['prototype',localUrl]]){
     const page=await context.newPage();
@@ -50,17 +51,19 @@ try{
         };
       });
       results[label]={opened:clicked,geometry,errors};
-      const localStart=geometry.couple?.top;
-      for(const stop of checkpointY){
-        const y=(label==='prototype' && localStart)
-          ? localStart+(stop.referenceY-3294.4) : stop.referenceY;
+      const sectionStart=geometry.couple?.top;
+      if(typeof sectionStart!=='number')throw new Error(label+' Couple section not found');
+      for(const stop of checkpoints){
+        // Align snapshots to the actual section start on EACH site, instead
+        // of assuming a shared absolute Y (Reduced Motion changes hero length).
+        const y=sectionStart+stop.offset;
         await page.evaluate(async y=>{
           document.documentElement.style.scrollBehavior='auto';
           window.scrollTo({top:Math.max(0,Math.round(y)),behavior:'instant'});
           await new Promise(requestAnimationFrame);
           await new Promise(requestAnimationFrame);
         },y);
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(1000);
         const metrics=await page.evaluate(()=>{
           const targets=[...document.querySelectorAll('h1,h2,h3,button,img')]
             .filter(el=>{const t=(el.textContent||'').trim();
@@ -96,7 +99,7 @@ try{
         });
         await page.screenshot({path:`${base}/${label}-${stop.name}.png`,
           animations:'disabled',timeout:20000});
-        results.checkpoints.push({label,checkpoint:stop.name,referenceY:stop.referenceY,
+        results.checkpoints.push({label,checkpoint:stop.name,sectionOffset:stop.offset,
           targetY:+y.toFixed(1),metrics});
       }
     }catch(error){
