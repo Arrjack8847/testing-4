@@ -271,20 +271,46 @@
 }
 
 
-/* The blush butterfly belongs to ambient motion, not a permanently parked
-   top-right decoration. Flight is intentionally sparse and comparison-only;
-   exact source path still needs timed reference capture. */
-.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-butterfly {
-  opacity:0;top:14%;right:3%;
-  animation:order-butterfly-passage 15s linear infinite;
+/* Measured source butterfly structure: paired 23×35px halves of a 46×35px
+   WebP, with 200% background-size, inner-edge 3D rotation, scale(.82).
+   The JS clock moves it ~44px/s with a small vertical oscillation. */
+.order-section .order-butterfly {display:none!important;} /* hidden image preloader */
+.order-section .order-bf {
+  display:none;position:absolute;top:0;left:0;
+  width:46px;height:35px;z-index:4;
+  pointer-events:none;opacity:1;
+  filter:drop-shadow(0 6px 5px rgba(40,52,40,.20));
+  transform-origin:23px 17.5px;
+  will-change:transform;
 }
-@keyframes order-butterfly-passage{
-  0%,8%{opacity:0;transform:translate3d(32px,70px,0) rotate(23deg)}
-  19%{opacity:.62}
-  48%{opacity:.58;transform:translate3d(-95px,165px,0) rotate(-13deg)}
-  73%{opacity:.5;transform:translate3d(-230px,80px,0) rotate(-26deg)}
-  85%,100%{opacity:0;transform:translate3d(-295px,32px,0) rotate(-34deg)}
+.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-bf {display:block;}
+.order-section .order-bf-wing {
+  position:absolute;top:0;width:23px;height:35px;
+  display:block;pointer-events:none;
+  background-image:url("./assets/reference-dev/bfly_blush.webp");
+  background-size:200% 100%;background-repeat:no-repeat;
+  backface-visibility:visible;
+  will-change:transform;
 }
-@media(prefers-reduced-motion:reduce){
-  .order-section[data-art="reference"] .order-butterfly{animation:none!important;opacity:0!important}
+.order-section .order-bf-left {
+  left:0;background-position:0% 50%;
+  transform-origin:right center;
+}
+.order-section .order-bf-right {
+  left:23px;background-position:100% 50%;
+  transform-origin:left center;
+}
+
+/* The source renders rose/lilac petals on a fixed 300×viewport canvas.
+   The canvas is transparent and appears only while this section is visible;
+   its JS clock is paused offscreen and when the invitation is closed. */
+.order-section .order-petal-canvas {
+  display:block;position:fixed;top:0;left:0;z-index:4;
+  width:300px;height:100dvh;pointer-events:none;
+  background:transparent;contain:strict;
+}
+.order-section[data-petal-renderer="canvas"] .order-petals {display:none;}
+@media (prefers-reduced-motion:reduce) {
+  .order-section .order-bf {display:none!important;will-change:auto;}
+  .order-section .order-bf-wing {will-change:auto;}
 }
