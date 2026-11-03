@@ -1,1 +1,8 @@
-# Never redistribute vendor artwork downloaded for local development.\nassets/reference-dev/\n\n# Local test infrastructure and screenshots\nnode_modules/\ntest-results/\nplaywright-report/\nsection5-live-evidence/\n
+# Never redistribute vendor artwork downloaded for local development.
+assets/reference-dev/
+
+# Local test infrastructure and screenshots
+node_modules/
+test-results/
+playwright-report/
+section5-live-evidence/
