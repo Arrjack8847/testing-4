@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="dress-code.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
+  <link rel="stylesheet" href="section-eight-gift.css">
   <script src="scene.js?v=20261104-fix1" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-couple.js" defer></script>
@@ -28,6 +29,7 @@
   <script src="dress-code.js" defer></script>
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
+  <script src="section-eight-gift.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -373,8 +375,63 @@
         <p class="gallery-disclaimer gallery-reveal">Gallery preview — the couple's photographs have not been provided yet.</p>
       </div>
     </section>
-    <!-- Section 8: original RSVP form preview. Nothing is submitted until a backend is configured. -->
-    <section class="rsvp-section" id="rsvp" data-section="8"
+    <!-- Section 8: Wedding Gift; vendor sample details are deliberately non-transactional. -->
+    <section id="weddingGift" class="gift-eight" data-section="8" aria-labelledby="giftEightHeading" aria-hidden="true" inert data-gift-artwork="original">
+      <div class="gift-eight-art" aria-hidden="true"></div>
+      <div class="gift-eight-content">
+        <h2 id="giftEightHeading" class="gift-eight-heading gift-eight-reveal">Wedding Gift</h2>
+        <p class="gift-eight-intro gift-eight-reveal">Your presence at our wedding is the greatest gift of all. However, if you wish to bless us with a gift, you may do so through the details provided below.</p>
+        <div class="gift-eight-send gift-eight-reveal">
+          <h3 class="gift-eight-subheading"><span aria-hidden="true">🎁</span> Send Gift</h3>
+          <div class="gift-eight-bank-list">
+            <article class="gift-eight-bank" data-gift-bank="0">
+              <h4 class="gift-eight-bank-name">Maybank</h4>
+              <p class="gift-eight-account">Account details not configured</p>
+              <p class="gift-eight-holder">Demo only · Recipient not verified</p>
+              <button class="gift-eight-copy" type="button" disabled>Copy Account Number</button>
+              <p class="gift-eight-status" role="status" aria-live="polite"></p>
+            </article>
+            <article class="gift-eight-bank" data-gift-bank="1">
+              <h4 class="gift-eight-bank-name">CIMB</h4>
+              <p class="gift-eight-account">Account details not configured</p>
+              <p class="gift-eight-holder">Demo only · Recipient not verified</p>
+              <button class="gift-eight-copy" type="button" disabled>Copy Account Number</button>
+              <p class="gift-eight-status" role="status" aria-live="polite"></p>
+            </article>
+          </div>
+        </div>
+        <div class="gift-eight-wishlist gift-eight-reveal">
+          <h3>Gift Wishlist</h3>
+          <p class="gift-eight-wishlist-intro">Reserve a gift so no two guests buy the same one.</p>
+          <div class="gift-eight-items">
+            <article class="gift-eight-item">
+              <div class="gift-eight-thumb" aria-hidden="true">✧</div>
+              <div><h4>Philips Avance Collection Rice Cooker HD3175/62</h4>
+                <p>Shopee · Example item, stock unverified</p>
+                <div class="gift-eight-actions"><span>View on Shopee</span><button type="button" disabled title="No reservation service connected">Reserve</button></div>
+              </div>
+            </article>
+            <article class="gift-eight-item">
+              <div class="gift-eight-thumb" aria-hidden="true">❦</div>
+              <div><h4>Philips 1.7L Kettle 1000 Series HD9314</h4>
+                <p>Lazada · Example item, reservation unverified</p>
+                <div class="gift-eight-actions"><span>View on Lazada</span><button type="button" disabled title="No verified reservation state">Reserved</button></div>
+              </div>
+            </article>
+            <article class="gift-eight-item">
+              <div class="gift-eight-thumb" aria-hidden="true">✦</div>
+              <div><h4>IKEA Gift Card</h4>
+                <p>Example item · Purchase link not configured</p>
+                <div class="gift-eight-actions"><button type="button" disabled title="No verified purchase destination">Buy</button></div>
+              </div>
+            </article>
+          </div>
+        </div>
+        <p class="gift-eight-disclaimer gift-eight-reveal">Demonstration only. Bank transfers, purchases and reservations are not enabled.</p>
+      </div>
+    </section>
+    <!-- Section 9: existing RSVP preview, preserved except its section number. -->
+    <section class="rsvp-section" id="rsvp" data-section="9"
       aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="rsvp-atmosphere" aria-hidden="true">
         <span class="rsvp-flower rsvp-flower-a">❧</span>
