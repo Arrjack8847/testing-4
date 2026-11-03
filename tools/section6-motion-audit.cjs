@@ -34,7 +34,7 @@ async function capture(page,selector){
     const cards=local?sec.querySelectorAll('.dress-palette'):sec.querySelectorAll('.cgv-dress-card');
     const paper=local?sec.querySelector('#dressSourceScene'):
       sec.querySelector('img[src*="paper.webp"]');
-    const butterfly=local?sec.querySelector('.dress-source-butterfly'):
+    const butterfly=local?sec.querySelector('.dress-flight-wing-left'):
       sec.querySelector('.cgv-bf-w');
     const scene=local?sec.querySelector('.dress-art'):
       (paper?.parentElement||null);
