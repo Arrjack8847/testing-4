@@ -272,34 +272,44 @@
 }
 
 
-/* Measured source butterfly structure: paired 23×35px halves of a 46×35px
-   WebP, with 200% background-size, inner-edge 3D rotation, scale(.82).
-   The JS clock moves it ~44px/s with a small vertical oscillation. */
-.order-section .order-butterfly {display:none!important;} /* hidden image preloader */
+/* Timed reference source: paired 23×35px wings on a 46×35px body,
+   moving in two timed passes: right-to-left at ~39px/s then left-to-right
+   at ~44px/s, with a pause at both edges. */
+.order-section .order-butterfly {display:none!important;} /* local image preloader */
 .order-section .order-bf {
-  display:none;position:absolute;top:0;left:0;
+  display:block;position:absolute;top:0;left:0;
   width:46px;height:35px;z-index:4;
   pointer-events:none;opacity:1;
   filter:drop-shadow(0 6px 5px rgba(40,52,40,.20));
   transform-origin:23px 17.5px;
   will-change:transform;
 }
-.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-bf {display:block;}
 .order-section .order-bf-wing {
   position:absolute;top:0;width:23px;height:35px;
   display:block;pointer-events:none;
-  background-image:url("./assets/reference-dev/bfly_blush.webp");
-  background-size:200% 100%;background-repeat:no-repeat;
+  /* Original gradient butterfly. The comparison-only WebP takes precedence
+     exclusively when a locally supplied image successfully decodes. */
+  background:
+    radial-gradient(ellipse at 64% 21%,rgba(255,240,248,.93) 0 7%,transparent 18%),
+    radial-gradient(ellipse at 60% 37%,#f1d4e5 0%,#ce9dbc 36%,#926182 65%,#58344f 83%);
+  background-size:100% 100%;background-repeat:no-repeat;
   backface-visibility:visible;
   will-change:transform;
 }
 .order-section .order-bf-left {
   left:0;background-position:0% 50%;
   transform-origin:right center;
+  clip-path:polygon(100% 5%,65% 2%,29% 12%,0 33%,10% 60%,46% 76%,59% 100%,100% 83%);
 }
 .order-section .order-bf-right {
   left:23px;background-position:100% 50%;
   transform-origin:left center;
+  clip-path:polygon(0 5%,35% 2%,71% 12%,100% 33%,90% 60%,54% 76%,41% 100%,0 83%);
+}
+.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-bf-wing {
+  background-image:url("./assets/reference-dev/bfly_blush.webp");
+  background-size:200% 100%;
+  clip-path:none;
 }
 
 /* The source renders rose/lilac petals on a fixed 300×viewport canvas.
