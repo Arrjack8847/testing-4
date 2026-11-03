@@ -201,3 +201,174 @@
     opacity:1!important;transform:none!important;transition:none!important;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   2026-11-03 measured reference-fidelity correction, at 390 x 844:
+   cgv-events: height=1580.9; inner padding=120px 26px;
+   one shared arch x=26 width=338, y=120, height=1163.6;
+   event rows x=32 width=326, y=120 and 666.5; 30px inter-row;
+   row padding=104px 30px 58px; heading=42px / 69.3px;
+   paper.webp (1080x1920) visually y=-190, element height=1960.
+   All coordinates are relative to Section 4 (not document Y).
+   Source screenshot/layout may differ under other skin/browser states.
+   ----------------------------------------------------------------------- */
+.event-section .event-body {
+  display:block;
+  max-width:390px;
+  min-height:1581px;
+  margin:0 auto;
+  padding:120px 26px 88px;
+}
+.event-section .event-prototype-label {
+  position:absolute;
+  top:48px;left:20px;right:20px;
+  width:auto;margin:0;
+  text-align:center;
+  font-size:9px;
+}
+.event-section .event-shared-arch {
+  position:relative;
+  width:100%;
+  min-height:1164px;
+  margin:0 auto;
+  padding:0 6px;
+  isolation:isolate;
+}
+.event-section .event-shared-arch::before {
+  content:"";
+  position:absolute;z-index:-1;
+  inset:0;
+  pointer-events:none;
+  border:1px solid rgba(185,150,101,.69);
+  border-radius:46% 46% 8px 8px / 10% 10% 8px 8px;
+  box-shadow:0 0 0 5px rgba(253,245,236,.34),
+    inset 0 0 0 7px rgba(255,253,248,.32);
+  background:linear-gradient(180deg,
+    rgba(255,251,243,.62),rgba(254,249,241,.57),rgba(248,238,243,.50));
+}
+.event-section[data-art="reference"] .event-shared-arch::before {
+  border:solid transparent;
+  border-width:200px 28px 26px;
+  border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_panel.svg");
+  border-image-slice:200 28 26 fill;
+  border-image-width:200px 28px 26px;
+  border-image-repeat:stretch;
+  background:none;
+  box-shadow:none;
+  border-radius:0;
+}
+.event-section .event-reference-card {
+  display:block;
+  width:100%;
+  min-height:0;
+  padding:104px 30px 58px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+  text-align:center;
+  isolation:auto;
+}
+.event-section .event-reference-card::before,
+.event-section .event-reference-card::after {display:none;}
+.event-section .event-reference-card.event-card-nikah {
+  min-height:516.5px;
+  margin-bottom:30px;
+}
+.event-section .event-reference-card.event-card-reception {
+  min-height:617.1px;
+  margin-bottom:0;
+}
+.event-section .event-card-ornament {display:none;}
+.event-section .event-card-title {
+  width:100%;
+  max-width:none;
+  margin:0 0 4px;
+  color:#5c264f;
+  font:400 42px/69.3px 'Pinyon Script',cursive;
+  overflow-wrap:normal;
+  text-shadow:none;
+}
+.event-section .event-card-date {
+  margin:0 0 10px;
+  color:#4a2a45;
+  font:400 18px/29.7px 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-time {
+  margin:0 0 21px;
+  color:#4a2a45;
+  font:400 18px/29.7px 'EB Garamond',Georgia,serif;
+  letter-spacing:0;
+}
+.event-section .event-card-diamond {
+  margin:0 auto 13px;
+  font:22px/1.4 Georgia,serif;
+  color:#986e8a;
+}
+.event-section .event-card-place {
+  max-width:100%;
+  margin:0 auto 8px;
+  color:#4a2a45;
+  font:400 19px/31.35px 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-address {
+  max-width:100%;
+  margin:0 auto 22px;
+  color:#715368;
+  font:400 15px/24.75px 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-links {gap:10px;}
+.event-section .event-map-link {
+  min-height:48px;
+  border:0;
+  padding:11px 24px;
+  background:#fff;
+  color:#5c264f;
+  border-radius:999px;
+  box-shadow:0 5px 15px rgba(55,39,58,.09);
+  font:500 11px/18.15px 'EB Garamond',Georgia,serif;
+  letter-spacing:0;
+}
+.event-section .event-calendar-link {
+  min-width:225px;
+  min-height:48px;
+  border:0;
+  border-radius:999px;
+  background:#7b3d6e;
+  font:500 12px/19.8px 'EB Garamond',Georgia,serif;
+  padding:14px 32px;
+}
+.event-section .event-countdown {
+  width:100%;
+  max-width:338px;
+  margin:52px auto 0;
+  padding:0;
+  text-align:center;
+}
+.event-section .event-countdown-grid {
+  margin-bottom:20px;
+}
+.event-section[data-art="reference"] .event-stage {
+  top:0;
+  height:100%;
+  min-height:100%;
+  transform:none;
+}
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  top:-190px;
+  left:0;
+  width:100%;
+  height:calc(100% + 380px);
+  object-fit:cover;
+  object-position:50% 50%;
+}
+@media(max-width:350px) {
+  .event-section .event-body {padding:120px 20px 88px;}
+  .event-section .event-shared-arch {padding:0 5px;}
+  .event-section .event-reference-card {padding:104px 17px 58px;}
+  .event-section .event-card-title {font-size:40px;line-height:66px;}
+  .event-section .event-card-date,.event-section .event-card-time {font-size:16px;}
+  .event-section .event-card-place {font-size:18px;}
+  .event-section .event-map-link {font-size:11px;padding:11px 18px;}
+}
