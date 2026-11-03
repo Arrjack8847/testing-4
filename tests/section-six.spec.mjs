@@ -20,7 +20,7 @@ async function reachRSVP(page) {
 
 test('RSVP is an honest preview with no destination configured',async({page})=>{
   const {section,errors}=await reachRSVP(page);
-  await expect(section).toHaveAttribute('data-section','8');
+  await expect(section).toHaveAttribute('data-section','9');
   await expect(page.getByRole('heading',{level:2,name:'Kindly Respond'})).toBeVisible();
   await expect(section.locator('#rsvpWarning')).toContainText('will not be sent');
   await expect(section.locator('.rsvp-preview')).toBeHidden();
@@ -71,11 +71,11 @@ test('declining RSVP resets the guests field and supports an empty message',asyn
   await expect(section.locator('#rsvpPreview')).toBeHidden();
 });
 
-test('RSVP Section 5-to-6 transition and inputs fit four phone widths',async({page},testInfo)=>{
+test('RSVP Section 8-to-9 transition and inputs fit four phone widths',async({page},testInfo)=>{
   const {section}=await reachRSVP(page);
   await expect(section).toHaveClass(/is-visible/);
   const stats=await section.evaluate(el=>{
-    const previous=document.getElementById('gallery');
+    const previous=document.getElementById('weddingGift');
     const card=el.querySelector('.rsvp-paper').getBoundingClientRect();
     const form=el.querySelector('#rsvpForm').getBoundingClientRect();
     return {adjacent:previous.nextElementSibling===el,
