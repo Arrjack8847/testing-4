@@ -131,6 +131,29 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
   const second=gallery.locator('[data-gallery-slot="1"]');
   await expect(first).toBeEnabled({timeout:12000});
   await expect(second).toBeEnabled();
+  // The original reference has a 4px white border with image pixels
+  // starting exactly 4px from each outside edge.
+  const frameMetrics=await first.evaluate(el=>{
+    const frame=el.getBoundingClientRect();
+    const photo=el.querySelector('.gallery-image').getBoundingClientRect();
+    const st=getComputedStyle(el);
+    return {
+      insetLeft:photo.left-frame.left,
+      insetTop:photo.top-frame.top,
+      insetRight:frame.right-photo.right,
+      insetBottom:frame.bottom-photo.bottom,
+      border:st.borderTopWidth,borderColor:st.borderTopColor,
+      radius:st.borderTopLeftRadius,
+      shadow:st.boxShadow
+    };
+  });
+  for(const key of ['insetLeft','insetTop','insetRight','insetBottom']){
+    expect(Math.abs(frameMetrics[key]-4),key).toBeLessThanOrEqual(0.5);
+  }
+  expect(frameMetrics.border).toBe('4px');
+  expect(frameMetrics.borderColor).toBe('rgb(255, 255, 255)');
+  expect(frameMetrics.radius).toBe('14px');
+  expect(frameMetrics.shadow).toContain('14px 36px');
   await expect(gallery.locator('[data-gallery-slot="2"]')).toBeDisabled();
   await expect(gallery.locator('.gallery-disclaimer')).toContainText('Tap an available');
   await first.click();
