@@ -162,7 +162,7 @@ test('Section 2 measured mauve message band follows the three-viewport lake',asy
 });
 
 
-test('Section 3 event details remain accessible and safe without a venue',async({page})=>{
+test('Section 4 reference sample events remain accessible across browser engines',async({page})=>{
   const errors=await load(page);
   const event=page.locator('#eventDetails');
   await expect(event).toHaveAttribute('aria-hidden','true');
@@ -176,9 +176,11 @@ test('Section 3 event details remain accessible and safe without a venue',async(
     window.scrollTo(0,Math.round(window.scrollY+target.getBoundingClientRect().top));
   });
   await expect(event).toBeInViewport();
-  await expect(page.getByRole('heading',{level:2,name:'The Celebration'})).toBeVisible();
-  await expect(event.locator('#eventVenue')).toHaveText('Venue to be announced');
-  await expect(event.locator('#eventDirections')).toBeHidden();
+  await expect(event.getByRole('heading',{level:2,name:'Akad Nikah'})).toBeVisible();
+  await expect(event.getByRole('heading',{level:2,name:'Wedding Reception'})).toBeVisible();
+  await expect(event.locator('#eventVenue')).toHaveText('Masjid Wilayah Persekutuan');
+  await expect(event.locator('#eventDirections')).toHaveAttribute('href',/google.com\/maps\/search/);
+  await expect(event.locator('.event-demo-note')).toContainText('Demonstration only');
   expect(errors).toEqual([]);
 });
 
