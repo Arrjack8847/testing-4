@@ -76,11 +76,16 @@
         const placeholder = button.querySelector('.gallery-photo-placeholder');
         if (placeholder) placeholder.hidden = true;
         available.add(index);
-        disclaimer.textContent = referenceMode
-          ? 'Local comparison only — the reference files are loaded from assets/gallery/reference/.'
-          : available.size === PHOTOS.length
-            ? 'Tap any photograph to view it in full.'
+        // When all five local WebPs are present, suppress the development-only
+        // placeholder message so the guest Gallery keeps the source's exact
+        // bottom spacing. The "Tap a frame to view" hint stays visible.
+        const complete = available.size === PHOTOS.length;
+        disclaimer.hidden = complete;
+        if (!complete) {
+          disclaimer.textContent = referenceMode
+            ? 'Local reference WebPs are still missing. Check assets/gallery/reference/.'
             : 'Tap an available photograph to view it. Other images are awaiting approval.';
+        }
       };
       image.onerror = () => {
         image.remove();
