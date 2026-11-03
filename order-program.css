@@ -134,3 +134,94 @@
 /* Existing prototype's extra standalone countdown is not a reference section.
    It stays accessible via ?legacySaveDate=1 for regression/testing only. */
 .save-date-section[hidden]{display:none!important}
+
+
+/* Live source calibration, 390×844 viewport, 3 Nov 2026.
+   Source screenshot: plum embossed-paper band, fine rectangular border.
+   H2 computed 46px Pinyon Script; LI 18px EB Garamond. */
+.order-section {
+  background:
+    radial-gradient(ellipse at 50% 15%,rgba(110,66,90,.13),transparent 52%),
+    radial-gradient(ellipse at 90% 72%,rgba(104,58,79,.13),transparent 48%),
+    linear-gradient(135deg,#361929 0%,#321525 53%,#3e2033 100%);
+  color:#f0dce9;
+}
+.order-section::before {
+  z-index:1;opacity:.29;
+  background:
+    repeating-radial-gradient(circle at 15% 18%,rgba(245,200,223,.075) 0 1px,transparent 2px 5px),
+    repeating-linear-gradient(95deg,rgba(255,217,232,.045) 0 1px,transparent 1px 7px);
+}
+.order-section::after {display:none;}
+.order-section .order-stage-original {
+  opacity:.38;
+  filter:grayscale(1) sepia(.65) saturate(.75) brightness(.65) contrast(1.25);
+  mix-blend-mode:overlay;
+  background:
+    url("./assets/couple-botanical-edges-original.svg") center center / 100% 100% no-repeat,
+    url("./assets/couple-garden-original.svg") center center / 100% auto no-repeat;
+}
+.order-section .order-stage-original::after {opacity:.25;}
+.order-section .order-leaf{opacity:.11;color:#e0b5c7;top:13%;font-size:125px;}
+.order-section .order-leaf-right{top:58%;}
+.order-section .order-inner{
+  padding:46px 28px 70px;
+  min-height:651px;
+}
+.order-section .order-inner::before {
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:20px 23px 68px;
+  border:1px solid rgba(229,212,217,.88);
+  box-shadow:0 0 0 1px rgba(255,237,232,.06) inset;
+}
+.order-section .order-eyebrow{
+  color:#d4b8ca;font:500 9px/1.4 'Cinzel',Georgia,serif;
+  letter-spacing:.35em;text-transform:uppercase;margin:0 0 8px;
+}
+.order-section h2.order-heading{
+  color:rgb(243,223,240);font-size:46px;line-height:1.15;
+  margin:0 auto 29px;text-shadow:0 2px 7px rgba(23,8,19,.35);
+  white-space:nowrap;
+}
+.order-section .order-timeline{max-width:334px;padding-left:0;}
+.order-section .order-timeline::before{
+  top:12px;bottom:30px;left:91px;
+  background:linear-gradient(to bottom,rgba(238,216,210,.45),rgba(238,216,210,.22));
+}
+.order-section .order-entry{
+  grid-template-columns:75px minmax(0,1fr);
+  gap:30px;min-height:52px;
+}
+.order-section .order-entry:first-child,
+.order-section .order-entry:nth-child(3){min-height:67px;}
+.order-section .order-entry::before{
+  top:10px;left:86px;width:9px;height:9px;
+  background:#ead0b1;border:1px solid #f3d3bb;
+  box-shadow:0 0 0 1px rgba(29,12,20,.25);
+}
+.order-section .order-time{
+  padding-top:7px;padding-left:16px;
+  color:#d6b6a5;font-size:10px;line-height:1.4;
+  letter-spacing:.02em;text-transform:none;
+}
+.order-section .order-event-text{padding:2px 0 9px 0;}
+.order-section .order-event-text strong{
+  color:#f2e5e4;font-size:18px;line-height:1.35;font-weight:400;
+}
+.order-section .order-event-text small{
+  color:#d9c0cf;font-size:13px;line-height:1.38;margin-top:1px;
+}
+.order-section .order-bottom-mark{display:none;}
+.order-section[data-art="reference"] .order-stage-original{opacity:0;}
+.order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{object-fit:cover;object-position:center;}
+@media(max-width:350px){
+  .order-section .order-inner{padding-inline:20px;}
+  .order-section .order-inner::before{left:13px;right:13px;}
+  .order-section .order-timeline{max-width:100%;}
+  .order-section .order-entry{grid-template-columns:68px minmax(0,1fr);gap:23px;}
+  .order-section .order-timeline::before{left:76px;}
+  .order-section .order-entry::before{left:71px;}
+  .order-section .order-time{padding-left:8px;font-size:9px;}
+  .order-section .order-event-text strong{font-size:17px;}
+  .order-section h2.order-heading{font-size:clamp(38px,12vw,46px);}
+}
