@@ -341,3 +341,13 @@
   color:#6f5a6c;
   font:300 12px/1.65 'EB Garamond',Georgia,serif;
 }
+
+/* Source kicker: MOMENTS at 11px/18.15px, EB Garamond 400,
+   #7e6479, letter-spacing 4.95px, margin-bottom 12px. */
+.gallery-section .gallery-eyebrow {
+  margin:0 0 12px;
+  color:#7e6479;
+  font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:4.95px;
+  text-transform:uppercase;
+}
