@@ -220,3 +220,49 @@ paper, butterfly activity without scroll, and reduced-motion behaviour.
 flight pattern, but the illustrated butterfly and paper art are original.
 Their pixels and exact randomized source flight cycles are not identical
 to the commercial reference.
+
+
+## Path A — authorized real-WebP integration (4 November 2026)
+
+**This section supersedes earlier statements about the original SVG and the
+developer-only remote `?dressReference=1` paper mode.**
+
+The user selected the rights-authorized source-artwork path. A read-only
+Playwright source audit verified that the actual Dress Code scene uses exactly:
+
+| Source artwork | Local path | Source dimensions |
+| --- | --- | --- |
+| Tasik Kayangan paper | `assets/section6/paper.webp` | 1080 × 1920 |
+| Serambi Ungu butterfly spread | `assets/section6/bfly_1.webp` | 256 × 204 |
+
+Both files have been downloaded, validated as RIFF/WebP, and committed
+as actual **binary files** on
+`feat/section6-dress-code-reference-20261103`. Their SHA-256 digests,
+source URLs, and byte sizes are in `assets/section6/ASSET-SOURCES.json`.
+The source-discovery script is `tools/section6-authorized-artwork-audit.cjs`
+and the repeatable importer is `tools/import-section6-authorized-assets.py`.
+
+### Runtime implementation
+
+- The default Section 6 loads `./assets/section6/paper.webp` in the existing
+  paper layer. Its section overlap, cover crop, and parallax remain calibrated.
+- Both CSS 3D wings display **the same local `bfly_1.webp`** with
+  `background-size: 200% 100%` and opposite background positions
+  (left `0 0`, right `100% 0`), just as measured in the reference source.
+- The prior CSS gradient butterfly art, thorax, antennae, floral placeholders
+  and orbit are no longer used in the active Section 6.
+- The visible cards, typography, colour circles, sizes, and reveal transitions
+  are unchanged. The independent time-driven butterfly path remains an
+  approximation of the live reference's varying flight cycles.
+- **No external source image request is needed at runtime**, including
+  `?dressReference=1`. The two WebPs are served by the project itself.
+
+### Verification / limits
+
+The test suite validates local asset HTTP 200, WebP magic header, 1080×1920
+paper dimensions, 200%-split wings, responsive layout, and reduced motion.
+A geometry match or loading test alone does not prove screenshot pixel parity,
+especially the butterfly animation and section transitions.
+
+Artwork reuse requires the rights represented by Path A. The files should not
+be copied into other commercial projects unless those rights cover the reuse.
