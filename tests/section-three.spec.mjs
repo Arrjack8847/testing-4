@@ -23,7 +23,7 @@ async function openEvents(page,query='') {
 test('Section 4 shows TWO reference-example ceremonies, source venue links and clear demo disclosure',async({page})=>{
   const {section,errors}=await openEvents(page);
   await expect(section).toHaveAttribute('data-section','4');
-  await expect(section).toHaveAttribute('data-art','original');
+  await expect(section).toHaveAttribute('data-art','reference');
   await expect(section.getByRole('heading',{name:'Akad Nikah',level:2})).toBeVisible();
   await expect(section.getByRole('heading',{name:'Wedding Reception',level:2})).toBeVisible();
   await expect(section.locator('.event-reference-card')).toHaveCount(2);
@@ -39,8 +39,8 @@ test('Section 4 shows TWO reference-example ceremonies, source venue links and c
   await expect(section.locator('.event-waze-link')).toHaveAttribute('href',/waze.com\/ul/);
   await expect(section.getByRole('link',{name:'Add to Calendar'})).toHaveAttribute('href',/calendar\/render/);
   await expect(section.locator('.event-demo-note')).toContainText('Demonstration only');
-  await expect(section.locator('#eventSourcePaper')).not.toHaveAttribute('src');
-  await expect(section.locator('#eventSourceButterfly')).not.toHaveAttribute('src');
+  await expect(section.locator('#eventSourcePaper')).toHaveAttribute('src',/tasik-kayangan\/paper\.webp/);
+  await expect(section.locator('#eventSourceButterfly')).toHaveAttribute('src',/anggerik-nirmala\/bfly_white\.webp/);
   expect(errors).toEqual([]);
 });
 
@@ -91,8 +91,8 @@ test('Section 4 countdown changes every second and does not claim real wedding d
   await expect(section.locator('.event-demo-note')).toContainText('not a confirmed invitation');
 });
 
-test('Section 4 source-art comparison is opt-in and leaves earlier sections unchanged',async({page})=>{
-  const {section}=await openEvents(page,'?eventsReference=1');
+test('Section 4 source-art is the development default and leaves earlier sections unchanged',async({page})=>{
+  const {section}=await openEvents(page);
   await expect(section).toHaveAttribute('data-art','reference');
   await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
     'src','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp');
