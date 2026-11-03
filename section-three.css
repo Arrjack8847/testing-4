@@ -136,7 +136,7 @@
 .event-section .event-map-link:hover {background:#fffaf1;}
 .event-section .event-waze-link {padding-inline:21px;}
 .event-section .event-countdown {
-  margin:0 auto;max-width:354px;width:100%;padding:7px 0 0;
+  margin:auto auto 0;max-width:354px;width:100%;padding:7px 0 0;
 }
 .event-section .event-countdown-grid {
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
