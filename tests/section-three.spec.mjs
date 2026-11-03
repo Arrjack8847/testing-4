@@ -210,3 +210,44 @@ test('390px Section 4 shared arch follows measured source geometry, without clip
   expect(measure.overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
+
+
+test('390px reference mode uses source individual arches and reversible paper parallax',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Reference motion measured at 390x844');
+  await page.goto('/?eventsReference=1');
+  const section=page.locator('#eventDetails');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await expect(section).toHaveAttribute('data-reference-paper','loaded',{timeout:16000});
+  const arch=await section.locator('.event-card-nikah').evaluate(el=>{
+    const style=getComputedStyle(el,'::before');
+    return {image:style.borderImageSource,borderWidth:style.borderImageWidth};
+  });
+  expect(arch.image).toContain('arch_event.svg');
+  const wrapImage=await section.locator('.event-shared-arch').evaluate(el=>getComputedStyle(el,'::before').display);
+  expect(wrapImage).toBe('none');
+
+  const shifts=[];
+  for(const progress of [0,0.5,1,0]){
+    await section.evaluate((el,p)=>{
+      document.documentElement.style.scrollBehavior='auto';
+      const r=el.getBoundingClientRect(),track=Math.max(0,r.height-innerHeight);
+      scrollTo(0,Math.round(r.top+scrollY+track*p));
+    },progress);
+    await expect.poll(async()=>Number(await section.getAttribute('data-event-paper-shift')),{
+      timeout:4000
+    }).not.toBeNaN();
+    await page.waitForTimeout(130);
+    shifts.push(Number(await section.getAttribute('data-event-paper-shift')));
+  }
+  expect(shifts[0]).toBeLessThan(-13);
+  expect(Math.abs(shifts[1])).toBeLessThan(2);
+  expect(shifts[2]).toBeGreaterThan(13);
+  expect(Math.abs(shifts[3]-shifts[0])).toBeLessThan(1);
+  const title=section.locator('#eventNikahHeading');
+  await expect(title).toHaveClass(/event-reveal/);
+  await expect(title).toHaveClass(/in-view/);
+  await section.evaluate(el=>scrollTo(0,el.getBoundingClientRect().top+scrollY+el.clientHeight-innerHeight));
+  await expect(title).not.toHaveClass(/in-view/);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect.poll(async()=>Number(await section.getAttribute('data-event-paper-shift'))).toBe(0);
+});
