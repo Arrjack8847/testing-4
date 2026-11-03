@@ -86,3 +86,68 @@ test('Reduced motion leaves labels and colours accessible',async({page})=>{
   expect(result.opacity).toBe('1');
   expect(result.transform).toBe('none');
 });
+
+
+test('Section 6 preserves measured reference typography, palette positions and colours',async({page})=>{
+  // Stable measurements at the final rest state; entrance motion is tested separately.
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {dress,errors}=await openDress(page);
+  const actual=await dress.evaluate(el=>{
+    const top=el.getBoundingClientRect().top;
+    const box=selector=>{
+      const node=el.querySelector(selector),r=node.getBoundingClientRect(),s=getComputedStyle(node);
+      return {y:r.top-top,fontSize:parseFloat(s.fontSize),color:s.color,width:r.width};
+    };
+    return {
+      width:innerWidth,
+      eyebrow:box('.dress-eyebrow'),
+      title:box('.dress-heading'),
+      intro:box('.dress-intro'),
+      groomSide:box('.dress-palette:first-child .dress-side'),
+      groomName:box('.dress-palette:first-child .dress-palette-name'),
+      groomColours:box('.dress-palette:first-child .dress-colour-label'),
+      brideSide:box('.dress-palette:last-child .dress-side'),
+      brideName:box('.dress-palette:last-child .dress-palette-name'),
+      brideColours:box('.dress-palette:last-child .dress-colour-label'),
+      swatches:[...el.querySelectorAll('.dress-swatch')].map(node=>{
+        const r=node.getBoundingClientRect();
+        return {y:r.top-top,width:r.width,color:getComputedStyle(node).backgroundColor};
+      })
+    };
+  });
+  const narrow=actual.width<390;
+  const expectedY=narrow
+    ?{eyebrow:0,title:30.14,intro:89.94,groomSide:178.53,
+      groomName:203.03,groomColours:283.72,brideSide:361.31,
+      brideName:385.81,brideColours:466.50,swatchFirst:241.72,swatchSecond:424.50}
+    :{eyebrow:0,title:30.14,intro:89.94,groomSide:158.73,
+      groomName:183.23,groomColours:263.92,brideSide:341.52,
+      brideName:366.02,brideColours:446.70,swatchFirst:221.92,swatchSecond:404.70};
+  const referenceStyles={
+    eyebrow:[11,'rgb(126, 100, 121)'],
+    title:[52,'rgb(123, 61, 110)'],
+    intro:[12,'rgb(111, 90, 108)'],
+    groomSide:[10,'rgb(126, 100, 121)'],
+    groomName:[19,'rgb(74, 42, 69)'],
+    groomColours:[11,'rgb(111, 90, 108)'],
+    brideSide:[10,'rgb(126, 100, 121)'],
+    brideName:[19,'rgb(74, 42, 69)'],
+    brideColours:[11,'rgb(111, 90, 108)']
+  };
+  for(const [key,style] of Object.entries(referenceStyles)){
+    expect(Math.abs(actual[key].y-expectedY[key]),key+' vertical position').toBeLessThanOrEqual(0.8);
+    expect(actual[key].fontSize,key+' font size').toBe(style[0]);
+    expect(actual[key].color,key+' text colour').toBe(style[1]);
+  }
+  const paletteColours=[
+    'rgb(138, 154, 123)','rgb(179, 192, 164)','rgb(237, 231, 217)',
+    'rgb(180, 105, 79)','rgb(220, 167, 154)','rgb(239, 221, 209)'
+  ];
+  expect(actual.swatches).toHaveLength(6);
+  for(const [index,swatch] of actual.swatches.entries()){
+    expect(Math.abs(swatch.y-(index<3?expectedY.swatchFirst:expectedY.swatchSecond))).toBeLessThanOrEqual(0.8);
+    expect(Math.abs(swatch.width-30)).toBeLessThanOrEqual(0.8);
+    expect(swatch.color).toBe(paletteColours[index]);
+  }
+  expect(errors).toEqual([]);
+});
