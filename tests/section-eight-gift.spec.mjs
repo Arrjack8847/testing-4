@@ -62,7 +62,7 @@ test('Section 8 uses the actual source content order without unsafe fake transac
     'Philips 1.7L Kettle 1000 Series HD9314',
     'IKEA Gift Card'
   ]);
-  await expect(gift.locator('.gift-eight-copy')).toBeDisabled();
+  for(const button of await gift.locator('.gift-eight-copy').all()) await expect(button).toBeDisabled();
   expect(await gift.locator('button:not(:disabled)').count()).toBe(0);
   expect(await gift.locator('a[href]').count()).toBe(0);
   await expect(gift.locator('.gift-eight-disclaimer')).toContainText('not enabled');
