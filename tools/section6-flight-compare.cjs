@@ -65,7 +65,12 @@ async function main(){
       const deltas=[];
       for(let i=0;i<targets.length;i++){
         const r=ref.states[i]?.geometry,l=local.states[i]?.geometry;
-        if(r&&!r.error&&l&&!l.error) deltas.push({
+        // The source wing may be an uninitialized placeholder (0,0) or
+        // midway through a different global flight loop. Those frames
+        // cannot be treated as valid scroll-position correspondence.
+        const sourceReady=r&&!r.error&&r.visible&&
+          r.y>-10&&r.y<135&&Math.abs(r.x)>.5;
+        if(sourceReady&&l&&!l.error) deltas.push({
           target:targets[i],
           dx:+(l.x-r.x).toFixed(2),
           dy:+(l.y-r.y).toFixed(2),
