@@ -280,7 +280,8 @@ test('Section 6 original butterfly follows measured upper-right flight path',asy
     expect(Math.abs(actual.wingX-point.wingX*actual.width/390)).toBeLessThanOrEqual(2);
     expect(Math.abs(actual.wingY-point.wingY)).toBeLessThanOrEqual(2);
     expect(actual.wingWidth).toBe(52);
-    expect(actual.wingHeight).toBe(41);
+    // Fractional CSS transforms can report 40.999996px instead of exactly 41px.
+    expect(Math.abs(actual.wingHeight-41)).toBeLessThanOrEqual(.05);
     expect(actual.leftWing).toBe('dress-wing-flight-left');
     expect(actual.rightWing).toBe('dress-wing-flight-right');
   }
