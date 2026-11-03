@@ -56,5 +56,6 @@ foreach ($name in $files) {
   }
 }
 Write-Host 'Local Gallery comparison WebPs verified (5/5).' -ForegroundColor Green
-Write-Host 'Open: http://localhost:8000/?galleryReference=1'
+Write-Host 'Open: http://localhost:8000/ (the five downloaded WebPs auto-load in the local preview)' -ForegroundColor Cyan
+Write-Host 'Optional strict comparison: http://localhost:8000/?galleryReference=1'
 Write-Host 'These files are ignored by Git. Do not publish third-party photos without appropriate permission.'
