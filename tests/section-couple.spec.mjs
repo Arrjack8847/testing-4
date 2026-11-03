@@ -17,16 +17,16 @@ async function openCouple(page){
   await expect(section).toBeInViewport();
   return {section,errors};
 }
-test('reference-inspired couple scene follows mauve and keeps events afterward',async({page})=>{
+test('default reference couple scene follows mauve and keeps events afterward',async({page})=>{
   const {section,errors}=await openCouple(page);
   await expect(section).toHaveAttribute('data-section','3');
   await expect(page.getByRole('heading',{level:2,name:'The Couple'})).toHaveCount(1);
   await expect(section.locator('.couple-portrait')).toHaveCount(2);
-  await expect(section.locator('#groomPortrait')).toHaveAttribute('alt',/placeholder/);
-  await expect(section.locator('#bridePortrait')).toHaveAttribute('alt',/placeholder/);
-  await expect(section.locator('.couple-name').first()).toHaveText('Rayyan');
-  await expect(section.locator('.couple-name').nth(1)).toHaveText('Sofea');
-  await expect(section.locator('.couple-demo-note')).toContainText('Replace');
+  await expect(section.locator('#groomPortrait')).toHaveAttribute('alt',/Reference website example/);
+  await expect(section.locator('#bridePortrait')).toHaveAttribute('alt',/Reference website example/);
+  await expect(section.locator('.couple-name').first()).toHaveText('Muhammad Rayyan bin Bujang');
+  await expect(section.locator('.couple-name').nth(1)).toHaveText('Nur Sofea binti Dzulkharnain');
+  await expect(section.locator('.couple-demo-note')).toHaveCount(0);
   const adjacency=await section.evaluate(el=>({
     prior:el.previousElementSibling?.id,next:el.nextElementSibling?.id,
     following:el.nextElementSibling?.getAttribute('data-section')
@@ -111,117 +111,97 @@ test('couple scene respects Reduced Motion and disables decorative petals',async
   await expect(section.locator('.couple-floating-petals span').first()).toHaveCSS('animation-name','none');
 });
 
-test('original floral scene parallax follows scrolling without moving cards',async({page})=>{
-  const {section}=await openCouple(page);
-  const sample=async targetY=>{
-    await page.evaluate(y=>window.scrollTo({top:Math.round(y),behavior:'instant'}),targetY);
-    await expect.poll(()=>page.evaluate(()=>{
-      const section=document.getElementById('couple');
-      return section.style.getPropertyValue('--couple-bg-y').trim();
-    })).not.toBe('');
+
+test('default reference garden camera follows scrolling without moving cards',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  await expect(section).toHaveAttribute('data-art','reference');
+  const begin=await section.evaluate(el=>({
+    start:el.getBoundingClientRect().top+scrollY,
+    distance:Math.max(0,el.offsetHeight-innerHeight)
+  }));
+  const sample=async fraction=>{
+    await page.evaluate(async target=>{
+      window.scrollTo({top:Math.round(target),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },begin.start+begin.distance*fraction);
     return section.evaluate(el=>({
-      offset:parseFloat(el.style.getPropertyValue('--couple-bg-y')),
-      bg:getComputedStyle(el).backgroundImage,
+      camera:parseFloat(el.dataset.referenceCameraOffset),
+      total:parseFloat(el.style.getPropertyValue('--couple-reference-y')),
+      background:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
       overflow:document.documentElement.scrollWidth-innerWidth
     }));
   };
-  // Relative section positions are used because 5H is not the same part
-  // of the Couple scene at 320x568 and 430x932.
-  const target=await section.evaluate(el=>{
-    const box=el.getBoundingClientRect();
-    return {start:box.top+scrollY,height:box.height,vh:innerHeight};
-  });
-  const first=await sample(target.start-target.vh*.25);
-  const second=await sample(target.start+target.height-target.vh*.4);
-  await expect.poll(()=>section.evaluate(el=>parseFloat(el.style.getPropertyValue('--couple-bg-y'))))
-    .toBeGreaterThan(5);
-  expect(first.offset).toBeLessThan(-10);
-  expect(second.bg).toContain('couple-garden-original.svg');
+  const first=await sample(.10);
+  const second=await sample(.80);
+  expect(first.camera).toBeLessThan(second.camera);
+  expect(second.background).toContain('tasik-kayangan/scene.webp');
+  expect(first.overflow).toBeLessThanOrEqual(1);
   expect(second.overflow).toBeLessThanOrEqual(1);
+  expect(Number.isFinite(second.total)).toBe(true);
+  expect(errors).toEqual([]);
 });
 
 
-test('Section 3 original lakeside edge illustration is behind arch and keeps section 4 seam intact',async({page})=>{
+test('default reference replaces original illustrations and keeps section 4 seam intact',async({page})=>{
   const {section,errors}=await openCouple(page);
-  const image=section.locator('.couple-lake-finish');
-  await expect(image).toHaveCount(1);
   const data=await section.evaluate(el=>{
-    const foot=el.querySelector('.couple-lake-finish');
     const arch=el.querySelector('.couple-arch');
-    const a=arch.getBoundingClientRect();
-    const f=foot.getBoundingClientRect();
+    const props=el=>getComputedStyle(el);
     const s=el.getBoundingClientRect();
     const next=document.getElementById('eventDetails').getBoundingClientRect();
-    return {sectionWidth:s.width,footerWidth:f.width,footerHeight:f.height,
-      footerBottom:f.bottom-s.bottom,
-      panelBeyondFooter:a.bottom-f.top,belowPanel:f.bottom-a.bottom,
-      zFooter:+getComputedStyle(foot).zIndex,zArch:+getComputedStyle(arch).zIndex,
-      bg:getComputedStyle(foot).backgroundImage,
-      gap:next.top-s.bottom,overflow:document.documentElement.scrollWidth-innerWidth};
+    return {
+      hiddenArtwork:['.couple-lake-finish','.couple-botanical-edges','.couple-hanging','.couple-arch-finial']
+        .every(selector=>props(el.querySelector(selector)).display==='none'),
+      arch:props(arch).borderImageSource,
+      sourcePortraits:[...el.querySelectorAll('.couple-portrait img')].map(img=>img.getAttribute('src')),
+      gap:next.top-s.bottom,
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
   });
-  expect(data.footerWidth).toBeCloseTo(data.sectionWidth,0);
-  expect(data.footerHeight).toBeCloseTo(178,0);
-  expect(data.footerBottom).toBeCloseTo(0,0);
-  expect(data.zArch).toBeGreaterThan(data.zFooter);
-  expect(data.belowPanel).toBeCloseTo(140,0);
-  expect(data.bg).toContain('couple-lake-finish-original.svg');
+  expect(data.hiddenArtwork).toBe(true);
+  expect(data.arch).toContain('arch_panel.svg');
+  expect(data.sourcePortraits.every(src=>!src.includes('-original.svg'))).toBe(true);
   expect(Math.abs(data.gap)).toBeLessThanOrEqual(1);
   expect(data.overflow).toBeLessThanOrEqual(1);
-  const loaded=await page.evaluate(async()=>{
-    const img=new Image();
-    img.src='./assets/couple-lake-finish-original.svg';
-    try {await img.decode();return img.naturalWidth>0;}catch{return false;}
-  });
-  expect(loaded).toBe(true);
   expect(errors).toEqual([]);
 });
 
-test('original botanical side art and carved arch render without covering text or overflowing',async({page},testInfo)=>{
+
+test('default reference arch, paper tint, portraits and text preserve mobile layering',async({page},testInfo)=>{
   const {section,errors}=await openCouple(page);
-  const report=await section.evaluate(async el=>{
-    const edge=el.querySelector('.couple-botanical-edges');
+  const report=await section.evaluate(el=>{
     const arch=el.querySelector('.couple-arch');
-    const content=el.querySelector('.couple-inner');
-    const load=async path=>{
-      const img=new Image();
-      img.src=path;
-      try{await img.decode();return {width:img.naturalWidth,height:img.naturalHeight};}
-      catch{return {width:0,height:0};}
-    };
-    const [flowers,relief]=await Promise.all([
-      load('./assets/couple-botanical-edges-original.svg'),
-      load('./assets/couple-arch-relief-original.svg')
-    ]);
+    const details=el.querySelector('.couple-inner');
+    const next=el.nextElementSibling;
     return {
-      flow:el.nextElementSibling?.id,
-      flowers,relief,
-      edgeZ:Number(getComputedStyle(edge).zIndex),
+      art:el.dataset.art,
+      washOpacity:getComputedStyle(el,'::before').opacity,
+      washZ:Number(getComputedStyle(el,'::before').zIndex),
       archZ:Number(getComputedStyle(arch).zIndex),
-      contentZ:Number(getComputedStyle(content).zIndex),
-      edgeImage:getComputedStyle(edge).backgroundImage,
-      archImage:getComputedStyle(arch).backgroundImage,
-      overflow:document.documentElement.scrollWidth-innerWidth,
-      seam:el.nextElementSibling.getBoundingClientRect().top-el.getBoundingClientRect().bottom
+      innerZ:Number(getComputedStyle(details).zIndex),
+      garden:getComputedStyle(el.querySelector('.couple-reference-scene')).backgroundImage,
+      archImage:getComputedStyle(arch).borderImageSource,
+      footer:next.id,
+      seam:next.getBoundingClientRect().top-el.getBoundingClientRect().bottom,
+      overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
-  expect(report.flow).toBe('eventDetails');
-  expect(report.flowers).toEqual({width:390,height:1840});
-  expect(report.relief).toEqual({width:366,height:1571});
-  expect(report.edgeZ).toBeGreaterThan(report.archZ);
-  expect(report.contentZ).toBeGreaterThan(report.edgeZ);
-  expect(report.edgeImage).toContain('couple-botanical-edges-original.svg');
-  expect(report.archImage).toContain('couple-arch-relief-original.svg');
-  expect(report.overflow).toBeLessThanOrEqual(1);
+  expect(report.art).toBe('reference');
+  expect(report.washOpacity).toBe('0.1');
+  expect(report.archZ).toBeGreaterThan(report.washZ);
+  expect(report.innerZ).toBeGreaterThan(report.archZ);
+  expect(report.garden).toContain('tasik-kayangan/scene.webp');
+  expect(report.archImage).toContain('arch_panel.svg');
+  expect(report.footer).toBe('eventDetails');
   expect(Math.abs(report.seam)).toBeLessThanOrEqual(1);
-  const width=await page.evaluate(()=>innerWidth);
-  await page.evaluate(()=>document.getElementById('couple').scrollIntoView({block:'start',behavior:'instant'}));
-  await page.screenshot({path:testInfo.outputPath('section3-botanical-'+width+'.png'),animations:'disabled'});
+  expect(report.overflow).toBeLessThanOrEqual(1);
+  await page.screenshot({path:testInfo.outputPath('section3-reference-default-'+testInfo.project.name+'.png'),animations:'disabled'});
   expect(errors).toEqual([]);
 });
 
-
-test('opt-in Section 3 reference-art preview uses existing vendor asset URLs without changing default',async({page})=>{
-  await page.goto('/?coupleReference=1');
+test('both plain / and old flag URL show identical approved Section 3 artwork',async({page})=>{
+  await page.goto('/');
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
   // Three known WebP URLs (garden, groom, bride) are actively observed,
@@ -264,15 +244,16 @@ test('opt-in Section 3 reference-art preview uses existing vendor asset URLs wit
   const seam=await section.evaluate(el=>el.nextElementSibling.getBoundingClientRect().top-el.getBoundingClientRect().bottom);
   expect(Math.abs(seam)).toBeLessThanOrEqual(1);
 
-  await page.goto('/');
-  await expect(page.locator('#couple')).not.toHaveAttribute('data-art','reference');
-  await expect(page.locator('#groomPortrait')).toHaveAttribute('src','./assets/couple-groom-art-original.svg');
-  await expect(page.locator('#bridePortrait')).toHaveAttribute('src','./assets/couple-bride-art-original.svg');
+  // The legacy URL may still be bookmarked, but cannot change Section 3.
+  await page.goto('/?coupleReference=1');
+  await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
+  await expect(page.locator('.couple-name').first()).toHaveText('Muhammad Rayyan bin Bujang');
+  await expect(page.locator('#groomPortrait')).toHaveAttribute('data-reference-url',/couples\/moody-groom\.webp$/);
 });
 
 
 test('reference preview camera matches four measured 390px scroll checkpoints',async({page},testInfo)=>{
-  await page.goto('/?coupleReference=1');
+  await page.goto('/');
   const section=page.locator('#couple');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const checks=[
@@ -336,7 +317,7 @@ test('reference preview camera matches four measured 390px scroll checkpoints',a
 
 
 test('reference garden camera moves continuously forwards and backwards across Section 3',async({page})=>{
-  await page.goto('/?coupleReference=1');
+  await page.goto('/');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const section=page.locator('#couple');
   const geometry=await section.evaluate(el=>({
@@ -378,7 +359,7 @@ test('reference garden camera moves continuously forwards and backwards across S
 
 
 test('reference groom image uses measured 5% zoom without resizing the portrait frame',async({page})=>{
-  await page.goto('/?coupleReference=1');
+  await page.goto('/');
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
   await page.getByRole('button',{name:'Open Invitation'}).click();
@@ -408,13 +389,14 @@ test('reference groom image uses measured 5% zoom without resizing the portrait 
     expect(report.frameWidth).toBeCloseTo(240.5,0);
     expect(report.frameHeight).toBeCloseTo(332.7,0);
   }
-  // The original-art preview is unaffected by the reference-only crop.
+  // The same approved crop remains active on the plain URL.
   await page.goto('/');
-  await expect(page.locator('#groomPortrait')).toHaveCSS('transform','none');
+  await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
+  await expect(page.locator('#groomPortrait')).toHaveCSS('transform','matrix(1.05, 0, 0, 1.05, 0, 0)');
 });
 
 test('reference preview entrance matches measured 52px lift and Reduced Motion removes it',async({page})=>{
-  await page.goto('/?coupleReference=1');
+  await page.goto('/');
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
   const first=section.locator('.couple-profile--groom .couple-portrait');
