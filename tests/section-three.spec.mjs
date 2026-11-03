@@ -251,3 +251,48 @@ test('390px reference mode uses source individual arches and reversible paper pa
   await page.emulateMedia({reducedMotion:'reduce'});
   await expect.poll(async()=>Number(await section.getAttribute('data-event-paper-shift'))).toBe(0);
 });
+
+
+test('390px source visual mode keeps full paper edges, true arch SVG and four purple countdown tiles',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Source screenshot measured at 390x844');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {section,errors}=await openEvents(page,'?eventsReference=1');
+  await expect(section).toHaveAttribute('data-reference-paper','loaded',{timeout:16000});
+  const visuals=await section.evaluate(async el=>{
+    const paper=el.querySelector('#eventSourcePaper');
+    const tiles=el.querySelectorAll('.event-countdown-grid span');
+    const tileStyle=getComputedStyle(tiles[0]);
+    const archSrc='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg';
+    const archLoaded=await new Promise(resolve=>{
+      const img=new Image();
+      const timeout=setTimeout(()=>resolve(false),9000);
+      img.onload=()=>{clearTimeout(timeout);resolve(img.naturalWidth>0)};
+      img.onerror=()=>{clearTimeout(timeout);resolve(false)};
+      img.src=archSrc;
+    });
+    return {
+      paperFit:getComputedStyle(paper).objectFit,
+      paperSize:[paper.naturalWidth,paper.naturalHeight],
+      archLoaded,
+      tileCount:tiles.length,
+      tileDisplay:getComputedStyle(el.querySelector('.event-countdown-grid')).display,
+      tileBackground:tileStyle.backgroundColor,
+      timerValue:el.querySelector('#eventCountDays').textContent.trim(),
+      dateWeight:getComputedStyle(el.querySelector('.event-card-date')).fontWeight,
+      venueWeight:getComputedStyle(el.querySelector('#eventVenue')).fontWeight,
+      directionsCase:getComputedStyle(el.querySelector('#eventDirections')).textTransform,
+      guideLine:getComputedStyle(el.querySelector('.event-card-diamond'),'::before').content
+    };
+  });
+  expect(visuals.paperFit).toBe('fill');
+  expect(visuals.paperSize).toEqual([1080,1920]);
+  expect(visuals.archLoaded).toBe(true);
+  expect(visuals.tileCount).toBe(4);
+  expect(visuals.tileDisplay).toBe('grid');
+  expect(visuals.tileBackground).toBe('rgb(97, 40, 82)');
+  expect(visuals.timerValue).toMatch(/^\d+$/);
+  expect(visuals.venueWeight).toBe('600');
+  expect(visuals.directionsCase).toBe('uppercase');
+  expect(visuals.guideLine).toBe('""');
+  expect(errors).toEqual([]);
+});
