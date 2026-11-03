@@ -93,7 +93,8 @@ test('Section 6 preserves measured reference typography, palette positions and c
   await page.emulateMedia({reducedMotion:'reduce'});
   const {dress,errors}=await openDress(page);
   const actual=await dress.evaluate(el=>{
-    const top=el.getBoundingClientRect().top;
+    // The reference y measurements are relative to its unpadded cgv-inner.
+    const top=el.querySelector('.dress-body').getBoundingClientRect().top;
     const box=selector=>{
       const node=el.querySelector(selector),r=node.getBoundingClientRect(),s=getComputedStyle(node);
       return {y:r.top-top,fontSize:parseFloat(s.fontSize),color:s.color,width:r.width};
@@ -148,6 +149,45 @@ test('Section 6 preserves measured reference typography, palette positions and c
     expect(Math.abs(swatch.y-(index<3?expectedY.swatchFirst:expectedY.swatchSecond))).toBeLessThanOrEqual(0.8);
     expect(Math.abs(swatch.width-30)).toBeLessThanOrEqual(0.8);
     expect(swatch.color).toBe(paletteColours[index]);
+  }
+  expect(errors).toEqual([]);
+});
+
+
+test('Dress Code paper panels match the source measured surface at four widths',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {dress,errors}=await openDress(page);
+  const metrics=await dress.evaluate(section=>{
+    const body=section.querySelector('.dress-body');
+    const top=body.getBoundingClientRect().top;
+    const cards=[...section.querySelectorAll('.dress-palette')].map(card=>{
+      const r=card.getBoundingClientRect(),s=getComputedStyle(card);
+      return {x:r.left,y:r.top-top,width:r.width,height:r.height,
+        padding:s.padding,background:s.backgroundColor,border:s.border,
+        radius:s.borderRadius,shadow:s.boxShadow};
+    });
+    const sr=section.getBoundingClientRect();
+    const br=body.getBoundingClientRect();
+    return {width:innerWidth,sectionHeight:sr.height,bodyHeight:br.height,
+      cardGap:cards[1].y-(cards[0].y+cards[0].height),cards};
+  });
+  const narrow=metrics.width<390;
+  const expectedBodyHeight=narrow?507.09:487.3;
+  expect(Math.abs(metrics.sectionHeight-(expectedBodyHeight+192))).toBeLessThanOrEqual(.75);
+  expect(Math.abs(metrics.bodyHeight-expectedBodyHeight)).toBeLessThanOrEqual(.75);
+  expect(Math.abs(metrics.cardGap-14)).toBeLessThanOrEqual(.8);
+  for(let index=0;index<2;index++){
+    const card=metrics.cards[index];
+    const firstTop=narrow?155.53:135.73;
+    expect(Math.abs(card.y-(firstTop+index*(168.78+14)))).toBeLessThanOrEqual(.8);
+    expect(Math.abs(card.width-(metrics.width-56))).toBeLessThanOrEqual(.8);
+    expect(Math.abs(card.height-168.78)).toBeLessThanOrEqual(.8);
+    expect(Math.abs(card.x-28)).toBeLessThanOrEqual(.8);
+    expect(card.padding).toBe('22px 18px');
+    expect(card.background).toBe('rgba(255, 255, 255, 0.5)');
+    expect(card.border).toBe('1px solid rgba(126, 100, 121, 0.3)');
+    expect(card.radius).toBe('16px');
+    expect(card.shadow).toBe('none');
   }
   expect(errors).toEqual([]);
 });
