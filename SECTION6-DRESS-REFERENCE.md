@@ -97,3 +97,38 @@ to load both pages.
 measurements and overlays provide the evidence needed to adjust CSS,
 artwork proportions and animation timings on the next calibration pass.
 A source screenshot comparison has not yet been run in this work session.
+
+## Evidence-based visual calibration — 4 November 2026
+
+A live-source vs local Playwright comparison ran successfully in GitHub Actions:
+https://github.com/Arrjack8847/testing-4/actions/runs/41677687212
+
+Four matched mobile widths were captured: **320, 360, 390, 430 px**, all
+at 844 px viewport height. The script measured the published source and local
+CSS independently, using the Dress Code heading as a shared anchor.
+
+**Measured matches at all four widths:**
+- Attire eyebrow, Dress Code heading, introduction.
+- Groom's Side, Sage Green & Cream, sage palette caption.
+- Bride's Side, Terracotta & Blush, terracotta palette caption.
+- All six 30 px circular palette swatches, their x/y coordinates and RGB values.
+- Relevant font sizes, text colour values, and vertical positions (0.00 px
+  reported difference in these sampled layout measurements).
+
+**Important scope:** This is *measured typography and swatch parity*, not a
+pixel-perfect visual match for the whole section. The source's `cgv-inner`
+content block was 487.3 px tall at 390 px, whereas the local measured
+container is an entire 679 px section; these heights are **different DOM
+boxes** and must not be compared as if they were equivalent.
+The independent source audit previously measured its overall Dress Code
+region at approximately 679 px. Our local section is 679 px.
+
+**Still different or not proven:** full background painting, floral/edge
+decorations, card borders and shadows, animation curves, scroll/sticky camera
+behaviour, and 1:1 screenshot pixel differences. They should be inspected
+visually before calling the reproduction exact.
+
+The CI calibration workflow uploads only measurements in JSON; third-party
+reference screenshots stay ephemeral on the runner and are never committed
+or uploaded as artifacts. A new automated regression check locks in these
+core measurements in `tests/section-six-dress.spec.mjs`.
