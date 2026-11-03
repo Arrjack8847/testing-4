@@ -172,6 +172,15 @@ test('390px Section 4 shared arch follows measured source geometry, without clip
       second:rect('.event-card-reception'),
       firstTitle:rect('#eventNikahHeading'),
       secondTitle:rect('#eventReceptionHeading'),
+      date:rect('.event-card-nikah .event-card-date'),
+      time:rect('#eventTime'),
+      venue:rect('#eventVenue'),
+      venue2:rect('.event-card-reception .event-card-place'),
+      maps:rect('#eventDirections'),
+      calendar:rect('.event-calendar-link'),
+      sectionHeight:base.height,
+      dateFont:getComputedStyle(el.querySelector('.event-card-nikah .event-card-date')).fontSize,
+      timeFont:getComputedStyle(el.querySelector('#eventTime')).fontSize,
       firstTitleFont:getComputedStyle(el.querySelector('#eventNikahHeading')).fontSize,
       secondTitleFont:getComputedStyle(el.querySelector('#eventReceptionHeading')).fontSize,
       overflow:document.documentElement.scrollWidth-innerWidth
@@ -190,6 +199,14 @@ test('390px Section 4 shared arch follows measured source geometry, without clip
   expect(measure.secondTitleFont).toBe('42px');
   expect(Math.abs(measure.second.y-666.5)).toBeLessThanOrEqual(12);
   expect(Math.abs(measure.secondTitle.y-770.5)).toBeLessThanOrEqual(12);
+  // Sub-fields and total section height measured on the live source.
+  expect(measure.dateFont).toBe('22px');
+  expect(measure.timeFont).toBe('14px');
+  for(const [key,expected] of [
+    ['date',305.3],['time',345.6],['venue',434.3],['venue2',1050.1],
+    ['maps',534.5],['calendar',1413.1]
+  ]) expect(Math.abs(measure[key].y-expected)).toBeLessThanOrEqual(5);
+  expect(Math.abs(measure.sectionHeight-1580.9)).toBeLessThanOrEqual(5);
   expect(measure.overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
