@@ -229,6 +229,8 @@ test('Section 6 uses the source-measured stagger and scroll camera',async({page}
 
 test('Section 6 uses only original Section 6 paper and paired local wings by default',async({page})=>{
   const {dress,errors}=await openDress(page);
+  // The reference-inspired autonomous flight has a short entrance delay.
+  await expect.poll(()=>dress.getAttribute('data-flight-ready'),{timeout:5000}).toBe('true');
   const art=await dress.evaluate(el=>{
     const paper=el.querySelector('.dress-art-original');
     const src=el.querySelector('#dressSourceScene');
