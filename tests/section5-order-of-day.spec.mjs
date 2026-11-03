@@ -101,17 +101,40 @@ test('reduced-motion preserves legible timeline without animation or camera move
   expect(Math.abs(Number(cam))).toBeLessThan(.01);
 });
 
-test('reference-hosted plum band is restricted to an explicit visual comparison mode',async({page})=>{
+test('reference comparison requests only locally staged WebPs and degrades safely if missing',async({page})=>{
   const {section}=await toOrder(page);
   await expect(section).not.toHaveAttribute('data-art','reference');
   expect(await section.locator('#orderSourceBand').getAttribute('src')).toBeNull();
-  await page.route('**/band_plum.webp',route=>route.abort());
-  await page.route('**/bfly_blush.webp',route=>route.abort());
+  await page.route('**/assets/reference-dev/*.webp',route=>route.fulfill({status:404,body:'Developer image not supplied'}));
   await page.goto('/?orderReference=1');
   await expect(section).toHaveAttribute('data-art','reference');
-  const url=await section.locator('#orderSourceBand').getAttribute('src');
-  expect(url).toBe('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/band_plum.webp');
-  await expect(section).toHaveAttribute('data-band-status',/loading|failed/);
+  await expect(section).toHaveAttribute('data-asset-source','local-webp');
+  const source=await section.locator('#orderSourceBand').getAttribute('src');
+  expect(source).toBe('./assets/reference-dev/band_plum.webp');
+  await expect(section).toHaveAttribute('data-band-status','failed');
+  await expect(section.locator('.order-heading')).toBeAttached();
+  expect(await section.evaluate(el=>getComputedStyle(el).backgroundImage)).not.toContain('undangankahwin.com');
+});
+
+test('valid local WebPs use section-level background-size cover with zero vendor hotlinks',async({page})=>{
+  // Synthetic fixture from existing image QA; never distributed as a wedding asset.
+  const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:fixture}));
+  const {section,errors}=await toOrder(page,'/?orderReference=1');
+  await expect(section).toHaveAttribute('data-band-status','loaded');
+  await expect(section).toHaveAttribute('data-butterfly-status','loaded');
+  const result=await section.evaluate(el=>{
+    const style=getComputedStyle(el);
+    return {background:style.backgroundImage,position:style.backgroundPosition,size:style.backgroundSize,
+      image:el.querySelector('#orderSourceBand')?.getAttribute('src')};
+  });
+  expect(result.background).toContain('/assets/reference-dev/band_plum.webp');
+  expect(result.background).not.toContain('undangankahwin.com');
+  expect(result.size).toContain('cover');
+  expect(result.position).toContain('50% 50%');
+  expect(result.image).toBe('./assets/reference-dev/band_plum.webp');
+  expect(errors).toEqual([]);
 });
 
 test('old standalone date-only demo remains available via an explicit legacy URL',async({page})=>{
