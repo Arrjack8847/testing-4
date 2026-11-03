@@ -225,6 +225,24 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
   expect(frameMetrics.borderColor).toBe('rgb(255, 255, 255)');
   expect(frameMetrics.radius).toBe('14px');
   expect(frameMetrics.shadow).toContain('14px 36px');
+  const caption=await first.locator('.gallery-frame-caption').evaluate(el=>{
+    const frame=el.closest('.gallery-photo').getBoundingClientRect();
+    const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+    return {left:r.left-frame.left,bottom:frame.bottom-r.bottom,
+      size:s.fontSize,height:s.lineHeight,weight:s.fontWeight,
+      color:s.color,tracking:s.letterSpacing,transform:s.textTransform,
+      textShadow:s.textShadow,background:s.backgroundImage};
+  });
+  expect(Math.abs(caption.left-16)).toBeLessThanOrEqual(0.5);
+  expect(Math.abs(caption.bottom-14)).toBeLessThanOrEqual(0.5);
+  expect(caption.size).toBe('10px');
+  expect(caption.height).toBe('16.5px');
+  expect(caption.weight).toBe('400');
+  expect(caption.color).toBe('rgb(255, 255, 255)');
+  expect(caption.tracking).toBe('2.8px');
+  expect(caption.transform).toBe('uppercase');
+  expect(caption.textShadow).toContain('1px 10px');
+  expect(caption.background).toBe('none');
   await expect(gallery.locator('[data-gallery-slot="2"]')).toBeDisabled();
   await expect(gallery.locator('.gallery-disclaimer')).toContainText('Tap an available');
   await first.click();
