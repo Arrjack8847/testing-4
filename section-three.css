@@ -218,7 +218,7 @@
   max-width:390px;
   min-height:1581px;
   margin:0 auto;
-  padding:120px 26px 88px;
+  padding:120px 26px 56px;
 }
 .event-section .event-prototype-label {
   position:absolute;
@@ -262,7 +262,7 @@
   display:block;
   width:100%;
   min-height:0;
-  padding:104px 30px 58px;
+  padding:104px 30px 53px;
   border:0;
   border-radius:0;
   box-shadow:none;
@@ -308,19 +308,20 @@
 }
 .event-section .event-card-place {
   max-width:100%;
-  margin:0 auto 8px;
+  margin:0 auto 10px;
   color:#4a2a45;
   font:400 19px/31.35px 'EB Garamond',Georgia,serif;
 }
 .event-section .event-card-address {
   max-width:100%;
-  margin:0 auto 22px;
+  margin:0 auto 13px;
   color:#715368;
   font:400 15px/24.75px 'EB Garamond',Georgia,serif;
 }
 .event-section .event-card-links {gap:10px;}
 .event-section .event-map-link {
   min-height:48px;
+  min-width:156px;
   border:0;
   padding:11px 24px;
   background:#fff;
@@ -342,7 +343,7 @@
 .event-section .event-countdown {
   width:100%;
   max-width:338px;
-  margin:52px auto 0;
+  margin:32px auto 0;
   padding:0;
   text-align:center;
 }
@@ -366,9 +367,13 @@
 @media(max-width:350px) {
   .event-section .event-body {padding:120px 20px 88px;}
   .event-section .event-shared-arch {padding:0 5px;}
-  .event-section .event-reference-card {padding:104px 17px 58px;}
+  .event-section .event-reference-card {padding:104px 17px 53px;}
   .event-section .event-card-title {font-size:40px;line-height:66px;}
   .event-section .event-card-date,.event-section .event-card-time {font-size:16px;}
   .event-section .event-card-place {font-size:18px;}
   .event-section .event-map-link {font-size:11px;padding:11px 18px;}
 }
+
+/* The measured reference Events page has a tall paper illustration but no
+   free-standing butterfly IMG in the Events viewport. Avoid inventing one. */
+.event-section[data-art="reference"] .event-source-butterfly {display:none!important;}
