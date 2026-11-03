@@ -1,0 +1,22 @@
+{
+  "purpose": "Authorized local Section 6 artwork; not hotlinked at runtime.",
+  "reference_page": "https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en",
+  "files": {
+    "paper.webp": {
+      "source": "https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 74096,
+      "sha256": "1a6beba7a3ded69a651d4efcb9e69a706d58a1e4f9cffacaa26c39313b757006",
+      "content_type": "image/webp"
+    },
+    "bfly_1.webp": {
+      "source": "https://undangankahwin.com/images/concierge/packs/serambi-ungu/bfly_1.webp",
+      "width": 256,
+      "height": 204,
+      "bytes": 21458,
+      "sha256": "685b727e858b04507a2aeb658a30e0bde98cde976dc37b8be0f771bbbb77add4",
+      "content_type": "image/webp"
+    }
+  }
+}
