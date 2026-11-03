@@ -29,10 +29,10 @@ or replace it with invented dates, venues, names or addresses.
 
 ## Art and animation
 
-- The default site uses independently authored scene gradients and **existing**
+- The original-art fallback (no longer selected by the root URL) uses independently authored scene gradients and **existing**
   original Couple botanical/garden/lake SVG assets. No new vendor asset files
   were copied into the repo. These backgrounds are decorative only.
-- To compare the actual provider artwork, visit **?eventsReference=1**.
+- The development site now uses the reference comparison artwork by default on **/**. The old **?eventsReference=1** bookmark still renders the same view.
   Only this explicit development comparison loads the provider's
   tasik-kayangan/paper.webp (events background) and
   anggerik-nirmala/bfly_white.webp (decorative butterfly) through their
@@ -82,7 +82,7 @@ artwork and verified customer data.
     powershell -ExecutionPolicy Bypass -File .\start.ps1
 
 Open http://localhost:8000/ normally or
-http://localhost:8000/?eventsReference=1 to compare provider artwork.
+http://localhost:8000/ to compare provider artwork; ?eventsReference=1 is a legacy equivalent.
 
     npm install
     npx playwright install chromium
@@ -204,3 +204,21 @@ The previous visual-diff run improved from bottom-frame mean RGB
 difference 29.426 to 19.899 out of 255 after the paper/countdown
 fixes. CI reference comparisons can vary slightly because animations
 and sample timers are not deterministic across two page loads.
+
+
+## Section 3 + Section 4 single-URL integration (4 November 2026)
+
+Merged the latest main Section 3 approved reference-only commit into
+the development Section 4 branch without replacing any Section 4 work.
+The two directly follow one another, with Section 5 following Events.
+
+The local testing URL is now **http://localhost:8000/** — both Sections
+3 and 4 display their reference-based versions without any query flag.
+The old ?eventsReference=1 URL is an equivalent bookmark.
+
+This is still an internal reverse-engineering **research prototype**;
+the original vendor's artwork and example photographs are requested
+from external hosts. Their availability and license are not guaranteed.
+Do **not** sell or publish this source-art version commercially;
+replace third-party artwork and content with properly authorized assets.
+The branch remains a draft PR, and main's Section 3 is preserved.
