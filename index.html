@@ -143,49 +143,67 @@
         </article>
       </div>
     </section>
-    <!-- Section 4: independently designed event information; all details below are SAMPLE/UNCONFIRMED. -->
-    <section class="event-section" id="eventDetails" data-section="4" aria-labelledby="eventHeading" aria-hidden="true" inert>
-      <div class="event-ambient" aria-hidden="true">
-        <span class="event-arc event-arc-one"></span>
-        <span class="event-arc event-arc-two"></span>
-        <span class="event-branch event-branch-left"><i></i><i></i><i></i><i></i></span>
-        <span class="event-branch event-branch-right"><i></i><i></i><i></i><i></i></span>
-        <span class="event-glow event-glow-one"></span>
-        <span class="event-glow event-glow-two"></span>
+    <!-- Section 4: Tasik Kayangan Events reference-recreation prototype.
+         All identities, dates, venues and links below are reference SAMPLE data.
+         Reference-only development preview hotlinks vendor art; never bundled. -->
+    <section class="event-section" id="eventDetails" data-section="4" data-art="reference"
+      aria-label="Wedding events reference prototype"
+      aria-hidden="true" inert>
+      <div class="event-stage" aria-hidden="true">
+        <div class="event-stage-paint"></div>
+        <img class="event-source-paper" id="eventSourcePaper" alt="" decoding="async">
+        <span class="event-flower event-flower-left">❧</span>
+        <span class="event-flower event-flower-right">❧</span>
+        <img class="event-source-butterfly" id="eventSourceButterfly" alt="" decoding="async">
       </div>
-      <div class="event-inner">
-        <p class="event-eyebrow event-reveal">With love, we gather</p>
-        <div class="event-ornament event-reveal" aria-hidden="true"><span></span>✧<span></span></div>
-        <h2 class="event-title event-reveal" id="eventHeading">The Celebration</h2>
-        <p class="event-subtitle event-reveal">Together with our families</p>
-        <time class="event-date-card event-reveal" datetime="2027-01-23" aria-label="Sample wedding date: Saturday, 23 January 2027">
-          <span class="event-date-month">JANUARY</span>
-          <div class="event-date-center"><span class="event-date-day">23</span><span class="event-date-year">2027</span></div>
-          <span class="event-date-weekday">SATURDAY</span>
-        </time>
-        <p class="event-demo-note event-reveal">Sample date · Event details awaiting confirmation</p>
-        <div class="event-info-panel event-reveal">
-          <div class="event-detail">
-            <span class="event-detail-icon" aria-hidden="true">◷</span>
-            <div>
-              <h3>Celebration Time</h3>
-              <p id="eventTime">To be confirmed</p>
-            </div>
+      <span class="event-petal-field" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </span>
+      <div class="event-body">
+        <p class="event-prototype-label">Reference recreation · sample event details</p>
+        <div class="event-shared-arch" aria-label="Two wedding ceremonies">
+        <article class="event-reference-card event-card-nikah" aria-labelledby="eventNikahHeading">
+          <div class="event-card-ornament" aria-hidden="true">✧</div>
+          <h2 id="eventNikahHeading" class="event-card-title event-reveal">Akad Nikah</h2>
+          <time datetime="2027-01-23" class="event-card-date event-reveal">Saturday, 23 January 2027</time>
+          <p class="event-card-time event-reveal" id="eventTime"><time datetime="10:00">10:00 AM</time><span aria-hidden="true"> — </span><time datetime="12:00">12:00 PM</time></p>
+          <span class="event-card-diamond event-reveal" aria-hidden="true">❖</span>
+          <h3 class="event-card-place event-reveal" id="eventVenue">Masjid Wilayah Persekutuan</h3>
+          <p class="event-card-address event-reveal" id="eventAddress">Jalan Tuanku Abdul Halim, 50480 Kuala Lumpur</p>
+          <a class="event-map-link event-reveal" id="eventDirections" target="_blank" rel="noopener noreferrer"
+            href="https://www.google.com/maps/search/?api=1&amp;query=Masjid+Wilayah+Persekutuan+Kuala+Lumpur">Open in Maps</a>
+        </article>
+
+        <article class="event-reference-card event-card-reception" aria-labelledby="eventReceptionHeading">
+          <div class="event-card-ornament" aria-hidden="true">✧</div>
+          <h2 id="eventReceptionHeading" class="event-card-title event-reveal">Wedding Reception</h2>
+          <time datetime="2027-01-23" class="event-card-date event-reveal">Saturday, 23 January 2027</time>
+          <p class="event-card-time event-reveal"><time datetime="19:30">7:30 PM</time><span aria-hidden="true"> — </span><time datetime="22:30">10:30 PM</time></p>
+          <span class="event-card-diamond event-reveal" aria-hidden="true">❖</span>
+          <h3 class="event-card-place event-reveal">Grand Ballroom, St. Regis Kuala Lumpur</h3>
+          <p class="event-card-address event-reveal">6, Jalan Stesen Sentral 2, 50470 Kuala Lumpur</p>
+          <div class="event-card-links event-reveal">
+            <a class="event-map-link event-reveal" target="_blank" rel="noopener noreferrer"
+              href="https://www.google.com/maps/search/?api=1&amp;query=The+St+Regis+Kuala+Lumpur">Open in Maps</a>
+            <a class="event-map-link event-waze-link event-reveal" target="_blank" rel="noopener noreferrer"
+              href="https://waze.com/ul?q=The%20St%20Regis%20Kuala%20Lumpur">Waze</a>
           </div>
-          <div class="event-detail-divider" aria-hidden="true"></div>
-          <div class="event-detail">
-            <span class="event-detail-icon" aria-hidden="true">⌖</span>
-            <div>
-              <h3>Venue</h3>
-              <p id="eventVenue">Venue to be announced</p>
-              <p class="event-address" id="eventAddress" hidden></p>
-            </div>
-          </div>
-          <a class="event-directions" id="eventDirections" href="#" target="_blank" rel="noopener noreferrer" hidden>Get Directions <span aria-hidden="true">↗</span></a>
-          <p class="event-directions-note" id="eventDirectionsNote">Directions will appear when the venue is confirmed.</p>
+        </article>
+
         </div>
-        <p class="event-farewell event-reveal">We look forward to celebrating this beautiful beginning with you.</p>
-        <div class="event-closing-mark event-reveal" aria-hidden="true">❦</div>
+
+        <div class="event-countdown event-reveal" id="eventCountdown">
+          <div class="event-countdown-grid" role="timer" aria-label="Countdown to the sample Wedding Reception in Malaysia">
+            <span><strong id="eventCountDays">00</strong><small>Days</small></span>
+            <span><strong id="eventCountHours">00</strong><small>Hours</small></span>
+            <span><strong id="eventCountMinutes">00</strong><small>Mins</small></span>
+            <span><strong id="eventCountSeconds">00</strong><small>Secs</small></span>
+          </div>
+          <a class="event-calendar-link" target="_blank" rel="noopener noreferrer"
+             href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=The%20Wedding%20of%20Rayyan%20%26%20Sofea&amp;dates=20270123T113000Z/20270123T143000Z&amp;location=The%20St.%20Regis%20Kuala%20Lumpur">Add to Calendar</a>
+          <p class="event-demo-note" id="eventDirectionsNote">Demonstration only — these are the reference website's sample wedding details, not a confirmed invitation.</p>
+        </div>
       </div>
     </section>
     <!-- Section 5: original date-only countdown. No unconfirmed ceremony time is implied. -->

@@ -1,126 +1,638 @@
-/* Section 3: image-free, mobile-only celebration details. Scoped to .event-section. */
+/* Section 4: Tasik Kayangan EVENTS reference recreation prototype.
+   Only #eventDetails; no selectors for Sections 1–3 or 5 onward.
+   ?eventsReference=1 requests source-owned WebP images for private comparison;
+   default mode uses original garden art and no vendor imagery. */
 .event-section {
-  position:relative;isolation:isolate;overflow:hidden;z-index:2;
-  min-height:100dvh;padding:clamp(84px,11dvh,116px) clamp(19px,5.2vw,26px) clamp(96px,12dvh,125px);
-  text-align:center;color:#654f63;
-  background:radial-gradient(ellipse at 50% 1%,#f8f0e8 0,transparent 50%),
-    radial-gradient(ellipse at -18% 70%,#dcc8d9,transparent 45%),
-    radial-gradient(ellipse at 110% 90%,#d6c6df,transparent 45%),
-    linear-gradient(180deg,#e4dae6 0%,#faf3ea 29%,#f4e9e7 69%,#e0d1e3 100%);
+  position:relative;
+  box-sizing:border-box;
+  z-index:2;isolation:isolate;overflow:hidden;width:100%;
+  min-height:1581px;
+  color:#704d67;text-align:center;
+  background:linear-gradient(180deg,#ded0e1 0%,#f7ecea 29%,#fdf6ee 64%,#e1d3e2 100%);
 }
-/* Transition bridge: Section 2 finishes in lavender, so the next scene
-   enters through a similar hue before revealing its warm ivory background. */
+.event-section *, .event-section *::before, .event-section *::after {box-sizing:border-box;}
+.event-section::before {
+  content:"";position:absolute;z-index:1;pointer-events:none;inset:0;
+  background:radial-gradient(ellipse at 50% 17%,rgba(255,249,236,.35),transparent 50%),
+    radial-gradient(ellipse at -20% 70%,rgba(196,160,203,.22),transparent 56%),
+    radial-gradient(ellipse at 120% 85%,rgba(196,160,203,.22),transparent 54%);
+}
 .event-section::after {
+  content:"";position:absolute;z-index:1;pointer-events:none;
+  left:0;right:0;top:0;height:145px;
+  background:linear-gradient(180deg,#ded0e1 0%,rgba(222,208,225,.55) 41%,transparent 100%);
+}
+.event-section .event-stage {
+  position:absolute;top:0;left:0;right:0;
+  height:100vh;height:100dvh;min-height:480px;
+  z-index:0;pointer-events:none;overflow:hidden;
+  transform:translate3d(0,var(--event-stage-y,0px),0);
+}
+.event-section .event-stage-paint {
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(248,239,233,.73),rgba(254,250,241,.56),rgba(222,209,227,.66)),
+    url("./assets/couple-botanical-edges-original.svg") center center / 100% 100% no-repeat,
+    url("./assets/couple-garden-original.svg") center center / 100% auto no-repeat;
+}
+.event-section .event-stage-paint::after {
+  content:"";position:absolute;left:0;right:0;bottom:0;height:150px;
+  opacity:.46;background:url("./assets/couple-lake-finish-original.svg") center bottom/100% auto no-repeat;
+  -webkit-mask-image:linear-gradient(transparent,black);
+  mask-image:linear-gradient(transparent,black);
+}
+.event-section .event-source-paper,
+.event-section .event-source-butterfly {display:none;pointer-events:none;}
+.event-section[data-art="reference"] .event-stage-paint {
+  background:radial-gradient(ellipse at center,#fff7ef 0%,#e6d9e5 76%,#ded0e1 100%);
+}
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  position:absolute;inset:0;display:block;width:100%;height:100%;
+  object-fit:cover;object-position:50% 50%;opacity:1;
+}
+.event-section[data-art="reference"][data-reference-butterfly="loaded"] .event-source-butterfly {
+  position:absolute;display:block;right:12%;top:10%;width:46px;height:45px;
+  object-fit:contain;opacity:.80;
+  transform-origin:center;animation:event-butterfly-hover 7s ease-in-out infinite alternate;
+}
+.event-section .event-flower {
+  position:absolute;top:18%;left:-47px;z-index:2;
+  color:#a18a9c;font:160px/1 Georgia,serif;opacity:.15;
+  animation:event-leaf-sway 10s ease-in-out infinite alternate;
+}
+.event-section .event-flower-right{left:auto;right:-47px;top:58%;transform:rotate(165deg);animation-delay:-5s;}
+.event-section[data-art="reference"] .event-flower {display:none;}
+.event-section .event-body {
+  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
+  width:100%;max-width:390px;min-height:1581px;
+  margin:0 auto;padding:74px 20px 80px;gap:32px;
+}
+.event-section .event-prototype-label {
+  color:#96798b;font:500 9px/1.5 'Cinzel',Georgia,serif;
+  letter-spacing:.095em;text-transform:uppercase;
+  margin:0 auto 0;max-width:34ch;
+}
+.event-section .event-reference-card {
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;min-height:473px;padding:47px 18px 40px;
+  color:#6d4f67;
+  border:1px solid rgba(187,155,118,.56);
+  border-radius:48% 48% 14px 14px / 15% 15% 14px 14px;
+  box-shadow:0 14px 43px rgba(66,49,75,.12),inset 0 0 35px rgba(255,252,243,.52);
+  background:linear-gradient(145deg,rgba(255,252,246,.91),rgba(251,242,241,.83));
+  isolation:isolate;
+}
+.event-section .event-reference-card::before {
+  content:"";position:absolute;inset:8px;border-radius:inherit;z-index:-1;
+  border:1px solid rgba(194,164,121,.39);pointer-events:none;
+}
+.event-section .event-reference-card::after {
+  content:"";position:absolute;top:10px;left:50%;width:80px;height:14px;
+  transform:translateX(-50%);opacity:.6;pointer-events:none;
+  background:radial-gradient(ellipse,rgba(180,142,94,.65),transparent 70%);
+}
+.event-section .event-card-ornament {font:20px/1 Georgia,serif;color:#bb9b72;margin:0 0 10px;}
+.event-section .event-card-title {
+  font:400 clamp(52px,14vw,61px)/1.05 'Pinyon Script','Alex Brush',cursive;
+  color:#815a78;letter-spacing:0;margin:0 0 18px;max-width:100%;
+  overflow-wrap:break-word;
+  text-shadow:0 2px 11px rgba(255,248,241,.84);
+}
+.event-section .event-card-date {
+  display:block;margin:0 0 11px;color:#725a71;
+  font:400 19px/1.45 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-time {
+  margin:0 0 19px;color:#8a6f85;
+  font:500 16px/1.55 'EB Garamond',Georgia,serif;letter-spacing:.025em;
+}
+.event-section .event-card-diamond {
+  display:block;margin:0 auto 16px;color:#b39870;font:25px/1 Georgia,serif;
+}
+.event-section .event-card-place {
+  max-width:25ch;margin:0 auto 10px;color:#66536a;
+  font:500 clamp(21px,5.6vw,25px)/1.25 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-address {
+  max-width:28ch;margin:0 auto 19px;color:#7e6c7b;
+  font:400 15px/1.5 'EB Garamond',Georgia,serif;
+  overflow-wrap:anywhere;
+}
+.event-section .event-card-links {
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;
+}
+.event-section .event-map-link {
+  display:inline-flex;align-items:center;justify-content:center;min-height:48px;
+  padding:11px 19px;border:1px solid #b8997f;
+  border-radius:25px;background:rgba(255,251,244,.90);
+  box-shadow:0 4px 12px rgba(82,57,73,.1);
+  color:#795b72;text-decoration:none;
+  font:500 11px/1.4 'Cinzel',Georgia,serif;letter-spacing:.04em;
+}
+.event-section .event-map-link:focus-visible,
+.event-section .event-calendar-link:focus-visible {
+  outline:3px solid #8b6b97;outline-offset:3px;
+}
+.event-section .event-map-link:hover {background:#fffaf1;}
+.event-section .event-waze-link {padding-inline:21px;}
+.event-section .event-countdown {
+  margin:auto auto 0;max-width:354px;width:100%;padding:7px 0 0;
+}
+.event-section .event-countdown-grid {
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
+  width:100%;margin:0 auto 20px;
+}
+.event-section .event-countdown-grid span {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:0;gap:3px;padding:12px 2px 9px;
+  border:1px solid rgba(190,157,116,.4);border-radius:7px;
+  background:rgba(255,251,245,.59);
+}
+.event-section .event-countdown-grid strong {
+  color:#7c5a79;font:400 clamp(31px,10vw,43px)/1 'EB Garamond',Georgia,serif;
+  font-variant-numeric:tabular-nums;letter-spacing:-.04em;
+}
+.event-section .event-countdown-grid small {
+  text-transform:uppercase;letter-spacing:.08em;color:#927c8e;
+  font:500 9px/1.4 'Cinzel',Georgia,serif;
+}
+.event-section .event-calendar-link {
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:205px;min-height:47px;padding:12px 20px;
+  border:1px solid #806380;border-radius:24px;
+  background:#806380;box-shadow:0 8px 16px rgba(75,50,76,.17);
+  color:#fffaf7;text-decoration:none;
+  font:500 12px/1.4 'Cinzel',Georgia,serif;letter-spacing:.06em;
+}
+.event-section .event-demo-note {
+  max-width:34ch;margin:17px auto 0;color:#847382;
+  font:400 11px/1.45 system-ui,sans-serif;
+}
+.event-section[data-reveal-ready="true"] .event-reveal {
+  opacity:0;transform:translate3d(0,52px,0) scale(.955);
+  transition:opacity .92s ease,transform 1.05s cubic-bezier(.2,.68,.18,1);
+}
+.event-section[data-reveal-ready="true"] .event-reveal.in-view {
+  opacity:1;transform:translate3d(0,0,0) scale(1);
+}
+.event-section .event-reveal:nth-of-type(2) {transition-delay:120ms;}
+.event-section .event-reveal:nth-of-type(3) {transition-delay:240ms;}
+@keyframes event-leaf-sway {
+  from {translate:0 6px;rotate:-3deg;opacity:.12}
+  to {translate:0 -9px;rotate:4deg;opacity:.25}
+}
+@keyframes event-butterfly-hover {
+  from {transform:translate3d(-6px,5px,0) rotate(-8deg)}
+  to {transform:translate3d(8px,-9px,0) rotate(9deg)}
+}
+@media(max-width:350px) {
+  .event-section .event-body {padding:72px 12px 85px;gap:26px;}
+  .event-section .event-reference-card {min-height:462px;padding:45px 12px 30px;}
+  .event-section .event-card-title {font-size:48px;}
+  .event-section .event-card-place {font-size:21px;}
+  .event-section .event-card-date {font-size:17px;}
+  .event-section .event-card-time {font-size:15px;}
+  .event-section .event-map-link {padding-inline:13px;font-size:10px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .event-section .event-flower,.event-section .event-source-butterfly {animation:none!important;}
+  .event-section[data-reveal-ready="true"] .event-reveal,
+  .event-section .event-reveal {
+    opacity:1!important;transform:none!important;transition:none!important;
+  }
+}
+
+
+/* -----------------------------------------------------------------------
+   2026-11-03 measured reference-fidelity correction, at 390 x 844:
+   cgv-events: height=1580.9; inner padding=120px 26px;
+   one shared arch x=26 width=338, y=120, height=1163.6;
+   event rows x=32 width=326, y=120 and 666.5; 30px inter-row;
+   row padding=104px 30px 58px; heading=42px / 69.3px;
+   paper.webp (1080x1920) visually y=-190, element height=1960.
+   All coordinates are relative to Section 4 (not document Y).
+   Source screenshot/layout may differ under other skin/browser states.
+   ----------------------------------------------------------------------- */
+.event-section .event-body {
+  display:block;
+  max-width:390px;
+  min-height:1581px;
+  margin:0 auto;
+  padding:120px 26px 56px;
+}
+.event-section .event-prototype-label {
+  position:absolute;
+  top:48px;left:20px;right:20px;
+  width:auto;margin:0;
+  text-align:center;
+  font-size:9px;
+}
+.event-section .event-shared-arch {
+  position:relative;
+  width:100%;
+  min-height:1164px;
+  margin:0 auto;
+  padding:0 6px;
+  isolation:isolate;
+}
+.event-section .event-shared-arch::before {
   content:"";
-  position:absolute;z-index:1;pointer-events:none;
-  top:0;left:0;right:0;
-  height:clamp(80px,16dvh,155px);
-  background:linear-gradient(to bottom,
-    #e2d7e8 0%,
-    rgba(226,215,232,.72) 30%,
-    rgba(226,215,232,0) 100%);
+  position:absolute;z-index:-1;
+  inset:0;
+  pointer-events:none;
+  border:1px solid rgba(185,150,101,.69);
+  border-radius:46% 46% 8px 8px / 10% 10% 8px 8px;
+  box-shadow:0 0 0 5px rgba(253,245,236,.34),
+    inset 0 0 0 7px rgba(255,253,248,.32);
+  background:linear-gradient(180deg,
+    rgba(255,251,243,.62),rgba(254,249,241,.57),rgba(248,238,243,.50));
 }
-.event-section::before {content:"";position:absolute;z-index:0;inset:0;opacity:.38;pointer-events:none;
-  background-image:radial-gradient(#fff 1px,transparent 1.5px);background-size:43px 48px;}
-.event-section .event-inner {position:relative;z-index:2;max-width:390px;margin:0 auto;}
-.event-section .event-ambient {pointer-events:none;position:absolute;inset:0;overflow:hidden;z-index:0;}
-.event-section .event-arc {position:absolute;width:460px;height:260px;top:-178px;left:50%;
-  border:1px solid rgba(176,146,109,.4);border-radius:50%;transform:translateX(-50%);}
-.event-section .event-arc-two {width:420px;height:238px;top:-163px;border-color:rgba(184,157,112,.27);}
-.event-section .event-glow {position:absolute;width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,252,226,.65),transparent 65%);filter:blur(12px);
-  animation:event-light-breathe 12s ease-in-out infinite alternate;}
-.event-section .event-glow-one{left:-160px;top:35%;}
-.event-section .event-glow-two{right:-175px;bottom:1%;animation-delay:-6s;}
-.event-section .event-branch {position:absolute;width:110px;height:235px;top:16%;left:-61px;opacity:.58;
-  transform-origin:50% 0;animation:event-leaf-sway 8s ease-in-out infinite alternate;}
-.event-section .event-branch-right{left:auto;right:-61px;top:52%;rotate:180deg;animation-delay:-4s;}
-.event-section .event-branch::before{content:"";position:absolute;left:61px;top:0;width:2px;height:210px;
-  border-radius:100%;background:linear-gradient(#bda58a,#a08b8d,transparent);transform:rotate(19deg);}
-.event-section .event-branch i{display:block;position:absolute;width:23px;height:49px;
-  border-radius:100% 0 100% 0;background:linear-gradient(130deg,#aca093a1,#a7a7a64d);}
-.event-section .event-branch i:nth-child(1){top:18px;left:62px;rotate:-57deg;}
-.event-section .event-branch i:nth-child(2){top:67px;left:43px;rotate:120deg;}
-.event-section .event-branch i:nth-child(3){top:118px;left:87px;rotate:-56deg;}
-.event-section .event-branch i:nth-child(4){top:169px;left:52px;rotate:120deg;}
-.event-section .event-eyebrow{font:500 10px/1.5 'Cinzel',Georgia,serif;letter-spacing:.25em;
-  color:#9f826a;text-transform:uppercase;margin:0 auto 18px;}
-.event-section .event-ornament{display:flex;align-items:center;justify-content:center;gap:13px;
-  color:#ad916f;font-size:23px;margin:0 0 18px;}
-.event-section .event-ornament span{display:block;height:1px;width:55px;
-  background:linear-gradient(90deg,transparent,#bca581,transparent);}
-.event-section h2.event-title{margin:0 auto 10px;font:400 clamp(48px,14vw,69px)/1.1 'Pinyon Script',cursive;
-  color:#896980;letter-spacing:0;text-shadow:0 3px 16px #fff9f4cc;}
-.event-section .event-subtitle{font:400 clamp(16px,4.3vw,20px)/1.45 'EB Garamond',Georgia,serif;
-  margin:0 auto 40px;color:#796779;}
-.event-section .event-date-card{display:block;width:min(100%,300px);margin:0 auto 15px;
-  position:relative;padding:24px 16px 22px;border:1px solid #c2aa8b;
-  border-radius:158px 158px 10px 10px / 98px 98px 10px 10px;
-  background:linear-gradient(160deg,#fffdf8f0,#f9f1ece8);
-  box-shadow:0 14px 30px #70586b24,inset 0 0 20px #ffffffc4;}
-.event-section .event-date-card::before{content:"";position:absolute;inset:7px;
-  border:1px solid #cbb79c99;border-radius:153px 153px 7px 7px / 93px 93px 7px 7px;
-  pointer-events:none;}
-.event-section .event-date-month,.event-section .event-date-weekday{
-  display:block;font:500 12px/1.2 'Cinzel',Georgia,serif;
-  letter-spacing:.26em;color:#9c7c66;}
-.event-section .event-date-month{padding-top:25px;}
-.event-section .event-date-center{display:flex;flex-direction:column;align-items:center;gap:0;margin:9px 0 16px;}
-.event-section .event-date-day{font:400 110px/.9 'EB Garamond',Georgia,serif;color:#82657b;}
-.event-section .event-date-year{font:500 17px/1.2 'Cinzel',Georgia,serif;letter-spacing:.33em;
-  padding-left:.33em;color:#ad907a;}
-.event-section .event-date-weekday{font-size:10px;padding-bottom:8px;}
-.event-section .event-demo-note{max-width:290px;margin:0 auto 35px;
-  font:400 12px/1.5 system-ui,sans-serif;color:#886f7b;letter-spacing:.02em;}
-.event-section .event-info-panel{margin:0 auto;padding:35px 22px 28px;
-  max-width:348px;border:1px solid #d1bba7b0;border-radius:14px;
-  background:linear-gradient(160deg,#fffcf7e8,#f7edede8);
-  box-shadow:0 10px 38px #6b466b17;}
-.event-section .event-detail{display:grid;grid-template-columns:38px minmax(0,1fr);gap:8px;
-  text-align:left;align-items:start;}
-.event-section .event-detail-icon{font:28px/1 Georgia,serif;color:#ad9175;padding-top:0;}
-.event-section .event-detail h3{margin:0 0 9px;font:500 12px/1.2 'Cinzel',Georgia,serif;
-  text-transform:uppercase;letter-spacing:.08em;color:#927a6b;}
-.event-section .event-detail p{margin:0;font:400 19px/1.5 'EB Garamond',Georgia,serif;
-  color:#615366;overflow-wrap:anywhere;}
-.event-section .event-detail p.event-address{margin-top:3px;font-size:16px;color:#806d7d;}
-.event-section .event-detail-divider{height:1px;margin:28px 0;
-  background:linear-gradient(90deg,transparent,#c4aa97,transparent);}
-.event-section .event-directions{display:flex;align-items:center;justify-content:center;gap:10px;
-  min-height:46px;padding:11px 17px;margin:29px 0 0;
-  background:#786078;color:#fff9f3;border-radius:24px;
-  text-decoration:none;font:500 12px/1.3 'Cinzel',Georgia,serif;
-  letter-spacing:.07em;box-shadow:0 6px 17px #6a456d37;}
-.event-section .event-directions[hidden],
-.event-section .event-address[hidden],
-.event-section .event-directions-note[hidden]{display:none!important;}
-.event-section .event-directions:focus-visible{outline:3px solid #7c5d86;outline-offset:4px;}
-.event-section .event-directions-note{font:400 13px/1.55 system-ui,sans-serif;
-  color:#836e79;margin:27px auto 0;max-width:245px;}
-.event-section .event-farewell{font:400 18px/1.6 'EB Garamond',Georgia,serif;
-  color:#7c677b;max-width:28ch;margin:44px auto 18px;}
-.event-section .event-closing-mark{font-size:29px;color:#b39b7b;}
-/* Progressive enhancement: normally readable if script is absent. */
-.event-section[data-reveal-ready="true"] .event-reveal{opacity:0;transform:translateY(17px);
-  transition:opacity .8s ease,transform .8s cubic-bezier(.22,.68,.22,1);
-  transition-delay:var(--event-delay,0ms);}
-.event-section[data-reveal-ready="true"].is-visible .event-reveal{opacity:1;transform:none;}
-.event-section .event-reveal:nth-child(1){--event-delay:0ms;}
-.event-section .event-reveal:nth-child(2){--event-delay:75ms;}
-.event-section .event-reveal:nth-child(3){--event-delay:150ms;}
-.event-section .event-reveal:nth-child(4){--event-delay:220ms;}
-.event-section .event-reveal:nth-child(5){--event-delay:290ms;}
-.event-section .event-reveal:nth-child(6){--event-delay:350ms;}
-.event-section .event-reveal:nth-child(7){--event-delay:410ms;}
-.event-section .event-reveal:nth-child(8){--event-delay:470ms;}
-@keyframes event-leaf-sway{from{transform:rotate(-3deg)}to{transform:rotate(4deg)}}
-@keyframes event-light-breathe{from{transform:translateY(12px);opacity:.45}to{transform:translateY(-14px);opacity:.95}}
-@media(max-width:350px){
-  .event-section{padding-inline:12px;}
-  .event-section .event-info-panel{padding-inline:15px;}
-  .event-section .event-date-day{font-size:94px;}
+.event-section[data-art="reference"] .event-shared-arch::before {
+  border:solid transparent;
+  border-width:200px 28px 26px;
+  border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_panel.svg");
+  border-image-slice:200 28 26 fill;
+  border-image-width:200px 28px 26px;
+  border-image-repeat:stretch;
+  background:none;
+  box-shadow:none;
+  border-radius:0;
 }
+.event-section .event-reference-card {
+  display:block;
+  width:100%;
+  min-height:0;
+  padding:104px 30px 53px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+  text-align:center;
+  isolation:auto;
+}
+.event-section .event-reference-card::before,
+.event-section .event-reference-card::after {display:none;}
+.event-section .event-reference-card.event-card-nikah {
+  min-height:516.5px;
+  margin-bottom:30px;
+}
+.event-section .event-reference-card.event-card-reception {
+  min-height:617.1px;
+  margin-bottom:0;
+}
+.event-section .event-card-ornament {display:none;}
+.event-section .event-card-title {
+  width:100%;
+  max-width:none;
+  margin:0 0 12px;
+  color:#5c264f;
+  font:400 42px/69.3px 'Pinyon Script',cursive;
+  overflow-wrap:normal;
+  text-shadow:none;
+}
+.event-section .event-card-date {
+  margin:0 0 4px;
+  color:#4a2a45;
+  font:600 22px/36.3px 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-time {
+  margin:0 0 21px;
+  color:#6f5a6c;
+  font:300 14px/23.1px 'EB Garamond',Georgia,serif;
+  letter-spacing:0;
+}
+.event-section .event-card-diamond {
+  margin:0 auto 13px;
+  font:22px/1.4 Georgia,serif;
+  color:#986e8a;
+}
+.event-section .event-card-place {
+  max-width:100%;
+  margin:0 auto 10px;
+  color:#4a2a45;
+  font:400 19px/31.35px 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-address {
+  max-width:100%;
+  margin:0 auto 11px;
+  color:#715368;
+  font:400 15px/24.75px 'EB Garamond',Georgia,serif;
+}
+.event-section .event-card-links {gap:10px;}
+.event-section .event-map-link {
+  min-height:48px;
+  min-width:156px;
+  border:0;
+  padding:11px 24px;
+  background:#fff;
+  color:#5c264f;
+  border-radius:999px;
+  box-shadow:0 5px 15px rgba(55,39,58,.09);
+  font:500 11px/18.15px 'EB Garamond',Georgia,serif;
+  letter-spacing:0;
+}
+.event-section .event-calendar-link {
+  min-width:225px;
+  min-height:48px;
+  border:0;
+  border-radius:999px;
+  background:#7b3d6e;
+  font:500 12px/19.8px 'EB Garamond',Georgia,serif;
+  padding:14px 32px;
+}
+.event-section .event-countdown {
+  width:100%;
+  max-width:338px;
+  margin:32px auto 0;
+  padding:0;
+  text-align:center;
+}
+.event-section .event-countdown-grid {
+  margin-bottom:20px;
+}
+.event-section[data-art="reference"] .event-stage {
+  top:0;
+  height:100%;
+  min-height:100%;
+  transform:none;
+}
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  top:-190px;
+  left:0;
+  width:100%;
+  height:calc(100% + 380px);
+  object-fit:cover;
+  object-position:50% 50%;
+}
+@media(max-width:350px) {
+  .event-section .event-body {padding:120px 20px 88px;}
+  .event-section .event-shared-arch {padding:0 5px;}
+  .event-section .event-reference-card {padding:104px 17px 53px;}
+  .event-section .event-card-title {font-size:40px;line-height:66px;}
+  .event-section .event-card-date {font-size:20px;}
+  .event-section .event-card-time {font-size:13px;}
+  .event-section .event-card-place {font-size:18px;}
+  .event-section .event-map-link {font-size:11px;padding:11px 18px;}
+}
+
+/* The measured reference Events page has a tall paper illustration but no
+   free-standing butterfly IMG in the Events viewport. Avoid inventing one. */
+.event-section[data-art="reference"] .event-source-butterfly {display:none!important;}
+
+/* The second source event places Maps and Waze on ONE line.
+   Keep Maps 156px wide, but let Waze stay compact inside the 266px column;
+   two 156px buttons wrapped, adding exactly ~58px of unwanted height. */
+.event-section .event-waze-link {min-width:80px;padding-inline:12px;}
+
+
+/* Verified against live #cgv-events DOM and computed CSS on 390x844.
+   The long .cgv-arch is a CONTENT POSITIONER. Each .cgv-ev owns its own
+   arch_event.svg border and a fine inset gold outline; arch_panel.svg
+   on the shared wrapper was the wrong image and is intentionally removed.
+   This vendor artwork is live-loaded only in the private comparison mode. */
+.event-section[data-art="reference"] {
+  background:transparent;
+  color:#4a2a45;
+}
+.event-section[data-art="reference"]::before,
+.event-section[data-art="reference"]::after {display:none;}
+.event-section[data-art="reference"] .event-stage-paint {background:#e9e4db;}
+.event-section[data-art="reference"] .event-stage-paint::after {display:none;}
+.event-section[data-art="reference"] .event-stage::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:#faf7fb;
+  opacity:.22;
+}
+.event-section[data-art="reference"] .event-source-paper {
+  transform:translate3d(0,var(--event-paper-shift,0px),0);
+  will-change:transform;
+}
+.event-section[data-art="reference"] .event-body {
+  isolation:isolate;
+}
+.event-section[data-art="reference"] .event-body::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(90% 80% at 50% 47%,
+    rgba(250,250,250,.88) 0%,
+    rgba(250,250,250,.76) 46%,
+    rgba(250,250,250,.42) 70%,
+    rgba(249,249,250,0) 90%);
+}
+.event-section[data-art="reference"] .event-shared-arch::before {
+  display:none;
+}
+.event-section[data-art="reference"] .event-reference-card {
+  position:relative;
+  isolation:isolate;
+  z-index:0;
+}
+.event-section[data-art="reference"] .event-reference-card::before {
+  content:"";
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:transparent;
+  border:solid transparent;
+  border-width:200px 28px 26px;
+  border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg");
+  border-image-slice:200 28 26 fill;
+  border-image-width:200px 28px 26px;
+  border-image-repeat:stretch;
+  border-radius:0;
+  opacity:1;
+}
+.event-section[data-art="reference"] .event-reference-card::after {
+  content:"";
+  display:block;
+  position:absolute;
+  inset:12px 6px;
+  z-index:-1;
+  width:auto;
+  height:auto;
+  pointer-events:none;
+  transform:none;
+  background:transparent;
+  border:1px solid rgba(180,154,106,.75);
+  border-radius:999px 999px 4px 4px;
+  opacity:.5;
+}
+.event-section[data-art="reference"] .event-prototype-label {
+  display:none;
+}
+.event-section[data-art="reference"] .event-demo-note {
+  display:none;
+}
+.event-section[data-art="reference"] .event-body {
+  min-height:1581px;
+}
+/* Match the reference's individual cgv-rv entrances: each line responds
+   independently to the viewport, rather than fading a complete card. */
+.event-section[data-reveal-ready="true"] .event-reveal {
+  transition:opacity 1s ease,transform 1.1s cubic-bezier(.22,.9,.24,1);
+}
+.event-section .event-reference-card .event-reveal {
+  max-width:100%;
+}
+.event-section .event-reference-card .event-reveal:nth-child(2) {transition-delay:0ms;}
+.event-section .event-reference-card .event-reveal:nth-child(3) {transition-delay:65ms;}
+.event-section .event-reference-card .event-reveal:nth-child(4) {transition-delay:110ms;}
+.event-section .event-reference-card .event-reveal:nth-child(5) {transition-delay:155ms;}
+.event-section .event-reference-card .event-reveal:nth-child(6) {transition-delay:200ms;}
+.event-section .event-reference-card .event-reveal:nth-child(7) {transition-delay:245ms;}
+.event-section .event-reference-card .event-reveal:nth-child(8) {transition-delay:290ms;}
 @media(prefers-reduced-motion:reduce){
-  .event-section .event-glow,.event-section .event-branch{animation:none!important;}
-  .event-section[data-reveal-ready="true"] .event-reveal{opacity:1!important;transform:none!important;transition:none!important;}
+  .event-section[data-art="reference"] .event-source-paper {
+    transform:none!important;
+    will-change:auto;
+  }
+}
+
+
+/* The inspected reference has no four-unit countdown grid between its two
+   ceremonies and the Add to Calendar button. Keep our functional example
+   countdown in original mode, but omit it from fidelity comparison mode. */
+.event-section[data-art="reference"] .event-countdown {
+  margin:129px auto 0;
+  padding:0;
+}
+.event-section[data-art="reference"] .event-countdown-grid {
+  display:none;
+}
+
+
+/* Screenshot-guided fixes: source paper is fitted to the 390x1960 image
+   rectangle without center-cropping, preserving both edge botanicals.
+   The visible source ALSO includes four plum countdown blocks (dynamic
+   content was absent from the text-only audit; verified by screenshots). */
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  object-fit:fill;
+  object-position:center;
+}
+.event-section[data-art="reference"] .event-card-time {
+  letter-spacing:.20em;
+}
+.event-section[data-art="reference"] .event-card-place {
+  font-weight:600;
+}
+.event-section[data-art="reference"] .event-map-link,
+.event-section[data-art="reference"] .event-calendar-link {
+  text-transform:uppercase;
+  letter-spacing:.20em;
+}
+.event-section[data-art="reference"] .event-card-diamond {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:15px;
+  width:180px;
+  max-width:100%;
+}
+.event-section[data-art="reference"] .event-card-diamond::before,
+.event-section[data-art="reference"] .event-card-diamond::after {
+  content:"";
+  display:block;
+  flex:1;
+  height:1px;
+  background:#8c7183;
+  opacity:.6;
+}
+.event-section[data-art="reference"] .event-countdown {
+  margin:32px auto 0;
+}
+.event-section[data-art="reference"] .event-countdown-grid {
+  display:grid;
+  width:310px;
+  max-width:100%;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin:0 auto 20px;
+}
+.event-section[data-art="reference"] .event-countdown-grid span {
+  height:75px;
+  min-height:75px;
+  border:0;
+  border-radius:11px;
+  background:#612852;
+  padding:10px 3px 8px;
+  box-shadow:0 5px 15px rgba(69,28,61,.11);
+}
+.event-section[data-art="reference"] .event-countdown-grid strong {
+  font:600 30px/1 'EB Garamond',Georgia,serif;
+  color:#fff;
+  letter-spacing:0;
+}
+.event-section[data-art="reference"] .event-countdown-grid small {
+  font:500 10px/1.45 'EB Garamond',Georgia,serif;
+  letter-spacing:.18em;
+  color:#fff;
+}
+
+
+/* Independently drifting petal silhouettes use CSS only; their visual
+   density and pastel hues match observed source behavior approximately.
+   Reference vendor WebPs remain hotlinked only in comparison mode. */
+.event-section .event-petal-field {display:none;pointer-events:none;}
+.event-section[data-art="reference"] .event-petal-field {
+  display:block;position:absolute;inset:0;z-index:3;overflow:hidden;
+}
+.event-section .event-petal-field i {
+  position:absolute;
+  left:var(--px,8%);
+  top:var(--py,10%);
+  width:var(--pw,8px);
+  height:var(--ph,13px);
+  border-radius:75% 18% 72% 18%;
+  transform:rotate(-32deg);
+  background:#b590bf;
+  opacity:.35;
+  animation:event-petal-drift var(--duration,9s) ease-in-out infinite alternate;
+  animation-delay:var(--delay,0s);
+}
+.event-section .event-petal-field i:nth-child(3n+1){background:#a46ca1;}
+.event-section .event-petal-field i:nth-child(4n+2){background:#d1bee3;}
+.event-section .event-petal-field i:nth-child(5n+3){background:#fefcf9;}
+.event-section .event-petal-field i:nth-child(1){--px:6%;--py:13%;--duration:7s;--delay:-2s;}
+.event-section .event-petal-field i:nth-child(2){--px:14%;--py:20%;--pw:6px;--ph:9px;--delay:-6s;}
+.event-section .event-petal-field i:nth-child(3){--px:25%;--py:27%;--delay:-3s;}
+.event-section .event-petal-field i:nth-child(4){--px:56%;--py:16%;--delay:-9s;}
+.event-section .event-petal-field i:nth-child(5){--px:74%;--py:9%;--duration:8s;--delay:-7s;}
+.event-section .event-petal-field i:nth-child(6){--px:8%;--py:40%;--duration:11s;--delay:-2s;}
+.event-section .event-petal-field i:nth-child(7){--px:32%;--py:33%;--pw:6px;--ph:11px;--delay:-4s;}
+.event-section .event-petal-field i:nth-child(8){--px:67%;--py:37%;--delay:-8s;}
+.event-section .event-petal-field i:nth-child(9){--px:3%;--py:54%;--duration:8s;--delay:-2s;}
+.event-section .event-petal-field i:nth-child(10){--px:22%;--py:61%;--delay:-5s;}
+.event-section .event-petal-field i:nth-child(11){--px:58%;--py:50%;--duration:12s;--delay:-7s;}
+.event-section .event-petal-field i:nth-child(12){--px:80%;--py:66%;--delay:-4s;}
+.event-section .event-petal-field i:nth-child(13){--px:7%;--py:76%;--pw:7px;--ph:12px;--delay:-6s;}
+.event-section .event-petal-field i:nth-child(14){--px:40%;--py:70%;--delay:-3s;}
+.event-section .event-petal-field i:nth-child(15){--px:73%;--py:86%;--duration:10s;--delay:-8s;}
+.event-section .event-petal-field i:nth-child(16){--px:11%;--py:93%;--delay:-5s;}
+@keyframes event-petal-drift {
+  from {transform:translate3d(-6px,5px,0) rotate(-35deg);opacity:.17;}
+  to {transform:translate3d(17px,26px,0) rotate(140deg);opacity:.58;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .event-section .event-petal-field i{animation:none;}
+}
+
+
+/* Final computed-style verification: source event paper object-fit is
+   COVER (not fill), and the inner fine gold frame is inset by exactly
+   7px on all four sides. These overrides replace the earlier visual
+   hypothesis with browser-read source values. */
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  object-fit:cover;
+}
+.event-section[data-art="reference"] .event-reference-card::after {
+  inset:7px;
 }
