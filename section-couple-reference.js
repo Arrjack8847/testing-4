@@ -1,16 +1,13 @@
 'use strict';
 /**
- * Optional reference-art visual comparison only (?coupleReference=1).
+ * Section 3 reference-art prototype is the default on every URL, including /.
+ * The old ?coupleReference=1 switch is no longer needed or evaluated.
  *
- * This mirrors the existing Section 1 approach by loading source artwork
- * from the reference provider, but ONLY on explicit opt-in, without saving
- * third-party artwork, altering the default original-art template, or
- * redistributing another site's example portrait photographs.
- *
- * The URL flag is for private development comparison, not commercial use.
+ * Source artwork is requested from the provider for private development
+ * comparison. These externally hosted images are not distributed here and
+ * must not be used commercially without the appropriate permission.
  */
 (() => {
-  if (new URLSearchParams(window.location.search).get('coupleReference') !== '1') return;
   const section = document.getElementById('couple');
   if (!section) return;
 
@@ -39,7 +36,7 @@
   section.dataset.art = 'reference';
   // Report whether the three known WebPs actually loaded, rather than
   // confusing CSS/HTML URLs with successful network image responses.
-  // This diagnostic exists only in the opt-in prototype and never downloads
+  // This diagnostic runs on the default prototype and never downloads
   // third-party files into the repository.
   const webpStatus = {scene:'loading',groom:'loading',bride:'loading'};
   const syncWebpStatus = () => {
@@ -65,11 +62,14 @@
       syncWebpStatus();
     });
     img.addEventListener('error', () => {
-      // Network / hotlink restrictions do not leave a broken-image box.
+      // If the provider blocks a photo, show only the neutral transparent
+      // placeholder: never substitute the retired illustrated portraits.
       if (img.getAttribute('src') !== fallback) {
         webpStatus[item.key] = 'fallback';
         syncWebpStatus();
         img.src = fallback;
+        img.alt = 'Reference portrait unavailable in this preview';
+        img.dataset.referencePhotoFallback = 'true';
         section.dataset.referencePhotoFallback = 'true';
       } else {
         webpStatus[item.key] = 'failed';
