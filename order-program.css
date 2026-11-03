@@ -1,0 +1,317 @@
+/* Section 5: source-ordered Tasik Kayangan Order of the Day.
+   Development comparison. Original art by default; reference WebPs opt-in only. */
+.order-section {
+  box-sizing:border-box;position:relative;z-index:2;isolation:isolate;overflow:hidden;
+  width:100%;min-height:651px;margin:0;
+  color:#70576f;text-align:center;
+  background:
+    radial-gradient(ellipse at 50% 36%,rgba(255,249,239,.76),transparent 61%),
+    linear-gradient(180deg,#e1d3e2 0%,#f3e7ea 23%,#fbf2ee 53%,#e1d2e2 100%);
+}
+.order-section *, .order-section *::before, .order-section *::after {box-sizing:border-box;}
+.order-section::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.24;
+  background:radial-gradient(ellipse at 0 22%,#bbabc6,transparent 47%),
+    radial-gradient(ellipse at 100% 74%,#b29db6,transparent 47%);
+}
+.order-section::after {
+  content:"";position:absolute;left:0;right:0;top:0;height:116px;z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom,#e1d3e2,rgba(225,211,226,0));
+}
+.order-section .order-stage{
+  position:absolute;inset:0 0 auto;z-index:0;height:100vh;height:100dvh;min-height:480px;
+  overflow:hidden;pointer-events:none;transform:translate3d(0,var(--order-stage-y,0px),0);
+  will-change:transform;
+}
+.order-section .order-stage-original {
+  position:absolute;inset:0;opacity:.63;
+  background:
+    linear-gradient(180deg,rgba(240,225,233,.34),rgba(255,251,245,.30),rgba(232,214,229,.49)),
+    url("./assets/couple-botanical-edges-original.svg") center center / 100% 100% no-repeat;
+}
+.order-section .order-stage-original::after{
+  content:"";position:absolute;inset:-13px 0;opacity:.33;
+  background:url("./assets/couple-garden-original.svg") center center / 100% auto no-repeat;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,black 22%,black 78%,transparent);
+  mask-image:linear-gradient(to bottom,transparent,black 22%,black 78%,transparent);
+}
+.order-section .order-art-image,.order-section .order-butterfly {display:none}
+.order-section[data-art="reference"] .order-stage-original {opacity:.12}
+.order-section[data-art="reference"][data-band-status="loaded"] .order-art-image {
+  display:block;position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:50% 50%;
+}
+.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-butterfly{
+  display:block;position:absolute;top:12%;right:7%;width:43px;height:43px;
+  object-fit:contain;opacity:.75;
+  animation:order-butterfly-hover 8s ease-in-out infinite alternate;
+}
+.order-section .order-leaf{
+  position:absolute;z-index:1;top:4%;left:-47px;color:#a589a4;opacity:.14;
+  font:150px/1 Georgia,serif;transform-origin:40% 75%;
+  animation:order-ambient-sway 11s ease-in-out infinite alternate;
+}
+.order-section .order-leaf-right{top:59%;left:auto;right:-45px;transform:rotate(180deg);animation-delay:-5.5s}
+.order-section[data-art="reference"] .order-leaf{display:none}
+.order-section .order-inner{
+  position:relative;z-index:2;max-width:390px;width:100%;min-height:651px;
+  padding:35px clamp(17px,5vw,26px) 34px;margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;
+}
+.order-section .order-eyebrow{
+  color:#937489;font:500 10px/1.4 'Cinzel',Georgia,serif;
+  letter-spacing:.16em;text-transform:none;margin:0 0 4px;
+}
+.order-section h2.order-heading{
+  color:#805b79;font:400 clamp(44px,12.8vw,57px)/1.04 'Pinyon Script','Alex Brush',cursive;
+  text-shadow:0 2px 10px rgba(255,252,249,.85);letter-spacing:0;
+  margin:0 0 14px;white-space:normal;
+}
+.order-section .order-timeline{
+  position:relative;list-style:none;width:100%;max-width:342px;
+  margin:0 auto;padding:0 0 0 4px;text-align:left;
+}
+.order-section .order-timeline::before{
+  content:"";position:absolute;top:18px;bottom:35px;left:83px;width:1px;
+  background:linear-gradient(180deg,#b79779,#ad94ab 45%,#b99c83 100%);
+  pointer-events:none;
+}
+.order-section .order-entry{
+  display:grid;grid-template-columns:75px minmax(0,1fr);
+  gap:17px;min-height:73px;position:relative;padding:0;
+}
+.order-section .order-entry::before{
+  content:"";position:absolute;top:11px;left:76px;width:12px;height:12px;
+  border-radius:50%;border:2px solid #fdf6ea;background:#b99982;
+  box-shadow:0 0 0 1px #baa49e90;z-index:2;
+}
+.order-section .order-time{
+  display:block;align-self:start;min-width:0;padding-top:9px;
+  color:#997887;font:500 10px/1.35 'Cinzel',Georgia,serif;
+  text-transform:lowercase;letter-spacing:.015em;
+}
+.order-section .order-event-text{
+  padding:3px 0 16px 12px;min-width:0;
+}
+.order-section .order-event-text strong{
+  display:block;font:500 20px/1.14 'EB Garamond',Georgia,serif;color:#725770;
+}
+.order-section .order-event-text small{
+  display:block;font:400 14px/1.32 'EB Garamond',Georgia,serif;color:#87758a;margin-top:3px;
+}
+.order-section .order-bottom-mark{
+  margin:0 auto;color:#b59b7c;font:28px/1 Georgia,serif;
+}
+.order-section .order-disclosure{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+.order-section[data-reveal-ready="true"] .order-reveal{
+  opacity:0;transform:translate3d(0,52px,0) scale(.955);
+  transition:opacity .86s ease,transform .95s cubic-bezier(.2,.7,.17,1);
+}
+.order-section[data-reveal-ready="true"] .order-reveal.order-in-view{
+  opacity:1;transform:none;
+}
+@keyframes order-ambient-sway{from{rotate:-3deg;opacity:.11}to{rotate:3deg;opacity:.2}}
+@keyframes order-butterfly-hover{from{transform:translate3d(-7px,-5px,0) rotate(-6deg)}to{transform:translate3d(8px,7px,0) rotate(8deg)}}
+@media(max-width:350px){
+  .order-section .order-inner{padding-top:40px;padding-left:12px;padding-right:12px}
+  .order-section .order-timeline{max-width:306px}
+  .order-section .order-entry{grid-template-columns:68px minmax(0,1fr);gap:13px;min-height:77px}
+  .order-section .order-timeline::before{left:73px}
+  .order-section .order-entry::before{left:66px}
+  .order-section .order-event-text strong{font-size:18px}
+  .order-section .order-event-text small{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .order-section .order-stage{will-change:auto}
+  .order-section .order-leaf,.order-section .order-butterfly{animation:none!important}
+  .order-section[data-reveal-ready="true"] .order-reveal{
+    opacity:1!important;transform:none!important;transition:none!important
+  }
+}
+/* Existing prototype's extra standalone countdown is not a reference section.
+   It stays accessible via ?legacySaveDate=1 for regression/testing only. */
+.save-date-section[hidden]{display:none!important}
+
+
+/* Live source calibration, 390×844 viewport, 3 Nov 2026.
+   Source screenshot: plum embossed-paper band, fine rectangular border.
+   H2 computed 46px Pinyon Script; LI 18px EB Garamond. */
+.order-section {
+  /* Independent plum emboss illustration: no source provider artwork is reused. */
+  background-color:#4b203b;
+  background-image:
+    linear-gradient(rgba(20,8,18,.13),rgba(20,8,18,.13)),
+    url("./assets/order-plum-emboss-original.svg"),
+    linear-gradient(135deg,#51243f 0%,#431e36 52%,#37172b 100%);
+  background-size:auto,100% 100%,auto;
+  background-position:0 0,50% 50%,0 0;
+  background-repeat:no-repeat;
+  color:#f0dce9;
+}
+.order-section::before {
+  z-index:1;opacity:.29;
+  background:
+    repeating-radial-gradient(circle at 15% 18%,rgba(245,200,223,.075) 0 1px,transparent 2px 5px),
+    repeating-linear-gradient(95deg,rgba(255,217,232,.045) 0 1px,transparent 1px 7px);
+}
+.order-section::after {display:none;}
+/* The panel carries its own independent floral relief; do not layer old
+   light-painted scenes or giant floral text on top of deep plum. */
+.order-section .order-stage-original{display:none;}
+.order-section .order-stage-original::after{display:none;}
+.order-section .order-leaf,.order-section .order-leaf-right{display:none;}
+.order-section .order-inner{
+  padding:96px 28px 70px;
+  min-height:651px;
+}
+.order-section .order-inner::before {
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:69px 23px 68px;
+  border:1px solid rgba(229,212,217,.88);
+  box-shadow:0 0 0 1px rgba(255,237,232,.06) inset;
+}
+.order-section .order-eyebrow{
+  width:100%;max-width:334px;
+  color:rgba(255,248,238,.88);font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:.45em;text-transform:uppercase;margin:0 0 12px;
+}
+.order-section h2.order-heading{
+  color:rgb(243,223,240);font-size:46px;line-height:1.15;
+  width:100%;max-width:334px;margin:0 auto 34px;text-shadow:0 2px 7px rgba(23,8,19,.35);
+  white-space:nowrap;
+}
+.order-section .order-timeline{max-width:334px;padding-left:0;}
+.order-section .order-timeline::before{
+  top:12px;bottom:30px;left:91px;
+  background:linear-gradient(to bottom,rgba(238,216,210,.45),rgba(238,216,210,.22));
+}
+.order-section .order-entry{
+  grid-template-columns:74px minmax(0,1fr);
+  gap:34px;min-height:52px;
+}
+.order-section .order-entry:first-child,
+.order-section .order-entry:nth-child(3){min-height:67.125px;}
+.order-section .order-entry::before{
+  top:10px;left:86px;width:9px;height:9px;
+  background:#ead0b1;border:1px solid #f3d3bb;
+  box-shadow:0 0 0 1px rgba(29,12,20,.25);
+}
+.order-section .order-time{
+  padding:2px 0 0;
+  color:rgb(232,211,168);font:400 12px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:.12em;text-transform:none;text-align:right;
+}
+.order-section .order-event-text{padding:0 0 9px;}
+.order-section .order-event-text strong{
+  color:rgb(255,248,239);font-size:17px;line-height:1.35;font-weight:400;
+}
+.order-section .order-event-text small{
+  color:rgba(255,248,238,.74);font-size:12px;line-height:1.6;
+  font-weight:300;margin-top:3px;
+}
+.order-section .order-bottom-mark{display:none;}
+.order-section[data-art="reference"] .order-stage-original{opacity:0;}
+.order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{object-fit:cover;object-position:center;}
+@media(max-width:350px){
+  .order-section .order-inner{padding-inline:20px;}
+  .order-section .order-inner::before{left:13px;right:13px;}
+  .order-section .order-timeline{max-width:100%;}
+  .order-section .order-entry{grid-template-columns:68px minmax(0,1fr);gap:23px;}
+  .order-section .order-timeline::before{left:76px;}
+  .order-section .order-entry::before{left:71px;}
+  .order-section .order-time{padding-left:0;font-size:11px;}
+  .order-section .order-event-text strong{font-size:17px;}
+  .order-section h2.order-heading{font-size:clamp(38px,12vw,46px);}
+}
+
+
+/* Verified source CSS from the live .cgv-timeline element:
+   background-image: linear-gradient(rgba(20,8,18,.12),rgba(20,8,18,.12)), band_plum.webp;
+   background-size: auto, cover; background-position:0 0,50% 50%.
+   Place the locally supplied, permission-cleared image on the 651px section for comparison,
+   not the viewport-height parallax layer (which changed the artwork crop). */
+.order-section[data-art="reference"][data-band-status="loaded"]{
+  background-image:
+    linear-gradient(rgba(20,8,18,.12),rgba(20,8,18,.12)),
+    url("./assets/reference-dev/band_plum.webp");
+  background-size:auto,cover;
+  background-position:0 0,50% 50%;
+  background-repeat:repeat,repeat;
+}
+.order-section[data-art="reference"][data-band-status="loaded"]::before{display:none}
+.order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{display:none}
+
+
+/* Sparse drifting petals observed crossing the plum panel in the live source.
+   Original CSS shapes; never vendor image copies. */
+.order-section .order-petals {
+  position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;
+}
+.order-section .order-petals span {
+  position:absolute;left:var(--px);top:var(--py);
+  width:5px;height:9px;border-radius:75% 5% 65% 9%;
+  background:rgba(242,216,237,.65);
+  box-shadow:0 0 3px rgba(255,236,255,.25);
+  transform:rotate(var(--r));
+  animation:order-petal-drift var(--pt) linear var(--pd) infinite;
+  animation-play-state:paused;
+}
+.order-section.order-visible .order-petals span {animation-play-state:running}
+@keyframes order-petal-drift {
+  0% {translate:-16px -48px;rotate:-12deg;opacity:0}
+  12% {opacity:.72}
+  49% {translate:18px 14px;rotate:72deg;opacity:.57}
+  88% {opacity:.45}
+  100% {translate:-32px 96px;rotate:170deg;opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .order-section .order-petals span {animation:none!important;opacity:.45}
+}
+
+
+/* Measured source butterfly structure: paired 23×35px halves of a 46×35px
+   WebP, with 200% background-size, inner-edge 3D rotation, scale(.82).
+   The JS clock moves it ~44px/s with a small vertical oscillation. */
+.order-section .order-butterfly {display:none!important;} /* hidden image preloader */
+.order-section .order-bf {
+  display:none;position:absolute;top:0;left:0;
+  width:46px;height:35px;z-index:4;
+  pointer-events:none;opacity:1;
+  filter:drop-shadow(0 6px 5px rgba(40,52,40,.20));
+  transform-origin:23px 17.5px;
+  will-change:transform;
+}
+.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-bf {display:block;}
+.order-section .order-bf-wing {
+  position:absolute;top:0;width:23px;height:35px;
+  display:block;pointer-events:none;
+  background-image:url("./assets/reference-dev/bfly_blush.webp");
+  background-size:200% 100%;background-repeat:no-repeat;
+  backface-visibility:visible;
+  will-change:transform;
+}
+.order-section .order-bf-left {
+  left:0;background-position:0% 50%;
+  transform-origin:right center;
+}
+.order-section .order-bf-right {
+  left:23px;background-position:100% 50%;
+  transform-origin:left center;
+}
+
+/* The source renders rose/lilac petals on a fixed 300×viewport canvas.
+   The canvas is transparent and appears only while this section is visible;
+   its JS clock is paused offscreen and when the invitation is closed. */
+.order-section .order-petal-canvas {
+  display:block;position:fixed;top:0;left:0;z-index:4;
+  width:300px;height:100dvh;pointer-events:none;
+  background:transparent;contain:strict;
+}
+.order-section[data-petal-renderer="canvas"] .order-petals {display:none;}
+@media (prefers-reduced-motion:reduce) {
+  .order-section .order-bf {display:none!important;will-change:auto;}
+  .order-section .order-bf-wing {will-change:auto;}
+}

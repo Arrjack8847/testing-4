@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="section-couple.css">
   <link rel="stylesheet" href="section-three.css">
   <link rel="stylesheet" href="section-four.css">
+  <link rel="stylesheet" href="order-program.css">
+  <link rel="stylesheet" href="dress-code.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
   <script src="scene.js?v=20261104-fix1" defer></script>
@@ -22,6 +24,8 @@
   <script src="section-couple-reference.js" defer></script>
   <script src="section-three.js" defer></script>
   <script src="section-four.js" defer></script>
+  <script src="order-program.js" defer></script>
+  <script src="dress-code.js" defer></script>
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
 </head>
@@ -206,8 +210,67 @@
         </div>
       </div>
     </section>
-    <!-- Section 5: original date-only countdown. No unconfirmed ceremony time is implied. -->
-    <section class="save-date-section" id="saveTheDate" data-section="5"
+    <!-- Tasik Kayangan reference Section 5: Order of the Day.
+         Source sequence follows Events. No separate Save the Date scene appears here. -->
+    <section class="order-section" id="runningOrder" data-section="5"
+      aria-labelledby="runningOrderHeading" aria-hidden="true" inert>
+      <div class="order-stage" aria-hidden="true">
+        <div class="order-stage-original"></div>
+        <img class="order-art-image" id="orderSourceBand" alt="">
+        <img class="order-butterfly" id="orderSourceButterfly" alt="">
+        <span class="order-leaf">❧</span><span class="order-leaf order-leaf-right">❧</span>
+        <div class="order-petals" aria-hidden="true">
+          <span style="--px:12%;--py:23%;--pd:-4s;--pt:12s;--r:-25deg"></span>
+          <span style="--px:67%;--py:13%;--pd:-9s;--pt:16s;--r:27deg"></span>
+          <span style="--px:83%;--py:44%;--pd:-2s;--pt:13s;--r:41deg"></span>
+          <span style="--px:34%;--py:70%;--pd:-7s;--pt:17s;--r:16deg"></span>
+          <span style="--px:9%;--py:80%;--pd:-1s;--pt:15s;--r:-51deg"></span>
+          <span style="--px:56%;--py:59%;--pd:-11s;--pt:18s;--r:30deg"></span>
+        </div>
+      </div>
+      <!-- Match the reference's two sprite-wing halves, not a static butterfly image.
+           The split sprite is loaded only from a locally staged WebP. -->
+      <span id="orderButterflyFlight" class="order-bf" aria-hidden="true">
+        <i class="order-bf-wing order-bf-left"></i>
+        <i class="order-bf-wing order-bf-right"></i>
+      </span>
+      <!-- The reference draws drifting petals on a fixed canvas rather than CSS spans. -->
+      <canvas id="orderPetalCanvas" class="order-petal-canvas" aria-hidden="true"></canvas>
+      <div class="order-inner">
+        <p class="order-eyebrow order-reveal">Running order</p>
+        <h2 id="runningOrderHeading" class="order-heading order-reveal">Order of the Day</h2>
+        <ol class="order-timeline" aria-label="Illustrative wedding running order">
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="11:00">11:00 am</time>
+            <div class="order-event-text"><strong>Guests arrive</strong><small>Lunch service opens</small></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="12:00">12:00 pm</time>
+            <div class="order-event-text"><strong>The couple arrive</strong></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="12:30">12:30 pm</time>
+            <div class="order-event-text"><strong>Wedding procession</strong><small>Led by kompang from the main entrance</small></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="13:00">1:00 pm</time>
+            <div class="order-event-text"><strong>Bersanding &amp; photographs</strong></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="14:00">2:00 pm</time>
+            <div class="order-event-text"><strong>Lunch is served</strong></div>
+          </li>
+          <li class="order-entry order-reveal">
+            <time class="order-time" datetime="16:00">4:00 pm</time>
+            <div class="order-event-text"><strong>Celebration ends</strong></div>
+          </li>
+        </ol>
+        <span class="order-bottom-mark" aria-hidden="true">❦</span>
+        <p class="order-disclosure">Reference wedding schedule is an example, not a verified customer schedule.</p>
+      </div>
+    </section>
+    <!-- Legacy date-only countdown; not part of the reference. Accessible only via ?legacySaveDate=1. -->
+    <section class="save-date-section" id="saveTheDate" data-section="legacy-save-date" hidden
              aria-labelledby="saveDateHeading" aria-hidden="true" inert>
       <div class="save-date-atmosphere" aria-hidden="true">
         <span class="save-date-halo save-date-halo-a"></span>
@@ -243,8 +306,54 @@
         <div class="save-date-ending save-date-reveal" aria-hidden="true">✧</div>
       </div>
     </section>
-    <!-- Section 6: original gallery. No photos are invented or embedded. -->
-    <section class="gallery-section" id="gallery" data-section="6"
+    <!-- Tasik Kayangan reference Section 6: Dress Code, following Order of the Day.
+         Original artwork by default; no vendor images stored in this repository. -->
+    <section class="dress-section" id="dressCode" data-section="6"
+      aria-labelledby="dressCodeHeading" aria-hidden="true" inert>
+      <div class="dress-art" aria-hidden="true">
+        <div class="dress-art-original"></div>
+        <img class="dress-source-scene" id="dressSourceScene" alt="">
+        <img class="dress-source-butterfly" id="dressSourceButterfly" alt="">
+        <span class="dress-flora dress-flora-left">❧</span>
+        <span class="dress-flora dress-flora-right">❧</span>
+        <span class="dress-orbit"></span>
+        <span class="dress-butterfly"></span>
+        <span class="dress-butterfly dress-butterfly-small"></span>
+      </div>
+      <div class="dress-inner">
+        <div class="dress-body">
+        <p class="dress-eyebrow dress-reveal">Attire</p>
+        <h2 class="dress-heading dress-reveal" id="dressCodeHeading">Dress Code</h2>
+        <p class="dress-intro dress-reveal">We would be delighted if you could dress along with our chosen palette.</p>
+        <div class="dress-palettes">
+          <article class="dress-palette dress-reveal" aria-label="Groom's Side colour palette">
+            <h3 class="dress-side">Groom's Side</h3>
+            <p class="dress-palette-name">Sage Green &amp; Cream</p>
+            <div class="dress-swatches" role="img" aria-label="Sage, soft sage, cream">
+              <span class="dress-swatch" style="--dress-colour:#8a9a7b"></span>
+              <span class="dress-swatch" style="--dress-colour:#b3c0a4"></span>
+              <span class="dress-swatch" style="--dress-colour:#ede7d9"></span>
+            </div>
+            <p class="dress-colour-label">Sage, soft sage, cream</p>
+          </article>
+          <article class="dress-palette dress-reveal" aria-label="Bride's Side colour palette">
+            <h3 class="dress-side">Bride's Side</h3>
+            <p class="dress-palette-name">Terracotta &amp; Blush</p>
+            <div class="dress-swatches" role="img" aria-label="Terracotta, blush, sand">
+              <span class="dress-swatch" style="--dress-colour:#b4694f"></span>
+              <span class="dress-swatch" style="--dress-colour:#dca79a"></span>
+              <span class="dress-swatch" style="--dress-colour:#efddd1"></span>
+            </div>
+            <p class="dress-colour-label">Terracotta, blush, sand</p>
+          </article>
+        </div>
+        </div>
+        <span class="dress-finish dress-reveal" aria-hidden="true" hidden>❦</span>
+        <p class="dress-disclosure">Demonstration attire palette from the public template, not a confirmed dress code.</p>
+      </div>
+    </section>
+    <!-- Section 7: original gallery. No photos are invented or embedded. -->
+    <section class="gallery-section" id="gallery" data-section="7"
       aria-labelledby="galleryHeading" aria-hidden="true" inert>
       <div class="gallery-atmosphere" aria-hidden="true">
         <span class="gallery-halo"></span>
@@ -285,8 +394,8 @@
         <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
-    <!-- Section 7: original RSVP form preview. Nothing is submitted until a backend is configured. -->
-    <section class="rsvp-section" id="rsvp" data-section="7"
+    <!-- Section 8: original RSVP form preview. Nothing is submitted until a backend is configured. -->
+    <section class="rsvp-section" id="rsvp" data-section="8"
       aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="rsvp-atmosphere" aria-hidden="true">
         <span class="rsvp-flower rsvp-flower-a">❧</span>
