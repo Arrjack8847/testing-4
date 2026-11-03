@@ -1,0 +1,41 @@
+name: Section 9 live-versus-local visual comparison
+on:
+  push:
+    branches:
+      - feat/section9-rsvp-wishes-reference-20261104
+    paths:
+      - tools/compare-section9-visual.mjs
+      - tools/compare-section9-images.py
+      - .github/workflows/section9-visual-compare.yml
+      - section-nine.css
+      - index.html
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Capture and measure three scroll checkpoints
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section9-server.log 2>&1 &
+          node tools/compare-section9-visual.mjs
+      - name: Diff screenshot rasters
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 tools/compare-section9-images.py
+      - name: Upload paired images, differences and geometry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section9-reference-vs-local
+          path: section9-visual-evidence/
+          if-no-files-found: warn
+          retention-days: 7
