@@ -1,0 +1,43 @@
+name: Section 5 exact artwork loader QA
+on:
+  push:
+    branches: [fix/section5-licensed-reference-art-default-20261104]
+  pull_request:
+    paths:
+      - index.html
+      - order-program.js
+      - order-program.css
+      - tests/section5-order-of-day.spec.mjs
+      - tools/section5-exact-art-compare.mjs
+      - .github/workflows/section5-exact-art-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reference-loader-four-phone:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Check JS syntax including the visual parity script
+        run: |
+          npm run test:syntax
+          node --check tools/section5-exact-art-compare.mjs
+      - name: Test source-local artwork states, animation, and Section 4→5→gallery seams
+        run: npx playwright test tests/section5-order-of-day.spec.mjs tests/section-four.spec.mjs tests/section-five.spec.mjs --workers=2
+      - name: Upload mobile screenshots and trace evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-exact-art-loader-four-phone
+          path: |
+            test-results/
+          retention-days: 5
+          if-no-files-found: warn

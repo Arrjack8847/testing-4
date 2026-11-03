@@ -2,6 +2,57 @@
 
 Reference: https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en
 
+## Current exact-art implementation (4 November 2026)
+
+Section 5 at **http://localhost:8000/** now uses only the reference-art
+layout. For an *exact artwork comparison*, these two actual reference files
+must be present locally and their use must be permitted:
+
+- `assets/reference-dev/band_plum.webp` — verified live CSS URL:
+  `https://undangankahwin.com/images/concierge/packs/tasik-kayangan/band_plum.webp`.
+  The live section's background uses a 12%-opacity dark overlay, centered
+  `background-size: cover`, and has ~651.28px height at 390×844.
+- `assets/reference-dev/bfly_blush.webp` — observed reference butterfly
+  split-wing sprite. Source path documented in
+  `download-section5-reference.ps1` under `anggerik-nirmala/`.
+  The live butterfly is approximately 46×35px, with two 23px wings,
+  `background-size: 200% 100%` and 3D hinge flapping.
+
+The artwork files are **not shipped with or downloaded by this public GitHub
+repository**. Only a rights-confirming local PowerShell script may stage them.
+No vendor art is automatically fetched from third-party servers by the
+website.
+
+The unrelated `assets/order-plum-emboss-original.svg` is **not referenced by
+the active Section 5 CSS** anymore. A solid neutral plum canvas appears if the
+background WebP cannot load; an explicit status message identifies missing
+WebPs. It does not silently imitate the reference illustration.
+
+The root URL requests both local WebPs automatically, with no
+`?orderReference=1`. `#runningOrder[data-artwork-status]` reports
+`loading`, `ready`, `partial` or `missing`. Only `ready` means both
+WebPs decoded.
+
+For private visual inspection *after ensuring you have permission*:
+
+```powershell
+cd D:\testing-4
+powershell -ExecutionPolicy Bypass -File .\download-section5-reference.ps1 -IHavePermission
+powershell -ExecutionPolicy Bypass -File .\start.ps1
+# In a second terminal:
+node tools/section5-exact-art-compare.mjs
+```
+
+The comparison script captures live and local **entrance, middle, exit** shots
+at 390×844 and saves geometry and image dimensions to
+`artifacts/section5-exact-compare/report.json`. It refuses to claim visual
+parity if either local WebP is absent. The script does not store source asset
+binaries. Compare the screenshots for crop, panel, text, borders and motion
+before claiming a pixel-perfect match.
+
+All other historical notes below describe earlier iterations; references to
+the original SVG fallback or `?orderReference=1` are **superseded**.
+
 ## Integrated single-URL behavior (4 November 2026)
 
 After integration with the approved Sections 1–4, the six-stop **Order of the Day**

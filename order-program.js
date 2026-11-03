@@ -1,6 +1,7 @@
 'use strict';
 // Tasik Kayangan reference Section 5: Order of the Day.
-// Reference layout is the only default. Permission-cleared local WebPs are optional.
+// Reference-art layout is the only default. Licensed WebPs are loaded locally.
+ // Missing art shows an explicit warning; no illustrated substitute is claimed.
 (() => {
   const invite=document.getElementById('invitation');
   const section=document.getElementById('runningOrder');
@@ -23,24 +24,45 @@
   new MutationObserver(()=>{syncCover();updateAmbient();}).observe(invite,{attributes:true,attributeFilter:['data-state']});
 
   {
-    // The approved reference version is the default at / on every load.
-    // Try locally staged, permission-cleared WebPs automatically, without
-    // requiring a query parameter. The original embossed artwork remains a
-    // safe fallback when source photos are missing. Never hotlink vendor art.
+    // The original WebPs are intentionally NOT committed or hotlinked.
+    // A user who has the necessary rights stages these files locally, and
+    // both are used on the plain root URL without a mode flag.
     section.dataset.art='reference';
     section.dataset.assetSource='local-webp';
+    const notice=document.getElementById('orderArtworkNotice');
     const assetRoot='./assets/reference-dev/';
     const images=[
-      [document.getElementById('orderSourceBand'),'bandStatus',assetRoot+'band_plum.webp'],
-      [document.getElementById('orderSourceButterfly'),'butterflyStatus',assetRoot+'bfly_blush.webp']
+      [document.getElementById('orderSourceBand'),'bandStatus',assetRoot+'band_plum.webp','band_plum.webp'],
+      [document.getElementById('orderSourceButterfly'),'butterflyStatus',assetRoot+'bfly_blush.webp','bfly_blush.webp']
     ];
+    const syncArtworkStatus=()=>{
+      const states=images.map(([img,key])=>img?section.dataset[key]:'failed');
+      const loading=states.includes('loading');
+      const loaded=states.filter(s=>s==='loaded').length;
+      section.dataset.artworkStatus=loading?'loading':loaded===images.length?'ready':loaded===0?'missing':'partial';
+      if (notice) {
+        notice.hidden=loading||loaded===images.length;
+        if(!notice.hidden) {
+          const missing=images.filter(([img,key])=>!img||section.dataset[key]!=='loaded').map(item=>item[3]);
+          notice.textContent='Exact reference artwork unavailable: '+missing.join(', ')+
+            '. Provide permission-cleared WebP files in assets/reference-dev/. No substitute artwork is being shown.';
+        }
+      }
+    };
     for (const [img,key,url] of images) {
+      section.dataset[key]=img?'loading':'failed';
       if (!img) continue;
-      section.dataset[key]='loading';
-      img.addEventListener('load',()=>{section.dataset[key]=img.naturalWidth>0?'loaded':'failed';updateAmbient();},{once:true});
-      img.addEventListener('error',()=>{section.dataset[key]='failed';updateAmbient();},{once:true});
+      img.addEventListener('load',()=>{
+        section.dataset[key]=img.naturalWidth>0?'loaded':'failed';
+        syncArtworkStatus();updateAmbient();
+      },{once:true});
+      img.addEventListener('error',()=>{
+        section.dataset[key]='failed';
+        syncArtworkStatus();updateAmbient();
+      },{once:true});
       img.src=url;
     }
+    syncArtworkStatus();
   }
 
   const reveals=[...section.querySelectorAll('.order-reveal')];

@@ -44,4 +44,4 @@ foreach($asset in $assets) {
   }
 }
 Write-Host 'Section 5 reference WebPs ready locally (never push these files to public GitHub).' -ForegroundColor Green
-Write-Host 'Open: http://localhost:8000/?orderReference=1'
+Write-Host 'Open: http://localhost:8000/'

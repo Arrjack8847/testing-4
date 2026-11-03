@@ -142,12 +142,11 @@
 .order-section {
   /* Independent plum emboss illustration: no source provider artwork is reused. */
   background-color:#4b203b;
-  background-image:
-    linear-gradient(rgba(20,8,18,.13),rgba(20,8,18,.13)),
-    url("./assets/order-plum-emboss-original.svg"),
-    linear-gradient(135deg,#51243f 0%,#431e36 52%,#37172b 100%);
-  background-size:auto,100% 100%,auto;
-  background-position:0 0,50% 50%,0 0;
+  /* No illustrated replacement: show a neutral plum base ONLY until
+     the exact, permission-cleared band_plum.webp decodes locally. */
+  background-image:linear-gradient(#5c264f,#5c264f);
+  background-size:auto;
+  background-position:0 0;
   background-repeat:no-repeat;
   color:#f0dce9;
 }
@@ -315,3 +314,15 @@
   .order-section .order-bf {display:none!important;will-change:auto;}
   .order-section .order-bf-wing {will-change:auto;}
 }
+
+/* This notice is intentionally conspicuous when files are missing: a flat
+   color cannot be mistaken for the reference's embossed floral artwork. */
+.order-section .order-artwork-notice{
+  box-sizing:border-box;position:absolute;z-index:8;
+  bottom:12px;left:12px;right:12px;margin:0;
+  padding:10px 12px;border:1px solid #ffdcbd;
+  border-radius:5px;background:rgba(40,13,29,.95);
+  color:#fff3e5;font:500 12px/1.4 system-ui,sans-serif;
+  text-align:left;pointer-events:none;
+}
+.order-section .order-artwork-notice[hidden]{display:none!important}
