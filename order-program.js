@@ -62,6 +62,7 @@
   const canvas=section.querySelector('#orderPetalCanvas');
   const ctx=canvas?.getContext('2d', {alpha:true}) || null;
   let petalVisible=false;
+  let visiblePixels=false;
   let petalFrame=0;
   let lastFrame=0;
   let elapsed=0;
@@ -171,12 +172,18 @@
     petalFrame=requestAnimationFrame(animateAmbient);
   }
   function canAnimateAmbient(){
-    return petalVisible && invite.dataset.state==='opened'
+    return petalVisible && visiblePixels && invite.dataset.state==='opened'
       && !document.hidden && !reduced.matches;
   }
   function updateAmbient(){
+    // A section touching the viewport boundary is not actually visible.
+    // IntersectionObserver can report isIntersecting=true for zero-area
+    // edge adjacency; the geometry guard prevents leaking animation into
+    // Section 6 at precisely the 5→6 seam.
+    const rect=section.getBoundingClientRect();
+    visiblePixels=rect.bottom>1 && rect.top<innerHeight-1;
     const active=canAnimateAmbient();
-    section.classList.toggle('order-visible',petalVisible && invite.dataset.state==='opened');
+    section.classList.toggle('order-visible',petalVisible && visiblePixels && invite.dataset.state==='opened');
     section.dataset.petalMotion=active?'running':(reduced.matches?'still':'paused');
     section.dataset.butterflyMotion=active?'running':'paused';
     if(active){
@@ -222,6 +229,7 @@
     if (invite.dataset.state!=='opened')return;
     section.style.setProperty('--order-stage-y',(travel+camera).toFixed(2)+'px');
     section.dataset.orderCamera=camera.toFixed(2);
+    updateAmbient();
   }
   function schedule(){if(!frame)frame=requestAnimationFrame(paint)}
   function motionChanged(){
