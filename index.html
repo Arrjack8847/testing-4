@@ -269,7 +269,7 @@
         <p class="order-disclosure">Reference wedding schedule is an example, not a verified customer schedule.</p>
       </div>
     </section>
-    <!-- Legacy date-only countdown; not part of the reference. Accessible only via ?legacySaveDate=1. -->
+    <!-- Legacy date-only countdown, opt-in via ?legacySaveDate=1; source Events has its own live clock. -->
     <section class="save-date-section" id="saveTheDate" data-section="legacy-save-date" hidden
              aria-labelledby="saveDateHeading" aria-hidden="true" inert>
       <div class="save-date-atmosphere" aria-hidden="true">
@@ -313,12 +313,20 @@
       <div class="dress-art" aria-hidden="true">
         <div class="dress-art-original"></div>
         <img class="dress-source-scene" id="dressSourceScene" alt="">
-        <img class="dress-source-butterfly" id="dressSourceButterfly" alt="">
         <span class="dress-flora dress-flora-left">❧</span>
         <span class="dress-flora dress-flora-right">❧</span>
         <span class="dress-orbit"></span>
         <span class="dress-butterfly"></span>
         <span class="dress-butterfly dress-butterfly-small"></span>
+      </div>
+      <!-- Original independent butterfly: two 3D wings driven by Section 6's scroll camera.
+           Kept outside the background layer so its flight does not inherit paper parallax. -->
+      <div class="dress-flight" id="dressFlight" aria-hidden="true">
+        <span class="dress-flight-wing dress-flight-wing-left"></span>
+        <span class="dress-flight-wing dress-flight-wing-right"></span>
+        <span class="dress-flight-thorax"></span>
+        <span class="dress-flight-antenna dress-flight-antenna-left"></span>
+        <span class="dress-flight-antenna dress-flight-antenna-right"></span>
       </div>
       <div class="dress-inner">
         <div class="dress-body">

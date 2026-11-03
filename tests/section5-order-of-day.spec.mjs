@@ -101,10 +101,11 @@ test('reduced-motion preserves legible timeline without animation or camera move
   expect(Math.abs(Number(cam))).toBeLessThan(.01);
 });
 
-test('reference comparison requests only locally staged WebPs and degrades safely if missing',async({page})=>{
+test('root URL uses the reference layout and attempts only permission-cleared local WebPs',async({page})=>{
   const {section}=await toOrder(page);
-  await expect(section).not.toHaveAttribute('data-art','reference');
-  expect(await section.locator('#orderSourceBand').getAttribute('src')).toBeNull();
+  await expect(section).toHaveAttribute('data-art','reference');
+  await expect(section).toHaveAttribute('data-asset-source','local-webp');
+  await expect(section.locator('#orderSourceBand')).toHaveAttribute('src','./assets/reference-dev/band_plum.webp');
   await page.route('**/assets/reference-dev/*.webp',route=>route.fulfill({status:404,body:'Developer image not supplied'}));
   await page.goto('/?orderReference=1');
   await expect(section).toHaveAttribute('data-art','reference');

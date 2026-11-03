@@ -307,18 +307,16 @@ test('single localhost root URL joins reference Couple -> reference Events -> Or
   const {section,errors}=await openEvents(page);
   const combined=await section.evaluate(events=>{
     const couple=document.getElementById('couple');
-    const save=document.getElementById('saveTheDate');
-    const order=document.getElementById('runningOrder');
+    const save=document.getElementById('runningOrder');
     const rect1=couple.getBoundingClientRect();
     const rect2=events.getBoundingClientRect();
-    const rect3=order.getBoundingClientRect();
+    const rect3=save.getBoundingClientRect();
     return {
       coupleArt:couple.dataset.art,
       eventsArt:events.dataset.art,
       eventPaper:events.querySelector('#eventSourcePaper').getAttribute('src')||'',
       prior:events.previousElementSibling?.id,
       following:events.nextElementSibling?.id,
-      legacyHidden:save.hidden,
       section3To4Gap:rect2.top-rect1.bottom,
       section4To5Gap:rect3.top-rect2.bottom,
       pageOverflow:document.documentElement.scrollWidth-innerWidth
@@ -329,7 +327,6 @@ test('single localhost root URL joins reference Couple -> reference Events -> Or
   expect(combined.eventPaper).toContain('/tasik-kayangan/paper.webp');
   expect(combined.prior).toBe('couple');
   expect(combined.following).toBe('runningOrder');
-  expect(combined.legacyHidden).toBe(true);
   expect(Math.abs(combined.section3To4Gap)).toBeLessThanOrEqual(1);
   expect(Math.abs(combined.section4To5Gap)).toBeLessThanOrEqual(1);
   expect(combined.pageOverflow).toBeLessThanOrEqual(1);

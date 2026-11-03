@@ -81,7 +81,7 @@ test('Section 4 respects reduced motion and remains readable',async({page})=>{
 });
 
 
-test('Section 3 to Section 4 keeps a continuous lavender transition',async({page},testInfo)=>{
+test('Reference Events joins the plum Order of the Day without a seam',async({page},testInfo)=>{
   await page.goto('/');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const adjacent=await page.evaluate(()=>{
@@ -99,7 +99,7 @@ test('Section 3 to Section 4 keeps a continuous lavender transition',async({page
   const bounds=await page.evaluate(()=>{
     const prior=document.getElementById('eventDetails').getBoundingClientRect();
     const next=document.getElementById('runningOrder').getBoundingClientRect();
-    const overlay=getComputedStyle(document.getElementById('runningOrder'),'::after');
+    const overlay=getComputedStyle(document.getElementById('runningOrder'));
     return {seam:next.top-prior.bottom,gradient:overlay.backgroundImage,
       pageOverflow:document.documentElement.scrollWidth-innerWidth};
   });

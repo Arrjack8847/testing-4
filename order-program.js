@@ -1,6 +1,6 @@
 'use strict';
 // Tasik Kayangan reference Section 5: Order of the Day.
-// The default illustration is original; source-hosted comparison art is opt-in only.
+// Reference layout is the only default. Permission-cleared local WebPs are optional.
 (() => {
   const invite=document.getElementById('invitation');
   const section=document.getElementById('runningOrder');
@@ -22,9 +22,11 @@
   syncCover();
   new MutationObserver(()=>{syncCover();updateAmbient();}).observe(invite,{attributes:true,attributeFilter:['data-state']});
 
-  if (query.get('orderReference')==='1') {
-    // Development preview only. Reference artwork must be supplied locally by
-    // a user with permission. Never hotlink or silently fetch vendor images.
+  {
+    // The approved reference version is the default at / on every load.
+    // Try locally staged, permission-cleared WebPs automatically, without
+    // requiring a query parameter. The original embossed artwork remains a
+    // safe fallback when source photos are missing. Never hotlink vendor art.
     section.dataset.art='reference';
     section.dataset.assetSource='local-webp';
     const assetRoot='./assets/reference-dev/';
@@ -193,7 +195,6 @@
     if(reduced.matches){
       section.removeAttribute('data-reveal-ready');
       section.style.setProperty('--order-stage-y','0px');
-      section.dataset.orderCamera='0.00';
       if(frame){cancelAnimationFrame(frame);frame=0;}
     }else{
       if(observer)section.dataset.revealReady='true';
