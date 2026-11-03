@@ -134,3 +134,194 @@
 /* Existing prototype's extra standalone countdown is not a reference section.
    It stays accessible via ?legacySaveDate=1 for regression/testing only. */
 .save-date-section[hidden]{display:none!important}
+
+
+/* Live source calibration, 390×844 viewport, 3 Nov 2026.
+   Source screenshot: plum embossed-paper band, fine rectangular border.
+   H2 computed 46px Pinyon Script; LI 18px EB Garamond. */
+.order-section {
+  /* Independent plum emboss illustration: no source provider artwork is reused. */
+  background-color:#4b203b;
+  background-image:
+    linear-gradient(rgba(20,8,18,.13),rgba(20,8,18,.13)),
+    url("./assets/order-plum-emboss-original.svg"),
+    linear-gradient(135deg,#51243f 0%,#431e36 52%,#37172b 100%);
+  background-size:auto,100% 100%,auto;
+  background-position:0 0,50% 50%,0 0;
+  background-repeat:no-repeat;
+  color:#f0dce9;
+}
+.order-section::before {
+  z-index:1;opacity:.29;
+  background:
+    repeating-radial-gradient(circle at 15% 18%,rgba(245,200,223,.075) 0 1px,transparent 2px 5px),
+    repeating-linear-gradient(95deg,rgba(255,217,232,.045) 0 1px,transparent 1px 7px);
+}
+.order-section::after {display:none;}
+/* The panel carries its own independent floral relief; do not layer old
+   light-painted scenes or giant floral text on top of deep plum. */
+.order-section .order-stage-original{display:none;}
+.order-section .order-stage-original::after{display:none;}
+.order-section .order-leaf,.order-section .order-leaf-right{display:none;}
+.order-section .order-inner{
+  padding:96px 28px 70px;
+  min-height:651px;
+}
+.order-section .order-inner::before {
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:69px 23px 68px;
+  border:1px solid rgba(229,212,217,.88);
+  box-shadow:0 0 0 1px rgba(255,237,232,.06) inset;
+}
+.order-section .order-eyebrow{
+  width:100%;max-width:334px;
+  color:rgba(255,248,238,.88);font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:.45em;text-transform:uppercase;margin:0 0 12px;
+}
+.order-section h2.order-heading{
+  color:rgb(243,223,240);font-size:46px;line-height:1.15;
+  width:100%;max-width:334px;margin:0 auto 34px;text-shadow:0 2px 7px rgba(23,8,19,.35);
+  white-space:nowrap;
+}
+.order-section .order-timeline{max-width:334px;padding-left:0;}
+.order-section .order-timeline::before{
+  top:12px;bottom:30px;left:91px;
+  background:linear-gradient(to bottom,rgba(238,216,210,.45),rgba(238,216,210,.22));
+}
+.order-section .order-entry{
+  grid-template-columns:74px minmax(0,1fr);
+  gap:34px;min-height:52px;
+}
+.order-section .order-entry:first-child,
+.order-section .order-entry:nth-child(3){min-height:67.125px;}
+.order-section .order-entry::before{
+  top:10px;left:86px;width:9px;height:9px;
+  background:#ead0b1;border:1px solid #f3d3bb;
+  box-shadow:0 0 0 1px rgba(29,12,20,.25);
+}
+.order-section .order-time{
+  padding:2px 0 0;
+  color:rgb(232,211,168);font:400 12px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:.12em;text-transform:none;text-align:right;
+}
+.order-section .order-event-text{padding:0 0 9px;}
+.order-section .order-event-text strong{
+  color:rgb(255,248,239);font-size:17px;line-height:1.35;font-weight:400;
+}
+.order-section .order-event-text small{
+  color:rgba(255,248,238,.74);font-size:12px;line-height:1.6;
+  font-weight:300;margin-top:3px;
+}
+.order-section .order-bottom-mark{display:none;}
+.order-section[data-art="reference"] .order-stage-original{opacity:0;}
+.order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{object-fit:cover;object-position:center;}
+@media(max-width:350px){
+  .order-section .order-inner{padding-inline:20px;}
+  .order-section .order-inner::before{left:13px;right:13px;}
+  .order-section .order-timeline{max-width:100%;}
+  .order-section .order-entry{grid-template-columns:68px minmax(0,1fr);gap:23px;}
+  .order-section .order-timeline::before{left:76px;}
+  .order-section .order-entry::before{left:71px;}
+  .order-section .order-time{padding-left:0;font-size:11px;}
+  .order-section .order-event-text strong{font-size:17px;}
+  .order-section h2.order-heading{font-size:clamp(38px,12vw,46px);}
+}
+
+
+/* Verified source CSS from the live .cgv-timeline element:
+   background-image: linear-gradient(rgba(20,8,18,.12),rgba(20,8,18,.12)), band_plum.webp;
+   background-size: auto, cover; background-position:0 0,50% 50%.
+   Place the locally supplied, permission-cleared image on the 651px section for comparison,
+   not the viewport-height parallax layer (which changed the artwork crop). */
+.order-section[data-art="reference"][data-band-status="loaded"]{
+  background-image:
+    linear-gradient(rgba(20,8,18,.12),rgba(20,8,18,.12)),
+    url("./assets/reference-dev/band_plum.webp");
+  background-size:auto,cover;
+  background-position:0 0,50% 50%;
+  background-repeat:repeat,repeat;
+}
+.order-section[data-art="reference"][data-band-status="loaded"]::before{display:none}
+.order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{display:none}
+
+
+/* Sparse drifting petals observed crossing the plum panel in the live source.
+   Original CSS shapes; never vendor image copies. */
+.order-section .order-petals {
+  position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;
+}
+.order-section .order-petals span {
+  position:absolute;left:var(--px);top:var(--py);
+  width:5px;height:9px;border-radius:75% 5% 65% 9%;
+  background:rgba(242,216,237,.65);
+  box-shadow:0 0 3px rgba(255,236,255,.25);
+  transform:rotate(var(--r));
+  animation:order-petal-drift var(--pt) linear var(--pd) infinite;
+  animation-play-state:paused;
+}
+.order-section.order-visible .order-petals span {animation-play-state:running}
+@keyframes order-petal-drift {
+  0% {translate:-16px -48px;rotate:-12deg;opacity:0}
+  12% {opacity:.72}
+  49% {translate:18px 14px;rotate:72deg;opacity:.57}
+  88% {opacity:.45}
+  100% {translate:-32px 96px;rotate:170deg;opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .order-section .order-petals span {animation:none!important;opacity:.45}
+}
+
+
+/* Timed reference source: paired 23×35px wings on a 46×35px body,
+   moving in two timed passes: right-to-left at ~39px/s then left-to-right
+   at ~44px/s, with a pause at both edges. */
+.order-section .order-butterfly {display:none!important;} /* local image preloader */
+.order-section .order-bf {
+  display:block;position:absolute;top:0;left:0;
+  width:46px;height:35px;z-index:4;
+  pointer-events:none;opacity:1;
+  filter:drop-shadow(0 6px 5px rgba(40,52,40,.20));
+  transform-origin:23px 17.5px;
+  will-change:transform;
+}
+.order-section .order-bf-wing {
+  position:absolute;top:0;width:23px;height:35px;
+  display:block;pointer-events:none;
+  /* Original gradient butterfly. The comparison-only WebP takes precedence
+     exclusively when a locally supplied image successfully decodes. */
+  background:
+    radial-gradient(ellipse at 64% 21%,rgba(255,240,248,.93) 0 7%,transparent 18%),
+    radial-gradient(ellipse at 60% 37%,#f1d4e5 0%,#ce9dbc 36%,#926182 65%,#58344f 83%);
+  background-size:100% 100%;background-repeat:no-repeat;
+  backface-visibility:visible;
+  will-change:transform;
+}
+.order-section .order-bf-left {
+  left:0;background-position:0% 50%;
+  transform-origin:right center;
+  clip-path:polygon(100% 5%,65% 2%,29% 12%,0 33%,10% 60%,46% 76%,59% 100%,100% 83%);
+}
+.order-section .order-bf-right {
+  left:23px;background-position:100% 50%;
+  transform-origin:left center;
+  clip-path:polygon(0 5%,35% 2%,71% 12%,100% 33%,90% 60%,54% 76%,41% 100%,0 83%);
+}
+.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-bf-wing {
+  background-image:url("./assets/reference-dev/bfly_blush.webp");
+  background-size:200% 100%;
+  clip-path:none;
+}
+
+/* The source renders rose/lilac petals on a fixed 300×viewport canvas.
+   The canvas is transparent and appears only while this section is visible;
+   its JS clock is paused offscreen and when the invitation is closed. */
+.order-section .order-petal-canvas {
+  display:block;position:fixed;top:0;left:0;z-index:4;
+  width:300px;height:100dvh;pointer-events:none;
+  background:transparent;contain:strict;
+}
+.order-section[data-petal-renderer="canvas"] .order-petals {display:none;}
+@media (prefers-reduced-motion:reduce) {
+  .order-section .order-bf {display:none!important;will-change:auto;}
+  .order-section .order-bf-wing {will-change:auto;}
+}

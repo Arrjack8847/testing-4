@@ -1,0 +1,42 @@
+name: Section 5 to 6 integration QA
+on:
+  push:
+    branches: [integration/latest-section5-6-20261104]
+    paths:
+      - index.html
+      - order-program.css
+      - order-program.js
+      - dress-code.css
+      - dress-code.js
+      - tests/section5-order-of-day.spec.mjs
+      - tests/section-six-dress.spec.mjs
+      - tests/section5-to-section6-integration.spec.mjs
+      - .github/workflows/section5-to-section6-integration-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:syntax
+      - name: Test Section 5, Dress Code and their seam across four phones
+        run: npx playwright test tests/section5-order-of-day.spec.mjs tests/section-six-dress.spec.mjs tests/section5-to-section6-integration.spec.mjs --workers=2
+      - name: Save seam screenshots and trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-to-6-integration-qa
+          path: |
+            test-results/**/*.png
+            test-results/**/*.zip
+            test-results/**/error-context.md
+          retention-days: 7
+          if-no-files-found: warn

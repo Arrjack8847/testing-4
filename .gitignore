@@ -4,3 +4,6 @@ test-results/
 playwright-report/
 node_modules/
 .DS_Store
+
+# Local permission-gated Section 5 reference WebPs: never commit vendor art
+assets/reference-dev/
