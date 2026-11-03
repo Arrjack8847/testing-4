@@ -41,6 +41,21 @@ The background painting now extends 64px above and below the viewport-sized came
 
 Its DOM/CSS implementation is an approximation of measured behavior, **not a claim of pixel-perfect source DOM parity**. Reverse scrolling recomputes the background displacement; Reduced Motion disables extra camera movement and fades.
 
+## Live-reference portrait focus (4 November 2026)
+
+Fresh side-by-side 390×844 screenshots confirmed that the reference applies a
+temporary `scale(1.05)` image zoom to **both** portraits as their midpoint
+moves through the central viewport. The groom is zoomed near the intro; it
+returns to natural size after passing the center. Later the bride zooms and
+returns to natural size as scrolling continues. Previously our prototype
+permanently zoomed only the groom.
+
+Section 3 now updates `.couple-portrait.is-focal` in its existing throttled
+camera-scroll callback. The portrait-frame geometry, positions and border
+dimensions do not change. The effect is reversible with backward scrolling
+and disabled by Reduced Motion. The exact timing curve is independently
+approximated; screenshots are the measurement source, not vendor code.
+
 ## Verification
 
 Run the single canonical URL `http://localhost:8000/`, click **Open Invitation** and scroll to Section 3. The section reports:

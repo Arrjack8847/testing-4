@@ -412,9 +412,18 @@ test('reference groom image uses measured 5% zoom without resizing the portrait 
   await expect(section).toHaveAttribute('data-art','reference');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const groom=section.locator('.couple-profile--groom .couple-portrait');
-  await groom.scrollIntoViewIfNeeded();
+  // Align the portrait to the viewport CENTER, as the live reference does.
+  await page.evaluate(()=>{
+    const p=document.querySelector('.couple-profile--groom .couple-portrait');
+    const r=p.getBoundingClientRect();
+    document.documentElement.style.scrollBehavior='auto';
+    scrollTo({top:scrollY+r.top+r.height/2-innerHeight/2,behavior:'instant'});
+  });
   await expect(groom).toHaveClass(/in-view/);
   await expect.poll(()=>groom.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+  await expect(groom).toHaveClass(/is-focal/);
+  await expect.poll(()=>groom.locator('img').evaluate(el=>getComputedStyle(el).transform))
+    .toBe('matrix(1.05, 0, 0, 1.05, 0, 0)');
   const report=await groom.evaluate(el=>{
     const image=el.querySelector('img');
     const frame=el.getBoundingClientRect();
@@ -437,10 +446,47 @@ test('reference groom image uses measured 5% zoom without resizing the portrait 
     expect(report.frameWidth).toBeCloseTo(240.5,0);
     expect(report.frameHeight).toBeCloseTo(332.7,0);
   }
-  // The same approved crop remains active on the plain URL.
+  // The default view is still reference art, but a portrait that is NOT
+  // in the focal band has no permanent zoom.
   await page.goto('/');
   await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
-  await expect(page.locator('#groomPortrait')).toHaveCSS('transform','matrix(1.05, 0, 0, 1.05, 0, 0)');
+  await expect(page.locator('#groomPortrait')).toHaveCSS('transform','none');
+});
+
+test('both reference portraits zoom only in the central viewport and reverse cleanly',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  const section=page.locator('#couple');
+  const portraits=[
+    section.locator('.couple-profile--groom .couple-portrait'),
+    section.locator('.couple-profile--bride .couple-portrait')
+  ];
+  const center=async portrait=>{
+    await portrait.evaluate(el=>{
+      const r=el.getBoundingClientRect();
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:scrollY+r.top+r.height/2-innerHeight/2,behavior:'instant'});
+    });
+    await expect(portrait).toHaveClass(/is-focal/);
+    await expect.poll(()=>portrait.locator('img').evaluate(el=>getComputedStyle(el).transform))
+      .toBe('matrix(1.05, 0, 0, 1.05, 0, 0)');
+  };
+  const away=async portrait=>{
+    await portrait.evaluate(el=>{
+      const r=el.getBoundingClientRect();
+      window.scrollTo({top:scrollY+r.top+r.height/2-innerHeight*1.5,behavior:'instant'});
+    });
+    await expect(portrait).not.toHaveClass(/is-focal/);
+    await expect.poll(()=>portrait.locator('img').evaluate(el=>getComputedStyle(el).transform))
+      .toBe('none');
+  };
+  for(const portrait of portraits){
+    await center(portrait);
+    await away(portrait);
+    await center(portrait); // Reverse scrolling restores the zoom.
+  }
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
 });
 
 test('reference preview entrance matches measured 52px lift and Reduced Motion removes it',async({page})=>{

@@ -215,12 +215,21 @@
 .couple-section[data-art="reference"] .couple-arch::before,
 .couple-section[data-art="reference"] .couple-arch::after{display:none;}
 .couple-section[data-art="reference"] .couple-demo-note{display:none;}
-/* The live reference groom image fills its unchanged 240.5 x 332.7 frame
-   with a measured 1.05 inner-image zoom at the 390px groom checkpoint.
-   Zoom the source portrait without altering its approved card geometry. */
-.couple-section[data-art="reference"] .couple-profile--groom .couple-portrait img{
-  transform:scale(1.05);
+/* Live reference: BOTH photographs zoom to 105% while their midpoint
+   occupies the visible focal band, and ease back to natural crop on exit. */
+.couple-section[data-art="reference"] .couple-portrait img{
+  transform:none;
   transform-origin:center center;
+  transition:transform .6s cubic-bezier(.2,.68,.18,1);
+}
+.couple-section[data-art="reference"] .couple-portrait.is-focal img{
+  transform:scale(1.05);
+}
+@media(prefers-reduced-motion:reduce){
+  .couple-section[data-art="reference"] .couple-portrait img{
+    transform:none!important;
+    transition:none!important;
+  }
 }
 
 @media(prefers-reduced-motion:reduce){

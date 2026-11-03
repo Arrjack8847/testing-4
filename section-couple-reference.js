@@ -117,6 +117,21 @@
   // document scroll pixel. Preserve normal section boundaries at all sizes.
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
+  const portraitCards = [...section.querySelectorAll('.couple-portrait')];
+  // The live reference zooms a portrait only while the guest is looking at
+  // its central focal area. Returning toward either end of the section
+  // restores the unzoomed crop; this is NOT a permanent groom-only scale.
+  function syncPortraitFocus() {
+    const viewportHeight = Math.max(window.innerHeight, 1);
+    for (const card of portraitCards) {
+      const rect = card.getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+      const withinFocalBand =
+        midpoint >= viewportHeight * .28 &&
+        midpoint <= viewportHeight * .78;
+      card.classList.toggle('is-focal', !motion.matches && withinFocalBand);
+    }
+  }
   let pending = false;
   function syncScene() {
     pending = false;
@@ -132,6 +147,7 @@
     const displacement = pinned + camera;
     section.style.setProperty('--couple-reference-y',displacement.toFixed(2)+'px');
     section.dataset.referenceCameraOffset = camera.toFixed(2);
+    syncPortraitFocus();
   }
   function scheduleSync() {
     if (pending) return;
