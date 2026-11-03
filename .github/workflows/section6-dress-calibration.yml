@@ -1,0 +1,69 @@
+name: Section 6 Dress Code mobile and reference calibration
+on:
+  push:
+    branches:
+      - feat/section6-dress-code-reference-20261103
+    paths:
+      - index.html
+      - dress-code.css
+      - dress-code.js
+      - tools/section6-reference-compare.cjs
+      - tests/section-six-dress.spec.mjs
+      - package.json
+      - .github/workflows/section6-dress-calibration.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dress-code:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Fetch reference artwork for ephemeral test only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re
+          base = 'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'
+          names = re.findall(r'^([a-z0-9_]+\.webp)$', Path('ASSET-MANIFEST.txt').read_text(), re.M)
+          assert len(names) == 25, f'Expected 25 WebP files, found {len(names)}'
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              response = urlopen(Request(base+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=40)
+              data = response.read()
+              assert data[:4] == b'RIFF' and data[8:12] == b'WEBP', name
+              Path('assets',name).write_bytes(data)
+          print('Ephemeral reference assets ready for visual QA.')
+          PY
+      - name: Start local website server
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/section6-http.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8000/ -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/section6-http.log
+          exit 1
+      - name: Verify JavaScript
+        run: npm run test:syntax
+      - name: Verify Dress Code at four mobile viewports
+        run: npx playwright test tests/section-six-dress.spec.mjs
+      - name: Compare four widths against live reference
+        run: npm run compare:section6
+      - name: Upload measurements only (never commercial reference screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-calibration-measurements
+          path: artifacts/section6-compare/measurements.json
+          retention-days: 7
+          if-no-files-found: warn
