@@ -182,13 +182,13 @@ test('Gallery reveals each frame independently and resets on reverse scroll',asy
   const lake=gallery.locator('[data-gallery-slot="4"]');
   const y=await heading.evaluate(el=>el.getBoundingClientRect().top+scrollY);
   await page.evaluate(y=>scrollTo({top:Math.max(0,y-innerHeight*1.85),behavior:'instant'}),y);
-  await expect(heading).not.toHaveClass(/\\bin\\b/);
-  await expect(together).not.toHaveClass(/\\bin\\b/);
+  await expect(heading).not.toHaveClass(/\bin\b/);
+  await expect(together).not.toHaveClass(/\bin\b/);
   await page.evaluate(y=>scrollTo({top:y-innerHeight*.65,behavior:'instant'}),y);
-  await expect(heading).toHaveClass(/\\bin\\b/);
-  await expect(together).toHaveClass(/\\bin\\b/);
-  await expect(bride).toHaveClass(/\\bin\\b/);
-  await expect(groom).not.toHaveClass(/\\bin\\b/);
+  await expect(heading).toHaveClass(/\bin\b/);
+  await expect(together).toHaveClass(/\bin\b/);
+  await expect(bride).toHaveClass(/\bin\b/);
+  await expect(groom).not.toHaveClass(/\bin\b/);
   const initialStyle=await together.evaluate(el=>({
     d:getComputedStyle(el).transitionDuration,
     delay:getComputedStyle(el).transitionDelay
@@ -197,14 +197,14 @@ test('Gallery reveals each frame independently and resets on reverse scroll',asy
   expect(initialStyle.d).toContain('1.1s');
   expect(initialStyle.delay).toBe('0s');
   await page.evaluate(y=>scrollTo({top:y+220,behavior:'instant'}),y);
-  await expect(groom).toHaveClass(/\\bin\\b/);
-  await expect(lake).toHaveClass(/\\bin\\b/);
+  await expect(groom).toHaveClass(/\bin\b/);
+  await expect(lake).toHaveClass(/\bin\b/);
   await page.evaluate(y=>scrollTo({top:Math.max(0,y-innerHeight*1.85),behavior:'instant'}),y);
-  await expect(heading).not.toHaveClass(/\\bin\\b/);
-  await expect(together).not.toHaveClass(/\\bin\\b/);
+  await expect(heading).not.toHaveClass(/\bin\b/);
+  await expect(together).not.toHaveClass(/\bin\b/);
   await page.evaluate(y=>scrollTo({top:y-innerHeight*.65,behavior:'instant'}),y);
-  await expect(heading).toHaveClass(/\\bin\\b/);
-  await expect(together).toHaveClass(/\\bin\\b/);
+  await expect(heading).toHaveClass(/\bin\b/);
+  await expect(together).toHaveClass(/\bin\b/);
   expect(errors).toEqual([]);
 });
 
