@@ -102,10 +102,9 @@ for viewport in data["viewports"]:
                         "nonPhotoPixels": valid,
                         "nonPhotoMeanAbsError0to255": mae,
                         "exactPhotoComparable": bool(
-                            all(frame.get("image",{}).get("natural",[0])[0]>0
-                                for frame in reference["data"]["frames"]
-                                if frame.get("image")) and
-                            all(frame.get("image",{}).get("natural",[0])[0]>0
+                            all(frame.get("image") and frame["image"]["natural"][0] > 0
+                                for frame in reference["data"]["frames"]) and
+                            all(frame.get("image") and frame["image"]["natural"][0] > 0
                                 for frame in local["data"]["frames"])
                         ),
                         "note": "No all-image fidelity score; local reference photo rights/assets are not established."})
