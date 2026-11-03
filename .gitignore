@@ -1,0 +1,3 @@
+# Ignore downloaded third-party reference photographs (local visual QA only).
+# Licensed customer photographs under assets/gallery/photo-*.webp are not ignored.
+assets/gallery/reference/
