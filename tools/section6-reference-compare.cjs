@@ -91,6 +91,18 @@ async function readMetrics(page,isLocal){
       selectedImages:root?[...root.querySelectorAll('img')].map(el=>({
         source:el.currentSrc||el.src,loaded:el.complete&&el.naturalWidth>0
       })):[],
+      // Compare leaf-level typography even if reference labels differ in
+      // capitalization, apostrophe choice, or HTML nesting.
+      textSamples:root?[...root.querySelectorAll('*')].map(el=>{
+        const ownText=[...el.childNodes].filter(node=>node.nodeType===3)
+          .map(node=>node.textContent).join(' ').replace(/\s+/g,' ').trim();
+        if(!ownText||ownText.length>100)return null;
+        const rect=el.getBoundingClientRect();
+        if(rect.width<3||rect.height<3)return null;
+        const data=box(el);
+        return {ownText,className:String(el.className||'').slice(0,100),
+          ...data};
+      }).filter(Boolean).slice(0,75):[],
       state:isLocal?document.getElementById('invitation')?.dataset.state:null
     };
   },isLocal);
