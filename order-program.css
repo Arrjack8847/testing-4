@@ -230,12 +230,12 @@
 /* Verified source CSS from the live .cgv-timeline element:
    background-image: linear-gradient(rgba(20,8,18,.12),rgba(20,8,18,.12)), band_plum.webp;
    background-size: auto, cover; background-position:0 0,50% 50%.
-   Place the source-owned image on the 651px section itself for comparison,
+   Place the locally supplied, permission-cleared image on the 651px section for comparison,
    not the viewport-height parallax layer (which changed the artwork crop). */
 .order-section[data-art="reference"][data-band-status="loaded"]{
   background-image:
     linear-gradient(rgba(20,8,18,.12),rgba(20,8,18,.12)),
-    url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/band_plum.webp");
+    url("./assets/reference-dev/band_plum.webp");
   background-size:auto,cover;
   background-position:0 0,50% 50%;
   background-repeat:repeat,repeat;
