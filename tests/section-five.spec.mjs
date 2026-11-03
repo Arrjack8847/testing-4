@@ -1,9 +1,9 @@
 import {test,expect} from '@playwright/test';
 
-async function reachGallery(page){
+async function reachGallery(page,query=''){
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/'+query);
   const gallery=page.locator('#gallery');
   await expect(gallery).toHaveAttribute('data-section','7');
   await expect(gallery).toHaveAttribute('aria-hidden','true');
@@ -32,11 +32,18 @@ test('Section 7 shows five honest empty photograph placeholders',async({page})=>
   await expect(gallery.locator('.gallery-disclaimer')).toContainText('have not been provided');
   await expect(gallery.locator('.gallery-slot-label')).toHaveText(['Together','The Bride','The Groom','The Garden','The Lake']);
   await expect(gallery.locator('.gallery-intro')).toHaveText('Tap a frame to view');
+  await expect(gallery.locator('.gallery-reference-note')).toBeHidden();
+  const sourceOrder = await gallery.evaluate(el => {
+    const frames=el.querySelector('.gallery-photos');
+    const hint=el.querySelector('.gallery-intro');
+    return Boolean(frames.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(sourceOrder).toBe(true);
   await expect(page.locator('#galleryDialog')).not.toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test('Section 7 fits mobile viewports and preserves Section 4 transition',async({page},testInfo)=>{
+test('Section 7 fits mobile viewports and preserves Dress Code transition',async({page},testInfo)=>{
   const {gallery}=await reachGallery(page);
   const bounds=await gallery.evaluate(el=>{
     const previous=document.getElementById('dressCode');
@@ -103,5 +110,38 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(first).toBeFocused();
+  expect(errors).toEqual([]);
+});
+
+
+test('Gallery reference QA mode requests only the five verified source photographs and displays captions',async({page})=>{
+  const filenames=['moody.webp','moody-bride.webp','moody-groom.webp','moody-garden.webp','moody-lake.webp'];
+  const requested=[];
+  await page.route('https://undangankahwin.com/images/concierge/couples/**', route => {
+    const uri=new URL(route.request().url());
+    requested.push(uri.pathname.split('/').at(-1));
+    return route.fulfill({status:200,contentType:'image/webp',body:testImage});
+  });
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=1');
+  await expect(gallery).toHaveAttribute('data-gallery-art','reference-comparison');
+  await expect(gallery.locator('.gallery-reference-note')).toBeVisible();
+  await expect(gallery.locator('.gallery-reference-note')).toContainText('Not licensed');
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
+  expect(requested.sort()).toEqual([...filenames].sort());
+  const urls = await gallery.locator('.gallery-image').evaluateAll(nodes=>nodes.map(el=>el.getAttribute('src')));
+  expect(urls).toEqual(filenames.map(name=>'https://undangankahwin.com/images/concierge/couples/'+name));
+  await gallery.locator('[data-gallery-slot="4"]').click();
+  await expect(page.locator('#galleryViewCaption')).toHaveText('The Lake');
+  await page.keyboard.press('Escape');
+  expect(errors).toEqual([]);
+});
+
+test('Gallery reference QA mode fails visibly but safely if third-party photos cannot load',async({page})=>{
+  await page.route('https://undangankahwin.com/images/concierge/couples/**',route=>route.fulfill({status:404,body:'Unavailable'}));
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=1');
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(0);
+  await expect(gallery.locator('[data-gallery-slot="0"]')).toBeDisabled();
+  await expect(gallery.locator('.gallery-photo-placeholder').first()).toBeVisible();
+  await expect(gallery.locator('.gallery-disclaimer')).toContainText('could not load');
   expect(errors).toEqual([]);
 });
