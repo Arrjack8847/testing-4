@@ -1,5 +1,5 @@
 'use strict';
-// Section 6 — Dress Code: independently illustrated time-driven butterfly,
+// Section 6 — Dress Code: local original-reference WebP wing artwork,
 // scroll-calibrated paper, accessible reveals, and reduced-motion fallback.
 (() => {
   const invitation=document.getElementById('invitation');
@@ -7,21 +7,19 @@
   const flight=document.getElementById('dressFlight');
   if(!invitation || !section)return;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  const query=new URLSearchParams(location.search);
-
-  // Opt-in source paper for developer-side visual comparison only.
-  // The default invitation ships with assets/dress-paper-original.svg.
-  if(query.get('dressReference')==='1'){
-    section.dataset.art='reference';
-    const img=document.getElementById('dressSourceScene');
-    if(img){
-      section.dataset.sceneStatus='loading';
-      img.addEventListener('load',()=>{
-        section.dataset.sceneStatus=img.naturalWidth>0?'loaded':'failed';
-      },{once:true});
-      img.addEventListener('error',()=>{section.dataset.sceneStatus='failed'},{once:true});
-      img.src='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp';
-    }
+  // Use the approved artwork as real repository files, never external URLs.
+  // paper.webp is exactly the source 1080x1920 artwork.
+  section.dataset.art='local-webp';
+  const paper=document.getElementById('dressSourceScene');
+  if(paper){
+    section.dataset.sceneStatus='loading';
+    paper.addEventListener('load',()=>{
+      section.dataset.sceneStatus=paper.naturalWidth>0?'loaded':'failed';
+    },{once:true});
+    paper.addEventListener('error',()=>{
+      section.dataset.sceneStatus='failed';
+    },{once:true});
+    paper.src='./assets/section6/paper.webp';
   }
 
   let cameraFrame=0,flightFrame=0,flightStart=0;
@@ -57,7 +55,7 @@
       const p=(seconds-initialDelay)%cycle;
       const pass=Math.floor(p/passLength);
       const t=p-pass*passLength;
-      const scale=clamp(.82*rect.width/390,.65,.94);
+      const scale=1; // Source butterfly uses a fixed 52×41px wrapper.
       // The reference alternates high flights (~50px from the top) and
       // low flights (~600–625px at 390/320 widths), with either direction.
       const lowerLane=pass===0||pass===3;
