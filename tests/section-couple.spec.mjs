@@ -176,6 +176,29 @@ test('Section 3 original lakeside edge illustration is behind arch and keeps sec
   expect(errors).toEqual([]);
 });
 
+
+test('original Section 3 photo disclaimer does not overlay the decorative lake',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const note=section.locator('.couple-demo-note');
+  await expect(note).toContainText("Replace with the couple's own photographs");
+  // The original example images remain identified as placeholders.
+  await expect(section.locator('#groomPortrait')).toHaveAttribute('alt',/placeholder/);
+  await expect(section.locator('#bridePortrait')).toHaveAttribute('alt',/placeholder/);
+  // Keep the text in the accessible DOM while excluding it from the scene.
+  await expect(note).toHaveCSS('clip-path','inset(50%)');
+  const view=await section.evaluate(el=>{
+    const note=el.querySelector('.couple-demo-note').getBoundingClientRect();
+    const lake=el.querySelector('.couple-lake-finish').getBoundingClientRect();
+    return {noteWidth:note.width,noteHeight:note.height,lakeHeight:lake.height,
+      overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(view.noteWidth).toBeLessThanOrEqual(1);
+  expect(view.noteHeight).toBeLessThanOrEqual(1);
+  expect(view.lakeHeight).toBeCloseTo(178,0);
+  expect(view.overflow).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});
+
 test('original botanical side art and carved arch render without covering text or overflowing',async({page},testInfo)=>{
   const {section,errors}=await openCouple(page);
   const report=await section.evaluate(async el=>{

@@ -111,9 +111,13 @@
   margin:52px 0 0;height:99px;line-height:99px;font-size:60px;
   font-family:'Pinyon Script',cursive;color:#815272;
 }
+/* Keep the preview-photo disclaimer available to screen readers, but
+   not over the painted lakeside footer. The sample illustrations also
+   have explicit placeholder alt text. */
 .couple-section .couple-demo-note{
-  position:absolute;top:calc(100% + 6px);margin:0 16px;font:400 11px/1.4 'EB Garamond',Georgia,serif;
-  font-style:italic;color:#867085;
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;border:0;
+  overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);
+  white-space:nowrap;
 }
 .couple-section .couple-floating-petals{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
 .couple-section .couple-floating-petals span{
