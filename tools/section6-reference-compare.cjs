@@ -76,6 +76,7 @@ async function readMetrics(page,isLocal){
     return {
       url:location.href,
       viewport:{width:innerWidth,height:innerHeight,documentWidth:document.documentElement.scrollWidth},
+      headingDocumentTop:+(headerRect.top+scrollY).toFixed(2),
       section:{top:+top.toFixed(2),height:+height.toFixed(2),
         rootTag:root?.tagName??null,rootClass:root?.className??null},
       heading:box(header),
@@ -113,11 +114,13 @@ async function takePage(browser,width,label,url,isLocal){
     await openInvitation(page);
     let metrics=await readMetrics(page,isLocal);
     if(metrics.error)throw Error(metrics.error);
-    await page.evaluate(top=>scrollTo({top,behavior:'instant'}),metrics.section.top);
+    // Align the SAME visible anchor in both pages. Their enclosing DOM elements
+    // are different, so scrolling to each root's top misaligns comparisons.
+    await page.evaluate(top=>scrollTo({top:Math.max(0,top-126),behavior:'instant'}),metrics.headingDocumentTop);
     await delay(1100);
     metrics=await readMetrics(page,isLocal);
-    // After scrolling the source's lazy media can shift document positions.
-    await page.evaluate(top=>scrollTo({top,behavior:'instant'}),metrics.section.top);
+    // Lazy images can shift the document; re-anchor after they settle.
+    await page.evaluate(top=>scrollTo({top:Math.max(0,top-126),behavior:'instant'}),metrics.headingDocumentTop);
     await delay(650);
     metrics=await readMetrics(page,isLocal);
     const file=label+'-'+width+'.png';
@@ -198,6 +201,16 @@ async function main(){
     referenceUrl:localOnly?null:referenceUrl,localUrl,
     viewportHeight:HEIGHT,screens
   };
+  console.log('\\nMEASURED DIFFERENCES (local minus reference, pixels):');
+  for(const width of WIDTHS){
+    const row=screens[width];
+    const d=row.differences;
+    if(!d){console.log('  '+width+'px: comparison unavailable');continue}
+    console.log('  '+width+'px: section height '+d.sectionHeight+
+      ', heading y '+(d.heading?.y??'unavailable')+
+      ', groom title y '+(d.groomTitle?.y??'unavailable')+
+      ', bride title y '+(d.brideTitle?.y??'unavailable'));
+  }
   fs.writeFileSync(path.join(OUTPUT,'measurements.json'),JSON.stringify(report,null,2));
   fs.writeFileSync(path.join(OUTPUT,'comparison.html'),reportHtml(report));
   console.log('\nOpen artifacts/section6-compare/comparison.html in Chrome.');
