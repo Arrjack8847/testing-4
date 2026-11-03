@@ -154,3 +154,42 @@ test('Section 3 Couple → Section 4 Events preserves an exact seam and Section 
     await page.screenshot({path:testInfo.outputPath('section3-to-4-events-seam.png'),animations:'disabled'});
   }
 });
+
+
+test('390px Section 4 shared arch follows measured source geometry, without clipping',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Measured mobile reference at 390x844');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {section,errors}=await openEvents(page);
+  const measure=await section.evaluate(el=>{
+    const base=el.getBoundingClientRect();
+    const rect=selector=>{
+      const box=el.querySelector(selector).getBoundingClientRect();
+      return {x:box.x,y:box.y-base.y,w:box.width,h:box.height};
+    };
+    return {
+      arch:rect('.event-shared-arch'),
+      first:rect('.event-card-nikah'),
+      second:rect('.event-card-reception'),
+      firstTitle:rect('#eventNikahHeading'),
+      secondTitle:rect('#eventReceptionHeading'),
+      firstTitleFont:getComputedStyle(el.querySelector('#eventNikahHeading')).fontSize,
+      secondTitleFont:getComputedStyle(el.querySelector('#eventReceptionHeading')).fontSize,
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  // Reference at 390x844: shared arch x26/w338/y120, first title at
+  // relative (x62,y224), second event row y666.5, second title y770.5.
+  expect(measure.arch.x).toBeCloseTo(26,0);
+  expect(measure.arch.w).toBeCloseTo(338,0);
+  expect(measure.arch.y).toBeCloseTo(120,0);
+  expect(measure.first.x).toBeCloseTo(32,0);
+  expect(measure.first.w).toBeCloseTo(326,0);
+  expect(measure.firstTitle.x).toBeCloseTo(62,0);
+  expect(measure.firstTitle.y).toBeCloseTo(224,0);
+  expect(measure.firstTitleFont).toBe('42px');
+  expect(measure.secondTitleFont).toBe('42px');
+  expect(Math.abs(measure.second.y-666.5)).toBeLessThanOrEqual(12);
+  expect(Math.abs(measure.secondTitle.y-770.5)).toBeLessThanOrEqual(12);
+  expect(measure.overflow).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});
