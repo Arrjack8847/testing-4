@@ -254,37 +254,37 @@ test('Section 6 uses only original Section 6 paper and paired local wings by def
   expect(errors).toEqual([]);
 });
 
-test('Section 6 original butterfly follows measured upper-right flight path',async({page})=>{
+test('Section 6 butterfly flies autonomously while scroll position is fixed',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
   const {dress,errors}=await openDress(page);
-  const samples=[{sectionY:0,wingX:352.21,wingY:57.83},
-    {sectionY:240,wingX:381.89,wingY:46.51},
-    {sectionY:-200,wingX:327.98,wingY:65.85}];
-  for(const point of samples){
-    await page.evaluate(sectionY=>{
-      const sec=document.getElementById('dressCode');
-      document.documentElement.style.scrollBehavior='auto';
-      const target=Math.max(0,scrollY+sec.getBoundingClientRect().top-sectionY);
-      scrollTo({top:target,behavior:'instant'});
-    },point.sectionY);
-    await page.waitForTimeout(160);
-    const actual=await dress.evaluate(sec=>{
-      const r=sec.getBoundingClientRect();
-      const wing=sec.querySelector('#dressFlight').getBoundingClientRect();
-      return {sectionY:r.top,wingX:wing.left,wingY:wing.top-r.top,
-        width:r.width,wingWidth:wing.width,wingHeight:wing.height,
-        leftWing:getComputedStyle(sec.querySelector('.dress-flight-wing-left')).animationName,
-        rightWing:getComputedStyle(sec.querySelector('.dress-flight-wing-right')).animationName};
-    });
-    // Reference readings were at 390px. Preserve their relative X on all mobile widths.
-    expect(Math.abs(actual.wingX-point.wingX*actual.width/390)).toBeLessThanOrEqual(2);
-    expect(Math.abs(actual.wingY-point.wingY)).toBeLessThanOrEqual(2);
-    expect(actual.wingWidth).toBe(52);
-    // Fractional CSS transforms can report 40.999996px instead of exactly 41px.
-    expect(Math.abs(actual.wingHeight-41)).toBeLessThanOrEqual(.05);
-    expect(actual.leftWing).toBe('dress-wing-flight-left');
-    expect(actual.rightWing).toBe('dress-wing-flight-right');
-  }
+  // Do not scroll during the test. The source reference travels horizontally
+  // at about 27–32px/sec even when the section stays in place.
+  await page.waitForTimeout(1250);
+  const first=await dress.evaluate(sec=>({
+    x:parseFloat(sec.style.getPropertyValue('--dress-flight-x')),
+    y:parseFloat(sec.style.getPropertyValue('--dress-flight-y')),
+    angle:parseFloat(sec.style.getPropertyValue('--dress-flight-rotate')),
+    top:sec.getBoundingClientRect().top,
+    active:sec.dataset.flightReady,
+    leftWing:getComputedStyle(sec.querySelector('.dress-flight-wing-left')).animationName,
+    rightWing:getComputedStyle(sec.querySelector('.dress-flight-wing-right')).animationName
+  }));
+  await page.waitForTimeout(1050);
+  const second=await dress.evaluate(sec=>({
+    x:parseFloat(sec.style.getPropertyValue('--dress-flight-x')),
+    y:parseFloat(sec.style.getPropertyValue('--dress-flight-y')),
+    top:sec.getBoundingClientRect().top
+  }));
+  expect(first.active).toBe('true');
+  expect(Number.isFinite(first.x)).toBe(true);
+  expect(Number.isFinite(second.x)).toBe(true);
+  expect(Math.abs(second.top-first.top)).toBeLessThanOrEqual(1);
+  // Starts by flying right-to-left at reference-comparable speed.
+  expect(second.x-first.x).toBeLessThan(-17);
+  expect(second.x-first.x).toBeGreaterThan(-38);
+  expect(first.angle).toBeLessThan(-50);
+  expect(first.leftWing).toBe('dress-wing-flight-left');
+  expect(first.rightWing).toBe('dress-wing-flight-right');
   expect(errors).toEqual([]);
 });
 
