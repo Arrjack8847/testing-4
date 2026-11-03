@@ -172,3 +172,45 @@ drawn CSS butterfly instead of republishing that vendor artwork. The
 illustrated background and butterfly cannot be described as pixel-identical;
 commercial redistribution would require source artwork rights or an approved
 original replacement.
+
+
+## Original butterfly flight and paper art — follow-up
+
+The default Section 6 now has its own original `assets/dress-paper-original.svg`
+(soft botanical/fiber texture with edge blossoms); it no longer relies on
+re-using the couple illustration for this section. Original-art mode gently
+blends into the purple edges of Sections 5 and 7, while preserving the measured
+text and card geometry.
+
+A new `#dressFlight` consists of **two independent, original CSS wings**,
+thorax and antennae with 3D flapping. Its section-relative flight path is based
+on samples from the live reference (left wing at 390px width):
+
+| Section top (screen px) | Wing X | Wing Y relative to section |
+| ---: | ---: | ---: |
+| -240 | 323.16 | 67.45 |
+| 0 | 352.21 | 57.83 |
+| 240 | 381.89 | 46.51 |
+| 580 | 413.66 | 46.05 |
+
+The JavaScript interpolates those positions and scales X for mobile widths,
+while respecting prefers-reduced-motion with a static wing. The paper artwork
+continues to follow its separately calibrated parallax curve.
+
+The old single remote butterfly image from an unrelated source pack has been
+removed. The only third-party source still requested in explicit
+`?dressReference=1` comparison mode is `paper.webp`; it is never packaged
+into this repository by the Section 6 implementation.
+
+Verification scripts:
+- `tests/section-six-dress.spec.mjs`: new original-paper, wing and reduced-motion
+  checks added to the existing layout tests.
+- `tools/section6-flight-compare.cjs`: compares the live-source and local
+  wing coordinates at 320/360/390/430px and three section positions.
+- The dedicated workflow captures only local original-art screenshots for
+  internal inspection; reference screenshots are not redistributed.
+
+**Fidelity boundary:** This recreates the reference motion concept without
+copying its butterfly illustration. The two images will not be pixel-identical
+without rights to the original artwork. Do not claim the entire section is exact
+based on geometry metrics alone.
