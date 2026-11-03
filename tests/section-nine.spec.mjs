@@ -14,9 +14,6 @@ async function go(page){
   await expect(section).toBeInViewport();
   return {section,errors};
 }
-const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;
-  const r=e.getBoundingClientRect(),s=document.querySelector('#rsvp').getBoundingClientRect();
-  return {x:+r.x.toFixed(1),y:+(r.y-s.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};};
 test('Section 9 matches source structure, field choices and section order',async({page})=>{
   const {section,errors}=await go(page);
   await expect(section).toHaveAttribute('data-section','9');
@@ -69,6 +66,7 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
   const {section,errors}=await go(page);
   await page.waitForTimeout(1300);
   const m=await page.evaluate(()=>{
+    const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;const r=e.getBoundingClientRect(),b=document.querySelector('#rsvp').getBoundingClientRect();return {x:+r.x.toFixed(1),y:+(r.y-b.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};};
     const a=document.getElementById('weddingGift').getBoundingClientRect(),
       b=document.getElementById('rsvp').getBoundingClientRect(),
       c=document.getElementById('closingMessage').getBoundingClientRect();
@@ -87,13 +85,13 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(r.x+r.width).toBeLessThanOrEqual(page.viewportSize().width+1);}
   if(testInfo.project.name==='iphone-390'){
     expect(Math.abs(m.section.height-1215.9)).toBeLessThan(4);
-    const measured=await page.evaluate(()=>({
+    const measured=await page.evaluate(()=>{const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;const r=e.getBoundingClientRect(),b=document.querySelector('#rsvp').getBoundingClientRect();return {x:+r.x.toFixed(1),y:+(r.y-b.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};}; return ({
       eyebrow:rect('#rsvp .s9-eyebrow'),heading:rect('#rsvpHeading'),
       name:rect('#rsvp label[for="s9Name"]'),
       attend:rect('#rsvp label[for="s9Attendance"]'),
       guests:rect('#rsvp label[for="s9Guests"]'),
       wish:rect('#rsvp label[for="s9Wish"]')
-    }));
+    });});
     console.log('S9_LOCAL_GEOMETRY '+JSON.stringify(measured));
     for(const [id,y] of [['eyebrow',96],['heading',144.3],['name',240.1],['attend',342.3],['guests',342.3],['wish',444.5]]){
       expect(Math.abs(measured[id].y-y),id).toBeLessThan(3);
