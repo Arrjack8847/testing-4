@@ -174,13 +174,23 @@
   display:block;z-index:1;pointer-events:none;
   background:#f8f1ec;opacity:.1;
 }
+/* Keep the measured camera trajectory while extending the ART (not the
+   camera coordinate box) 64px past each viewport edge. The camera ranges
+   from -44.8px to +20px; the old 100dvh image exposed unpainted seams. */
 .couple-section[data-art="reference"] .couple-reference-scene{
   display:block;position:absolute;inset:0 auto auto 0;
   width:100%;height:100dvh;min-height:480px;
   z-index:0;pointer-events:none;
-  background:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/scene.webp")
-    center center/cover no-repeat;
+  background:none;
   transform:translate3d(0,var(--couple-reference-y,0px),0);
+}
+.couple-section[data-art="reference"] .couple-reference-scene::before{
+  content:"";position:absolute;inset:-64px 0;
+  pointer-events:none;
+  background-image:var(--couple-reference-image,url("./assets/scene.webp"));
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
 }
 .couple-section[data-art="reference"] .couple-lake-finish,
 .couple-section[data-art="reference"] .couple-botanical-edges,

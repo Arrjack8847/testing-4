@@ -13,7 +13,7 @@ Old original-art SVG files remain in the repository for historical purposes but 
 
 ## Reference artwork inventory
 
-The Section 3 reference comparison uses exactly three externally referenced WebP images and one SVG border:
+The Section 3 reference comparison uses the same local scene.webp as Section 1 when available, with the reference host used as a fallback. The two example portraits remain remote, and the arch is still externally referenced. These are three visual WebP roles and one SVG border:
 
 | Role | Source URL |
 | --- | --- |
@@ -37,6 +37,8 @@ The independent reference camera is driven by a clamped 0.0427px-per-scroll-pixe
 | 3587px | −8.8px |
 | 4220px | +18.2px |
 
+The background painting now extends 64px above and below the viewport-sized camera box. Its original transform geometry remains unchanged while the extra artwork covers the measured −44.8px to +20px vertical drift, avoiding empty 40–45px strips. It uses the locally available Section 1 `assets/scene.webp` first; when absent, JavaScript selects the original reference URL.
+
 Its DOM/CSS implementation is an approximation of measured behavior, **not a claim of pixel-perfect source DOM parity**. Reverse scrolling recomputes the background displacement; Reduced Motion disables extra camera movement and fades.
 
 ## Verification
@@ -44,6 +46,7 @@ Its DOM/CSS implementation is an approximation of measured behavior, **not a cla
 Run the single canonical URL `http://localhost:8000/`, click **Open Invitation** and scroll to Section 3. The section reports:
 
 - `data-art="reference"` — reference layout always active.
+- `data-reference-scene-source` — `local`, `remote`, or `unavailable`; the first-scene local painting is preferred.
 - `data-reference-webp-count` — count of the three WebPs that actually loaded (0–3).
 - `data-reference-webp-state` — `loading`, `ready` or `partial`.
 - `data-reference-webp-missing` — unavailable asset keys, if any.
