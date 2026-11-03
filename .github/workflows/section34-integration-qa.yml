@@ -1,0 +1,57 @@
+name: Section 3→4 integrated reference QA
+on:
+  push:
+    branches:
+      - integration/section3-to-events-reference-20261104
+  pull_request:
+    paths:
+      - index.html
+      - section-three.css
+      - section-three.js
+      - section-couple.css
+      - section-couple-reference.js
+      - tests/section-couple.spec.mjs
+      - tests/section-three.spec.mjs
+      - tests/section1-2-handoff.spec.mjs
+      - .github/workflows/section34-integration-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  section34-four-phone:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Load Section 1 artwork for test runner only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen,Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              data=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP'
+              Path('assets',name).write_bytes(data)
+          PY
+      - name: Validate scripts and 4-phone Section 3→4 handoff
+        run: |
+          npm run test:syntax
+          npx playwright test tests/section-couple.spec.mjs tests/section-three.spec.mjs tests/section1-2-handoff.spec.mjs --workers=2
+      - name: Upload screenshots and result summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integrated-section34-four-phone
+          path: |
+            test-results/
+          retention-days: 5
+          if-no-files-found: warn
