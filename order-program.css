@@ -269,3 +269,22 @@
 @media(prefers-reduced-motion:reduce){
   .order-section .order-petals span {animation:none!important;opacity:.45}
 }
+
+
+/* The blush butterfly belongs to ambient motion, not a permanently parked
+   top-right decoration. Flight is intentionally sparse and comparison-only;
+   exact source path still needs timed reference capture. */
+.order-section[data-art="reference"][data-butterfly-status="loaded"] .order-butterfly {
+  opacity:0;top:14%;right:3%;
+  animation:order-butterfly-passage 15s linear infinite;
+}
+@keyframes order-butterfly-passage{
+  0%,8%{opacity:0;transform:translate3d(32px,70px,0) rotate(23deg)}
+  19%{opacity:.62}
+  48%{opacity:.58;transform:translate3d(-95px,165px,0) rotate(-13deg)}
+  73%{opacity:.5;transform:translate3d(-230px,80px,0) rotate(-26deg)}
+  85%,100%{opacity:0;transform:translate3d(-295px,32px,0) rotate(-34deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .order-section[data-art="reference"] .order-butterfly{animation:none!important;opacity:0!important}
+}
