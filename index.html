@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="section-four.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
+  <link rel="stylesheet" href="gift-reference.css">
   <script src="scene.js" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-couple.js" defer></script>
@@ -24,6 +25,7 @@
   <script src="section-four.js" defer></script>
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
+  <script src="gift-reference.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -278,8 +280,73 @@
         <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
-    <!-- Section 7: original RSVP form preview. Nothing is submitted until a backend is configured. -->
-    <section class="rsvp-section" id="rsvp" data-section="7"
+    <!-- Reference Section 5 feature — Wedding Gift, following the gallery in live source order.
+         Demonstration only: no bank details, purchases or reservation endpoint are configured. -->
+    <section class="gift-reference-section" id="weddingGift" data-section="7"
+      aria-labelledby="giftHeading" aria-hidden="true" inert>
+      <div class="gift-env" aria-hidden="true">
+        <span class="gift-arch"></span>
+        <span class="gift-vine"></span><span class="gift-vine gift-vine-right"></span>
+        <span class="gift-spark gift-spark-a">✧</span><span class="gift-spark gift-spark-b">✦</span>
+      </div>
+      <div class="gift-content">
+        <p class="gift-kicker gift-reveal">With love and gratitude</p>
+        <div class="gift-ornament gift-reveal" aria-hidden="true"><span></span>✦<span></span></div>
+        <h2 id="giftHeading" class="gift-script gift-reveal">Wedding Gift</h2>
+        <p class="gift-intro gift-reveal">Your presence at our wedding is the greatest gift of all. If you wish to bless us with a gift, the details will be shared here.</p>
+        <div class="gift-panel gift-reveal">
+          <h3><span aria-hidden="true">✧ </span>Send Gift</h3>
+          <div class="gift-bank-list">
+            <article class="gift-bank">
+              <strong>Maybank</strong>
+              <span class="gift-account">Account details not configured</span>
+              <span class="gift-holder">Demonstration example — no recipient verified</span>
+              <button type="button" disabled title="No verified transfer recipient">Copy Account Number</button>
+            </article>
+            <article class="gift-bank">
+              <strong>CIMB</strong>
+              <span class="gift-account">Account details not configured</span>
+              <span class="gift-holder">Demonstration example — no recipient verified</span>
+              <button type="button" disabled title="No verified transfer recipient">Copy Account Number</button>
+            </article>
+          </div>
+        </div>
+        <div class="gift-wishlist gift-reveal">
+          <h3>Gift Wishlist</h3>
+          <p class="gift-wishlist-intro">Reserve a gift so no two guests buy the same one.</p>
+          <div class="gift-items">
+            <article class="gift-item">
+              <div class="gift-thumb" data-gift-thumb="0" data-image-state="original" aria-hidden="true">✧</div>
+              <div>
+                <h4>Philips Avance Collection Rice Cooker HD3175/62</h4>
+                <p>Shopee · Reference example (stock not verified)</p>
+                <button type="button" disabled title="Reservations require a connected gift service">Reserve</button>
+              </div>
+            </article>
+            <article class="gift-item">
+              <div class="gift-thumb" data-gift-thumb="1" data-image-state="original" aria-hidden="true">❦</div>
+              <div>
+                <h4>Philips 1.7L Kettle 1000 Series HD9314</h4>
+                <p>Lazada · Reference example (reservation not verified)</p>
+                <button type="button" disabled title="Reservations require a connected gift service">Reserved</button>
+              </div>
+            </article>
+            <article class="gift-item">
+              <div class="gift-thumb" data-image-state="original" aria-hidden="true">✦</div>
+              <div>
+                <h4>IKEA Gift Card</h4>
+                <p>Reference example · No purchase link configured</p>
+                <button type="button" disabled title="No verified gift card destination">Buy</button>
+              </div>
+            </article>
+          </div>
+        </div>
+        <p class="gift-disclosure gift-reveal">Reference-recreation demonstration only. Bank accounts, gift purchases and reservations are not active. Optional vendor thumbnails are for visual comparison and are not included in the repository.</p>
+        <p class="gift-end" aria-hidden="true">❦</p>
+      </div>
+    </section>
+    <!-- Section 8: original RSVP preview, preserved after Wedding Gift. -->
+    <section class="rsvp-section" id="rsvp" data-section="8"
       aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="rsvp-atmosphere" aria-hidden="true">
         <span class="rsvp-flower rsvp-flower-a">❧</span>
