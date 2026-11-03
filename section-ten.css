@@ -39,7 +39,7 @@
 }
 .section-ten .closing10-source-scene {
   display:none;position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:center;opacity:.66;
+  object-fit:cover;object-position:center;opacity:1;
 }
 .section-ten[data-artwork="licensed-local"] .closing10-source-scene {display:block;}
 .section-ten[data-artwork="licensed-local"] .ref-environment::before,
