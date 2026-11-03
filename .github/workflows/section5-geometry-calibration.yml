@@ -1,0 +1,30 @@
+name: Calibrate Section 5 reference geometry
+on:
+  push:
+    branches: [feat/section5-order-of-day-reference-20261103]
+    paths:
+      - tools/calibrate-section5-geometry.mjs
+      - .github/workflows/section5-geometry-calibration.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  calibrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Compare source and local layouts at 390x844
+        run: node tools/calibrate-section5-geometry.mjs
+      - name: Retain mobile screenshots and CSS metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-geometry-evidence
+          path: section5-geometry-evidence/
+          retention-days: 7
+          if-no-files-found: warn
