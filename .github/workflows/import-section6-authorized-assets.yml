@@ -1,0 +1,45 @@
+name: Import authorized Section 6 WebP artwork
+on:
+  push:
+    branches:
+      - feat/section6-dress-code-reference-20261103
+    paths:
+      - tools/import-section6-authorized-assets.py
+      - .github/workflows/import-section6-authorized-assets.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import-artwork:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/section6-dress-code-reference-20261103
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download and validate licensed source images
+        run: python tools/import-section6-authorized-assets.py
+      - name: Preserve local WebP files as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-local-authorized-webps
+          path: |
+            assets/section6/paper.webp
+            assets/section6/bfly_1.webp
+            assets/section6/ASSET-SOURCES.json
+          retention-days: 7
+      - name: Commit binary artwork to the Section 6 branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/section6/paper.webp assets/section6/bfly_1.webp assets/section6/ASSET-SOURCES.json
+          if git diff --cached --quiet; then
+            echo 'Artwork already matches the pinned local files.'
+            exit 0
+          fi
+          git commit -m 'assets(section6): vendor authorized reference paper and butterfly WebPs'
+          git push origin HEAD:refs/heads/feat/section6-dress-code-reference-20261103
