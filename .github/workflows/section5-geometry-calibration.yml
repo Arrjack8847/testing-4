@@ -3,6 +3,9 @@ on:
   push:
     branches: [feat/section5-order-of-day-reference-20261103]
     paths:
+      - order-program.css
+      - order-program.js
+      - index.html
       - tools/calibrate-section5-geometry.mjs
       - .github/workflows/section5-geometry-calibration.yml
   workflow_dispatch:
