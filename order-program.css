@@ -273,7 +273,8 @@
 
 
 /* Timed reference source: paired 23×35px wings on a 46×35px body,
-   moving ONCE from the lower-right to lower-left at about 39px/s. */
+   moving in two timed passes: right-to-left at ~39px/s then left-to-right
+   at ~44px/s, with a pause at both edges. */
 .order-section .order-butterfly {display:none!important;} /* local image preloader */
 .order-section .order-bf {
   display:block;position:absolute;top:0;left:0;
