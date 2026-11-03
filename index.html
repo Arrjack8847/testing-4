@@ -222,6 +222,14 @@
           <span style="--px:56%;--py:59%;--pd:-11s;--pt:18s;--r:30deg"></span>
         </div>
       </div>
+      <!-- Match the reference's two sprite-wing halves, not a static butterfly image.
+           The split sprite is loaded only from a locally staged WebP. -->
+      <span id="orderButterflyFlight" class="order-bf" aria-hidden="true">
+        <i class="order-bf-wing order-bf-left"></i>
+        <i class="order-bf-wing order-bf-right"></i>
+      </span>
+      <!-- The reference draws drifting petals on a fixed canvas rather than CSS spans. -->
+      <canvas id="orderPetalCanvas" class="order-petal-canvas" aria-hidden="true"></canvas>
       <div class="order-inner">
         <p class="order-eyebrow order-reveal">Running order</p>
         <h2 id="runningOrderHeading" class="order-heading order-reveal">Order of the Day</h2>
