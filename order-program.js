@@ -120,7 +120,7 @@
     const entryX=section.clientWidth+38;
     const exitX=-55;
     const x=Math.max(exitX,entryX-t*39);
-    const y=590+18*Math.cos(t*.8+.35)+6*Math.sin(t*2.1);
+    const y=585+18*Math.cos(t*.56+.15);
     const rotation=-1.42+.22*Math.sin(t*1.8+.5);
     butterfly.style.transform='translate3d('+x.toFixed(2)+'px,'+y.toFixed(2)+'px,0) translate(-50%,-50%) rotate('+rotation.toFixed(4)+'rad) scale(.82)';
     butterfly.dataset.x=x.toFixed(2);
