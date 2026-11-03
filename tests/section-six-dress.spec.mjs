@@ -191,3 +191,37 @@ test('Dress Code paper panels match the source measured surface at four widths',
   }
   expect(errors).toEqual([]);
 });
+
+
+test('Section 6 uses the source-measured stagger and scroll camera',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const {dress,errors}=await openDress(page);
+  await expect(dress).toHaveAttribute('data-reveal-ready','true');
+  const styles=await dress.evaluate(el=>{
+    return ['.dress-eyebrow','.dress-heading','.dress-intro',
+      '.dress-palette:first-child','.dress-palette:last-child'].map(sel=>{
+      const s=getComputedStyle(el.querySelector(sel));
+      return {duration:s.transitionDuration,delay:s.transitionDelay,
+        ease:s.transitionTimingFunction};
+    });
+  });
+  for(const [i,style] of styles.entries()){
+    expect(style.duration).toBe('1s, 1.1s');
+    expect(style.delay).toBe(['0s','.15s','.3s','.45s','.6s'][i].replace(/^\./,'0.'));
+    expect(style.ease).toBe('ease, cubic-bezier(0.22, 0.9, 0.24, 1)');
+  }
+  for(const y of [0,240,-200]){
+    await page.evaluate(y=>{
+      const el=document.getElementById('dressCode');
+      scrollTo({top:scrollY+el.getBoundingClientRect().top-y,behavior:'instant'});
+    },y);
+    await page.waitForTimeout(130);
+    const data=await dress.evaluate(el=>({
+      top:el.getBoundingClientRect().top,
+      camera:parseFloat(el.style.getPropertyValue('--dress-camera-y'))
+    }));
+    const expected=3.5-data.top*.0427;
+    expect(Math.abs(data.camera-expected)).toBeLessThanOrEqual(1);
+  }
+  expect(errors).toEqual([]);
+});
