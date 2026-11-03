@@ -10,6 +10,7 @@ on:
       - section-three.js
       - tools/section4-visual-metrics.mjs
       - tools/section4-motion-audit.mjs
+      - tools/section4-screenshot-compare.mjs
       - .github/workflows/section4-reference-measure.yml
 permissions:
   contents: read
@@ -36,13 +37,16 @@ jobs:
         run: node tools/section4-visual-metrics.mjs
       - name: Audit shared arch, pseudo elements and artwork scroll behavior
         run: node tools/section4-motion-audit.mjs
-      - name: Upload numerical layout metadata (not reference screenshots)
+      - name: Compare Section 4 reference and prototype views at 3 scroll positions
+        run: node tools/section4-screenshot-compare.mjs
+      - name: Upload numerical audit and paired screenshot artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: section4-reference-computed-layout
+          name: section4-reference-layout-motion-and-screenshots
           path: |
             section4-reference-metrics.json
             section4-motion-audit.json
+            section4-comparison/
           retention-days: 7
           if-no-files-found: warn
