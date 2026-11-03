@@ -325,7 +325,13 @@ test('reference-density petal canvas paints original transparent particles',asyn
     for(let i=3;i<d.length;i+=4){
       if(d[i]>0){visible++;sum+=d[i];}
     }
-    return {visible,averageAlpha:visible?sum/visible:0};
+    // Source capture uses deviceScaleFactor=1, but the phone projects
+    // in this suite can use a 2x canvas backing store. Normalize raw
+    // backing pixels to CSS pixels before checking source density.
+    const rect=el.getBoundingClientRect();
+    const pixelsPerCssPixel=(el.width/rect.width)*(el.height/rect.height);
+    return {visible:visible/pixelsPerCssPixel,
+      averageAlpha:visible?sum/visible:0};
   });
   // The source's observed 390px canvas had ~1000 nontransparent pixels and
   // mean alpha ~118. These generous bands avoid timer-phase flakiness.
