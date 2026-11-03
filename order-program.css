@@ -140,10 +140,15 @@
    Source screenshot: plum embossed-paper band, fine rectangular border.
    H2 computed 46px Pinyon Script; LI 18px EB Garamond. */
 .order-section {
-  background:
-    radial-gradient(ellipse at 50% 15%,rgba(110,66,90,.13),transparent 52%),
-    radial-gradient(ellipse at 90% 72%,rgba(104,58,79,.13),transparent 48%),
-    linear-gradient(135deg,#361929 0%,#321525 53%,#3e2033 100%);
+  /* Independent plum emboss illustration: no source provider artwork is reused. */
+  background-color:#4b203b;
+  background-image:
+    linear-gradient(rgba(20,8,18,.13),rgba(20,8,18,.13)),
+    url("./assets/order-plum-emboss-original.svg"),
+    linear-gradient(135deg,#51243f 0%,#431e36 52%,#37172b 100%);
+  background-size:auto,100% 100%,auto;
+  background-position:0 0,50% 50%,0 0;
+  background-repeat:no-repeat;
   color:#f0dce9;
 }
 .order-section::before {
@@ -153,17 +158,11 @@
     repeating-linear-gradient(95deg,rgba(255,217,232,.045) 0 1px,transparent 1px 7px);
 }
 .order-section::after {display:none;}
-.order-section .order-stage-original {
-  opacity:.38;
-  filter:grayscale(1) sepia(.65) saturate(.75) brightness(.65) contrast(1.25);
-  mix-blend-mode:overlay;
-  background:
-    url("./assets/couple-botanical-edges-original.svg") center center / 100% 100% no-repeat,
-    url("./assets/couple-garden-original.svg") center center / 100% auto no-repeat;
-}
-.order-section .order-stage-original::after {opacity:.25;}
-.order-section .order-leaf{opacity:.11;color:#e0b5c7;top:13%;font-size:125px;}
-.order-section .order-leaf-right{top:58%;}
+/* The panel carries its own independent floral relief; do not layer old
+   light-painted scenes or giant floral text on top of deep plum. */
+.order-section .order-stage-original{display:none;}
+.order-section .order-stage-original::after{display:none;}
+.order-section .order-leaf,.order-section .order-leaf-right{display:none;}
 .order-section .order-inner{
   padding:96px 28px 70px;
   min-height:651px;
