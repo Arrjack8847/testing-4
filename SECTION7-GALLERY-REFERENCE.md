@@ -59,3 +59,41 @@ powershell -ExecutionPolicy Bypass -File .\start.ps1
 Visit `http://localhost:8000`, open the invitation and scroll past
 **Dress Code** to **Our Gallery**. Do not merge this branch into main
 until the focused visual and browser tests pass.
+
+## Phase 2 — verified reference URLs and opt-in photo comparison
+
+All five image links were verified from the live public Tasik Kayangan page
+HTML image references (not guessed):
+
+| Caption | Original URL |
+|---|---|
+| Together | https://undangankahwin.com/images/concierge/couples/moody.webp |
+| The Bride | https://undangankahwin.com/images/concierge/couples/moody-bride.webp |
+| The Groom | https://undangankahwin.com/images/concierge/couples/moody-groom.webp |
+| The Garden | https://undangankahwin.com/images/concierge/couples/moody-garden.webp |
+| The Lake | https://undangankahwin.com/images/concierge/couples/moody-lake.webp |
+
+The public HTML order places **Tap a frame to view after the five frames**;
+the local section now uses the same DOM order.
+
+Normal guest mode uses only local
+`./assets/gallery/photo-01.webp` through `photo-05.webp`. To compare
+with source photos temporarily, open:
+
+```text
+http://localhost:8000/?galleryReference=1
+```
+
+These source photos are remote, never downloaded or committed by this
+branch, and are **not licensed for inclusion in commercial customer work**.
+A distinct on-page notice identifies the comparison mode; if hotlinking
+fails, placeholders remain instead of broken interactive frames.
+
+The comparison mode verifies content and photo identities, **not** exact
+CSS dimensions, crop positions, colors, camera motion, or timings. Do not
+declare the gallery pixel-perfect until side-by-side mobile screenshots
+have been measured and manual device testing has been completed.
+
+Focused CI uses `.github/workflows/section7-gallery-qa.yml`, testing
+four mobile sizes, image viewer, remote-image mock, keyboard use, fallback,
+reduced motion, and three browser engines.
