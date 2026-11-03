@@ -95,8 +95,15 @@
     const viewport = innerHeight;
     const pinned = clamp(-rect.top, 0, Math.max(0, rect.height - viewport));
     const camera = reduced.matches ? 0 : clamp((-rect.top) * .0427, -20, 24);
+    // The source paper drifts by ~0.0427px for each scroll pixel:
+    // roughly -15.7px at the start, 0 at the middle, +15.7px at the end.
+    // Unlike a fixed hero this remains in normal scrolling flow.
+    const motionDistance = -rect.top - Math.max(0, rect.height - viewport) / 2;
+    const paperShift = reduced.matches ? 0 : clamp(motionDistance * .0427, -24, 24);
     section.style.setProperty('--event-stage-y', (pinned + camera).toFixed(2) + 'px');
+    section.style.setProperty('--event-paper-shift', paperShift.toFixed(2) + 'px');
     section.dataset.eventCamera = camera.toFixed(2);
+    section.dataset.eventPaperShift = paperShift.toFixed(2);
   }
   function scheduleCamera() {
     if (cameraFrame !== null) return;
@@ -116,9 +123,11 @@
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
-        if (entry.isIntersecting) entry.target.classList.add('in-view');
+        // Match the reference: a text line enters when visible and returns
+        // to its resting state when scrolled offscreen, in both directions.
+        entry.target.classList.toggle('in-view', entry.isIntersecting);
       }
-    }, {threshold:.10,rootMargin:'30px 0px'});
+    }, {threshold:.08,rootMargin:'0px'});
     reveals.forEach(item => observer.observe(item));
 
     const sectionObserver = new IntersectionObserver(entries => {
