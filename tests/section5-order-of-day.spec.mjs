@@ -252,7 +252,7 @@ test('390px timeline text and six row baselines match measured source geometry',
     const style=e=>{
       const s=getComputedStyle(e);
       return {font:s.fontFamily,size:s.fontSize,lineHeight:s.lineHeight,color:s.color,
-        letterSpacing:s.letterSpacing};
+        letterSpacing:s.letterSpacing,textAlign:s.textAlign};
     };
     return {heading:pos(heading),eyebrow:pos(eyebrow),time:pos(time),
       title:pos(title),sub:pos(sub),rows:rows.map(pos),titleStyle:style(title),
@@ -275,6 +275,7 @@ test('390px timeline text and six row baselines match measured source geometry',
   near(m.sub.y,238.97);
   expect(m.timeStyle.font).toContain('EB Garamond');
   expect(m.timeStyle.size).toBe('12px');
+  expect(m.timeStyle.textAlign).toBe('right');
   expect(m.titleStyle.size).toBe('17px');
   expect(m.eyebrowStyle.size).toBe('11px');
   expect(errors).toEqual([]);
