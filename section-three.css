@@ -624,3 +624,15 @@
 @media(prefers-reduced-motion:reduce) {
   .event-section .event-petal-field i{animation:none;}
 }
+
+
+/* Final computed-style verification: source event paper object-fit is
+   COVER (not fill), and the inner fine gold frame is inset by exactly
+   7px on all four sides. These overrides replace the earlier visual
+   hypothesis with browser-read source values. */
+.event-section[data-art="reference"][data-reference-paper="loaded"] .event-source-paper {
+  object-fit:cover;
+}
+.event-section[data-art="reference"] .event-reference-card::after {
+  inset:7px;
+}
