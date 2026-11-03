@@ -1,5 +1,5 @@
 'use strict';
-// Original Section 5 gallery. The five slots are local-only and have no
+// Reference-structured Section 7 gallery. The five slots are local-only and have no
 // real photographs yet. Supply licensed/consented images and accurate alt text.
 (() => {
   const section = document.getElementById('gallery');
@@ -8,11 +8,11 @@
   if (!section || !invitation || !dialog) return;
 
   const PHOTOS = Object.freeze([
-    {src:'./assets/gallery/photo-01.webp', alt:'Gallery photo 1', caption:'Photo 01'},
-    {src:'./assets/gallery/photo-02.webp', alt:'Gallery photo 2', caption:'Photo 02'},
-    {src:'./assets/gallery/photo-03.webp', alt:'Gallery photo 3', caption:'Photo 03'},
-    {src:'./assets/gallery/photo-04.webp', alt:'Gallery photo 4', caption:'Photo 04'},
-    {src:'./assets/gallery/photo-05.webp', alt:'Gallery photo 5', caption:'Photo 05'}
+    {src:'./assets/gallery/photo-01.webp', alt:'Wedding couple together', caption:'Together'},
+    {src:'./assets/gallery/photo-02.webp', alt:'The bride', caption:'The Bride'},
+    {src:'./assets/gallery/photo-03.webp', alt:'The groom', caption:'The Groom'},
+    {src:'./assets/gallery/photo-04.webp', alt:'The wedding garden', caption:'The Garden'},
+    {src:'./assets/gallery/photo-05.webp', alt:'The lakeside scene', caption:'The Lake'}
   ]);
   const buttons = Array.from(section.querySelectorAll('[data-gallery-slot]'));
   const viewImage = document.getElementById('galleryViewImage');
