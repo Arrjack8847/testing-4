@@ -234,7 +234,11 @@ test('canvas and butterfly stop when invitation closes or reduced motion is enab
 
 test('390px timeline text and six row baselines match measured source geometry',async({page},testInfo)=>{
   test.skip(testInfo.project.name!=='iphone-390','Source baseline measured at 390 x 844');
+  // Compare the settled layout, not a 52px entrance translation in flight.
+  // The live reference geometry audit uses the same reduced-motion setting.
+  await page.emulateMedia({reducedMotion:'reduce'});
   const {section,errors}=await toOrder(page);
+  await page.evaluate(()=>document.fonts.ready);
   await expect(section).toBeInViewport();
   const m=await section.evaluate(el=>{
     const a=el.getBoundingClientRect();
