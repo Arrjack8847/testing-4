@@ -1,0 +1,40 @@
+name: Section 4 source layout measurement
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/section4-events-reference-prototype-20261103
+    paths:
+      - tools/section4-visual-metrics.mjs
+      - .github/workflows/section4-reference-measure.yml
+permissions:
+  contents: read
+jobs:
+  measure-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Start local prototype server
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/section4-server.log 2>&1 &
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl -fsS http://127.0.0.1:8000/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Read-only 390px live reference and 4-phone prototype layout audit
+        run: node tools/section4-visual-metrics.mjs
+      - name: Upload numerical layout metadata (not reference screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section4-reference-computed-layout
+          path: section4-reference-metrics.json
+          retention-days: 7
+          if-no-files-found: warn
