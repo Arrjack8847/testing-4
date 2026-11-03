@@ -202,7 +202,7 @@
 .order-section .order-time{
   padding:2px 0 0;
   color:rgb(232,211,168);font:400 12px/1.65 'EB Garamond',Georgia,serif;
-  letter-spacing:.12em;text-transform:none;
+  letter-spacing:.12em;text-transform:none;text-align:right;
 }
 .order-section .order-event-text{padding:0 0 9px;}
 .order-section .order-event-text strong{
