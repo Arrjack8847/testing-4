@@ -3,7 +3,7 @@ import {test, expect} from '@playwright/test';
 async function visitCountdown(page){
   const pageErrors=[];
   page.on('pageerror',e=>pageErrors.push(e.message));
-  await page.goto('/');
+  await page.goto('/?legacySaveDate=1');
   const section=page.locator('#saveTheDate');
   await expect(section).toHaveAttribute('aria-hidden','true');
   await expect(section).toHaveJSProperty('inert',true);
@@ -20,7 +20,7 @@ async function visitCountdown(page){
 
 test('Section 4 follows the venue, shows a date-only sample countdown, and blocks unconfirmed download',async({page})=>{
   const {section,pageErrors}=await visitCountdown(page);
-  await expect(section).toHaveAttribute('data-section','5');
+  await expect(section).toHaveAttribute('data-section','legacy-save-date');
   await expect(page.getByRole('heading',{level:2,name:'Save the Date'})).toBeVisible();
   await expect(section.locator('.save-date-disclaimer')).toContainText('Demonstration date');
   await expect(section.locator('time')).toHaveAttribute('datetime','2027-01-23');
@@ -81,13 +81,13 @@ test('Section 4 respects reduced motion and remains readable',async({page})=>{
 });
 
 
-test('Section 3 to Section 4 keeps a continuous lavender transition',async({page},testInfo)=>{
+test('Reference Events joins the plum Order of the Day without a seam',async({page},testInfo)=>{
   await page.goto('/');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const adjacent=await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
     const prior=document.getElementById('eventDetails');
-    const next=document.getElementById('saveTheDate');
+    const next=document.getElementById('runningOrder');
     const adjacent=prior.nextElementSibling===next;
     const nextTop=next.getBoundingClientRect().top+scrollY;
     window.scrollTo(0,Math.round(nextTop-innerHeight*.5));
@@ -95,11 +95,11 @@ test('Section 3 to Section 4 keeps a continuous lavender transition',async({page
   });
   expect(adjacent).toBe(true);
   await expect(page.locator('#eventDetails')).toBeInViewport();
-  await expect(page.locator('#saveTheDate')).toBeInViewport();
+  await expect(page.locator('#runningOrder')).toBeInViewport();
   const bounds=await page.evaluate(()=>{
     const prior=document.getElementById('eventDetails').getBoundingClientRect();
-    const next=document.getElementById('saveTheDate').getBoundingClientRect();
-    const overlay=getComputedStyle(document.getElementById('saveTheDate'),'::after');
+    const next=document.getElementById('runningOrder').getBoundingClientRect();
+    const overlay=getComputedStyle(document.getElementById('runningOrder'));
     return {seam:next.top-prior.bottom,gradient:overlay.backgroundImage,
       pageOverflow:document.documentElement.scrollWidth-innerWidth};
   });

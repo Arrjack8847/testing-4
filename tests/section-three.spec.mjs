@@ -303,11 +303,11 @@ test('390px source visual mode keeps full paper edges, true arch SVG and four pu
 });
 
 
-test('single localhost root URL joins reference Couple -> reference Events -> Save the Date',async({page})=>{
+test('single localhost root URL joins reference Couple -> reference Events -> Order of the Day',async({page})=>{
   const {section,errors}=await openEvents(page);
   const combined=await section.evaluate(events=>{
     const couple=document.getElementById('couple');
-    const save=document.getElementById('saveTheDate');
+    const save=document.getElementById('runningOrder');
     const rect1=couple.getBoundingClientRect();
     const rect2=events.getBoundingClientRect();
     const rect3=save.getBoundingClientRect();
@@ -326,7 +326,7 @@ test('single localhost root URL joins reference Couple -> reference Events -> Sa
   expect(combined.eventsArt).toBe('reference');
   expect(combined.eventPaper).toContain('/tasik-kayangan/paper.webp');
   expect(combined.prior).toBe('couple');
-  expect(combined.following).toBe('saveTheDate');
+  expect(combined.following).toBe('runningOrder');
   expect(Math.abs(combined.section3To4Gap)).toBeLessThanOrEqual(1);
   expect(Math.abs(combined.section4To5Gap)).toBeLessThanOrEqual(1);
   expect(combined.pageOverflow).toBeLessThanOrEqual(1);
