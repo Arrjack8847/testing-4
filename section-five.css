@@ -193,3 +193,85 @@
 .gallery-section[data-gallery-art="reference-comparison"] .gallery-disclaimer{
   max-width:36ch;margin-top:10px;
 }
+
+/* Section 7 source-measured gallery geometry (Playwright audit 2026-11-03).
+   Reference @390px: x28...362, cols 161/161, gap 12px;
+   row 1 Together 246.9h, Bride 214.7h; row 2 Groom 160x213.3
+   centered; rows 3+4 full-width 334x249.4.
+   @320px: x28...292, cols 126/126; proportions identical.
+   These dimensions come from the reference DOM's visible image frames.
+   Color, photo crops and transitions still need screenshot inspection. */
+.gallery-section {
+  padding-inline:28px;
+}
+.gallery-section .gallery-content {
+  max-width:400px;
+}
+.gallery-section h2.gallery-heading {
+  font-size:52px;
+  line-height:1.15;
+  margin-bottom:40px;
+}
+.gallery-section .gallery-photos {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:auto;
+  column-gap:12px;
+  row-gap:12px;
+  align-items:start;
+}
+.gallery-section .gallery-photo {
+  min-height:0;
+  padding:4px;
+}
+.gallery-section .gallery-photo-feature,
+.gallery-section .gallery-photo-small {
+  min-height:0;
+}
+.gallery-section .gallery-photo[data-gallery-slot="0"] {
+  grid-column:1;
+  grid-row:1;
+  aspect-ratio:161 / 246.9;
+}
+.gallery-section .gallery-photo[data-gallery-slot="1"] {
+  grid-column:2;
+  grid-row:1;
+  aspect-ratio:161 / 214.7;
+}
+.gallery-section .gallery-photo[data-gallery-slot="2"] {
+  grid-column:1 / -1;
+  grid-row:2;
+  justify-self:center;
+  width:calc((100% - 12px)/2 - 1px);
+  aspect-ratio:160 / 213.3;
+}
+.gallery-section .gallery-photo[data-gallery-slot="3"],
+.gallery-section .gallery-photo[data-gallery-slot="4"] {
+  grid-column:1 / -1;
+  aspect-ratio:334 / 249.4;
+}
+.gallery-section .gallery-photo[data-gallery-slot="3"] {
+  grid-row:3;
+}
+.gallery-section .gallery-photo[data-gallery-slot="4"] {
+  grid-row:4;
+}
+@media(max-width:350px) {
+  .gallery-section {padding-inline:28px;}
+  .gallery-section .gallery-photos {column-gap:12px;row-gap:12px;}
+  .gallery-section .gallery-photo-feature,
+  .gallery-section .gallery-photo-small {min-height:0;}
+  .gallery-section h2.gallery-heading {font-size:52px;}
+  .gallery-section .gallery-photo[data-gallery-slot="2"] {
+    width:calc((100% - 12px)/2 - 1px);
+  }
+  .gallery-section .gallery-photo {
+    padding:4px;
+  }
+}
+/* Keep short labels within the smaller 126px frames on 320px phones. */
+.gallery-section .gallery-photo[data-gallery-slot="0"] .gallery-photo-note,
+.gallery-section .gallery-photo[data-gallery-slot="1"] .gallery-photo-note,
+.gallery-section .gallery-photo[data-gallery-slot="2"] .gallery-photo-note {
+  font-size:12px;
+}
