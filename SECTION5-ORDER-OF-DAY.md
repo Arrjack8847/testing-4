@@ -147,3 +147,47 @@ The measured trajectory and wing structure are substantially closer to
 the source, but the exact proprietary JS motion curve and canvas particle
 path have **not** been reproduced byte-for-byte or certified pixel-perfect.
 The work remains draft, limited strictly to Section 5.
+
+
+## 4 November — pixel-geometry and fallback-art calibration
+
+Read-only Chromium geometry snapshots at **390×844** captured
+the reference and this branch at equivalent timeline offsets.
+Measured reference coordinates relative to `cgv-timeline`:
+
+| Content | x | y | width | height |
+| --- | ---: | ---: | ---: | ---: |
+| Running order eyebrow | 28 | 96 | 334 | 18.14 |
+| Order of the Day title | 28 | 126.14 | 334 | 52.89 |
+| Row 1 | 28 | 213.03 | 334 | 67.13 |
+| Row 2 | 28 | 280.16 | 334 | 52 |
+| Row 3 | 28 | 332.16 | 334 | 67.13 |
+| Row 4 | 28 | 399.28 | 334 | 52 |
+| Row 5 | 28 | 451.28 | 334 | 52 |
+| Row 6 | 28 | 503.28 | 334 | 52 |
+
+The latest read-only comparison after the adjustments reported **0px
+heading and eyebrow delta**, and row y errors of 0–0.01px. The section
+is still 0.28px shorter (651px rather than 651.28px), which is beneath
+one device pixel at the calibrated viewport.
+
+Matching typography: EB Garamond 11px / 18.15px at 0.45em letter spacing
+for the eyebrow, Pinyon Script 46px for the title, EB Garamond 12px /
+19.8px letter spaced 0.12em for times **right-aligned** within
+the first column, 17px for event titles, and 12px at 300 weight
+for subtitles. Alignment is frozen in the dedicated phone test.
+
+Visual source screenshot inspection showed that the independently
+illustrated original fallback was washed out compared with the
+reference. A new independently drawn file
+`assets/order-plum-emboss-original.svg` now provides a dark plum
+botanical relief behind the unchanged content. This is **not** a
+replica of the source-owned `band_plum.webp`; users with permission
+can still stage the latter under ignored `assets/reference-dev/`.
+Floating petals were softened to reduce visual noise.
+
+The reference includes a branded fixed bar from the surrounding
+preview and a finer-grained embossed floral texture; those are not
+part of Section 5's isolated code scope. The live copyrighted WebP
+has not been committed. Visual parity beyond layout and typography
+must not be claimed from geometry tests alone.
