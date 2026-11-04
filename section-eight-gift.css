@@ -333,3 +333,14 @@
 @media(prefers-reduced-motion:reduce){
   .gift-eight-petals i{animation:none!important}
 }
+
+
+/* Private licensed thumbnail comparison; original demo glyphs remain otherwise. */
+.gift-eight[data-gift-thumb-rice="reference-local"] .gift-eight-thumb-rice{
+  background:#fff url("./assets/reference-dev/gift-rice-cooker.jpg") center/contain no-repeat;
+  font-size:0;
+}
+.gift-eight[data-gift-thumb-kettle="reference-local"] .gift-eight-thumb-kettle{
+  background:#fff url("./assets/reference-dev/gift-kettle.webp") center/contain no-repeat;
+  font-size:0;
+}
