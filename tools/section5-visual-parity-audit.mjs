@@ -150,6 +150,41 @@ async function capture(browser,url,id,viewport){
         throw new Error('Local reference artwork not ready ('+status+'). '+(warning||'Check assets/reference-dev/.'));
       }
     }
+    // Capture the unaltered source first for provenance. Some public preview
+    // controls (floating menu/name badge) sit over the wedding invitation
+    // but are NOT part of the timeline artwork being compared.
+    if(id==='reference'){
+      const rawPath=join(output,'reference-raw-'+viewport.id+'.png');
+      await element.screenshot({path:rawPath,animations:'disabled',timeout:30000});
+      details.unalteredCapture=rawPath;
+      details.hiddenPreviewOverlays=await element.evaluate(section=>{
+        const stage=section.getBoundingClientRect();
+        const overlap=r=>r.width>0 && r.height>0 &&
+          r.right>stage.left && r.left<stage.right &&
+          r.bottom>stage.top && r.top<stage.bottom &&
+          r.right>0 && r.left<innerWidth && r.bottom>0 && r.top<innerHeight;
+        const hidden=[];
+        for(const node of document.body.querySelectorAll('*')){
+          if(node===section || section.contains(node) || node.contains(section))continue;
+          const style=getComputedStyle(node);
+          if(!['fixed','sticky'].includes(style.position))continue;
+          if(style.visibility==='hidden'||style.display==='none')continue;
+          const rect=node.getBoundingClientRect();
+          if(!overlap(rect))continue;
+          node.setAttribute('data-section5-audit-hide','true');
+          hidden.push({tag:node.tagName,
+            className:typeof node.className==='string'?node.className.slice(0,100):'',
+            position:style.position,
+            x:+rect.x.toFixed(2),y:+rect.y.toFixed(2),
+            width:+rect.width.toFixed(2),height:+rect.height.toFixed(2)});
+        }
+        return hidden;
+      });
+      if(details.hiddenPreviewOverlays.length){
+        await page.addStyleTag({content:
+          '[data-section5-audit-hide="true"]{visibility:hidden!important}'});
+      }
+    }
     await element.screenshot({path,animations:'disabled',timeout:30000});
     return {status:'captured',file:path,details,errors};
   }finally{await context.close();}
