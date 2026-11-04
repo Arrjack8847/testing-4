@@ -62,10 +62,12 @@
   // Opening demo bank details is an accessible local disclosure, not a transfer.
   const trigger=section.querySelector('#giftEightTrigger');
   const banks=section.querySelector('#giftEightBanks');
-  if(trigger&&banks){
+  const wishlist=section.querySelector('#giftEightWishlist');
+  if(trigger&&banks&&wishlist){
     trigger.addEventListener('click',()=>{
       const expanded=trigger.getAttribute('aria-expanded')==='true';
       banks.hidden=expanded;
+      wishlist.hidden=expanded;
       trigger.setAttribute('aria-expanded',String(!expanded));
     });
   }
