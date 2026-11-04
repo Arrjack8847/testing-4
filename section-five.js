@@ -148,8 +148,13 @@
   close.addEventListener('click', () => dialog.close());
   previous.addEventListener('click', () => moveBy(-1));
   next.addEventListener('click', () => moveBy(1));
+  // The full-screen viewer fills the dialog's content box. Treat a tap
+  // on its empty surface as an overlay dismissal, but not a tap on a photo
+  // or a viewer control.
   dialog.addEventListener('click', event => {
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog || event.target.classList.contains('gallery-viewer')) {
+      dialog.close();
+    }
   });
   dialog.addEventListener('keydown', event => {
     if (event.key === 'ArrowLeft') { event.preventDefault(); moveBy(-1); }
