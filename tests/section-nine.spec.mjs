@@ -401,3 +401,32 @@ test('Section 9 captures entry middle exit and reverse scroll on four phones',as
   expect(animations).toEqual({west:'none',east:'none',petals:'none'});
   expect(errors).toEqual([]);
 });
+
+test('Section 9 butterfly x tracks match archived 390px reference frames',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Reference positions measured at 390px');
+  const {section}=await go(page);
+  const tracks=await section.evaluate(el=>{
+    const sample=(selector,name,ms)=>{
+      const target=el.querySelector(selector);
+      const animation=target.getAnimations().find(item=>item.animationName===name);
+      if(!animation)return null;
+      animation.pause();
+      animation.currentTime=ms;
+      return target.getBoundingClientRect().x;
+    };
+    return {
+      eastStart:sample('.s9-butterfly-forward','s9-flight-forward',8800),
+      eastEnd:sample('.s9-butterfly-forward','s9-flight-forward',13600),
+      westStart:sample('.s9-butterfly','s9-flight',10000),
+      westEnd:sample('.s9-butterfly','s9-flight',13600),
+    };
+  });
+  // These times are reconstructed from the previous local flight's 21-frame
+  // animation clock, not copied from the vendor's JavaScript.
+  // Reference observations: east 121→319px; west 302→147px.
+  const source={eastStart:121,eastEnd:319,westStart:302,westEnd:147};
+  for(const [key,expected] of Object.entries(source)){
+    expect(tracks[key],key+' must be a sampled CSS-animation coordinate').not.toBeNull();
+    expect(Math.abs(tracks[key]-expected),key+' at 390px').toBeLessThan(9);
+  }
+});
