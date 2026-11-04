@@ -9,6 +9,7 @@
  *
  * Optional:
  *   node tools/section5-visual-parity-audit.mjs --reference-only
+ *   node tools/section5-visual-parity-audit.mjs --geometry-only
  *   node tools/section5-visual-parity-audit.mjs --local-url http://localhost:8000/
  *
  * Evidence is written to artifacts/section5-visual-parity/ (gitignored).
@@ -23,6 +24,9 @@ const valueOf=(name,fallback)=>{
   return i<0?fallback:args[i+1]||fallback;
 };
 const referenceOnly=args.includes('--reference-only');
+// Layout comparison is meaningful even without licensed provider artwork.
+// Never call its screenshots a pixel-parity result in this mode.
+const geometryOnly=args.includes('--geometry-only');
 const localUrl=valueOf('--local-url','http://localhost:8000/');
 const referenceUrl='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en';
 const output='artifacts/section5-visual-parity';
@@ -108,7 +112,8 @@ async function capture(browser,url,id,viewport){
         return ['ready','partial','missing'].includes(status);
       },null,{timeout:12000});
       const status=await element.getAttribute('data-artwork-status');
-      if(status!=='ready'){
+      details.artworkStatus=status;
+      if(status!=='ready' && !geometryOnly){
         const warning=await page.locator('#orderArtworkNotice').textContent().catch(()=>null);
         throw new Error('Local reference artwork not ready ('+status+'). '+(warning||'Check assets/reference-dev/.'));
       }
@@ -188,10 +193,10 @@ async function comparePixels(browser,aBytes,bBytes){
 await mkdir(output,{recursive:true});
 const report={
   referenceUrl,localUrl,checkedAt:new Date().toISOString(),
-  artAssets:await checkStagedArt(),widths:[],mode:referenceOnly?'reference-only':'comparison'
+  artAssets:await checkStagedArt(),widths:[],mode:referenceOnly?'reference-only':geometryOnly?'geometry-only':'comparison'
 };
 let failures=0;
-if(!referenceOnly&&report.artAssets.some(asset=>!asset.valid)){
+if(!referenceOnly&&!geometryOnly&&report.artAssets.some(asset=>!asset.valid)){
   console.error('Section 5 artwork preflight: permission-cleared local WebPs are missing or invalid.');
   console.error('Run download-section5-reference.ps1 -IHavePermission ONLY if you have rights to those assets.');
   for(const asset of report.artAssets)console.error(asset.name+': '+(asset.valid?'OK':'MISSING/INVALID'));
@@ -209,12 +214,14 @@ try{
       if(!referenceOnly){
         result.local=await capture(browser,localUrl,'local',viewport);
         result.geometryDifference=differences(result.reference.details,result.local.details);
-        const [a,b]=await Promise.all([readFile(result.reference.file),readFile(result.local.file)]);
-        const diff=await comparePixels(browser,a,b);
-        const diffPath=join(output,'diff-'+viewport.id+'.png');
-        await writeFile(diffPath,diff.diff);
-        result.pixelDifference=diff.stats;
-        result.diffFile=diffPath;
+        if(!geometryOnly){
+          const [a,b]=await Promise.all([readFile(result.reference.file),readFile(result.local.file)]);
+          const diff=await comparePixels(browser,a,b);
+          const diffPath=join(output,'diff-'+viewport.id+'.png');
+          await writeFile(diffPath,diff.diff);
+          result.pixelDifference=diff.stats;
+          result.diffFile=diffPath;
+        }
         if(result.local.details.horizontalOverflow>1)throw new Error('Section 5 causes mobile horizontal overflow');
       }
       console.log('SECTION5_PARITY '+JSON.stringify({
