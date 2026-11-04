@@ -496,11 +496,11 @@
   min-width:42px;
   min-height:42px;
   padding:0;
-  border:0;
+  border:1px solid #fff;
   border-radius:50%;
   background:rgba(255,255,255,.15);
   color:#fff;
-  font:400 22px/1 system-ui,sans-serif;
+  font:400 17px/1 'EB Garamond',Georgia,serif;
 }
 .gallery-dialog .gallery-viewer-figure {
   box-sizing:border-box;
@@ -517,6 +517,7 @@
   border-radius:16px;
   overflow:hidden;
   background:transparent;
+  box-shadow:0 40px 100px rgba(0,0,0,.5);
 }
 .gallery-dialog #galleryViewImage {
   position:absolute;
