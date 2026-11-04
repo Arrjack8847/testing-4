@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-// Section 9 source-grounded RSVP & Wishes. Intentionally no real submission backend.
+// Section 9 source-grounded RSVP & Wishes with real API; UI uses safe stub while Python tests exercise SQLite.
 async function go(page){
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
@@ -27,11 +27,18 @@ test('Section 9 matches source structure, field choices and section order',async
   await expect(section.locator('#s9Guests option')).toHaveCount(5);
   await expect(section.locator('#s9Wish')).toHaveAttribute('maxlength','300');
   await expect(section.locator('.s9-wish')).toHaveCount(3);
-  await expect(section.locator('#s9FormStatus')).toContainText('not sent');
+  await expect(section.locator('#s9FormStatus')).toContainText('save it privately');
   expect(errors).toEqual([]);
 });
-test('No submission, guest message or public wish is persisted by demo',async({page})=>{
-  const writes=[];page.on('request',req=>{if(!['GET','HEAD'].includes(req.method()))writes.push(req.method()+' '+req.url())});
+test('A confirmed POST reveals a receipt; errors never pretend to save',async({page})=>{
+  const writes=[];
+  await page.route('**/api/rsvp',async route=>{
+    const payload=route.request().postDataJSON();
+    writes.push(payload);
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({
+      ok:true,saved:true,receipt:payload.requestId
+    })});
+  });
   const {section,errors}=await go(page);
   await section.locator('#s9Name').fill('  Dana    Test  ');
   await section.locator('#s9Attendance').selectOption('yes');
@@ -41,26 +48,45 @@ test('No submission, guest message or public wish is persisted by demo',async({p
   await expect(section.locator('#s9Preview')).toBeVisible();
   await expect(section.locator('#s9PreviewName')).toHaveText('Dana Test');
   await expect(section.locator('#s9PreviewGuests')).toHaveText('3');
-  await expect(section.locator('#s9FormStatus')).toContainText('not sent or saved');
-  expect(writes).toEqual([]);
+  await expect(section.locator('#s9FormStatus')).toContainText('received and saved');
+  expect(writes).toHaveLength(1);
+  expect(writes[0].requestId).toMatch(/^[a-f0-9-]{36}$/);
+  expect(writes[0].shareWish).toBe(false);
   await page.reload();
   await page.getByRole('button',{name:'Open Invitation'}).click();
   await expect(page.locator('#s9Preview')).toBeHidden();
-  await expect(page.locator('#s9Name')).toHaveValue('');
-  await expect(page.locator('.s9-wish')).toHaveCount(3);
   expect(errors).toEqual([]);
 });
-test('Declining disables guest count and cover reset clears local preview',async({page})=>{
+test('Declining saves guest count zero and closing cover hides receipt',async({page})=>{
+  let sent;
+  await page.route('**/api/rsvp',async route=>{
+    sent=route.request().postDataJSON();
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({
+      ok:true,saved:true,receipt:sent.requestId
+    })});
+  });
   const {section}=await go(page);
   await section.locator('#s9Name').fill('Guest Example');
   await section.locator('#s9Attendance').selectOption('no');
   await expect(section.locator('#s9Guests')).toBeDisabled();
   await section.getByRole('button',{name:'Send RSVP'}).click();
   await expect(section.locator('#s9PreviewGuests')).toHaveText('Not attending');
+  expect(sent.guests).toBe(0);
   await page.evaluate(()=>{document.getElementById('invitation').dataset.state='cover';});
   await expect(section).toHaveJSProperty('inert',true);
   await expect(section.locator('#s9Preview')).toBeHidden();
-  await expect(section.locator('#s9Name')).toHaveValue('');
+});
+test('Backend error preserves entry and never claims saved',async({page})=>{
+  await page.route('**/api/rsvp',route=>route.fulfill({
+    status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:'Service unavailable.'})
+  }));
+  const {section}=await go(page);
+  await section.locator('#s9Name').fill('Test Guest');
+  await section.locator('#s9Attendance').selectOption('yes');
+  await section.getByRole('button',{name:'Send RSVP'}).click();
+  await expect(section.locator('#s9FormStatus')).toContainText('Service unavailable');
+  await expect(section.locator('#s9Preview')).toBeHidden();
+  await expect(section.locator('#s9Name')).toHaveValue('Test Guest');
 });
 test('Four widths have no overflow and Section 8→9→10 seams stay exact',async({page},testInfo)=>{
   const {section,errors}=await go(page);
