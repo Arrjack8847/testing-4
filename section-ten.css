@@ -50,7 +50,7 @@
 .section-ten .closing10-inner {
   position:relative;z-index:2;box-sizing:border-box;
   width:100%;max-width:334px;height:664px;margin:0 auto;
-  padding-top:52px;
+  padding-top:0;
 }
 .section-ten .closing10-inner::before {
   content:"";position:absolute;z-index:-1;
@@ -59,8 +59,8 @@
   pointer-events:none;
 }
 .section-ten .closing10-frame {
-  position:absolute;left:2px;right:2px;top:40px;
-  height:688px;border:1px solid #7e64794d;
+  position:absolute;left:-6px;right:-6px;top:-28px;
+  height:720px;border:1px solid #7e64794d;
   z-index:-1;pointer-events:none;
 }
 .section-ten .closing10-frame::before,
@@ -80,7 +80,7 @@
   letter-spacing:4.95px;text-transform:uppercase;
 }
 .section-ten .closing10-message {
-  max-width:292px;margin:0 auto;
+  max-width:306px;margin:0 auto;
   color:#6f5a6c;font:400 18px/1.65 'EB Garamond',Georgia,serif;
 }
 .section-ten .closing10-rule {
