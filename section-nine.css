@@ -26,7 +26,7 @@
 /* Source's cgv-tframe: a tall, pointed-arch ivory panel, not four loose
    25px corner brackets. Framing is original CSS, no vendor frame asset copied. */
 .s9-frame{
-  position:absolute;top:-91px;bottom:-67px;left:-13px;right:-13px;
+  position:absolute;top:-91px;bottom:-37px;left:-13px;right:-13px;
   z-index:-1;pointer-events:none;opacity:1;overflow:visible;
   /* Let the original paper texture remain faintly visible beneath the ivory arch. */
   background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,252,253,.84));
