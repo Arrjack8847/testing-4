@@ -1,0 +1,61 @@
+name: Section 4 exact reference audit (four phones)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'section-three.css'
+      - 'section-three.js'
+      - 'tests/section-three.spec.mjs'
+      - 'tools/section4-exact-asset-audit.mjs'
+      - 'tools/section4-visual-parity-4phones.mjs'
+      - 'tools/section4-source-hashes.mjs'
+      - '.github/workflows/section4-exact-parity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  section4-reference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Validate Section 4 scripts and tests
+        run: |
+          node --check section-three.js
+          node --check tests/section-three.spec.mjs
+          node --check tools/section4-exact-asset-audit.mjs
+          node --check tools/section4-visual-parity-4phones.mjs
+          node --check tools/section4-source-hashes.mjs
+      - name: Run standard localhost:8000 server
+        run: |
+          python3 tools/dev-server.py > /tmp/section4-localhost.log 2>&1 &
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent http://127.0.0.1:8000/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/section4-localhost.log
+          exit 1
+      - name: Inspect every source image and font at three scroll states on four phones
+        id: asset-audit
+        run: node tools/section4-exact-asset-audit.mjs
+      - name: Capture 12 paired reference/prototype screenshots and measure differences
+        if: success() || failure()
+        run: node tools/section4-visual-parity-4phones.mjs
+      - name: Upload evidence (not original vendor assets)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section4-exact-audit-320-360-390-430
+          path: section4-exact-audit/
+          retention-days: 5
+          if-no-files-found: warn
+      - name: Print localhost errors on failures
+        if: failure()
+        run: cat /tmp/section4-localhost.log || true
