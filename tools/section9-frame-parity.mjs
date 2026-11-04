@@ -50,7 +50,11 @@ try{
       },{id,offset});
     };
     await Promise.all([scroll(original,'#cgv-rsvp'),scroll(local,'#rsvp')]);
-    await wait(300);
+    // The reference's opening choreography can continue scrolling for ~1.8s;
+    // avoid comparing Section 8 on one page against Section 9 on the other.
+    await wait(1800);
+    await Promise.all([scroll(original,'#cgv-rsvp'),scroll(local,'#rsvp')]);
+    await wait(250);
     const t0=Date.now();
     for(const ms of [0,600,1200,1800,2400,3600,4800]){
       const elapsed=Date.now()-t0;
