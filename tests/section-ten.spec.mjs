@@ -223,7 +223,8 @@ test('Section 10 reveals and hides individual blocks on forward and reverse scro
     return top+el.offsetHeight>0&&top<innerHeight*0.85;
   });
   await expect(heading).toHaveAttribute('data-in-view',String(headlineExposedAtBottom));
-  await page.waitForTimeout(1450);
+  // Source footer waits 1.05s before its 1.0s fade; allow the full 2.05s.
+  await page.waitForTimeout(2250);
   if(headlineExposedAtBottom)expect(await opacity(heading)).toBeGreaterThan(0.98);
   else expect(await opacity(heading)).toBeLessThan(0.03);
   expect(await opacity(footer)).toBeGreaterThan(0.98);
@@ -232,7 +233,8 @@ test('Section 10 reveals and hides individual blocks on forward and reverse scro
   await go(-200);
   await expect(heading).toHaveAttribute('data-in-view','true');
   await expect(footer).toHaveAttribute('data-in-view','false');
-  await page.waitForTimeout(1350);
+  // On reverse scroll the source uses the same footer transition delay.
+  await page.waitForTimeout(2250);
   expect(await opacity(heading)).toBeGreaterThan(0.98);
   expect(await opacity(footer)).toBeLessThan(0.03);
   await expect(closing).toHaveAttribute('data-revealed','true');
@@ -271,4 +273,25 @@ test('Section 10 reference trigger boundaries match the source at 390x844',async
   await check('.closing10-contacts',false);
   await goto(-370);
   await check('.closing10-rule',false);
+});
+
+
+test('Section 10 CSS matches measured reference stagger and duration',async({page})=>{
+  await openInvitation(page);
+  const measured=await page.locator('#closingMessage').evaluate(section=>{
+    const selectors=['.closing10-frame','#closingHeading','.closing10-message',
+      '.closing10-rule','.closing10-signoff','.closing10-names',
+      '.closing10-contacts','.closing10-credit'];
+    return selectors.map(q=>{
+      const style=getComputedStyle(section.querySelector(q));
+      return {delay:style.transitionDelay,duration:style.transitionDuration,
+        timing:style.transitionTimingFunction};
+    });
+  });
+  const expected=['0s','0.15s','0.3s','0.45s','0.6s','0.75s','0.9s','1.05s'];
+  measured.forEach((m,i)=>{
+    expect(m.delay).toBe(expected[i]);
+    expect(m.duration).toBe('1s, 1.1s');
+    expect(m.timing).toContain('cubic-bezier(0.22, 0.9, 0.24, 1)');
+  });
 });
