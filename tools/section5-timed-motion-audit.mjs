@@ -103,6 +103,43 @@ async function trace(browser,source){
   finally{await context.close()}
 }
 
+
+/**
+ * Derive signed x-velocity in CSS pixels/second from real samples.
+ * This deliberately reports phase-agnostic observations: source and local
+ * animation clocks are not synchronized, so point-by-point position
+ * equality would be invalid.
+ */
+function summarize(traceResult){
+  if(traceResult.status!=='captured')return {status:'unavailable'};
+  const pairs=[];
+  const samples=traceResult.samples||[];
+  for(let i=1;i<samples.length;i++){
+    const a=samples[i-1],b=samples[i];
+    const x0=a.butterfly?.relativeX,x1=b.butterfly?.relativeX;
+    const dt=(b.actualElapsedMs-a.actualElapsedMs)/1000;
+    if(!Number.isFinite(x0)||!Number.isFinite(x1)||dt<=0)continue;
+    const speed=+( (x1-x0)/dt ).toFixed(2);
+    pairs.push({
+      fromMs:a.targetMs,toMs:b.targetMs,cssPixelsPerSecond:speed,
+      observedDirection:speed < -8?'left':speed > 8?'right':'hold',
+      localPassageStart:a.butterfly?.passage||null,
+      localPassageEnd:b.butterfly?.passage||null
+    });
+  }
+  const directions=[...new Set(pairs.map(p=>p.observedDirection))];
+  const visibleSamples=samples.filter(s=>s.butterfly?.visible).length;
+  const petalSamples=samples.filter(s=>typeof s.petals?.nonTransparentPixels==='number');
+  return {
+    visibleButterflySamples:visibleSamples,
+    capturedPetalSamples:petalSamples.length,
+    directions,
+    meanVisiblePetalPixels:petalSamples.length?
+      +(petalSamples.reduce((sum,s)=>sum+s.petals.nonTransparentPixels,0)/petalSamples.length).toFixed(1):null,
+    intervals:pairs
+  };
+}
+
 await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true});
 let report;
@@ -111,7 +148,14 @@ try{
   report={
     measuredAt:new Date().toISOString(),sourceUrl,localUrl,viewport,checkpoints,
     note:'Diagnostic only. Source and local clocks can start at different phases; missing artwork leaves local butterfly invisible.',
-    reference,local
+    reference,local,
+    referenceSummary:summarize(reference),
+    localSummary:summarize(local),
+    evaluation:{
+      realArtworkReady:(local.samples||[]).some(s=>s.artworkStatus==='ready'),
+      clocksPhaseAligned:false,
+      interpretation:'Direction/velocity diagnostic only. Do not claim identical motion or images without matched-phase and permission-cleared artwork.'
+    }
   };
 }finally{await browser.close()}
 const path=out+'/report.json';
@@ -122,5 +166,9 @@ for(const side of ['reference','local']){
     ' visible butterfly observations='+((r.samples||[]).filter(x=>x.butterfly?.visible).length));
   if(r.error)console.error(side+': '+r.error);
 }
+console.log('MOTION_SUMMARY '+JSON.stringify({
+  reference:report.referenceSummary,local:report.localSummary,
+  realArtworkReady:report.evaluation.realArtworkReady
+}));
 console.log('Motion trace: '+path);
 if(report.reference.status!=='captured'||report.local.status!=='captured')process.exitCode=1;
