@@ -1,6 +1,6 @@
 /* Section 10: independent Tasik Kayangan closing scene.
    Based on measured 390x844 live source geometry. No vendor art is bundled.
-   Optional licensed local scene: assets/reference-dev/scene.webp gated in section-ten.js. */
+   Optional locally staged reference scene: assets/reference-dev/scene.webp; source use requires artwork rights. */
 .reference-continuation.ref-closing.section-ten {
   --closing10-purple:#7e6479;
   --closing10-ink:#4a2a45;
@@ -41,10 +41,10 @@
   display:none;position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;object-position:center;opacity:1;
 }
-.section-ten[data-artwork="licensed-local"] .closing10-source-scene {display:block;}
-.section-ten[data-artwork="licensed-local"] .ref-environment::before,
-.section-ten[data-artwork="licensed-local"] .ref-vine,
-.section-ten[data-artwork="licensed-local"] .ref-light {display:none;}
+.section-ten[data-artwork="local-reference"] .closing10-source-scene {display:block;}
+.section-ten[data-artwork="local-reference"] .ref-environment::before,
+.section-ten[data-artwork="local-reference"] .ref-vine,
+.section-ten[data-artwork="local-reference"] .ref-light {display:none;}
 .section-ten .closing10-inner {
   position:relative;z-index:2;box-sizing:border-box;
   width:100%;max-width:334px;height:664px;margin:0 auto;
