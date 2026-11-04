@@ -164,7 +164,7 @@
    Its -160px start keeps it out of view until the natural middle checkpoint. */
 @keyframes s9-flight-forward{
   0%{opacity:0;transform:translate3d(-160px,4px,0) rotate(90deg) scale(.82)}
-  13%{opacity:1;transform:translate3d(calc(-160px + 13vw * 1.69),3px,0) rotate(85deg) scale(.82)}
+  13%{opacity:1;transform:translate3d(-74px,3px,0) rotate(85deg) scale(.82)}
   30%{opacity:1;transform:translate3d(38px,0,0) rotate(96deg) scale(.82)}
   50%{opacity:1;transform:translate3d(170px,-7px,0) rotate(86deg) scale(.82)}
   70%{opacity:1;transform:translate3d(302px,-10px,0) rotate(94deg) scale(.82)}
