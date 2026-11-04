@@ -133,3 +133,77 @@
 @media(min-width:375px) and (max-width:414px){.gift-eight{min-height:991px}}
 @media(min-width:415px){.gift-eight{min-height:923px}}
 @media(prefers-reduced-motion:reduce){.gift-eight-art{animation:none!important}}
+
+
+/* Authorized local blush butterfly: appears near the Gift→RSVP exit,
+   where the reference screenshot shows a small pale butterfly.
+   Source position/motion remains provisional pending frame-by-frame audit. */
+.gift-eight-butterfly{
+  position:absolute;
+  left:61%;
+  bottom:91px;
+  width:51px;
+  height:43px;
+  z-index:3;
+  pointer-events:none;
+  opacity:0;
+  visibility:hidden;
+  transform:translate3d(0,0,0) rotate(-8deg);
+  transform-origin:center;
+  filter:drop-shadow(0 2px 3px rgba(25,6,23,.22));
+}
+.gift-eight[data-gift-butterfly="reference-local"] .gift-eight-butterfly{
+  opacity:.9;
+  visibility:visible;
+  animation:gift-eight-butterfly-drift 5.6s ease-in-out infinite;
+}
+.gift-eight-bfly-wing{
+  position:absolute;
+  top:2px;
+  width:26px;
+  height:38px;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+.gift-eight[data-gift-butterfly="reference-local"] .gift-eight-bfly-wing{
+  background-image:url("./assets/reference-dev/bfly_blush.webp");
+}
+.gift-eight-bfly-left{
+  left:1px;
+  transform-origin:95% 60%;
+  animation:gift-eight-butterfly-left 1.15s ease-in-out infinite alternate;
+}
+.gift-eight-bfly-right{
+  right:1px;
+  transform-origin:5% 60%;
+  animation:gift-eight-butterfly-right 1.15s ease-in-out infinite alternate;
+}
+.gift-eight-bfly-body{
+  position:absolute;
+  top:13px;
+  left:23px;
+  width:4px;
+  height:21px;
+  border-radius:100%;
+  background:linear-gradient(#f8e4ca,#9b5982);
+  box-shadow:0 0 4px #f1cada;
+}
+@keyframes gift-eight-butterfly-drift{
+  0%,100%{transform:translate3d(0,0,0) rotate(-8deg)}
+  47%{transform:translate3d(-7px,-10px,0) rotate(6deg)}
+}
+@keyframes gift-eight-butterfly-left{
+  from{transform:rotateY(18deg) rotate(-5deg)}
+  to{transform:rotateY(69deg) rotate(-13deg)}
+}
+@keyframes gift-eight-butterfly-right{
+  from{transform:scaleX(-1) rotateY(18deg) rotate(-5deg)}
+  to{transform:scaleX(-1) rotateY(69deg) rotate(-13deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .gift-eight .gift-eight-butterfly,
+  .gift-eight .gift-eight-bfly-wing{
+    animation:none!important;
+  }
+}
