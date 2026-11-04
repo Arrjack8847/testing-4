@@ -2,7 +2,12 @@
 import argparse
 import csv
 from pathlib import Path
-from dev_server import database, ROOT
+import importlib.util
+spec=importlib.util.spec_from_file_location("rsvp_dev_server",Path(__file__).with_name("dev-server.py"))
+server_module=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(server_module)
+database=server_module.database
+ROOT=server_module.ROOT
 
 def spreadsheet_safe(text):
     value=str(text)
