@@ -334,6 +334,13 @@
          Photo slots remain placeholders until the couple provides authorized images. -->
     <section class="gallery-section" id="gallery" data-section="7"
       aria-labelledby="galleryHeading" aria-hidden="true" inert>
+      <!-- Section 7 owns a second sticky use of the locally stored scene.webp.
+           Keep this behind Gallery content, separate from Section 1's hero. -->
+      <div class="gallery-scene-backdrop" aria-hidden="true">
+        <img class="gallery-scene-image" src="./assets/scene.webp" alt=""
+          loading="lazy" decoding="async" draggable="false">
+        <div class="gallery-scene-wash"></div>
+      </div>
       <div class="gallery-atmosphere" aria-hidden="true">
         <span class="gallery-halo"></span>
         <span class="gallery-flora gallery-flora-left">❧</span>

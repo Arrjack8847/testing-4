@@ -1,0 +1,74 @@
+name: Section 7 real-art isolated pixel comparison
+on:
+  push:
+    branches:
+      - feat/section7-reference-validation-20261104
+    paths:
+      - .github/workflows/section7-real-art-check.yml
+      - tools/section7-real-art-pixel-report.py
+      - tools/section7-method-audit.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated browser and image comparison dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python -m pip install Pillow
+      - name: Fetch reference WebP files into this disposable CI runner only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request
+          scene_root="https://undangankahwin.com/images/concierge/packs/tasik-kayangan/"
+          gallery_root="https://undangankahwin.com/images/concierge/couples/"
+          targets=[(scene_root+"scene.webp",Path("assets/scene.webp"))]
+          targets += [(gallery_root+name,Path("assets/gallery/reference")/name)
+                      for name in ("moody.webp","moody-bride.webp","moody-groom.webp",
+                                   "moody-garden.webp","moody-lake.webp")]
+          for url,target in targets:
+            target.parent.mkdir(parents=True,exist_ok=True)
+            req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
+            with urllib.request.urlopen(req,timeout=35) as resp:
+              data=resp.read()
+            if len(data)<64 or data[0:4]!=b"RIFF" or data[8:12]!=b"WEBP":
+              raise RuntimeError(f"Missing or invalid WebP from source: {target}")
+            target.write_bytes(data)
+            print(f"Verified temporary WebP: {target.name} ({len(data)} bytes)")
+          print("All 6 reference WebPs are present only in this temporary runner.")
+          PY
+      - name: Render source and local Gallery at 320 360 390 430
+        run: |
+          python -m http.server 8000 --bind 127.0.0.1 >/tmp/gallery-real-art-server.log 2>&1 &
+          node tools/section7-method-audit.mjs
+      - name: Measure photo-interior pixels and complete Gallery views
+        run: python tools/section7-real-art-pixel-report.py
+      - name: Remove copyrighted source and local screenshot bytes
+        if: always()
+        run: |
+          rm -f assets/scene.webp
+          rm -rf assets/gallery/reference
+          find section7-method-evidence -type f -name '*.png' -delete || true
+      - name: Save measurements ONLY, not images or vendor image files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-real-art-numeric-results
+          path: |
+            section7-method-evidence/measurements.json
+            section7-method-evidence/full-art-pixel-report.json
+            section7-method-evidence/QA-REPORT.md
+          if-no-files-found: warn
+          retention-days: 7

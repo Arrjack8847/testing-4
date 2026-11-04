@@ -1,0 +1,53 @@
+name: Section 7 six-phase reference verification
+on:
+  push:
+    branches:
+      - feat/section7-reference-validation-20261104
+    paths:
+      - tools/section7-method-audit.mjs
+      - tools/section7-screenshot-compare.py
+      - .github/workflows/section7-method-verification.yml
+      - tests/section-five.spec.mjs
+      - section-five.js
+      - section-five.css
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  section7:
+    name: Four-phone functional QA, source visual and motion evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install project dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium Firefox WebKit
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Verify JavaScript syntax
+        run: |
+          node --check tools/section7-method-audit.mjs
+          npm run test:syntax
+      - name: Four-width Section 7 Gallery functional tests
+        run: npx playwright test tests/section-five.spec.mjs
+      - name: Isolated three-engine Section 7 accessibility
+        run: npx playwright test --config playwright.crossbrowser.config.mjs --grep 'Section 7 provides an accessible gallery'
+      - name: Capture source and local four-width visual and 1-3-5s animation evidence
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section7-server.log 2>&1 &
+          node tools/section7-method-audit.mjs
+      - name: Generate paired screenshots and masked artwork-aware comparison
+        run: |
+          python3 -m pip install --user Pillow
+          python3 tools/section7-screenshot-compare.py
+      - name: Preserve source/local screenshots, motion data and comparison results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-six-phase-reference-evidence
+          path: section7-method-evidence/
+          if-no-files-found: warn
+          retention-days: 7
