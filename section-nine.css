@@ -101,8 +101,14 @@
 .s9-rsvp :is(input,select,textarea,button):focus-visible{outline:3px solid #925c8e;outline-offset:3px}
 /* Source audit: butterfly travels right-to-left about 80px above the Section 9
    bottom, at ~33–34px/s. Source wing sprite is 52×41 and rotated ~-90°. */
-.s9-butterfly{position:absolute;z-index:1;left:0;top:calc(100% - 80px);width:52px;height:41px;opacity:0;pointer-events:none;
-  transform-origin:center center;animation:s9-flight 16s linear 1.5s infinite;animation-play-state:paused}
+/* The source has two opposite 0.82-scale butterfly flights near the lower
+   RSVP boundary. Measured mid-scroll at 390px: the rightbound butterfly
+   crosses ~121→319px, while a later leftbound one crosses ~302→147px.
+   Preserve separate timing so they do not overlap unnaturally at entry. */
+.s9-butterfly{position:absolute;z-index:1;left:0;top:calc(100% - 12px);width:52px;height:41px;opacity:0;pointer-events:none;
+  transform-origin:center center;animation:s9-flight 16s linear 5s infinite;animation-play-state:paused}
+.s9-butterfly-forward{position:absolute;z-index:1;left:0;top:calc(100% - 72px);width:52px;height:41px;opacity:0;pointer-events:none;
+  transform-origin:center center;animation:s9-flight-forward 16s linear 0s infinite;animation-play-state:paused}
 .s9-wing{position:absolute;top:3px;width:27px;height:34px;
   background:radial-gradient(ellipse at 60% 40%,#f4eaf7 8%,#b49bbd 57%,#816b9b 92%);
   border-radius:83% 11% 75% 21%;filter:drop-shadow(0 1px 1px #8f7fa9)}
@@ -132,7 +138,7 @@
   from{transform:perspective(210px) rotateY(8deg)}
   to{transform:perspective(210px) rotateY(72deg)}
 }
-.s9-rsvp.s9-active .s9-butterfly,.s9-rsvp.s9-active .s9-wing{animation-play-state:running}
+.s9-rsvp.s9-active .s9-butterfly,.s9-rsvp.s9-active .s9-butterfly-forward,.s9-rsvp.s9-active .s9-wing{animation-play-state:running}
 .s9-rsvp:not(.s9-active) .s9-wing{animation-play-state:paused}
 .s9-rsvp.s9-reveal-ready .s9-reveal{opacity:0;transform:translate3d(0,52px,0) scale(.955);
   transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.7,.2,1)}
@@ -154,12 +160,23 @@
   85%{opacity:1;transform:translate3d(calc(100vw - 406px),-1px,0) rotate(-106deg) scale(.82)}
   100%{opacity:0;transform:translate3d(calc(100vw - 488px),-5px,0) rotate(-80deg) scale(.82)}
 }
+/* Rightbound source sprite is rotated about +90deg and travels ~41px/s.
+   Its -160px start keeps it out of view until the natural middle checkpoint. */
+@keyframes s9-flight-forward{
+  0%{opacity:0;transform:translate3d(-160px,4px,0) rotate(90deg) scale(.82)}
+  13%{opacity:1;transform:translate3d(calc(-160px + 13vw * 1.69),3px,0) rotate(85deg) scale(.82)}
+  30%{opacity:1;transform:translate3d(38px,0,0) rotate(96deg) scale(.82)}
+  50%{opacity:1;transform:translate3d(170px,-7px,0) rotate(86deg) scale(.82)}
+  70%{opacity:1;transform:translate3d(302px,-10px,0) rotate(94deg) scale(.82)}
+  88%{opacity:1;transform:translate3d(421px,-12px,0) rotate(88deg) scale(.82)}
+  100%{opacity:0;transform:translate3d(500px,-13px,0) rotate(90deg) scale(.82)}
+}
 @keyframes s9-flap-left{from{transform:rotateY(10deg)}to{transform:rotateY(74deg)}}
 @keyframes s9-flap-right{from{transform:scaleX(-1) rotateY(10deg)}to{transform:scaleX(-1) rotateY(74deg)}}
 @media(max-width:350px){.s9-rsvp{padding-inline:20px}.s9-row2{gap:10px}.s9-eyebrow{letter-spacing:4px}.s9-heading{font-size:48px}}
 @media(prefers-reduced-motion:reduce){
- .s9-rsvp .s9-butterfly,.s9-rsvp .s9-wing{animation:none!important}
- .s9-rsvp .s9-butterfly{opacity:0!important}
+ .s9-rsvp .s9-butterfly,.s9-rsvp .s9-butterfly-forward,.s9-rsvp .s9-wing{animation:none!important}
+ .s9-rsvp .s9-butterfly,.s9-rsvp .s9-butterfly-forward{opacity:0!important}
  .s9-rsvp.s9-reveal-ready .s9-reveal{opacity:1!important;transform:none!important;transition:none!important}
 }
 /* Optional explicit consent occupies the reference's under-button note position. */
