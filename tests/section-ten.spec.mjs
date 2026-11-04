@@ -340,3 +340,63 @@ test('Section 10 artwork camera pins through the Section 9 seam and reverses at 
   // Pin the same scene on entry, midway and exit, including a reverse traversal.
   for(const fraction of [0.05,0.5,0.95,0.5,0.05]) await checkAt(fraction);
 });
+
+
+test('Section 9→10 visual seam has no blank frame, overlap, or camera jump on reversal',async({page},testInfo)=>{
+  // Isolated original 1080×1920 fixture, never distributes vendor artwork.
+  const sceneFixture='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#ddd0e7"/><circle cx="540" cy="900" r="280" fill="#9c8cbd"/></svg>';
+  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+    status:200,contentType:'image/svg+xml',body:sceneFixture
+  }));
+  const errors=await openInvitation(page);
+  const closing=page.locator('#closingMessage'),previous=page.locator('#rsvp');
+  const scene=closing.locator('.closing10-source-scene');
+  await expect(closing).toHaveAttribute('data-artwork','local-reference');
+  await expect(scene).toHaveJSProperty('naturalWidth',1080);
+  const seam=await page.evaluate(()=>{
+    const prev=document.getElementById('rsvp').getBoundingClientRect();
+    const last=document.getElementById('closingMessage').getBoundingClientRect();
+    return {y:scrollY+last.top,gap:last.top-prev.bottom,
+      closingWidth:last.width,viewport:innerWidth};
+  });
+  expect(Math.abs(seam.gap)).toBeLessThanOrEqual(1);
+  expect(seam.closingWidth).toBeLessThanOrEqual(seam.viewport+1);
+  const snapshots=[];
+  for(const fraction of [-0.70,-0.30,0,0.25,0.75,0.25,0,-0.30]){
+    await page.evaluate(({y,offset})=>{
+      window.scrollTo({top:y+offset*innerHeight,behavior:'instant'});
+    },{y:seam.y,offset:fraction});
+    await page.waitForTimeout(80);
+    const snapshot=await page.evaluate(()=>{
+      const a=document.getElementById('rsvp').getBoundingClientRect();
+      const b=document.getElementById('closingMessage').getBoundingClientRect();
+      const art=document.querySelector('#closingMessage .closing10-sticky-art').getBoundingClientRect();
+      const pic=document.querySelector('#closingMessage .closing10-source-scene');
+      const img=pic.getBoundingClientRect();
+      const overlap=a.bottom>b.top+1;
+      const gap=a.bottom<b.top-1;
+      return {
+        scrollY,sectionTop:b.top,previousBottom:a.bottom,
+        overlap,gap,sceneReady:pic.complete&&pic.naturalWidth===1080,
+        sceneX:img.x,sceneWidth:img.width,artTop:art.top,
+        active:document.getElementById('closingMessage').dataset.active
+      };
+    });
+    snapshots.push(snapshot);
+    expect(snapshot.overlap).toBe(false);
+    expect(snapshot.gap).toBe(false);
+    expect(snapshot.sceneReady).toBe(true);
+    expect(Math.abs(snapshot.sceneX)).toBeLessThanOrEqual(1);
+    expect(Math.abs(snapshot.sceneWidth-seam.viewport)).toBeLessThanOrEqual(1);
+  }
+  // Once Section 10 has entered the viewport the image remains pinned.
+  const entering=snapshots.filter(x=>x.sectionTop<=0 && x.active==='true');
+  expect(entering.length).toBeGreaterThanOrEqual(2);
+  for(const s of entering)expect(Math.abs(s.artTop)).toBeLessThanOrEqual(2);
+  if(testInfo.project.name==='iphone-390'){
+    await page.evaluate(y=>window.scrollTo({top:y+innerHeight*.25,behavior:'instant'}),seam.y);
+    await page.waitForTimeout(2300);
+    await page.screenshot({path:testInfo.outputPath('section9-to10-seam-390x844.png'),animations:'disabled'});
+  }
+  expect(errors).toEqual([]);
+});
