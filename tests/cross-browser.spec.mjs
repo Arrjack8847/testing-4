@@ -185,27 +185,26 @@ test('Section 4 reference sample events remain accessible across browser engines
 });
 
 
-test('Section 4 calendar-day countdown remains accessible across browser engines',async({page})=>{
+test('Current Order of the Day is accessible; legacy countdown remains hidden',async({page})=>{
   const errors=await load(page);
-  const section=page.locator('#saveTheDate');
+  const legacy=page.locator('#saveTheDate'),section=page.locator('#runningOrder');
+  await expect(legacy).toBeHidden();
   await expect(section).toHaveAttribute('aria-hidden','true');
   await expect(section).toHaveJSProperty('inert',true);
   await open(page);
+  await expect(legacy).toBeHidden();
   await expect(section).toHaveAttribute('aria-hidden','false');
   await expect(section).toHaveJSProperty('inert',false);
   await page.evaluate(()=>{
     document.documentElement.style.scrollBehavior='auto';
-    document.getElementById('saveTheDate').scrollIntoView({block:'start',behavior:'instant'});
+    document.getElementById('runningOrder').scrollIntoView({block:'start',behavior:'instant'});
   });
   await expect(section).toBeInViewport();
-  await expect(page.getByRole('heading',{level:2,name:'Save the Date'})).toBeVisible();
-  await expect(section.locator('#countdownDays')).toHaveText(/^\d+$/);
-  await expect(section.locator('#saveDateButton')).toBeDisabled();
+  await expect(section.getByRole('heading',{level:2,name:'Order of the Day'})).toBeVisible();
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
-
 
 test('Section 5 provides an accessible gallery without falsely populated photos',async({page})=>{
   const errors=await load(page);
