@@ -722,3 +722,45 @@
 .event-section[data-art="reference"] .event-calendar-link {
   box-shadow:0 12px 34px rgba(60,45,30,.35);
 }
+
+
+/* Recovered four-phone source audit (2026-11-04):
+   320: source Events 1742.3px, earlier local 1581px.
+   360: source Events 1649.9px, earlier local 1581px.
+   390: measured source Events 1580.9px.
+   The linear narrow-screen height target maintains the original section
+   boundary without adding a fake standalone scene or scrolling container. */
+@media (max-width:390px) {
+  .event-section[data-art="reference"] .event-body {
+    min-height:max(1581px, calc(2478px - 230vw));
+  }
+}
+/* The source uses 42/22/14/19px at 320px too; old prototype shrank these
+   to 40/20/13/18px under its narrow-device override. */
+@media (max-width:350px) {
+  .event-section[data-art="reference"] .event-card-title {
+    font-size:42px;
+    line-height:69.3px;
+  }
+  .event-section[data-art="reference"] .event-card-date {
+    font-size:22px;
+    line-height:36.3px;
+  }
+  .event-section[data-art="reference"] .event-card-time {
+    font-size:14px;
+    line-height:23.1px;
+  }
+  .event-section[data-art="reference"] .event-card-place {
+    font-size:19px;
+    line-height:31.35px;
+  }
+}
+/* The source countdown numbers use 28px at all four measured widths,
+   and the source address color is #6f5a6c, not the older rose tone. */
+.event-section[data-art="reference"] .event-countdown-grid strong {
+  font-size:28px;
+  line-height:28px;
+}
+.event-section[data-art="reference"] .event-card-address {
+  color:#6f5a6c;
+}
