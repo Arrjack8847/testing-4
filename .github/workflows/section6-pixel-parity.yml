@@ -5,6 +5,8 @@ on:
       - feat/section6-dress-code-reference-20261103
     paths:
       - tools/section6-pixel-audit.py
+      - tools/section6-forensic-reference.cjs
+      - tools/section6-forensic-pixels.py
       - .github/workflows/section6-pixel-parity.yml
   workflow_dispatch:
 permissions:
@@ -25,7 +27,7 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
-          python3 -m pip install Pillow
+          python3 -m pip install Pillow numpy
       - name: Start development site
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/sec6-local.log 2>&1 &
@@ -39,11 +41,18 @@ jobs:
         run: npm run compare:section6
       - name: Quantify pixel parity without redistributing reference screenshots
         run: python3 tools/section6-pixel-audit.py
+      - name: Inspect isolated section source/local images and paper crop geometry
+        run: |
+          node tools/section6-forensic-reference.cjs
+          python3 tools/section6-forensic-pixels.py
       - name: Upload numerical evidence only
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: section6-pixel-parity-numerical-report
-          path: artifacts/section6-compare/pixel-parity.json
+          path: |
+            artifacts/section6-compare/pixel-parity.json
+            artifacts/section6-forensic/numeric-differences.json
+            artifacts/section6-forensic/dom-geometry.json
           retention-days: 7
           if-no-files-found: warn
