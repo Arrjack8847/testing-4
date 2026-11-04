@@ -33,7 +33,7 @@ Measured over entry, middle and exit, sampled at 0, 1, 3 and 5 seconds. Reveal b
 
 ## Source assets and licensing
 
-The public repository commits **no vendor WebP** for Section 9 and makes **no vendor image requests** at runtime in this new section. Default artwork is independently drawn CSS paper and butterfly only, visibly different from vendor original. `?section9Reference=1` loads an **optional local** `assets/reference-dev/section9/paper.webp` for permission-cleared research. The directory is Git-ignored; missing files fall back automatically. Real-source image screenshot captures in ephemeral Action artifacts are for comparative research only; commercial reuse and redistribution require permission.
+The public repository commits **no vendor WebP** for Section 9 and makes **no vendor image requests** at runtime in this new section. Default artwork is independently drawn CSS paper and butterfly only, visibly different from vendor original. `?section9Reference=1` loads **optional local** `assets/reference-dev/section9/paper.webp` and `assets/reference-dev/section9/bfly_1.webp` for permission-cleared research. The 52×41px butterfly sprite uses two image halves with independent flap animations; if it is missing, the original CSS butterfly remains visible. The browser does not request these files in default mode. The directory is Git-ignored; missing files fall back automatically. Real-source image screenshot captures in ephemeral Action artifacts are for comparative research only; commercial reuse and redistribution require permission.
 
 ## Implementation
 
