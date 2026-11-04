@@ -1,0 +1,16 @@
+# Build and local browser test artifacts
+node_modules/
+test-results/
+playwright-report/
+*.log
+
+# Original third-party reference imagery may be staged here only with permission.
+# Never commit vendor artwork into the public prototype.
+assets/reference-dev/
+
+# Section 10 local source captures / screenshot comparisons
+section10-evidence/
+
+# Do not publish customer tokens, local configuration or environment secrets.
+.env
+.env.*
