@@ -39,6 +39,20 @@ foreach ($asset in $artwork) {
         continue
     }
 
+    # Prefer the already-downloaded files in the other testing-4 worktrees.
+    # This also allows the local preview to work when the reference host is offline.
+    $parent = Split-Path -Parent $root
+    $siblings = @('testing-4-section9', 'testing-4')
+    foreach ($sibling in $siblings) {
+        $candidate = Join-Path (Join-Path $parent $sibling) ('assets\reference-dev\section9\' + $asset.Name)
+        if ((Test-Section9WebP $candidate) -and ($candidate -ne $target)) {
+            Copy-Item -LiteralPath $candidate -Destination $target -Force
+            Write-Host "Recovered Section 9 artwork from sibling worktree: $($asset.Name)" -ForegroundColor Green
+            break
+        }
+    }
+    if (Test-Section9WebP $target) { continue }
+
     Write-Host "Repairing local Section 9 artwork: $($asset.Name)" -ForegroundColor Yellow
     $temp = Join-Path $folder ($asset.Name + '.' + $PID + '.tmp')
     try {
