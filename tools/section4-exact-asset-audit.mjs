@@ -53,7 +53,18 @@ try {
         },site.selector);
         await page.waitForTimeout(1300);
         await page.evaluate(()=>document.fonts.ready);
-        const inventory = await page.evaluate(selector=>{
+        // Reveal lazy artwork while traversing the full Events scene.
+        // A single top-of-section snapshot can miss scroll-triggered imagery.
+        const scans=[];
+        for (const fraction of [0,0.5,1]) {
+          await page.evaluate(({selector,fraction})=>{
+            const el=document.querySelector(selector);
+            const top=el.getBoundingClientRect().top+scrollY;
+            const travel=Math.max(0,el.getBoundingClientRect().height-innerHeight);
+            scrollTo({top:top+travel*fraction,behavior:'instant'});
+          },{selector:site.selector,fraction});
+          await page.waitForTimeout(550);
+          const scan = await page.evaluate(selector=>{
           const section=document.querySelector(selector);
           if(!section)return {error:'missing Events section'};
           const origin=location.href;
@@ -129,7 +140,44 @@ try {
             cssDrawingTotal:cssDrawing.length,
             canvasCount,inlineSvgCount,animatedElementCount
           };
-        },site.selector);
+          },site.selector);
+          scans.push({fraction,inventory:scan});
+        }
+        const inventory={...scans[0].inventory};
+        const assets=new Map();
+        const fonts=new Map();
+        for(const {fraction,inventory:scan} of scans){
+          for(const asset of scan.assets||[]){
+            const old=assets.get(asset.url);
+            if(!old){
+              assets.set(asset.url,{...asset,seenAt:[fraction]});
+            }else{
+              old.occurrences=Math.max(old.occurrences,asset.occurrences);
+              old.seenAt.push(fraction);
+              for(const role of asset.roles) {
+                if(!old.roles.some(x=>JSON.stringify(x)===JSON.stringify(role))){
+                  old.roles.push(role);
+                }
+              }
+            }
+          }
+          for(const font of scan.visibleFonts||[]){
+            fonts.set(font.name,Math.max(font.count,fonts.get(font.name)||0));
+          }
+        }
+        inventory.assets=[...assets.values()].sort((a,b)=>a.url.localeCompare(b.url));
+        inventory.visibleFonts=[...fonts].map(([name,count])=>({name,count}));
+        inventory.scrollPhases=scans.map(({fraction,inventory:scan})=>({
+          fraction,
+          height:scan.sectionHeight,
+          assetCount:scan.assets?.length||0,
+          animatedElementCount:scan.animatedElementCount??null,
+          cssDrawingTotal:scan.cssDrawingTotal??null,
+          canvasCount:scan.canvasCount??null
+        }));
+        inventory.animatedElementCount=Math.max(...scans.map(x=>x.inventory.animatedElementCount||0));
+        inventory.cssDrawingTotal=Math.max(...scans.map(x=>x.inventory.cssDrawingTotal||0));
+        inventory.canvasCount=Math.max(...scans.map(x=>x.inventory.canvasCount||0));
         for(const asset of inventory.assets||[]){
           asset.httpStatus=responses.get(asset.url)?.status??null;
           asset.requestFailure=failures.find(x=>x.url===asset.url)?.error||null;
