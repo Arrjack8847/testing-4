@@ -85,6 +85,21 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(r.x+r.width).toBeLessThanOrEqual(page.viewportSize().width+1);}
   if(testInfo.project.name==='iphone-390'){
     expect(Math.abs(m.section.height-1215.9)).toBeLessThan(4);
+    const exact=await section.evaluate(el=>{
+      const inp=el.querySelector('#s9Name'),btn=el.querySelector('.s9-submit'),paper=el.querySelector('.s9-reference-art'),
+        wall=el.querySelector('.s9-wall'),wish=el.querySelector('.s9-wish'),base=el.getBoundingClientRect();
+      const rc=e=>{const r=e.getBoundingClientRect();return {y:r.y-base.y,height:r.height}};
+      return {inputHeight:inp.getBoundingClientRect().height,inputRadius:getComputedStyle(inp).borderRadius,
+        buttonBg:getComputedStyle(btn).backgroundColor,buttonRadius:getComputedStyle(btn).borderRadius,
+        paperTop:getComputedStyle(paper).top,paperHeight:getComputedStyle(paper).height,
+        wall:rc(wall),wishRadius:getComputedStyle(wish).borderRadius};
+    });
+    expect(Math.abs(exact.inputHeight-58.05)).toBeLessThan(1);
+    expect(exact.inputRadius).toBe('12px');
+    expect(exact.buttonBg).toBe('rgb(123, 61, 110)');
+    expect(exact.buttonRadius).toBe('999px');
+    expect(exact.wishRadius).toBe('14px');
+    expect(Math.abs(exact.wall.y-756.88)).toBeLessThan(4);
     const measured=await page.evaluate(()=>{const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;const r=e.getBoundingClientRect(),b=document.querySelector('#rsvp').getBoundingClientRect();return {x:+r.x.toFixed(1),y:+(r.y-b.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};}; return ({
       eyebrow:rect('#rsvp .s9-eyebrow'),heading:rect('#rsvpHeading'),
       name:rect('#rsvp label[for="s9Name"]'),
