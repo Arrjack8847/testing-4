@@ -172,6 +172,62 @@ async function inspect(label,viewport){
           };
         });
         report.interaction.status='captured';
+
+        // Normalize all element coordinates to the Gift section's top so
+        // different scroll positions cannot masquerade as visual offsets.
+        // Only geometry and visibility are gathered; no bank/payment data.
+        report.interaction.expandedGeometry=await root.evaluate(gift=>{
+          const root=gift.getBoundingClientRect();
+          const rect=node=>{
+            if(!node)return null;
+            const b=node.getBoundingClientRect(),css=getComputedStyle(node);
+            return {x:+b.x.toFixed(1),y:+(b.y-root.y).toFixed(1),
+              width:+b.width.toFixed(1),height:+b.height.toFixed(1),
+              visible:css.display!=='none'&&css.visibility!=='hidden'&&
+                Number(css.opacity)>.05};
+          };
+          const wishlist=gift.querySelector('.cgv-acct.cgv-gl,#giftEightWishlist');
+          const cards=[...gift.querySelectorAll('.cgv-gl-item,.gift-eight-item')];
+          const images=[...gift.querySelectorAll('.cgv-gl-img img,.gift-eight-thumb')];
+          const cta=[...gift.querySelectorAll('button')]
+            .find(x=>/send gift/i.test(x.textContent||''));
+          return {
+            sectionHeight:+root.height.toFixed(1),
+            button:rect(cta),wishlist:rect(wishlist),
+            firstProduct:rect(cards[0]),productCards:cards.slice(0,5).map(rect),
+            thumbnails:images.slice(0,5).map(rect),
+            horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+          };
+        });
+
+        // The reference animates its wishlist into view only after it enters
+        // the viewport. A section-level screenshot taken before this scroll
+        // can misleadingly show a blank panel. Capture the revealed state.
+        const wishSelector=label==='reference'?'.cgv-acct.cgv-gl':'#giftEightWishlist';
+        const panel=page.locator(wishSelector).first();
+        if(await panel.count()){
+          await panel.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
+          await page.waitForTimeout(1350);
+          report.interaction.wishlistReveal=await panel.evaluate(node=>{
+            const s=getComputedStyle(node),r=node.getBoundingClientRect();
+            const children=[...node.querySelectorAll('.cgv-gl-item,.gift-eight-item')].slice(0,3);
+            return {
+              display:s.display,visibility:s.visibility,opacity:s.opacity,
+              viewportY:+r.y.toFixed(1),height:+r.height.toFixed(1),
+              children:children.map(child=>{
+                const c=getComputedStyle(child),b=child.getBoundingClientRect();
+                return {height:+b.height.toFixed(1),display:c.display,
+                  opacity:c.opacity,visibility:c.visibility};
+              })
+            };
+          });
+          if(viewport.width===390){
+            await page.screenshot({path:folder+'/'+label+'-390-wishlist-inview.png',
+              animations:'allow',timeout:20000});
+          }
+        }else{
+          report.interaction.wishlistReveal={status:'missing',selector:wishSelector};
+        }
         if(viewport.width===390){
           await page.screenshot({path:folder+'/'+label+'-390-sendgift-open.png',
             animations:'allow',timeout:18000});
@@ -214,7 +270,22 @@ for(const viewport of sizes){
       referenceBackground:reference.frames[0].data.sectionStyle.background,
       localBackground:local.frames[0].data.sectionStyle.background,
       referencePadding:reference.frames[0].data.sectionStyle.padding,
-      localPadding:local.frames[0].data.sectionStyle.padding
+      localPadding:local.frames[0].data.sectionStyle.padding,
+      expandedHeightDelta:round(
+        (local.interaction?.expandedGeometry?.sectionHeight??NaN)-
+        (reference.interaction?.expandedGeometry?.sectionHeight??NaN)),
+      wishlistTopDelta:round(
+        (local.interaction?.expandedGeometry?.wishlist?.y??NaN)-
+        (reference.interaction?.expandedGeometry?.wishlist?.y??NaN)),
+      wishlistHeightDelta:round(
+        (local.interaction?.expandedGeometry?.wishlist?.height??NaN)-
+        (reference.interaction?.expandedGeometry?.wishlist?.height??NaN)),
+      firstProductTopDelta:round(
+        (local.interaction?.expandedGeometry?.firstProduct?.y??NaN)-
+        (reference.interaction?.expandedGeometry?.firstProduct?.y??NaN)),
+      firstProductHeightDelta:round(
+        (local.interaction?.expandedGeometry?.firstProduct?.height??NaN)-
+        (reference.interaction?.expandedGeometry?.firstProduct?.height??NaN))
     });
   }
 }
