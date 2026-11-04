@@ -17,16 +17,59 @@ const open=async(page)=>{
     await button.first().click({timeout:12000});
   }
 };
+// The reference's .cgv-bf element can be offscreen with opacity 0 while
+// a different animation is visible. Record candidates rather than treating
+// that hidden element as the source's visible butterfly.
 const pose=async(page,root,butterfly)=>{
   return page.evaluate(({root,butterfly})=>{
     const section=document.querySelector(root);
     const bf=document.querySelector(butterfly);
-    const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {
-      x:Number(r.x.toFixed(1)),y:Number(r.y.toFixed(1)),
-      width:Number(r.width.toFixed(1)),height:Number(r.height.toFixed(1)),
-      transform:getComputedStyle(e).transform,opacity:getComputedStyle(e).opacity
-    }};
-    return {section:box(section),butterfly:box(bf)};
+    const box=element=>{
+      if(!element)return null;
+      const r=element.getBoundingClientRect(),style=getComputedStyle(element);
+      return {
+        x:Number(r.x.toFixed(1)),y:Number(r.y.toFixed(1)),
+        width:Number(r.width.toFixed(1)),height:Number(r.height.toFixed(1)),
+        transform:style.transform,opacity:style.opacity
+      };
+    };
+    const candidates=[];
+    const viewportWidth=innerWidth,viewportHeight=innerHeight;
+    for(const element of document.querySelectorAll('*')){
+      const identity=[
+        element.tagName,element.getAttribute('id')||'',
+        element.getAttribute('class')||'',element.getAttribute('src')||'',
+        element.getAttribute('alt')||'',element.getAttribute('style')||''
+      ].join(' ');
+      // Skip unrelated elements without requiring expensive computed styles.
+      if(!/bfly|butterfly|flutter|wing/i.test(identity))continue;
+      const rect=element.getBoundingClientRect(),style=getComputedStyle(element);
+      const visible=rect.width>0&&rect.height>0&&
+        rect.right>0&&rect.bottom>0&&rect.left<viewportWidth&&rect.top<viewportHeight&&
+        style.display!=='none'&&style.visibility!=='hidden'&&Number(style.opacity)>0.04;
+      candidates.push({
+        selector:(element.id?'#'+element.id:element.tagName.toLowerCase()+
+          (typeof element.className==='string'&&element.className?
+            '.'+element.className.trim().split(/\s+/).slice(0,2).join('.') :'')),
+        image:element.getAttribute('src')||style.backgroundImage.slice(0,160),
+        visible,rect:box(element),
+        animation:style.animationName,animationState:style.animationPlayState
+      });
+    }
+    candidates.sort((left,right)=>Number(right.visible)-Number(left.visible));
+    const visibleButterflyCandidates=candidates.filter(item=>item.visible).slice(0,8);
+    return {
+      section:box(section),
+      // Preserve the old field so prior frame stats can compare old/new audits.
+      butterfly:box(bf),
+      referenceSelectorWasVisible:candidates.some(item=>item.visible&&
+        item.rect?.x===box(bf)?.x&&item.rect?.y===box(bf)?.y),
+      visibleButterflyCandidates,
+      butterflyCandidates:candidates.slice(0,12),
+      // An absent candidate means "unmeasured", not "no butterfly exists".
+      visibleButterflyMeasurement:visibleButterflyCandidates.length?
+        'visible-dom-candidate':'not-observed'
+    };
   },{root,butterfly});
 };
 try{
@@ -75,6 +118,15 @@ try{
   metrics.failure=String(error);
   console.error('S9_FRAME_AUDIT_ERROR',String(error));
   process.exitCode=1;
+  const countVisible=key=>metrics.frames.filter(frame=>
+    frame[key]?.visibleButterflyMeasurement==='visible-dom-candidate').length;
+  console.log('S9_BUTTERFLY_CANDIDATES '+JSON.stringify({
+    totalFrames:metrics.frames.length,
+    referenceVisibleSamples:countVisible('original'),
+    localVisibleSamples:countVisible('local'),
+    legacyReferenceSelectorMayBeOffscreen:true,
+    note:'No visible candidate does not prove that a canvas or CSS pseudo-element is absent.'
+  }));
 }finally{
   fs.writeFileSync(output+'/frames.json',JSON.stringify(metrics,null,2));
   await browser.close();
