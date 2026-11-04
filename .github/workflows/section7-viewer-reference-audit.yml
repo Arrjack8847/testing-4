@@ -1,0 +1,54 @@
+name: Section 7 source viewer read-only audit
+on:
+  push:
+    branches:
+      - audit/section7-lightbox-reference-20261104
+    paths:
+      - tools/section7-viewer-reference-audit.mjs
+      - .github/workflows/section7-viewer-reference-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  viewer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Stage five WebPs for temporary local browser QA
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          base="https://undangankahwin.com/images/concierge/couples/"
+          root=Path("assets/gallery/reference")
+          root.mkdir(parents=True,exist_ok=True)
+          for name in ("moody.webp","moody-bride.webp","moody-groom.webp",
+                       "moody-garden.webp","moody-lake.webp"):
+            with urlopen(Request(base+name,headers={"User-Agent":"Mozilla/5.0"}),timeout=30) as response:
+              data=response.read()
+            if data[:4]!=b"RIFF" or data[8:12]!=b"WEBP": raise Exception("Invalid WebP: "+name)
+            (root/name).write_bytes(data)
+          PY
+      - name: Inspect reference viewer at 320 and 390px
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section7-viewer-server.log 2>&1 &
+          node tools/section7-viewer-reference-audit.mjs
+      - name: Remove local reference photos before uploading numeric evidence
+        if: always()
+        run: rm -rf assets/gallery/reference
+      - name: Upload structured DOM and style measurements ONLY
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-viewer-numeric-report
+          path: section7-viewer-evidence/viewer.json
+          retention-days: 7
+          if-no-files-found: warn
