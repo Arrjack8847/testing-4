@@ -8,13 +8,11 @@ const webp = Buffer.from(
   'UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==',
   'base64'
 );
-const devices=[
-  [320,568],[360,740],[390,844],[430,932]
-];
-
-for (const [width,height] of devices) {
-  test(`Section 7 source-measured lightbox at ${width}x${height}`, async ({page},testInfo) => {
-    await page.setViewportSize({width,height});
+// The repository Playwright config already defines four phone projects.
+// Run ONCE per project rather than multiplying four devices by four projects.
+test('Section 7 source-measured lightbox matches its phone viewport', async ({page},testInfo) => {
+    const {width,height}=testInfo.project.use.viewport;
+    expect([[320,568],[360,740],[390,844],[430,932]]).toContainEqual([width,height]);
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.route('**/assets/gallery/reference/*.webp',route=>
       route.fulfill({status:200,contentType:'image/webp',body:webp}));
@@ -125,5 +123,4 @@ for (const [width,height] of devices) {
       await expect(dialog).not.toBeVisible();
       await expect(frame).toBeFocused();
     }
-  });
-}
+});
