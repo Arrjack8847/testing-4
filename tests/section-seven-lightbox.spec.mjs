@@ -86,5 +86,24 @@ for (const [width,height] of devices) {
     await page.keyboard.press('Escape');
     await expect(dialog).not.toBeVisible();
     await expect(first).toBeFocused();
+
+    // Landscape frames must preserve the same centered viewer geometry
+    // and source-style cover crop; do not leak a caption or arrow toolbar.
+    for(const [slot,caption] of [[3,'The Garden'],[4,'The Lake']]){
+      const frame=page.locator(`#gallery [data-gallery-slot="${slot}"]`);
+      await frame.scrollIntoViewIfNeeded();
+      await expect(frame).toBeEnabled();
+      await frame.click();
+      await expect(dialog).toBeVisible();
+      await expect(page.locator('#galleryViewCaption')).toHaveText(caption);
+      await expect(page.locator('#galleryViewImage')).toHaveCSS('object-fit','cover');
+      await expect(page.locator('.gallery-viewer-navigation')).toBeHidden();
+      const size=await page.locator('.gallery-viewer-figure').boundingBox();
+      near(size.width,width-56,'landscape viewer width');
+      near(size.height,(width-56)*4/3,'landscape viewer height');
+      await page.getByRole('button',{name:'Close photo viewer'}).click();
+      await expect(dialog).not.toBeVisible();
+      await expect(frame).toBeFocused();
+    }
   });
 }
