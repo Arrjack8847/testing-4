@@ -34,13 +34,15 @@ test('Section 5 shows five honest empty photograph placeholders',async({page})=>
   expect(errors).toEqual([]);
 });
 
-test('Section 5 fits mobile viewports and preserves Section 4 transition',async({page},testInfo)=>{
+test('Section 7 gallery fits mobile viewports after Dress Code Section 6',async({page},testInfo)=>{
   const {gallery}=await reachGallery(page);
   const bounds=await gallery.evaluate(el=>{
-    const previous=document.getElementById('runningOrder');
+    const previous=document.getElementById('dressCode'),legacy=document.getElementById('saveTheDate');
+    const order=document.getElementById('runningOrder');
     const boxes=[...el.querySelectorAll('.gallery-photo')].map(node=>node.getBoundingClientRect());
-    const boundary =el.getBoundingClientRect().top - previous.getBoundingClientRect().bottom;
-    return {adjacent:previous.nextElementSibling?.hidden===true && previous.nextElementSibling?.nextElementSibling===el,boundary,overflow:document.documentElement.scrollWidth-innerWidth,
+    const boundary=el.getBoundingClientRect().top-previous.getBoundingClientRect().bottom;
+    const adjacent=order.nextElementSibling===legacy&&legacy.hidden&&legacy.nextElementSibling===previous&&previous.nextElementSibling===el;
+    return {adjacent,boundary,overflow:document.documentElement.scrollWidth-innerWidth,
       width:innerWidth,boxes:boxes.map(b=>({left:b.left,right:b.right,width:b.width}))};
   });
   expect(bounds.adjacent).toBe(true);

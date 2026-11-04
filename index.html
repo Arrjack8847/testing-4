@@ -17,6 +17,9 @@
   <link rel="stylesheet" href="order-program.css">
   <link rel="stylesheet" href="section-five.css">
   <link rel="stylesheet" href="section-six.css">
+  <link rel="stylesheet" href="reference-continuation.css">
+  <link rel="stylesheet" href="section-nine.css">
+  <link rel="stylesheet" href="section-ten.css">
   <script src="scene.js?v=20261104-fix1" defer></script>
   <script src="section-two.js" defer></script>
   <script src="section-couple.js" defer></script>
@@ -26,6 +29,9 @@
   <script src="order-program.js" defer></script>
   <script src="section-five.js" defer></script>
   <script src="section-six.js" defer></script>
+  <script src="reference-continuation.js" defer></script>
+  <script src="section-nine.js" defer></script>
+  <script src="section-ten.js" defer></script>
 </head>
 <body>
   <main class="invitation" id="invitation" data-state="cover" data-layers="loading">
@@ -305,8 +311,28 @@
         <div class="save-date-ending save-date-reveal" aria-hidden="true">✧</div>
       </div>
     </section>
+    <section class="reference-continuation ref-dress" id="dressCode" aria-labelledby="dressCodeHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-b"></i></div>
+      <div class="ref-content">
+        <p class="ref-kicker ref-reveal">Attire</p>
+        <h2 class="ref-script ref-reveal" id="dressCodeHeading">Dress Code</h2>
+        <p class="ref-intro ref-reveal">An invitation to celebrate in soft, garden-inspired shades.</p>
+        <div class="ref-palettes">
+          <article class="ref-palette ref-reveal"><p class="ref-palette-title">Groom's Side</p><h3>Sage &amp; Cream</h3>
+            <div class="ref-swatches" aria-label="Sage green, soft sage and cream"><i style="--swatch:#77937c"></i><i style="--swatch:#acbea7"></i><i style="--swatch:#f4ead9"></i></div>
+            <p>Sage green · muted sage · warm cream</p>
+          </article>
+          <article class="ref-palette ref-reveal"><p class="ref-palette-title">Bride's Side</p><h3>Terracotta &amp; Blush</h3>
+            <div class="ref-swatches" aria-label="Terracotta, blush and sand"><i style="--swatch:#bb8068"></i><i style="--swatch:#e6bcb7"></i><i style="--swatch:#e1c8a5"></i></div>
+            <p>Terracotta · blush · sand</p>
+          </article>
+        </div>
+        <p class="ref-disclosure">Sample palette for reference comparison, not a confirmed dress requirement.</p>
+      </div>
+    </section>
     <!-- Section 6: original gallery. No photos are invented or embedded. -->
-    <section class="gallery-section" id="gallery" data-section="6"
+    <!-- Section 7: original gallery. No photos are invented or embedded. -->
+    <section class="gallery-section" id="gallery" data-section="7"
       aria-labelledby="galleryHeading" aria-hidden="true" inert>
       <div class="gallery-atmosphere" aria-hidden="true">
         <span class="gallery-halo"></span>
@@ -347,87 +373,126 @@
         <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
-    <!-- Section 7: original RSVP form preview. Nothing is submitted until a backend is configured. -->
-    <section class="rsvp-section" id="rsvp" data-section="7"
-      aria-labelledby="rsvpHeading" aria-hidden="true" inert>
-      <div class="rsvp-atmosphere" aria-hidden="true">
-        <span class="rsvp-flower rsvp-flower-a">❧</span>
-        <span class="rsvp-flower rsvp-flower-b">❧</span>
-        <span class="rsvp-glimmer rsvp-glimmer-a">✧</span>
-        <span class="rsvp-glimmer rsvp-glimmer-b">✦</span>
+    <section class="reference-continuation ref-gifts" id="weddingGift" aria-labelledby="giftHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-a"></i></div>
+      <div class="ref-content">
+        <p class="ref-kicker ref-reveal">With gratitude</p>
+        <h2 class="ref-script ref-reveal" id="giftHeading">Wedding Gift</h2>
+        <p class="ref-intro ref-reveal">Your company is a gift in itself. For those who wish, a gift area can be arranged here.</p>
+        <div class="ref-gift-card ref-reveal">
+          <span aria-hidden="true" class="ref-gift-icon">❖</span>
+          <h3>Gift details</h3>
+          <p>No bank account or gift destination has been confirmed for this example invitation.</p>
+          <button type="button" disabled aria-describedby="giftUnavailable">Copy account number</button>
+          <small id="giftUnavailable">Unavailable until the couple provides verified details.</small>
+        </div>
+        <div class="ref-gift-card ref-reveal">
+          <span aria-hidden="true" class="ref-gift-icon">✧</span>
+          <h3>Gift Wishlist</h3>
+          <p>Gift reservations and store links need actual approved items and a reservation service.</p>
+          <button type="button" disabled>Reserve a gift</button>
+          <small>Preview only — no reservation is collected.</small>
+        </div>
       </div>
-      <div class="rsvp-content">
-        <p class="rsvp-kicker rsvp-reveal">The pleasure of your company</p>
-        <div class="rsvp-flourish rsvp-reveal" aria-hidden="true"><span></span>✦<span></span></div>
-        <h2 id="rsvpHeading" class="rsvp-heading rsvp-reveal">Kindly Respond</h2>
-        <p class="rsvp-intro rsvp-reveal">It would mean so much to celebrate with you.</p>
-
-        <div class="rsvp-paper rsvp-reveal">
-          <div class="rsvp-paper-inner">
-            <p class="rsvp-paper-label">Répondez s'il vous plaît</p>
-            <h3>Attendance</h3>
-            <p class="rsvp-warning" id="rsvpWarning">Interactive preview only. No RSVP recipient is connected, and your response will not be sent.</p>
-
-            <form id="rsvpForm" class="rsvp-form">
-              <label class="rsvp-field" for="rsvpName">
-                <span>Your name <span aria-hidden="true">*</span></span>
-                <input id="rsvpName" name="guestName" type="text" autocomplete="name"
-                  maxlength="80" minlength="1" required placeholder="Enter your full name">
-              </label>
-
-              <fieldset class="rsvp-attendance">
-                <legend>Will you attend? <span aria-hidden="true">*</span></legend>
-                <label class="rsvp-choice">
-                  <input type="radio" name="attendance" value="yes" required>
-                  <span class="rsvp-choice-symbol" aria-hidden="true">✧</span>
-                  <span>Joyfully accepts</span>
-                </label>
-                <label class="rsvp-choice">
-                  <input type="radio" name="attendance" value="no" required>
-                  <span class="rsvp-choice-symbol" aria-hidden="true">✧</span>
-                  <span>Regretfully declines</span>
-                </label>
-              </fieldset>
-
-              <label class="rsvp-field" for="rsvpGuests">
-                <span>Number of guests</span>
-                <select id="rsvpGuests" name="guestCount" disabled>
-                  <option value="1">1 guest</option>
-                  <option value="2">2 guests</option>
-                  <option value="3">3 guests</option>
-                  <option value="4">4 guests</option>
-                  <option value="5">5 guests</option>
-                </select>
-                <small id="rsvpGuestHint">Available if you accept the invitation. Guest limits are a demo setting.</small>
-              </label>
-
-              <label class="rsvp-field" for="rsvpMessage">
-                <span>Message for the couple <span class="rsvp-optional">(optional)</span></span>
-                <textarea id="rsvpMessage" name="message" rows="3" maxlength="300"
-                  placeholder="Share a wish or a kind note…"></textarea>
-                <small>Up to 300 characters</small>
-              </label>
-
-              <button type="submit" class="rsvp-preview-button">Preview RSVP — not sent</button>
-            </form>
-
-            <div class="rsvp-preview" id="rsvpPreview" hidden aria-labelledby="rsvpPreviewHeading">
-              <div class="rsvp-preview-rule" aria-hidden="true">✦</div>
-              <h4 id="rsvpPreviewHeading">Your RSVP Preview</h4>
-              <dl class="rsvp-preview-details">
-                <dt>Name</dt><dd id="rsvpPreviewName"></dd>
-                <dt>Response</dt><dd id="rsvpPreviewAttendance"></dd>
-                <dt>Guests</dt><dd id="rsvpPreviewGuests"></dd>
-                <dt>Message</dt><dd id="rsvpPreviewMessage"></dd>
-              </dl>
-              <p class="rsvp-preview-disclosure">This is a local preview. Your RSVP has not been submitted or saved.</p>
-              <button type="button" id="rsvpCopyButton" class="rsvp-copy-button">Copy RSVP text</button>
-              <p id="rsvpCopyStatus" class="rsvp-copy-status" role="status" aria-live="polite"></p>
+    </section>
+    <!-- Section 9: RSVP & Wishes. Source-measured 390x844 layout; demo-only guest form. -->
+    <section class="s9-rsvp" id="rsvp" data-section="9" aria-labelledby="rsvpHeading" aria-hidden="true" inert>
+      <div class="s9-art" aria-hidden="true">
+        <div class="s9-original-paper"></div>
+        <img id="s9ReferenceArt" class="s9-reference-art" alt="" decoding="async">
+        <div class="s9-art-wash"></div>
+      </div>
+      <div class="s9-butterfly" aria-hidden="true"><i class="s9-wing s9-wing-left"></i><i class="s9-wing s9-wing-right"></i></div>
+      <div class="s9-inner">
+        <div class="s9-frame s9-reveal" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <p class="s9-eyebrow s9-reveal">Kindly respond by 31 December 2026</p>
+        <h2 id="rsvpHeading" class="s9-heading s9-reveal">RSVP &amp; Wishes</h2>
+        <form id="s9RsvpForm" class="s9-form s9-reveal">
+          <div class="s9-field">
+            <label for="s9Name">Your name</label>
+            <input id="s9Name" name="guestName" maxlength="60" autocomplete="name" placeholder="e.g. Aiman" required>
+          </div>
+          <div class="s9-row2">
+            <div class="s9-field">
+              <label for="s9Attendance">Attendance</label>
+              <select id="s9Attendance" name="attendance" required>
+                <option value="" selected disabled>Choose</option>
+                <option value="yes">Joyfully attending</option>
+                <option value="no">Sending love from afar</option>
+              </select>
+            </div>
+            <div class="s9-field">
+              <label for="s9Guests">Guests</label>
+              <select id="s9Guests" name="guests">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </div>
           </div>
+          <div class="s9-field">
+            <label for="s9Wish">Your wish for the couple</label>
+            <textarea id="s9Wish" name="wish" maxlength="300" rows="3" placeholder="Write a few warm words…"></textarea>
+          </div>
+          <button class="s9-submit" type="submit">Send RSVP</button>
+          <p id="s9FormStatus" class="s9-form-status" role="status" aria-live="polite">Preview only — submissions are not sent or stored.</p>
+          <p class="s9-note">Wishes appear on the wall below and are visible to all guests.</p>
+        </form>
+        <div class="s9-preview" id="s9Preview" hidden>
+          <p>Your RSVP preview has not been sent.</p>
+          <dl>
+            <dt>Name</dt><dd id="s9PreviewName"></dd>
+            <dt>Attendance</dt><dd id="s9PreviewAttendance"></dd>
+            <dt>Guests</dt><dd id="s9PreviewGuests"></dd>
+            <dt>Wish</dt><dd id="s9PreviewWish"></dd>
+          </dl>
+          <button type="button" id="s9Copy">Copy preview text</button>
         </div>
-        <p class="rsvp-outro rsvp-reveal">With love, we hope to see you there.</p>
-        <div class="rsvp-outro-symbol" aria-hidden="true">❦</div>
+        <div class="s9-wall" id="wishesWall" aria-label="Example guest wishes">
+          <article class="s9-wish s9-reveal">
+            <div class="s9-who"><strong>Aunty Zaharah</strong><span>Kajang</span></div>
+            <p>“So proud of you both. See you at the wedding!”</p>
+          </article>
+          <article class="s9-wish s9-reveal">
+            <div class="s9-who"><strong>The Tan Family</strong><span>Penang</span></div>
+            <p>“Two of the kindest souls we know. Congratulations!”</p>
+          </article>
+          <article class="s9-wish s9-reveal">
+            <div class="s9-who"><strong>Farah &amp; Iqbal</strong><span>Kuala Lumpur</span></div>
+            <p>“Wishing you a lifetime of love and laughter. Can't wait to celebrate!”</p>
+          </article>
+          <p class="s9-demo-note">Sample wishes for visual comparison — not real guest submissions.</p>
+        </div>
+      </div>
+    </section>
+    <section class="reference-continuation ref-closing section-ten" id="closingMessage"
+      data-section="10" data-artwork="original" aria-labelledby="closingHeading" aria-hidden="true" inert>
+      <div class="ref-environment" aria-hidden="true">
+        <div class="closing10-sticky-art"><img class="closing10-source-scene" alt=""></div>
+        <i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i>
+        <i class="ref-light ref-light-b"></i>
+      </div>
+      <div class="closing10-inner">
+        <div class="closing10-frame closing10-reveal" aria-hidden="true">
+          <i class="closing10-corner closing10-corner-bl"></i>
+          <i class="closing10-corner closing10-corner-br"></i>
+        </div>
+        <h2 class="closing10-label closing10-reveal" id="closingHeading">Until we meet</h2>
+        <p class="closing10-message closing10-reveal">It would be the greatest honour of our lives to have you beside us as two families become one. Thank you — for every prayer, every wish, and every mile travelled.</p>
+        <div class="closing10-rule closing10-reveal" aria-hidden="true"></div>
+        <p class="closing10-label closing10-signoff closing10-reveal">With love &amp; gratitude,</p>
+        <p class="closing10-names closing10-reveal"><span>Rayyan</span><span class="closing10-ampersand">&amp;</span><span>Sofea</span></p>
+        <div class="closing10-contacts closing10-reveal" aria-label="Contact information">
+          <p class="closing10-contacts-title">Contact Us</p>
+          <div class="closing10-contact-row">
+            <button type="button" disabled title="Contact number not supplied">Call</button>
+            <button type="button" disabled title="WhatsApp number not supplied">WhatsApp</button>
+          </div>
+        </div>
+        <p class="closing10-credit closing10-reveal">✦ Celestial Lake invitation study ✦</p>
+        <p class="closing10-disclosure closing10-reveal">Example wedding details · Contact links are unavailable until verified.</p>
       </div>
     </section>
   </main>
