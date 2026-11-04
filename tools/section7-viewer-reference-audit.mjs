@@ -73,10 +73,26 @@ for(const [site,url] of urls)for(const viewport of viewports){
     await page.evaluate(y=>{document.documentElement.style.scrollBehavior='auto';scrollTo({top:y,behavior:'instant'});},top-viewport.height*.3);
     await page.waitForTimeout(1400);
     record.before=await page.evaluate(inspect);
-    const referenceBtn=page.getByRole('button',{name:'View photo 1'}).first();
+    // Source frames present their photographs as role=img; they are not
+    // accessible "View photo 1" buttons. Click the actual image to learn
+    // whether its parent opens a lightbox, rather than inferring no viewer.
+    const referenceBtn=page.getByRole('img',{name:'Together',exact:true}).first();
     const localBtn=page.locator('#gallery [data-gallery-slot="0"]').first();
     const buttonToClick=site==='reference'?referenceBtn:localBtn;
     record.buttonCount=await buttonToClick.count();
+    if(site==='reference'&&record.buttonCount){
+      record.sourceImageAncestors=await buttonToClick.evaluate(el=>{
+        const chain=[];
+        for(let i=0;el&&i<6;i++,el=el.parentElement){
+          const st=getComputedStyle(el);
+          chain.push({tag:el.tagName,id:el.id,cls:String(el.className||'').slice(0,150),
+            role:el.getAttribute('role'),tabindex:el.getAttribute('tabindex'),
+            cursor:st.cursor,onClickAttribute:el.getAttribute('onclick'),
+            text:(el.innerText||'').slice(0,90)});
+        }
+        return chain;
+      });
+    }
     if(record.buttonCount){
       const state=await buttonToClick.evaluate(el=>({
         disabled:el.disabled??false,html:el.outerHTML.slice(0,460),
