@@ -682,3 +682,43 @@
   left:22px;
   background-position:100% 0%;
 }
+
+
+/* -----------------------------------------------------------------------
+   Measured Section 4 typography/card-detail correction.
+   Source: recovered Chromium source/prototype DOM audit (Nov 3, 390x844).
+   Scoped to Events only. Keep the measured arch/paper/section geometry.
+   ----------------------------------------------------------------------- */
+.event-section[data-art="reference"] .event-card-time {
+  margin-bottom:18px;
+}
+.event-section[data-art="reference"] .event-card-diamond {
+  font:18px/29.7px 'EB Garamond',Georgia,serif;
+  margin-bottom:18px;
+}
+.event-section[data-art="reference"] .event-card-place {
+  margin-bottom:0;
+}
+.event-section[data-art="reference"] .event-card-address {
+  font:400 16px/26.4px 'EB Garamond',Georgia,serif;
+  margin-bottom:16px;
+}
+.event-section[data-art="reference"] .event-map-link {
+  min-height:44px;
+  box-shadow:0 2px 10px rgba(70,24,60,.16);
+}
+.event-section[data-art="reference"] .event-countdown-grid {
+  width:322px;
+  gap:14px;
+  margin-bottom:23px;
+}
+.event-section[data-art="reference"] .event-countdown-grid span {
+  min-height:75.5px;
+  height:75.5px;
+  border-radius:12px;
+  background:#5c264f;
+  box-shadow:0 8px 22px rgba(70,24,60,.24);
+}
+.event-section[data-art="reference"] .event-calendar-link {
+  box-shadow:0 12px 34px rgba(60,45,30,.35);
+}
