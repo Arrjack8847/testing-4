@@ -1,30 +1,94 @@
-"""Quantify approximate frame differences; a zero score alone would establish pixel equality."""
-from PIL import Image,ImageChops,ImageStat
+"""Compare paired frames while separating Section 9 art from adjacent sections.
+
+Full-viewport metrics are retained for continuity assessment. sectionOnlyMAE
+uses the area visible in both Section 9 elements, omitting fixed global UI
+and Section 10 from Section 9's reported art mismatch.
+"""
 from pathlib import Path
+from statistics import mean
+from PIL import Image, ImageChops, ImageStat
 import json
-p=Path("section9-frame-audit")
-frames=json.loads((p/"frames.json").read_text())
-results=[]
-for record in frames["frames"]:
-    a,b=[Image.open(p/name).convert("RGB") for name in record["files"]]
-    if a.size!=b.size:
-        raise RuntimeError("Viewport size differs")
-    diff=ImageChops.difference(a,b)
-    # Also score a content-only region so fixed site-wide navigation/order
-    # badges don't get misreported as Section 9 artwork defects.
-    roi=ImageChops.difference(a.crop((20,120,370,660)),b.crop((20,120,370,660)))
-    roi_mae=round(sum(ImageStat.Stat(roi).mean)/3,3)
-    target=p/("difference-"+record["files"][0].removeprefix("reference-"))
-    diff.save(target)
-    means=ImageStat.Stat(diff).mean
-    mae=round(sum(means)/3,3)
-    results.append({"checkpoint":record["checkpoint"],"elapsedMs":record["elapsedMs"],
-                    "rgbMeanAbsoluteError":mae,"centralContentMAE":roi_mae,"pixelPerfect":mae==0})
-summary={"totalFrames":len(results),"allPixelIdentical":bool(results) and all(r["pixelPerfect"] for r in results),
-         "frames":results,"meanMAE":round(sum(x["rgbMeanAbsoluteError"] for x in results)/max(1,len(results)),3),
-         "centralContentMAE":round(sum(x["centralContentMAE"] for x in results)/max(1,len(results)),3)}
-(p/"results.json").write_text(json.dumps(summary,indent=2))
-print("S9_FRAME_PARITY "+json.dumps({"count":summary["totalFrames"],"meanMAE":summary["meanMAE"],
-    "allPixelIdentical":summary["allPixelIdentical"],"centralContentMAE":summary["centralContentMAE"],
-    "byCheckpoint":{name:round(sum(r["rgbMeanAbsoluteError"] for r in results if r["checkpoint"]==name)/max(1,sum(r["checkpoint"]==name for r in results)),3)
-                    for name in ("entry","middle","exit")}}))
+import math
+
+p = Path('section9-frame-audit')
+frames = json.loads((p / 'frames.json').read_text())
+results = []
+
+
+def rgb_mae(image):
+    return round(mean(ImageStat.Stat(image).mean), 3)
+
+
+def section_only_roi(record, size):
+    """Restrict comparison to the common visible Section 9 pixels."""
+    source = (record.get('original') or {}).get('section')
+    local = (record.get('local') or {}).get('section')
+    if not source or not local:
+        return None
+    width, height = size
+    left, right = 20, min(width - 20, 370)
+    # Exclude the floating source toolbar and order/navigation controls.
+    top = math.ceil(max(120, source['y'] + 8, local['y'] + 8))
+    bottom = math.floor(min(660, height - 120,
+                            source['y'] + source['height'] - 12,
+                            local['y'] + local['height'] - 12))
+    if right - left < 80 or bottom - top < 80:
+        return None
+    return (left, top, right, bottom)
+
+
+for record in frames['frames']:
+    reference, local = [Image.open(p / name).convert('RGB') for name in record['files']]
+    if reference.size != local.size:
+        raise RuntimeError('Viewport size differs')
+    difference = ImageChops.difference(reference, local)
+    target = p / ('difference-' + record['files'][0].removeprefix('reference-'))
+    difference.save(target)
+
+    # Preserve the original full-frame and legacy central-content metrics.
+    whole_mae = rgb_mae(difference)
+    central_mae = rgb_mae(ImageChops.difference(
+        reference.crop((20, 120, 370, 660)), local.crop((20, 120, 370, 660))))
+    roi = section_only_roi(record, reference.size)
+    section_mae = (rgb_mae(ImageChops.difference(
+        reference.crop(roi), local.crop(roi))) if roi else None)
+    results.append({
+        'checkpoint': record['checkpoint'],
+        'elapsedMs': record['elapsedMs'],
+        'rgbMeanAbsoluteError': whole_mae,
+        'centralContentMAE': central_mae,
+        'sectionOnlyMAE': section_mae,
+        'sectionROI': roi,
+        'pixelPerfect': whole_mae == 0,
+        'sectionOnlyPixelPerfect': section_mae == 0 if section_mae is not None else None,
+    })
+
+valid_section = [r['sectionOnlyMAE'] for r in results if r['sectionOnlyMAE'] is not None]
+summary = {
+    'totalFrames': len(results),
+    'allPixelIdentical': bool(results) and all(r['pixelPerfect'] for r in results),
+    'frames': results,
+    'meanMAE': round(mean(r['rgbMeanAbsoluteError'] for r in results), 3) if results else None,
+    'centralContentMAE': round(mean(r['centralContentMAE'] for r in results), 3) if results else None,
+    'sectionOnlyMAE': round(mean(valid_section), 3) if valid_section else None,
+    'sectionOnlyFrames': len(valid_section),
+}
+(p / 'results.json').write_text(json.dumps(summary, indent=2))
+print('S9_FRAME_PARITY ' + json.dumps({
+    'count': summary['totalFrames'],
+    'meanMAE': summary['meanMAE'],
+    'centralContentMAE': summary['centralContentMAE'],
+    'sectionOnlyMAE': summary['sectionOnlyMAE'],
+    'sectionOnlyFrames': summary['sectionOnlyFrames'],
+    'allPixelIdentical': summary['allPixelIdentical'],
+    'byCheckpoint': {
+        checkpoint: {
+            'fullFrameMAE': round(mean(r['rgbMeanAbsoluteError'] for r in selected), 3),
+            'sectionOnlyMAE': round(mean(r['sectionOnlyMAE'] for r in selected if r['sectionOnlyMAE'] is not None), 3)
+                              if any(r['sectionOnlyMAE'] is not None for r in selected) else None,
+        }
+        for checkpoint in ('entry', 'middle', 'exit')
+        for selected in [[r for r in results if r['checkpoint'] == checkpoint]]
+        if selected
+    },
+}))

@@ -1,7 +1,16 @@
 name: Section 9 persistent RSVP and frame parity
 on:
   push:
-    branches: [feat/section9-rsvp-persistence-visual-audit-20261104]
+    branches: [feat/section9-rsvp-persistence-visual-audit-20261104, main]
+    paths:
+      - index.html
+      - section-nine.js
+      - section-nine.css
+      - section-ten.css
+      - section-ten.js
+      - tools/section9-frame-parity.mjs
+      - tools/section9-frame-stats.py
+      - .github/workflows/section9-rsvp-backend-parity.yml
   pull_request:
     paths:
       - index.html
@@ -11,6 +20,10 @@ on:
       - tools/rsvp-admin.py
       - tests/section-nine.spec.mjs
       - tests/test_rsvp_api.py
+      - section-ten.css
+      - section-ten.js
+      - tools/section9-frame-parity.mjs
+      - tools/section9-frame-stats.py
       - .github/workflows/section9-rsvp-backend-parity.yml
   workflow_dispatch:
 permissions:
@@ -73,7 +86,7 @@ jobs:
         run: |
           python3 tools/dev-server.py >/tmp/s9-local-server.log 2>&1 &
           node tools/section9-frame-parity.mjs
-      - name: Measure pixel differences without false parity claims
+      - name: Measure Section 9-only differences separately from Section 10
         run: |
           python3 -m pip install --quiet --break-system-packages Pillow
           python3 tools/section9-frame-stats.py
