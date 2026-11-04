@@ -59,14 +59,20 @@
   stateObserver.observe(invitation,{attributes:true,attributeFilter:['data-state']});
   if(reduced.addEventListener)reduced.addEventListener('change',syncMotion);
   else if(reduced.addListener)reduced.addListener(syncMotion);
-  // Third-party artwork must only be used in this developer-only mode after
-  // obtaining appropriate permission and staging the WebP in Git-ignored
-  // assets/reference-dev. The public prototype always uses original artwork.
+  // The existing scene.webp is on the separate "assets/shared-artwork-20261104"
+  // Git branch, not on this feature branch. For local reference development,
+  // stage it in the Git-ignored assets/reference-dev directory using
+  // stage-section10-art.ps1. Never fetch vendor artwork at production runtime.
+  // Uploading source art to GitHub does not establish redistribution rights.
   section.dataset.artwork='original';
-  if(new URLSearchParams(location.search).get('section10LicensedArt')==='1'){
+  const previewHost=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+  const explicitPreview=new URLSearchParams(location.search).get('section10LicensedArt')==='1';
+  if(previewHost || explicitPreview){
     const img=section.querySelector('.closing10-source-scene');
     if(img){
-      img.onload=()=>{section.dataset.artwork='licensed-local';};
+      img.onload=()=>{
+        if(img.naturalWidth>0) section.dataset.artwork='local-reference';
+      };
       img.onerror=()=>{section.dataset.artwork='original';};
       img.src='./assets/reference-dev/scene.webp';
     }
