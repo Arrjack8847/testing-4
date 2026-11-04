@@ -30,6 +30,8 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_rsvp_api.py' -v
       - name: Validate Section 9 browser scripts
         run: node --check section-nine.js
+      - name: Verify unconfigured Vercel API rejects fake writes
+        run: node --test tests/rsvp-serverless.test.cjs
       - name: Four-phone Section 9 and 10 integration
         run: npx playwright test tests/section-nine.spec.mjs tests/section-six.spec.mjs tests/section-ten.spec.mjs --workers=2
       - name: Save test evidence without storing guest data
