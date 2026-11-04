@@ -41,7 +41,21 @@ async function visit(kind,url){
     // Wait for images and layout shifts before matching section-end coordinates.
     await page.waitForTimeout(kind==='source'?1800:750);
     await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';window.scrollTo(0,document.documentElement.scrollHeight);});
-    await page.waitForTimeout(1450);
+    // Wait through the source footer's 1.05s delay plus 1.1s transition.
+    // An earlier 1.45s wait measured an element still moving.
+    await page.waitForTimeout(3100);
+    const contactDetails=await page.evaluate(kind=>{
+      const el=document.querySelector(kind==='source'?'.cgv-closing .cgv-contacts':'#closingMessage .closing10-contacts');
+      if(!el)return null;
+      return [el,...el.querySelectorAll('*')].slice(0,35).map(n=>{
+        const r=n.getBoundingClientRect(),st=getComputedStyle(n);
+        return {tag:n.tagName,cls:String(n.className),text:(n.textContent||'').trim().slice(0,70),
+          x:+r.x.toFixed(2),y:+r.y.toFixed(2),w:+r.width.toFixed(2),h:+r.height.toFixed(2),
+          margin:st.margin,padding:st.padding,display:st.display,
+          font:st.font,letterSpacing:st.letterSpacing,border:st.border,
+          opacity:st.opacity,transform:st.transform};
+      });
+    },kind);
     const rects=await page.evaluate(sel=>{
       const fields={};
       const item=q=>{
@@ -67,7 +81,7 @@ async function visit(kind,url){
         fields};
     },selectors[kind]);
     await page.screenshot({path:OUTPUT+'/'+kind+'-exit-390x844.png',animations:'disabled'});
-    const exit=rects;
+    const exit={...rects,contactDetails};
     const region=selectors[kind].section;
     await page.evaluate(q=>{
       const e=document.querySelector(q);
@@ -105,6 +119,7 @@ try{
   if(result.local.fields.scene?.naturalWidth!==1080)throw new Error('Shared artwork was not loaded.');
   console.log('SECTION10_MATCHED_VISUAL_GEOMETRY '+JSON.stringify(result.geometryDifferences));
   console.log('SECTION10_MATCHED_ART '+JSON.stringify({source:result.source.fields.scene,local:result.local.fields.scene}));
+  console.log('SECTION10_CONTACT_DETAILS '+JSON.stringify({source:result.source.contactDetails,local:result.local.contactDetails}));
 }catch(e){
   result.error=String(e);
   console.error('SECTION10_VISUAL_QA_ERROR '+String(e));
