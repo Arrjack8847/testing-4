@@ -102,6 +102,7 @@ const pose=async(page,root,butterfly)=>{
       sectionButterflyFound:sectionSprites.length>0,
       sectionButterflyVisible:activeSprite(bf),
       sectionButterflyCount:sectionSprites.length,
+      sectionButterflyIndex:bf?sectionSprites.indexOf(bf):null,
       visibleSectionSprites:sectionSprites.filter(activeSprite).map(box),
       referenceSelectorWasVisible:activeSprite(legacyBf)&&belongsToSection(legacyBf),
       visibleButterflyCandidates,
