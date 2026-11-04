@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="section-six.css">
   <link rel="stylesheet" href="dress-code.css">
   <link rel="stylesheet" href="reference-continuation.css">
+  <link rel="stylesheet" href="section-eight-gift.css">
   <link rel="stylesheet" href="section-nine.css">
   <link rel="stylesheet" href="section-ten.css">
   <script src="scene.js?v=20261104-fix1" defer></script>
@@ -32,6 +33,7 @@
   <script src="section-six.js" defer></script>
   <script src="dress-code.js" defer></script>
   <script src="reference-continuation.js" defer></script>
+  <script src="section-eight-gift.js" defer></script>
   <script src="section-nine.js" defer></script>
   <script src="section-ten.js" defer></script>
 </head>
@@ -365,6 +367,13 @@
     <!-- Section 7: original gallery. No photos are invented or embedded. -->
     <section class="gallery-section" id="gallery" data-section="7"
       aria-labelledby="galleryHeading" aria-hidden="true" inert>
+      <!-- Section 7 owns a second sticky use of the locally stored scene.webp.
+           Keep this behind Gallery content, separate from Section 1's hero. -->
+      <div class="gallery-scene-backdrop" aria-hidden="true">
+        <img class="gallery-scene-image" src="./assets/scene.webp" alt=""
+          loading="lazy" decoding="async" draggable="false">
+        <div class="gallery-scene-wash"></div>
+      </div>
       <div class="gallery-atmosphere" aria-hidden="true">
         <span class="gallery-halo"></span>
         <span class="gallery-flora gallery-flora-left">❧</span>
@@ -374,59 +383,101 @@
         <span class="gallery-spark gallery-spark-three">✧</span>
       </div>
       <div class="gallery-content">
-        <p class="gallery-eyebrow gallery-reveal">A collection of moments</p>
+        <p class="gallery-eyebrow gallery-reveal">Moments</p>
         <div class="gallery-flourish gallery-reveal" aria-hidden="true"><span></span>✦<span></span></div>
-        <h2 id="galleryHeading" class="gallery-heading gallery-reveal">Our Memories</h2>
-        <p class="gallery-intro gallery-reveal">Little moments, beautiful memories, and a story still unfolding.</p>
-        <div class="gallery-photos">
+        <h2 id="galleryHeading" class="gallery-heading gallery-reveal">Our Gallery</h2>
+        <div class="gallery-photos" aria-label="Five wedding gallery frames">
           <button type="button" class="gallery-photo gallery-photo-feature gallery-reveal" data-gallery-slot="0" disabled>
-            <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 01</span><span class="gallery-photo-note">Awaiting your photograph</span></span>
-          </button>
-          <div class="gallery-photo-pair">
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="1" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">Photo 02</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="2" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 03</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-          </div>
-          <div class="gallery-photo-pair gallery-photo-pair-last">
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="3" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">Photo 04</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="4" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 05</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-          </div>
+      <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Together</span><span class="gallery-photo-note">Awaiting your photograph</span></span>
+      <span class="gallery-frame-caption" aria-hidden="true">Together</span>
+     </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="1" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">The Bride</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Bride</span>
+      </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="2" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">The Groom</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Groom</span>
+      </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="3" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">The Garden</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Garden</span>
+      </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="4" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">The Lake</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Lake</span>
+      </button>
         </div>
+        <p class="gallery-intro gallery-reveal">Tap a frame to view</p>
+        <p class="gallery-reference-note" hidden>Local comparison only: files in assets/gallery/reference/ are for authorized review, not for reuse in commercial invitations without the owner’s permission.</p>
         <p class="gallery-disclaimer gallery-reveal">Gallery preview — the couple's photographs have not been provided yet.</p>
-        <p class="gallery-ending gallery-reveal">And so our story continues…</p>
-        <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
-    <section class="reference-continuation ref-gifts" id="weddingGift" aria-labelledby="giftHeading" aria-hidden="true" inert>
-      <div class="ref-environment" aria-hidden="true"><i class="ref-vine ref-vine-left"></i><i class="ref-vine ref-vine-right"></i><i class="ref-light ref-light-a"></i></div>
-      <div class="ref-content">
-        <p class="ref-kicker ref-reveal">With gratitude</p>
-        <h2 class="ref-script ref-reveal" id="giftHeading">Wedding Gift</h2>
-        <p class="ref-intro ref-reveal">Your company is a gift in itself. For those who wish, a gift area can be arranged here.</p>
-        <div class="ref-gift-card ref-reveal">
-          <span aria-hidden="true" class="ref-gift-icon">❖</span>
-          <h3>Gift details</h3>
-          <p>No bank account or gift destination has been confirmed for this example invitation.</p>
-          <button type="button" disabled aria-describedby="giftUnavailable">Copy account number</button>
-          <small id="giftUnavailable">Unavailable until the couple provides verified details.</small>
+    <!-- Section 8: Wedding Gift; vendor sample details are deliberately non-transactional. -->
+    <section id="weddingGift" class="gift-eight" data-section="8" aria-labelledby="giftEightHeading" aria-hidden="true" inert data-gift-artwork="original" data-gift-butterfly="unavailable">
+      <div class="gift-eight-art" aria-hidden="true"></div>
+      <div class="gift-eight-petals" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <!-- Local-only blossom butterfly for the Gift-to-RSVP handoff. -->
+      <div class="gift-eight-butterfly" aria-hidden="true">
+        <i class="gift-eight-bfly-wing gift-eight-bfly-left"></i>
+        <i class="gift-eight-bfly-wing gift-eight-bfly-right"></i>
+        <i class="gift-eight-bfly-body"></i>
+      </div>
+      <div class="gift-eight-content">
+        <h2 id="giftEightHeading" class="gift-eight-heading gift-eight-reveal">Wedding Gift</h2>
+        <p class="gift-eight-intro gift-eight-reveal">Your presence at our wedding is the greatest gift of all. However, if you wish to bless us with a gift, you may do so through the details provided below.</p>
+        <div class="gift-eight-send gift-eight-reveal">
+          <button class="gift-eight-trigger" id="giftEightTrigger" type="button" aria-expanded="false" aria-controls="giftEightBanks giftEightWishlist giftEightDisclaimer" title="Preview only: no payments or reservations are enabled"><span aria-hidden="true">🎁</span> Send Gift</button>
+          <div class="gift-eight-bank-list" id="giftEightBanks" hidden>
+            <article class="gift-eight-bank" data-gift-bank="0">
+              <h4 class="gift-eight-bank-name">Maybank</h4>
+              <p class="gift-eight-account">Account details not configured</p>
+              <p class="gift-eight-holder">Demo only · Recipient not verified</p>
+              <button class="gift-eight-copy" type="button" disabled>Copy Account Number</button>
+              <p class="gift-eight-status" role="status" aria-live="polite"></p>
+            </article>
+            <article class="gift-eight-bank" data-gift-bank="1">
+              <h4 class="gift-eight-bank-name">CIMB</h4>
+              <p class="gift-eight-account">Account details not configured</p>
+              <p class="gift-eight-holder">Demo only · Recipient not verified</p>
+              <button class="gift-eight-copy" type="button" disabled>Copy Account Number</button>
+              <p class="gift-eight-status" role="status" aria-live="polite"></p>
+            </article>
+          </div>
         </div>
-        <div class="ref-gift-card ref-reveal">
-          <span aria-hidden="true" class="ref-gift-icon">✧</span>
+        <div class="gift-eight-wishlist gift-eight-reveal" id="giftEightWishlist" hidden>
           <h3>Gift Wishlist</h3>
-          <p>Gift reservations and store links need actual approved items and a reservation service.</p>
-          <button type="button" disabled>Reserve a gift</button>
-          <small>Preview only — no reservation is collected.</small>
+          <p class="gift-eight-wishlist-intro">Reserve a gift so no two guests buy the same one.</p>
+          <div class="gift-eight-items">
+            <article class="gift-eight-item">
+              <div class="gift-eight-thumb gift-eight-thumb-rice" aria-hidden="true">✧</div>
+              <div><h4>Philips Avance Collection Rice Cooker HD3175/62</h4>
+                <p>Shopee · Example item, stock unverified</p>
+                <div class="gift-eight-actions"><span>View on Shopee</span><button type="button" disabled title="No reservation service connected">Reserve</button></div>
+              </div>
+            </article>
+            <article class="gift-eight-item">
+              <div class="gift-eight-thumb gift-eight-thumb-kettle" aria-hidden="true">❦</div>
+              <div><h4>Philips 1.7L Kettle 1000 Series HD9314</h4>
+                <p>Lazada · Example item, reservation unverified</p>
+                <div class="gift-eight-actions"><span>View on Lazada</span><button type="button" disabled title="No verified reservation state">Reserved</button></div>
+              </div>
+            </article>
+            <article class="gift-eight-item">
+              <div class="gift-eight-thumb" aria-hidden="true">✦</div>
+              <div><h4>IKEA Gift Card</h4>
+                <p>Example item · Purchase link not configured</p>
+                <div class="gift-eight-actions"><button type="button" disabled title="No verified purchase destination">Buy</button></div>
+              </div>
+            </article>
+          </div>
         </div>
+        <p class="gift-eight-disclaimer gift-eight-reveal" id="giftEightDisclaimer" hidden>Demonstration only. Bank transfers, purchases and reservations are not enabled.</p>
       </div>
     </section>
-    <!-- Section 9: RSVP & Wishes. Source-measured 390x844 layout; demo-only guest form. -->
+    <!-- Section 9: RSVP & Wishes. Source-measured; live submissions require RSVP API. -->
     <section class="s9-rsvp" id="rsvp" data-section="9" aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="s9-art" aria-hidden="true">
         <div class="s9-original-paper"></div>
@@ -468,20 +519,21 @@
             <textarea id="s9Wish" name="wish" maxlength="300" rows="3" placeholder="Write a few warm words…"></textarea>
           </div>
           <button class="s9-submit" type="submit">Send RSVP</button>
-          <p id="s9FormStatus" class="s9-form-status" role="status" aria-live="polite">Preview only — submissions are not sent or stored.</p>
-          <p class="s9-note">Wishes appear on the wall below and are visible to all guests.</p>
+          <p id="s9FormStatus" class="s9-form-status" role="status" aria-live="polite">Submit your RSVP to save it privately.</p>
+          <p class="s9-note" id="s9WishesNote">Wishes appear on the wall below and are visible to all guests.</p>
+          <label class="s9-note s9-consent" for="s9ShareWish" hidden><input type="checkbox" id="s9ShareWish" name="shareWish"> Allow my wish to appear publicly after review.</label>
         </form>
         <div class="s9-preview" id="s9Preview" hidden>
-          <p>Your RSVP preview has not been sent.</p>
+          <p id="s9ReceiptState">Your RSVP has been saved privately. Wishes appear publicly only after approval.</p>
           <dl>
             <dt>Name</dt><dd id="s9PreviewName"></dd>
             <dt>Attendance</dt><dd id="s9PreviewAttendance"></dd>
             <dt>Guests</dt><dd id="s9PreviewGuests"></dd>
             <dt>Wish</dt><dd id="s9PreviewWish"></dd>
           </dl>
-          <button type="button" id="s9Copy">Copy preview text</button>
+          <button type="button" id="s9Copy">Copy confirmation</button>
         </div>
-        <div class="s9-wall" id="wishesWall" aria-label="Example guest wishes">
+        <div class="s9-wall" id="wishesWall" aria-label="Guest wishes and design examples">
           <article class="s9-wish s9-reveal">
             <div class="s9-who"><strong>Aunty Zaharah</strong><span>Kajang</span></div>
             <p>“So proud of you both. See you at the wedding!”</p>

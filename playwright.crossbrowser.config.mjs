@@ -31,7 +31,7 @@ export default defineConfig({
     }}
   ],
   webServer:{
-    command:'python3 -m http.server 8000 --bind 127.0.0.1',
+    command:'python3 tools/dev-server.py',
     port:8000,timeout:20_000,
     reuseExistingServer:!process.env.CI
   }

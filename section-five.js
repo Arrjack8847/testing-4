@@ -1,6 +1,8 @@
 'use strict';
-// Original Section 5 gallery. The five slots are local-only and have no
-// real photographs yet. Supply licensed/consented images and accurate alt text.
+// Section 7 uses downloaded WebP files only: no remote image hosts or silent fallback.
+// Production mode uses licensed couple photos. Local development (localhost / 127.0.0.1)
+// prefers locally downloaded reference WebPs when present, with a licensed-photo fallback.
+// ?galleryReference=1 is a strict reference-only QA mode. Reference files are Git-ignored.
 (() => {
   const section = document.getElementById('gallery');
   const invitation = document.getElementById('invitation');
@@ -8,12 +10,27 @@
   if (!section || !invitation || !dialog) return;
 
   const PHOTOS = Object.freeze([
-    {src:'./assets/gallery/photo-01.webp', alt:'Gallery photo 1', caption:'Photo 01'},
-    {src:'./assets/gallery/photo-02.webp', alt:'Gallery photo 2', caption:'Photo 02'},
-    {src:'./assets/gallery/photo-03.webp', alt:'Gallery photo 3', caption:'Photo 03'},
-    {src:'./assets/gallery/photo-04.webp', alt:'Gallery photo 4', caption:'Photo 04'},
-    {src:'./assets/gallery/photo-05.webp', alt:'Gallery photo 5', caption:'Photo 05'}
+    {src:'./assets/gallery/photo-01.webp', alt:'Wedding couple together', caption:'Together'},
+    {src:'./assets/gallery/photo-02.webp', alt:'The bride', caption:'The Bride'},
+    {src:'./assets/gallery/photo-03.webp', alt:'The groom', caption:'The Groom'},
+    {src:'./assets/gallery/photo-04.webp', alt:'The wedding garden', caption:'The Garden'},
+    {src:'./assets/gallery/photo-05.webp', alt:'The lakeside scene', caption:'The Lake'}
   ]);
+  const referenceMode = new URLSearchParams(window.location.search).get('galleryReference') === '1';
+  // Auto-comparison is deliberately limited to loopback addresses: on Vercel, custom
+  // domains and published previews, the guest Gallery never requests vendor photos.
+  const autoLocalReference = !referenceMode &&
+    ['localhost','127.0.0.1','[::1]','::1'].includes(window.location.hostname);
+  const REFERENCE_FILES = Object.freeze([
+    './assets/gallery/reference/moody.webp',
+    './assets/gallery/reference/moody-bride.webp',
+    './assets/gallery/reference/moody-groom.webp',
+    './assets/gallery/reference/moody-garden.webp',
+    './assets/gallery/reference/moody-lake.webp'
+  ]);
+  section.dataset.galleryArt = referenceMode ? 'reference-comparison' : 'local';
+  const referenceNote = section.querySelector('.gallery-reference-note');
+  if (referenceNote) referenceNote.hidden = !referenceMode;
   const buttons = Array.from(section.querySelectorAll('[data-gallery-slot]'));
   const viewImage = document.getElementById('galleryViewImage');
   const viewCaption = document.getElementById('galleryViewCaption');
@@ -39,9 +56,9 @@
     attributes:true,attributeFilter:['data-state']
   });
 
-  // No remote images, no inferred couple photos and no silent external fallback.
+  // Local relative URLs only. Reject absolute, root-relative, data:, and external schemes.
   function safeLocalUrl(src) {
-    return /^\.\/assets\/gallery\/[a-z0-9_-]+\.(webp|png|jpe?g)$/i.test(src) ? src : '';
+    return /^\.\/assets\/gallery\/(?:reference\/)?[a-z0-9_-]+\.webp$/i.test(src) ? src : '';
   }
   function loadPhotos() {
     if (assetsRequested) return;
@@ -49,29 +66,52 @@
     PHOTOS.forEach((photo,index) => {
       const button = buttons.find(b => Number(b.dataset.gallerySlot) === index);
       const local = safeLocalUrl(photo.src);
-      if (!button || !local) return;
+      const photoUrl = safeLocalUrl((referenceMode || autoLocalReference) ? REFERENCE_FILES[index] : local);
+      if (!button || !photoUrl) return;
       const image = document.createElement('img');
       image.className = 'gallery-image';
-      image.loading = 'lazy';
+      image.loading = (referenceMode || autoLocalReference) ? 'eager' : 'lazy';
       image.decoding = 'async';
       image.alt = photo.alt;
       image.onload = () => {
         if (!image.naturalWidth) return;
+        // The downloaded WebPs are for local visual comparison only.
+        // Show no extra reference banner so localhost resembles the source Gallery.
+        if (autoLocalReference && image.getAttribute('src') === REFERENCE_FILES[index]) {
+          section.dataset.galleryArt = 'local-reference-preview';
+        }
         button.classList.add('has-image');
         button.disabled = false;
         button.setAttribute('aria-label','View photo ' + (index+1));
         const placeholder = button.querySelector('.gallery-photo-placeholder');
         if (placeholder) placeholder.hidden = true;
         available.add(index);
-        disclaimer.textContent = available.size === PHOTOS.length
-          ? 'Tap any photograph to view it in full.'
-          : 'Tap an available photograph to view it. Other images are awaiting approval.';
+        // When all five local WebPs are present, suppress the development-only
+        // placeholder message so the guest Gallery keeps the source's exact
+        // bottom spacing. The "Tap a frame to view" hint stays visible.
+        const complete = available.size === PHOTOS.length;
+        disclaimer.hidden = complete;
+        if (!complete) {
+          disclaimer.textContent = referenceMode
+            ? 'Local reference WebPs are still missing. Check assets/gallery/reference/.'
+            : 'Tap an available photograph to view it. Other images are awaiting approval.';
+        }
       };
       image.onerror = () => {
+        // In normal localhost mode, prefer original comparison artwork if authorized
+        // copies exist; otherwise keep the standard owned/consented photo fallback.
+        // The strict ?galleryReference=1 QA mode never falls back.
+        if (autoLocalReference && image.getAttribute('src') === REFERENCE_FILES[index]) {
+          image.src = local;
+          return;
+        }
         image.remove();
+        if (referenceMode && available.size === 0) {
+          disclaimer.textContent = 'Local reference WebP missing. Add the files in assets/gallery/reference/ to compare.';
+        }
       };
       button.prepend(image);
-      image.src = local;
+      image.src = photoUrl;
     });
   }
 
@@ -137,8 +177,18 @@
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   if (!reduced.matches && 'IntersectionObserver' in window) {
+    // The source observes each heading/frame independently, rather than
+    // revealing the entire Gallery once. Entries reset when they leave view,
+    // so scrolling back up produces a fresh entrance.
     section.dataset.revealReady = 'true';
+    const revealObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        entry.target.classList.toggle('in', entry.isIntersecting);
+      }
+    }, {threshold:0.08});
+    section.querySelectorAll('.gallery-reveal').forEach(node => revealObserver.observe(node));
   }
+  // Image loading remains lazy and independent of reveal/reverse motion.
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry=>entry.isIntersecting)) return;

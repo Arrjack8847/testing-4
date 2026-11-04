@@ -1,5 +1,5 @@
 'use strict';
-// Section 9 interaction is independent of Section 6. No backend, network, storage or write operations.
+// Section 9 saves RSVP through same-origin /api/rsvp and only displays approved, consented wishes.
 (() => {
   const section=document.getElementById('rsvp');
   const invitation=document.getElementById('invitation');
@@ -8,11 +8,12 @@
   const name=document.getElementById('s9Name'),attendance=document.getElementById('s9Attendance'),
     guests=document.getElementById('s9Guests'),wish=document.getElementById('s9Wish'),
     status=document.getElementById('s9FormStatus'),preview=document.getElementById('s9Preview'),
-    copy=document.getElementById('s9Copy');
+    copy=document.getElementById('s9Copy'),shareWish=document.getElementById('s9ShareWish'),
+    button=form.querySelector('.s9-submit'),receiptStatus=document.getElementById('s9ReceiptState');
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
   const fields={name:document.getElementById('s9PreviewName'),attendance:document.getElementById('s9PreviewAttendance'),
     guests:document.getElementById('s9PreviewGuests'),wish:document.getElementById('s9PreviewWish')};
-  let inView=false,previewText='';
+  let inView=false,previewText='',requestId=null,busy=false;
   const stop=()=>!inView||motion.matches||document.hidden||invitation.dataset.state!=='opened';
   const syncMotion=()=>{
     section.classList.toggle('s9-active',!stop());
@@ -22,8 +23,8 @@
   const syncCover=()=>{
     const closed=invitation.dataset.state!=='opened';
     section.inert=closed;section.setAttribute('aria-hidden',String(closed));
-    if(closed){form.reset();guests.disabled=false;preview.hidden=true;previewText='';
-      status.classList.remove('s9-feedback-visible');status.textContent='Preview only — submissions are not sent or stored.';}
+    if(closed){form.reset();guests.disabled=false;shareWish.closest('label').hidden=true;preview.hidden=true;previewText='';
+      status.classList.remove('s9-feedback-visible');status.textContent='Submit your RSVP to save it privately.';}
     syncMotion();
   };
   syncCover();
@@ -55,9 +56,9 @@
     const loadPaper=()=>{
       if(!art)return;
       art.addEventListener('load',()=>{
-        if(art.naturalWidth>0)section.classList.add('s9-reference-loaded');
+        if(art.naturalWidth>0){section.classList.add('s9-reference-loaded');section.dataset.referenceArt='loaded';}
       },{once:true});
-      art.addEventListener('error',()=>{section.dataset.referenceArt='missing';},{once:true});
+      art.addEventListener('error',()=>{section.dataset.referenceArt='missing';if(localPreview)console.warn('Section 9 paper.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');},{once:true});
       art.src=paperUrl;
     };
     const loadButterfly=()=>{
@@ -70,6 +71,7 @@
       },{once:true});
       sprite.addEventListener('error',()=>{
         section.dataset.referenceButterfly='missing';
+        if(localPreview)console.warn('Section 9 bfly_1.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');
       },{once:true});
       sprite.src=butterflyUrl;
     };
@@ -80,36 +82,156 @@
     }else{
       // HEAD preflight means an absent file never replaces the CSS fallback
       // with a broken <img>. The server is local; no vendor URL is fetched.
-      const loadIfPresent=async(url,onPresent)=>{
+      const loadIfPresent=async(url,onPresent,kind)=>{
         try{
           const response=await fetch(url,{method:'HEAD',cache:'no-store'});
-          if(response.ok)onPresent();
-        }catch(_){/* Local server unavailable; CSS artwork remains visible. */}
+          if(response.ok || response.status===405){onPresent();return;}
+          if(kind==='paper')section.dataset.referenceArt='missing';
+          else section.dataset.referenceButterfly='missing';
+          console.warn('Section 9 '+kind+' is missing locally (HTTP '+response.status+'). Run ensure-section9-art.ps1.');
+        }catch(error){
+          if(kind==='paper')section.dataset.referenceArt='unavailable';
+          else section.dataset.referenceButterfly='unavailable';
+          console.warn('Section 9 '+kind+' could not be checked. Run start.ps1 again.',error);
+        }
       };
-      void loadIfPresent(paperUrl,loadPaper);
-      void loadIfPresent(butterflyUrl,loadButterfly);
+      void loadIfPresent(paperUrl,loadPaper,'paper');
+      void loadIfPresent(butterflyUrl,loadButterfly,'butterfly');
     }
   }
-  form.addEventListener('submit',event=>{
+  const makeId=()=>{
+    if(typeof crypto.randomUUID==='function')return crypto.randomUUID();
+    const a=crypto.getRandomValues(new Uint8Array(16));a[6]=(a[6]&15)|64;a[8]=(a[8]&63)|128;
+    const hex=[...a].map(v=>v.toString(16).padStart(2,'0')).join('');
+    return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-');
+  };
+  const feedback=(message)=>{
+    status.classList.add('s9-feedback-visible');
+    status.textContent=message;
+  };
+  const renderApproved=(wishes)=>{
+    if(!Array.isArray(wishes)||!wishes.length)return;
+    const wall=document.getElementById('wishesWall');
+    if(!wall)return;
+    const fragment=document.createDocumentFragment();
+    for(const item of wishes.slice(0,20)){
+      if(typeof item.name!=='string'||typeof item.wish!=='string')continue;
+      const article=document.createElement('article');article.className='s9-wish s9-in';
+      const who=document.createElement('div');who.className='s9-who';
+      const strong=document.createElement('strong');strong.textContent=item.name.slice(0,60);
+      const label=document.createElement('span');label.textContent='Wedding guest';
+      const message=document.createElement('p');message.textContent=item.wish.slice(0,300);
+      who.append(strong,label);article.append(who,message);fragment.append(article);
+    }
+    if(!fragment.childNodes.length)return;
+    wall.replaceChildren(fragment);wall.setAttribute('aria-label','Approved guest wishes');
+  };
+  const refreshWishes=async()=>{
+    try{
+      const response=await fetch('/api/wishes',{cache:'no-store'});
+      if(response.ok){
+        const payload=await response.json();
+        renderApproved(payload.wishes);
+      }
+    }catch(_){/* Static preview: keep clearly labeled example wishes. */}
+  };
+  void refreshWishes();
+  const consentLabel=shareWish.closest('label');
+  const syncConsent=()=>{
+    const hasWish=Boolean(wish.value.trim());
+    consentLabel.hidden=!hasWish;
+    if(!hasWish)shareWish.checked=false;
+  };
+  wish.addEventListener('input',syncConsent);
+  syncConsent();
+  // Vercel production requires a human-verification token; local SQLite
+  // preview does not. Site key is public, secret stays on the server.
+  let captchaToken='',captchaWidget=null;
+  const setupCaptcha=async()=>{
+    try{
+      const response=await fetch('/api/rsvp/status',{cache:'no-store'});
+      if(!response.ok)return;
+      const info=await response.json();
+      if(!info.accepting||!info.captchaSiteKey)return;
+      const area=document.createElement('div');area.id='s9CaptchaArea';
+      area.setAttribute('aria-label','Anti-spam verification');
+      button.before(area);
+      const script=document.createElement('script');
+      script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async=true;script.defer=true;
+      script.onload=()=>{
+        if(!window.turnstile)return;
+        captchaWidget=window.turnstile.render(area,{
+          sitekey:info.captchaSiteKey,
+          callback:token=>{captchaToken=token;},
+          'expired-callback':()=>{captchaToken='';}
+        });
+      };
+      script.onerror=()=>feedback('Verification is unavailable. RSVPs cannot be sent right now.');
+      document.head.append(script);
+    }catch(_){/* Static preview or offline: do not claim a working backend. */}
+  };
+  void setupCaptcha();
+  const markEdited=()=>{
+    if(!busy){requestId=null;preview.hidden=true;previewText='';}
+  };
+  for(const el of [name,attendance,guests,wish,shareWish]){
+    el.addEventListener('input',markEdited);
+    el.addEventListener('change',markEdited);
+  }
+  form.addEventListener('submit',async event=>{
     event.preventDefault();
+    if(busy)return;
     const clean=name.value.trim().replace(/\s+/g,' ');
     if(!clean){name.setCustomValidity('Please enter your name.');name.reportValidity();return;}
     name.setCustomValidity('');
     if(!form.reportValidity())return;
-    const yes=attendance.value==='yes';
-    if(!yes&&attendance.value!=='no')return;
-    fields.name.textContent=clean;fields.attendance.textContent=yes?'Joyfully attending':'Sending love from afar';
-    fields.guests.textContent=yes?guests.value:'Not attending';
-    fields.wish.textContent=wish.value.trim()||'No wish entered';
-    previewText=['Wedding RSVP — not submitted','Name: '+clean,'Attendance: '+fields.attendance.textContent,
-      'Guests: '+fields.guests.textContent,'Wish: '+fields.wish.textContent].join('\n');
-    preview.hidden=false;
-    status.classList.add('s9-feedback-visible');status.textContent='This is a local preview only. Your response was not sent or saved.';
+    if(attendance.value!=='yes'&&attendance.value!=='no')return;
+    const payload={
+      requestId:requestId||makeId(),name:clean,attendance:attendance.value,
+      guests:attendance.value==='yes'?Number(guests.value):0,
+      wish:wish.value.trim(),shareWish:Boolean(shareWish.checked&&wish.value.trim()),captchaToken
+    };
+    requestId=payload.requestId;
+    busy=true;button.disabled=true;button.textContent='Sending…';
+    feedback('Saving your RSVP…');
+    try{
+      const response=await fetch('/api/rsvp',{
+        method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+        body:JSON.stringify(payload)
+      });
+      const data=await response.json().catch(()=>null);
+      if(!response.ok||!data||data.saved!==true)throw new Error(data?.error||'RSVP service unavailable. No response was saved.');
+      fields.name.textContent=clean;
+      fields.attendance.textContent=payload.attendance==='yes'?'Joyfully attending':'Sending love from afar';
+      fields.guests.textContent=payload.attendance==='yes'?String(payload.guests):'Not attending';
+      fields.wish.textContent=payload.wish||'No wish entered';
+      receiptStatus.textContent='Saved privately. Your wish will appear publicly only if you opted in and it is approved.';
+      previewText=['RSVP received','Receipt: '+data.receipt,'Name: '+clean,
+        'Attendance: '+fields.attendance.textContent,'Guests: '+fields.guests.textContent,
+        'Wish: '+fields.wish.textContent].join('\n');
+      preview.hidden=false;
+      feedback('RSVP received and saved. Thank you!');
+      void refreshWishes();
+      requestId=null;
+      if(captchaWidget!==null&&window.turnstile?.reset){
+        window.turnstile.reset(captchaWidget);captchaToken='';
+      }
+    }catch(error){
+      preview.hidden=true;
+      feedback(error.message||'Unable to save your RSVP. Please try again.');
+    }finally{
+      busy=false;button.disabled=false;button.textContent='Send RSVP';
+    }
   });
   name.addEventListener('input',()=>name.setCustomValidity(''));
   copy.addEventListener('click',async()=>{
     if(!previewText)return;
-    try{await navigator.clipboard.writeText(previewText);status.classList.add('s9-feedback-visible');status.textContent='Preview copied. Nothing was sent.';}
-    catch{status.classList.add('s9-feedback-visible');status.textContent='Copy unavailable. Please select and copy your preview manually.';}
+    try{
+      await navigator.clipboard.writeText(previewText);
+      feedback('Confirmation copied. Your RSVP remains saved.');
+    }catch{
+      feedback('Copy unavailable. You can select and copy the confirmation above.');
+    }
   });
 })();

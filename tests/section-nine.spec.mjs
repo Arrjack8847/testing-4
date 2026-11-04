@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-// Section 9 source-grounded RSVP & Wishes. Intentionally no real submission backend.
+// Section 9 source-grounded RSVP & Wishes with real API; UI uses safe stub while Python tests exercise SQLite.
 async function go(page){
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
@@ -27,11 +27,18 @@ test('Section 9 matches source structure, field choices and section order',async
   await expect(section.locator('#s9Guests option')).toHaveCount(5);
   await expect(section.locator('#s9Wish')).toHaveAttribute('maxlength','300');
   await expect(section.locator('.s9-wish')).toHaveCount(3);
-  await expect(section.locator('#s9FormStatus')).toContainText('not sent');
+  await expect(section.locator('#s9FormStatus')).toContainText('save it privately');
   expect(errors).toEqual([]);
 });
-test('No submission, guest message or public wish is persisted by demo',async({page})=>{
-  const writes=[];page.on('request',req=>{if(!['GET','HEAD'].includes(req.method()))writes.push(req.method()+' '+req.url())});
+test('A confirmed POST reveals a receipt; errors never pretend to save',async({page})=>{
+  const writes=[];
+  await page.route('**/api/rsvp',async route=>{
+    const payload=route.request().postDataJSON();
+    writes.push(payload);
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({
+      ok:true,saved:true,receipt:payload.requestId
+    })});
+  });
   const {section,errors}=await go(page);
   await section.locator('#s9Name').fill('  Dana    Test  ');
   await section.locator('#s9Attendance').selectOption('yes');
@@ -41,26 +48,45 @@ test('No submission, guest message or public wish is persisted by demo',async({p
   await expect(section.locator('#s9Preview')).toBeVisible();
   await expect(section.locator('#s9PreviewName')).toHaveText('Dana Test');
   await expect(section.locator('#s9PreviewGuests')).toHaveText('3');
-  await expect(section.locator('#s9FormStatus')).toContainText('not sent or saved');
-  expect(writes).toEqual([]);
+  await expect(section.locator('#s9FormStatus')).toContainText('received and saved');
+  expect(writes).toHaveLength(1);
+  expect(writes[0].requestId).toMatch(/^[a-f0-9-]{36}$/);
+  expect(writes[0].shareWish).toBe(false);
   await page.reload();
   await page.getByRole('button',{name:'Open Invitation'}).click();
   await expect(page.locator('#s9Preview')).toBeHidden();
-  await expect(page.locator('#s9Name')).toHaveValue('');
-  await expect(page.locator('.s9-wish')).toHaveCount(3);
   expect(errors).toEqual([]);
 });
-test('Declining disables guest count and cover reset clears local preview',async({page})=>{
+test('Declining saves guest count zero and closing cover hides receipt',async({page})=>{
+  let sent;
+  await page.route('**/api/rsvp',async route=>{
+    sent=route.request().postDataJSON();
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({
+      ok:true,saved:true,receipt:sent.requestId
+    })});
+  });
   const {section}=await go(page);
   await section.locator('#s9Name').fill('Guest Example');
   await section.locator('#s9Attendance').selectOption('no');
   await expect(section.locator('#s9Guests')).toBeDisabled();
   await section.getByRole('button',{name:'Send RSVP'}).click();
   await expect(section.locator('#s9PreviewGuests')).toHaveText('Not attending');
+  expect(sent.guests).toBe(0);
   await page.evaluate(()=>{document.getElementById('invitation').dataset.state='cover';});
   await expect(section).toHaveJSProperty('inert',true);
   await expect(section.locator('#s9Preview')).toBeHidden();
-  await expect(section.locator('#s9Name')).toHaveValue('');
+});
+test('Backend error preserves entry and never claims saved',async({page})=>{
+  await page.route('**/api/rsvp',route=>route.fulfill({
+    status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:'Service unavailable.'})
+  }));
+  const {section}=await go(page);
+  await section.locator('#s9Name').fill('Test Guest');
+  await section.locator('#s9Attendance').selectOption('yes');
+  await section.getByRole('button',{name:'Send RSVP'}).click();
+  await expect(section.locator('#s9FormStatus')).toContainText('Service unavailable');
+  await expect(section.locator('#s9Preview')).toBeHidden();
+  await expect(section.locator('#s9Name')).toHaveValue('Test Guest');
 });
 test('Four widths have no overflow and Section 8→9→10 seams stay exact',async({page},testInfo)=>{
   const {section,errors}=await go(page);
@@ -85,6 +111,16 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(r.x+r.width).toBeLessThanOrEqual(page.viewportSize().width+1);}
   if(testInfo.project.name==='iphone-390'){
     expect(Math.abs(m.section.height-1215.9)).toBeLessThan(4);
+    const eyebrowBreak=await section.locator('.s9-eyebrow').evaluate(el=>{
+      const text=el.firstChild,idx=text.textContent.indexOf('31');
+      const topOf=(start,length)=>{
+        const range=document.createRange();
+        range.setStart(text,start);range.setEnd(text,start+length);
+        return range.getBoundingClientRect().top;
+      };
+      return {first:topOf(0,6),date:topOf(idx,2)};
+    });
+    expect(eyebrowBreak.date-eyebrowBreak.first).toBeGreaterThan(8);
     const exact=await section.evaluate(el=>{
       const inp=el.querySelector('#s9Name'),btn=el.querySelector('.s9-submit'),paper=el.querySelector('.s9-reference-art'),
         wall=el.querySelector('.s9-wall'),wish=el.querySelector('.s9-wish'),base=el.getBoundingClientRect();
@@ -99,6 +135,41 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(exact.buttonBg).toBe('rgb(123, 61, 110)');
     expect(exact.buttonRadius).toBe('999px');
     expect(exact.wishRadius).toBe('14px');
+    const wishStyles=await section.evaluate(el=>{
+      const note=el.querySelector('#s9WishesNote'),who=el.querySelector('.s9-who'),
+        city=who.querySelector('span'),firstCard=el.querySelector('.s9-wish');
+      return {
+        noticeHeight:note.getBoundingClientRect().height,
+        noticeLineHeight:parseFloat(getComputedStyle(note).lineHeight),
+        nameFontSize:getComputedStyle(who).fontSize,
+        cityTransform:getComputedStyle(city).textTransform,
+        cardHeight:firstCard.getBoundingClientRect().height
+      };
+    });
+    expect(wishStyles.noticeHeight).toBeLessThanOrEqual(wishStyles.noticeLineHeight+1);
+    expect(wishStyles.nameFontSize).toBe('18px');
+    expect(wishStyles.cityTransform).toBe('uppercase');
+    expect(wishStyles.cardHeight).toBeGreaterThan(90);
+    const frame=await section.locator('.s9-frame').evaluate(el=>{
+      const r=el.getBoundingClientRect(),s=document.getElementById('rsvp').getBoundingClientRect();
+      const disclosure=document.querySelector('#rsvp .s9-demo-note').getBoundingClientRect();
+      return {top:r.top-s.top,bottom:r.bottom-s.top,left:r.left-s.left,width:r.width,
+        noticeTop:disclosure.top-s.top,noticeBottom:disclosure.bottom-s.top,
+        radius:getComputedStyle(el).borderTopLeftRadius,
+        background:getComputedStyle(el).backgroundImage};
+    });
+    expect(Math.abs(frame.top-5)).toBeLessThan(5);
+    expect(frame.left).toBeGreaterThan(8);
+    expect(frame.left).toBeLessThan(22);
+    expect(frame.background).toContain('linear-gradient');
+    // Live source's inner arch ends around section-relative y=1150 at 390px.
+    // The example-wishes disclosure stays visible below the arch, not inside
+    // the grid that artificially stretched the gold border by ~40px.
+    expect(frame.bottom).toBeGreaterThan(1138);
+    expect(frame.bottom).toBeLessThan(1165);
+    expect(frame.noticeTop).toBeGreaterThan(frame.bottom);
+    expect(frame.noticeBottom).toBeLessThan(m.section.height-6);
+
     const flight=await section.locator('.s9-butterfly').evaluate(el=>({
       top:parseFloat(getComputedStyle(el).top),
       duration:getComputedStyle(el).animationDuration
@@ -134,6 +205,7 @@ test('Local reference mode loads split-wing sprite only with explicit opt-in',as
   const section=page.locator('#rsvp');
   await expect(section).toHaveClass(/s9-reference-loaded/);
   await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section).toHaveAttribute('data-reference-art','loaded');
   await expect(section).toHaveAttribute('data-reference-butterfly','loaded');
   const wing=section.locator('.s9-wing-left');
   const style=await wing.evaluate(el=>({image:getComputedStyle(el).backgroundImage,
@@ -154,6 +226,19 @@ test('Plain localhost root automatically loads locally staged paper and butterfl
   await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
   expect(new URL(page.url()).searchParams.has('section9Reference')).toBe(false);
   await page.goto('/?section9Reference=0');
+  await expect(section).not.toHaveClass(/s9-reference-loaded/);
+  await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
+});
+
+test('Missing original Section 9 files report diagnostics rather than silently vanishing',async({page})=>{
+  await page.route('**/assets/reference-dev/section9/*.webp',route=>route.fulfill({
+    status:404,contentType:'text/plain',body:'Not found'
+  }));
+  await page.goto('/');
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveAttribute('data-reference-art','missing');
+  await expect(section).toHaveAttribute('data-reference-butterfly','missing');
   await expect(section).not.toHaveClass(/s9-reference-loaded/);
   await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
   await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
