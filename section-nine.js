@@ -128,6 +128,14 @@
     }catch(_){/* Static preview: keep clearly labeled example wishes. */}
   };
   void refreshWishes();
+  const consentLabel=shareWish.closest('label');
+  const syncConsent=()=>{
+    const hasWish=Boolean(wish.value.trim());
+    consentLabel.hidden=!hasWish;
+    if(!hasWish)shareWish.checked=false;
+  };
+  wish.addEventListener('input',syncConsent);
+  syncConsent();
   const markEdited=()=>{
     if(!busy){requestId=null;preview.hidden=true;previewText='';}
   };
