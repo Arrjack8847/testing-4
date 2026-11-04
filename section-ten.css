@@ -84,7 +84,7 @@
   color:#6f5a6c;font:400 18px/1.65 'EB Garamond',Georgia,serif;
 }
 .section-ten .closing10-rule {
-  width:76px;height:1px;margin:26px auto;
+  width:80px;height:1px;margin:26px auto;
   background:linear-gradient(90deg,transparent,#7e6479,transparent);
 }
 .section-ten .closing10-signoff {margin:0 0 2px;color:#7e6479;}
@@ -101,7 +101,7 @@
 .section-ten .closing10-contacts-title {
   width:max-content;margin:0 auto;opacity:.8;
   font:400 11px/1.65 'EB Garamond',Georgia,serif;
-  letter-spacing:4.95px;color:#7e6479;text-transform:uppercase;
+  letter-spacing:3.08px;color:#7e6479;text-transform:uppercase;
 }
 .section-ten .closing10-contact-row {
   display:flex;justify-content:center;align-items:center;gap:9px;margin-top:12px;
