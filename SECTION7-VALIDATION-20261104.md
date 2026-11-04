@@ -318,3 +318,58 @@ through DOM ancestry and computed positioning.
 **Current decision:** No edit to Section 6, Section 8 or the
 integration shell; this branch remains QA/documentation-only and
 draft PR #26 remains unmerged.
+
+## Implemented in validation branch: Gallery sticky scene layer
+
+Following the browser measurements from
+[41753256821](https://github.com/Arrjack8847/testing-4/actions/runs/41753256821),
+the validation branch now includes a Section 7-only, correctly clipped
+instance of the already-downloaded `assets/scene.webp`:
+
+- `#gallery > .gallery-scene-backdrop`: absolute `inset:0`,
+  `z-index:0`, `overflow:clip`; does not receive pointer input.
+- `.gallery-scene-image`: sticky `top:0`, width 100%,
+  height `100dvh`, `object-fit:cover`,
+  `object-position:50% 50%`. Source image intrinsic dimensions
+  are 1080×1920; it is the same file used by the opening hero but
+  **not** the same DOM element or animation clock.
+- `.gallery-scene-wash`: absolute overlay `#faf7fb`,
+  source-measured opacity **0.1**, not an invented gradient.
+- `.gallery-content`: foreground `z-index:4` so captions,
+  frames and viewer controls remain above the scene.
+- The outer section changes `overflow:hidden` to `overflow:clip`
+  to allow native sticky positioning while still clipping the artwork
+  at Gallery boundaries.
+
+**No scene file was committed**; it must exist as
+`D:\testing-4-section7\assets\scene.webp` on the user's local
+worktree (confirmed verified earlier). The new Gallery image is purely
+decorative with empty alt text and `aria-hidden` ancestry; photo
+viewer and scroll-reveal event systems remain unchanged.
+
+Four-viewport Playwright test added to `tests/section-five.spec.mjs`
+for the scene asset URL, exact crop/wash, sticky top and exit,
+foreground hit targets, and reduced-motion-safe behavior.
+
+The screenshots from old workflow runs predate this implementation,
+so do not reuse old accuracy numbers as proof of the revised scene.
+A fresh source-vs-local screenshot using the already downloaded
+WebPs is required to certify the appearance. This change does NOT
+add reference photos to GitHub or integrate Wedding Gift / shared
+floating controls.
+
+**Local commands (existing separate worktree, not the conflicting
+main folder):**
+
+```powershell
+cd D:\testing-4
+git fetch origin
+cd D:\testing-4-section7
+git switch --detach origin/feat/section7-reference-validation-20261104
+powershell -ExecutionPolicy Bypass -File .\start.ps1
+```
+
+The original scene/photo WebPs in this worktree stay local and are
+not modified by checking out the new branch revision. Open
+`http://localhost:8000/`, click Open Invitation, and scroll
+through Gallery from top to bottom.
