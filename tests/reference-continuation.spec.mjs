@@ -111,7 +111,7 @@ test('reduced motion and local-only guest/gift safeguards are honored',async({pa
   expect(state.opacity).toBe('1');
   await expect(page.locator('#weddingGift button').first()).toBeDisabled();
   await expect(page.locator('#wishesWall')).toContainText('not real guest submissions');
-  await expect(page.locator('#rsvpWarning')).toContainText('response will not be sent');
+  await expect(page.locator('#s9FormStatus')).toContainText('not sent or stored');
 });
 
 
