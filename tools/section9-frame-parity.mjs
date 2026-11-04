@@ -23,7 +23,19 @@ const open=async(page)=>{
 const pose=async(page,root,butterfly)=>{
   return page.evaluate(({root,butterfly})=>{
     const section=document.querySelector(root);
-    const bf=document.querySelector(butterfly);
+    const legacyBf=document.querySelector(butterfly);
+    const belongsToSection=element=>section&&section.contains(element);
+    const activeSprite=element=>{
+      if(!element)return false;
+      const r=element.getBoundingClientRect(),s=getComputedStyle(element);
+      return r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&
+        r.left<innerWidth&&r.top<innerHeight&&s.display!=='none'&&
+        s.visibility!=='hidden'&&Number(s.opacity)>0.04;
+    };
+    // The document's first .cgv-bf is a hidden sprite from another section.
+    // Choose only a rendered element DESCENDING FROM the target section.
+    const sectionSprites=section?[...section.querySelectorAll(butterfly)]:[];
+    const bf=sectionSprites.find(activeSprite)||sectionSprites[0]||null;
     const box=element=>{
       if(!element)return null;
       const r=element.getBoundingClientRect(),style=getComputedStyle(element);
@@ -86,8 +98,12 @@ const pose=async(page,root,butterfly)=>{
       section:box(section),
       // Preserve the old field so prior frame stats can compare old/new audits.
       butterfly:box(bf),
-      referenceSelectorWasVisible:candidates.some(item=>item.visible&&
-        item.rect?.x===box(bf)?.x&&item.rect?.y===box(bf)?.y),
+      legacyButterfly:box(legacyBf),
+      sectionButterflyFound:sectionSprites.length>0,
+      sectionButterflyVisible:activeSprite(bf),
+      sectionButterflyCount:sectionSprites.length,
+      visibleSectionSprites:sectionSprites.filter(activeSprite).map(box),
+      referenceSelectorWasVisible:activeSprite(legacyBf)&&belongsToSection(legacyBf),
       visibleButterflyCandidates,
       butterflyCandidates:candidates.slice(0,12),
       // An absent candidate means "unmeasured", not "no butterfly exists".
@@ -142,16 +158,17 @@ try{
   metrics.failure=String(error);
   console.error('S9_FRAME_AUDIT_ERROR',String(error));
   process.exitCode=1;
+}finally{
   const countVisible=key=>metrics.frames.filter(frame=>
-    frame[key]?.visibleButterflyMeasurement==='visible-dom-candidate').length;
+    frame[key]?.sectionButterflyVisible===true).length;
   console.log('S9_BUTTERFLY_CANDIDATES '+JSON.stringify({
     totalFrames:metrics.frames.length,
-    referenceVisibleSamples:countVisible('original'),
-    localVisibleSamples:countVisible('local'),
-    legacyReferenceSelectorMayBeOffscreen:true,
-    note:'No visible candidate does not prove that a canvas or CSS pseudo-element is absent.'
+    referenceVisibleSectionSprites:countVisible('original'),
+    localVisibleSectionSprites:countVisible('local'),
+    referenceSectionSpriteCounts:[...new Set(metrics.frames.map(
+      frame=>frame.original?.sectionButterflyCount||0))],
+    note:'Only sprites inside the target section are used for pose; visible global candidates are diagnostic.'
   }));
-}finally{
   fs.writeFileSync(output+'/frames.json',JSON.stringify(metrics,null,2));
   await browser.close();
 }
