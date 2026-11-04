@@ -21,9 +21,22 @@
     <path d="M0 -18 C9 -34 18 -19 9 -10 C23 -16 30 -1 13 4 C28 11 16 22 4 13 C1 30 -15 26 -12 10 C-29 16 -26 -3 -11 -5 C-22 -19 -7 -30 0 -18Z" fill="#673354" opacity=".48" stroke="#a77693" stroke-opacity=".33" stroke-width="1"/>
     <circle r="5" fill="#9c638b" opacity=".3"/>
   </g>
+
+  <!-- Independently drawn velvet grain and soft relief, not a reference image. -->
+  <filter id="velvetNoise" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".038 .070" numOctaves="3" seed="17" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <filter id="relief" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="1.6" dy="2.0" stdDeviation="1.2" flood-color="#100910" flood-opacity=".83"/>
+    <feDropShadow dx="-1.1" dy="-1.3" stdDeviation=".85" flood-color="#d4aac1" flood-opacity=".33"/>
+  </filter>
 </defs>
+<!-- A deep plum relief background, designed independently from source imagery. -->
+<rect width="390" height="1000" fill="#321c18" opacity=".58"/>
+<rect width="390" height="1000" filter="url(#velvetNoise)" opacity=".22" style="mix-blend-mode:overlay"/>
 <rect width="390" height="1000" fill="url(#grain)"/>
-<g opacity=".87">
+<g opacity=".94" filter="url(#relief)">
   <use href="#frond" transform="translate(-34 20) rotate(-11 20 155)"/>
   <use href="#frond" transform="translate(380 190) scale(-1 .85) rotate(-14 40 180)"/>
   <use href="#frond" transform="translate(-36 560) rotate(8 20 175)"/>
@@ -32,7 +45,7 @@
   <use href="#frond" transform="translate(267 325) scale(.56 .65) rotate(17 60 70)" opacity=".5"/>
   <use href="#frond" transform="translate(187 99) scale(.65 .5) rotate(65 40 70)" opacity=".54"/>
 </g>
-<g opacity=".34">
+<g opacity=".70" filter="url(#relief)">
 <use href="#littlebloom" transform="translate(69 52) scale(1.8)"/>
 <use href="#littlebloom" transform="translate(327 284) scale(1.2)"/>
 <use href="#littlebloom" transform="translate(110 677) scale(1.7)"/>
