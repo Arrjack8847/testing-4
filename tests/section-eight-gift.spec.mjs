@@ -215,7 +215,7 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
   expect(faults).toEqual([]);
 });
 
-test('Missing private butterfly remains invisible without fetching vendor URLs',async({page})=>{
+test('Missing private butterfly uses original animated fallback without vendor hotlinks',async({page})=>{
   const requested=[];
   page.on('request',req=>{
     if(/bfly_blush|band_plum/i.test(req.url()))requested.push(req.url());
@@ -224,12 +224,17 @@ test('Missing private butterfly remains invisible without fetching vendor URLs',
   const value=await gift.evaluate(el=>({
     status:el.dataset.giftButterfly,
     visibility:getComputedStyle(el.querySelector('.gift-eight-butterfly')).visibility,
+    opacity:parseFloat(getComputedStyle(el.querySelector('.gift-eight-butterfly')).opacity),
     background:getComputedStyle(el.querySelector('.gift-eight-bfly-left')).backgroundImage
   }));
-  expect(['unavailable','reference-local']).toContain(value.status);
-  if(value.status==='unavailable'){
-    expect(value.visibility).toBe('hidden');
-    expect(value.background).toBe('none');
+  expect(['original','reference-local']).toContain(value.status);
+  expect(value.visibility).toBe('visible');
+  expect(value.opacity).toBeGreaterThan(.8);
+  if(value.status==='original'){
+    expect(value.background).toContain('section8-blush-wing-original.svg');
+    const img=await page.request.get('/assets/section8-blush-wing-original.svg');
+    expect(img.status()).toBe(200);
+    expect(img.headers()['content-type']).toContain('image/svg+xml');
   }
   expect(requested.every(url=>new URL(url).hostname==='127.0.0.1')).toBe(true);
 });
@@ -380,5 +385,170 @@ test('390px source-calibrated expanded Gift button and wishlist alignment',async
   expect(data.wishlistIntro.x).toBeGreaterThanOrEqual(45);
   expect(data.wishlistIntro.x).toBeLessThanOrEqual(47);
   expect(data.overflow).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});
+
+
+test('Expanded wishlist preserves measured first-card and 68px thumbnail geometry',async({page},testInfo)=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  const trigger=gift.locator('#giftEightTrigger');
+  const collapsedHeight=await gift.evaluate(el=>el.getBoundingClientRect().height);
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded','true');
+  const wishlist=gift.locator('#giftEightWishlist');
+  await expect(wishlist).toBeVisible();
+  const m=await wishlist.evaluate(panel=>{
+    const r=e=>{const b=e.getBoundingClientRect();return {width:b.width,height:b.height};};
+    const products=[...panel.querySelectorAll('.gift-eight-item')];
+    return {
+      panel:r(panel),
+      first:r(products[0]),
+      items:products.map(r),
+      thumbs:[...panel.querySelectorAll('.gift-eight-thumb')].map(r),
+      bottomPadding:getComputedStyle(panel).paddingBottom,
+      rowGap:getComputedStyle(panel.querySelector('.gift-eight-items')).rowGap,
+      firstBackground:getComputedStyle(products[0]).backgroundColor,
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  expect(m.bottomPadding).toBe('10px');
+  expect(m.rowGap).toBe('0px');
+  expect(m.firstBackground).toBe('rgba(0, 0, 0, 0)');
+  expect(m.items).toHaveLength(3);
+  expect(m.thumbs).toHaveLength(3);
+  for(const thumb of m.thumbs){
+    expect(thumb.width).toBe(68);
+    expect(thumb.height).toBe(68);
+  }
+  const sourceFirst={ 'small-phone':177.2, 'android-360':182.1,
+    'iphone-390':185.5, 'large-phone':138.3 }[testInfo.project.name];
+  expect(m.first.height).toBeGreaterThanOrEqual(sourceFirst-10);
+  expect(m.first.height).toBeLessThanOrEqual(sourceFirst+16);
+  expect(m.overflow).toBeLessThanOrEqual(1);
+  if(testInfo.project.name==='large-phone'){
+    const anchors=await gift.evaluate(section=>{
+      const top=section.getBoundingClientRect().top;
+      const cta=section.querySelector('#giftEightTrigger').getBoundingClientRect();
+      const wish=section.querySelector('#giftEightWishlist').getBoundingClientRect();
+      return {ctaY:cta.top-top,wishlistY:wish.top-top};
+    });
+    // Live reference at 430×932: CTA Y=308.4, wishlist Y=667.6.
+    expect(Math.abs(anchors.ctaY-308.4)).toBeLessThanOrEqual(8);
+    expect(Math.abs(anchors.wishlistY-667.6)).toBeLessThanOrEqual(8);
+  }
+  if(testInfo.project.name==='iphone-390'){
+    // Source audit: panel 514.9px; first item 185.5px at 390px.
+    // Tolerance accommodates fallback fonts and non-licensed placeholders.
+    expect(m.panel.height).toBeGreaterThan(500);
+    expect(m.panel.height).toBeLessThan(530);
+  }
+  await wishlist.scrollIntoViewIfNeeded();
+  await wishlist.screenshot({
+    path:testInfo.outputPath('section8-wishlist-expanded.png'),
+    animations:'disabled'
+  });
+  await trigger.click();
+  await expect(wishlist).toBeHidden();
+  const reclosedHeight=await gift.evaluate(el=>el.getBoundingClientRect().height);
+  expect(Math.abs(reclosedHeight-collapsedHeight)).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});
+
+
+test('Expanded source geometry stays within measured tolerance at all four phone widths',async({page},testInfo)=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  await gift.locator('#giftEightTrigger').click();
+  await expect(gift.locator('#giftEightWishlist')).toBeVisible();
+  // DOM values from the source/local screenshot audit in GitHub Actions 41789080486.
+  // No vendor imagery is required for these layout/overflow checks.
+  const reference={
+    // 320px source audit sampled an unrevealed element at scale(.955)
+    // translateY(52px). Its visible/revealed box was 537.3px high versus
+    // 513.2px before reveal; normalize the source Y into the *untransformed*
+    // coordinate system used by reduced-motion Playwright:
+    // 798.1 - 52 - (537.3-513.2)/2 = 734.05.
+    // Keep the same strict 10px tolerance as every other viewport.
+    'small-phone':{y:734.05,panel:537.3,section:1367.4,first:185.5,third:98.6},
+    'android-360':{y:676.4,panel:529.6,section:1289.1,first:182.8,third:97.2},
+    'iphone-390':{y:655.7,panel:514.9,section:1266.6,first:185.5,third:98.6},
+    'large-phone':{y:666.5,panel:443.8,section:1199.0,first:138.4,third:97.8}
+  }[testInfo.project.name];
+  const measured=await gift.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const wish=el.querySelector('#giftEightWishlist').getBoundingClientRect();
+    const products=[...el.querySelectorAll('.gift-eight-item')].map(x=>x.getBoundingClientRect().height);
+    const doc=document.documentElement;
+    const prev=document.getElementById('gallery').getBoundingClientRect();
+    const next=document.getElementById('rsvp').getBoundingClientRect();
+    return {
+      y:wish.top-r.top,panel:wish.height,section:r.height,
+      first:products[0],third:products[2],
+      sideways:doc.scrollWidth-innerWidth,
+      galleryGap:r.top-prev.bottom,rsvpGap:next.top-r.bottom
+    };
+  });
+  // Include *actual* browser values in failure logs/evidence so an issue
+  // can be fixed from one local run, without guessing which side moved.
+  console.log('SECTION8_GEOMETRY_'+testInfo.project.name+' '+JSON.stringify({reference,measured}));
+  await testInfo.attach('section8-source-geometry',{
+    body:Buffer.from(JSON.stringify({viewport:testInfo.project.name,reference,measured},null,2)),
+    contentType:'application/json'
+  });
+  for(const key of ['y','panel','section','first','third']){
+    expect(Math.abs(measured[key]-reference[key]),key+' geometry drift; observed='+measured[key]+' ref='+reference[key]).toBeLessThanOrEqual(10);
+  }
+  expect(measured.sideways).toBeLessThanOrEqual(1);
+  expect(Math.abs(measured.galleryGap)).toBeLessThanOrEqual(1);
+  expect(Math.abs(measured.rsvpGap)).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});
+
+
+test('Published wishlist icons use original assets and preserve local authorized photo overrides',async({page})=>{
+  const {gift,faults}=await openGift(page);
+  await gift.locator('#giftEightTrigger').click();
+  const items=gift.locator('.gift-eight-item');
+  const illustrations=[
+    'section8-rice-cooker-original.svg',
+    'section8-kettle-original.svg',
+    'section8-giftcard-original.svg'
+  ];
+  for(let i=0;i<illustrations.length;i++){
+    const url='/assets/'+illustrations[i];
+    const response=await page.request.get(url);
+    expect(response.status(),url+' must load on default localhost').toBe(200);
+    expect(response.headers()['content-type']).toContain('image/svg+xml');
+    expect(await response.text()).toContain('<svg ');
+    const tile=items.nth(i).locator('.gift-eight-thumb');
+    const style=await tile.evaluate(el=>getComputedStyle(el).backgroundImage);
+    expect(style).toContain(illustrations[i]);
+  }
+  expect(faults).toEqual([]);
+});
+
+
+test('Original plum botanical fallback uses self-contained relief artwork',async({page})=>{
+  const {gift,faults}=await openGift(page);
+  const response=await page.request.get('/assets/section8-plum-botanical-original.svg');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('image/svg+xml');
+  const svg=await response.text();
+  expect(svg).toContain('id="velvetNoise"');
+  expect(svg).toContain('id="relief"');
+  expect(svg).toContain('feTurbulence');
+  // The SVG namespace itself uses an http:// URL; only external asset
+  // imports or linked resources are prohibited.
+  expect(svg).not.toMatch(/(?:href|src)\s*=\s*["']https?:\/\//i);
+  const style=await gift.evaluate(el=>({
+    mode:el.dataset.giftArtwork,
+    background:getComputedStyle(el.querySelector('.gift-eight-art')).backgroundImage
+  }));
+  if(style.mode==='original')expect(style.background).toContain('section8-plum-botanical-original.svg');
+  else{
+    expect(style.mode).toBe('reference-local');
+    expect(style.background).toContain('reference-dev/band_plum.webp');
+  }
   expect(faults).toEqual([]);
 });

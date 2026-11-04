@@ -39,7 +39,7 @@ test('Section 4 shows TWO reference-example ceremonies, source venue links and c
   await expect(section.locator('.event-waze-link')).toHaveAttribute('href',/waze.com\/ul/);
   await expect(section.getByRole('link',{name:'Add to Calendar'})).toHaveAttribute('href',/calendar\/render/);
   await expect(section.locator('.event-demo-note')).toContainText('Demonstration only');
-  await expect(section.locator('#eventSourcePaper')).toHaveAttribute('src',/tasik-kayangan\/paper\.webp/);
+  await expect(section.locator('#eventSourcePaper')).toHaveAttribute('src',/(?:tasik-kayangan|reference-dev)\/paper\.webp/);
   await expect(section.locator('#eventSourceButterfly')).toHaveAttribute('src',/anggerik-nirmala\/bfly_white\.webp/);
   expect(errors).toEqual([]);
 });
@@ -52,13 +52,21 @@ test('Section 4 event cards, countdown and edge positions fit each phone viewpor
     const sectionBox=el.getBoundingClientRect();
     const body=el.querySelector('.event-body').getBoundingClientRect();
     const cards=[...el.querySelectorAll('.event-reference-card')].map(x=>x.getBoundingClientRect());
-    const links=[...el.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
+    const links=[...el.querySelectorAll('a')].map(x=>({box:x.getBoundingClientRect(),isMap:x.classList.contains('event-map-link')}));
     return {width:innerWidth,height:sectionBox.height,
       overflow:document.documentElement.scrollWidth-innerWidth,
       body:{left:body.left,right:body.right},
       cards:cards.map(x=>({left:x.left,right:x.right,height:x.height,top:x.top,bottom:x.bottom})),
-      links:links.map(x=>({width:x.width,height:x.height,left:x.left,right:x.right}))};
+      links:links.map(({box:x,isMap})=>({width:x.width,height:x.height,left:x.left,right:x.right,isMap}))};
   });
+  // Live source four-phone measurements: 320=1742.3, 360=1649.9,
+  // 390=1580.9. At 430 the recovered comparison did not include a
+  // section-height measurement; avoid inventing one.
+  const measuredHeightByWidth={320:1742.3,360:1649.9,390:1580.9};
+  if(Object.prototype.hasOwnProperty.call(measuredHeightByWidth,geometry.width)){
+    expect(Math.abs(geometry.height-measuredHeightByWidth[geometry.width])).toBeLessThanOrEqual(5);
+  }
+  await expect(section.locator('.event-card-links')).not.toHaveClass(/event-reveal/);
   expect(geometry.overflow).toBeLessThanOrEqual(1);
   expect(geometry.height).toBeGreaterThanOrEqual(1581);
   expect(geometry.body.left).toBeGreaterThanOrEqual(-1);
@@ -71,11 +79,66 @@ test('Section 4 event cards, countdown and edge positions fit each phone viewpor
   }
   expect(geometry.cards[1].top).toBeGreaterThan(geometry.cards[0].bottom);
   for(const link of geometry.links){
-    expect(link.height).toBeGreaterThanOrEqual(43);
+    // The reference ghost link measures 42px while its .955 entrance
+    // transform is active. Do not impose the old 43px prototype minimum.
+    expect(link.height).toBeGreaterThanOrEqual(link.isMap ? 41 : 43);
+    if(link.isMap) expect(link.height).toBeLessThanOrEqual(45.5);
     expect(link.left).toBeGreaterThanOrEqual(-1);
     expect(link.right).toBeLessThanOrEqual(geometry.width+1);
   }
   await section.screenshot({path:testInfo.outputPath('section4-events-full.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+});
+
+test('Section 4 source-measured typography, link and countdown styling are retained',async({page})=>{
+  const {section,errors}=await openEvents(page);
+  const styles=await section.evaluate(el=>{
+    const css=(selector)=>getComputedStyle(el.querySelector(selector));
+    const time=css('.event-card-time');
+    const diamond=css('.event-card-diamond');
+    const place=css('.event-card-place');
+    const address=css('.event-card-address');
+    const map=css('.event-map-link');
+    const grid=css('.event-countdown-grid');
+    const tile=css('.event-countdown-grid span');
+    return {
+      timeBottomMargin:time.marginBottom,
+      diamondFontSize:diamond.fontSize,
+      diamondLineHeight:diamond.lineHeight,
+      diamondBottomMargin:diamond.marginBottom,
+      placeBottomMargin:place.marginBottom,
+      addressFontSize:address.fontSize,
+      addressLineHeight:address.lineHeight,
+      addressBottomMargin:address.marginBottom,
+      mapMinHeight:map.minHeight,
+      gridGap:grid.columnGap,
+      tileColor:tile.backgroundColor,
+      timerNumberFontSize:css('.event-countdown-grid strong').fontSize,
+      titleFontSize:css('.event-card-title').fontSize,
+      dateFontSize:css('.event-card-date').fontSize,
+      timeFontSize:time.fontSize,
+      venueFontSize:place.fontSize,
+      tileRadius:tile.borderRadius
+    };
+  });
+  expect(styles.timeBottomMargin).toBe('18px');
+  expect(styles.diamondFontSize).toBe('18px');
+  expect(styles.diamondLineHeight).toBe('29.7px');
+  expect(styles.diamondBottomMargin).toBe('18px');
+  expect(styles.placeBottomMargin).toBe('0px');
+  expect(styles.addressFontSize).toBe('16px');
+  expect(styles.addressLineHeight).toBe('26.4px');
+  expect(styles.addressBottomMargin).toBe('16px');
+  expect(styles.mapMinHeight).toBe('44px');
+  expect(styles.gridGap).toBe('14px');
+  expect(styles.tileColor).toBe('rgb(92, 38, 79)');
+  expect(styles.timerNumberFontSize).toBe('28px');
+  expect(styles.titleFontSize).toBe('42px');
+  expect(styles.dateFontSize).toBe('22px');
+  expect(styles.timeFontSize).toBe('14px');
+  expect(styles.venueFontSize).toBe('19px');
+
+  expect(styles.tileRadius).toBe('12px');
   expect(errors).toEqual([]);
 });
 
@@ -95,7 +158,7 @@ test('Section 4 source-art is the development default and leaves earlier section
   const {section}=await openEvents(page);
   await expect(section).toHaveAttribute('data-art','reference');
   await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
-    'src','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp');
+    'src',/(?:https:\/\/undangankahwin\.com\/images\/concierge\/packs\/tasik-kayangan|assets\/reference-dev)\/paper\.webp/);
   await expect(section.locator('#eventSourceButterfly')).toHaveAttribute(
     'src','https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp');
   await expect(section.locator('.event-reference-card')).toHaveCount(2);
@@ -105,6 +168,54 @@ test('Section 4 source-art is the development default and leaves earlier section
   // Events must preserve that approved rendering.
   await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
   await expect(page.locator('#message')).toHaveAttribute('data-section','2');
+});
+
+test('Section 4 uses staged local files for all measured source-art layers when present',async({page})=>{
+  // The CI fixture uses tiny synthetic SVGs, not copyrighted vendor files.
+  // This checks local path selection only; exact source identity is checked
+  // separately by the permission-gated staging script.
+  const syntheticSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="white"/></svg>';
+  for (const suffix of ['paper.webp','arch_event.svg','bfly_white.webp']) {
+    await page.route('**/assets/reference-dev/'+suffix,route=>route.fulfill({
+      status:200,contentType:'image/svg+xml',body:syntheticSVG
+    }));
+  }
+  const {section,errors}=await openEvents(page);
+  await expect(section).toHaveAttribute('data-reference-paper-source','local');
+  await expect(section).toHaveAttribute('data-reference-frame-source','local');
+  await expect(section).toHaveAttribute('data-reference-wing-source','local');
+  await expect(section).toHaveAttribute('data-reference-paper','loaded');
+  await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
+    'src','./assets/reference-dev/paper.webp');
+  const frameSource = await section.locator('.event-reference-card').first().evaluate(
+    el=>getComputedStyle(el,'::before').borderImageSource);
+  expect(frameSource).toContain('assets/reference-dev/arch_event.svg');
+  const sprite = await section.locator('.event-reference-butterfly').evaluate(el=>{
+    const b=el.getBoundingClientRect();
+    const left=el.querySelector('.event-reference-butterfly-left');
+    const right=el.querySelector('.event-reference-butterfly-right');
+    const ls=getComputedStyle(left);
+    const rs=getComputedStyle(right);
+    return {
+      width:b.width,height:b.height,opacity:getComputedStyle(el).opacity,
+      wingWidth:left.getBoundingClientRect().width,
+      leftPosition:ls.backgroundPosition,
+      rightPosition:rs.backgroundPosition,
+      leftSize:ls.backgroundSize,rightSize:rs.backgroundSize,
+      leftImage:ls.backgroundImage,rightImage:rs.backgroundImage
+    };
+  });
+  expect(sprite.width).toBe(44);
+  expect(sprite.height).toBe(34);
+  expect(sprite.wingWidth).toBe(22);
+  expect(sprite.opacity).toBe('0');
+  expect(sprite.leftSize).toBe('200% 100%');
+  expect(sprite.rightSize).toBe('200% 100%');
+  expect(sprite.leftPosition).toMatch(/^0(?:px|%) 0(?:px|%)$/);
+  expect(sprite.rightPosition).toMatch(/^100% 0(?:px|%)$/);
+  expect(sprite.leftImage).toContain('assets/reference-dev/bfly_white.webp');
+  expect(sprite.rightImage).toContain('assets/reference-dev/bfly_white.webp');
+  expect(errors).toEqual([]);
 });
 
 test('Section 4 pin-camera stays bounded, returns on backward scroll, and respects Reduced Motion',async({page})=>{
@@ -294,7 +405,8 @@ test('390px source visual mode keeps full paper edges, true arch SVG and four pu
   expect(visuals.archLoaded).toBe(true);
   expect(visuals.tileCount).toBe(4);
   expect(visuals.tileDisplay).toBe('grid');
-  expect(visuals.tileBackground).toBe('rgb(97, 40, 82)');
+  // The 2026-11-03 live source computed color is rgb(92,38,79); the previous 97,40,82 assertion was stale.
+  expect(visuals.tileBackground).toBe('rgb(92, 38, 79)');
   expect(visuals.timerValue).toMatch(/^\d+$/);
   expect(visuals.venueWeight).toBe('600');
   expect(visuals.directionsCase).toBe('uppercase');

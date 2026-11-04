@@ -23,10 +23,12 @@ repository**. Only a rights-confirming local PowerShell script may stage them.
 No vendor art is automatically fetched from third-party servers by the
 website.
 
-The unrelated `assets/order-plum-emboss-original.svg` is **not referenced by
-the active Section 5 CSS** anymore. A solid neutral plum canvas appears if the
-background WebP cannot load; an explicit status message identifies missing
-WebPs. It does not silently imitate the reference illustration.
+The independently illustrated `assets/order-plum-emboss-original.svg` is the
+**clearly labeled original fallback** whenever the exact reference band is
+missing or fails to decode. It preserves the plum botanical atmosphere without
+redistributing vendor art. The original relief is not pixel-identical to the
+source's `band_plum.webp`; an explicit status message identifies missing WebPs.
+The live reference WebP takes precedence automatically once present locally.
 
 The root URL requests both local WebPs automatically, with no
 `?orderReference=1`. `#runningOrder[data-artwork-status]` reports
@@ -267,3 +269,92 @@ preview and a finer-grained embossed floral texture; those are not
 part of Section 5's isolated code scope. The live copyrighted WebP
 has not been committed. Visual parity beyond layout and typography
 must not be claimed from geometry tests alone.
+
+
+## 4 November — final reference-image visual audit tool
+
+The final screenshot comparison requires the actual permission-cleared local
+`band_plum.webp` and `bfly_blush.webp` files under the ignored
+`assets/reference-dev/` directory. **Neither reference image is committed
+or downloaded automatically by the audit.**
+
+With the Section 5 regression branch running at `http://localhost:8000/`:
+
+```powershell
+cd D:\testing-4
+node tools/section5-visual-parity-audit.mjs
+```
+
+The tool first checks that both local assets exist and have RIFF/WebP
+signatures. If either is missing or invalid, it stops before claiming
+visual parity and reports the missing filename.
+
+Without those files, `node tools/section5-visual-parity-audit.mjs
+--geometry-only` still compares the reference and local section geometry
+at all four phone sizes. It deliberately **skips pixel comparisons** while
+local artwork is missing. The GitHub Actions workflow
+`section5-four-phone-geometry-audit.yml` runs this mode with no WebPs
+and uploads temporary screenshots/measurements for review.
+
+Pixel comparisons keep screenshots at their original sizes: if the
+reference and local sections have different heights, the extra area is
+counted in the mismatch rather than stretching either screenshot.
+
+If both are available, it opens the live reference and local invitation
+at **320×568, 360×740, 390×844 and 430×932**, captures each full timeline
+panel, and writes screenshot pairs, difference heatmaps, element geometry,
+per-pixel mean absolute error, and mismatch coverage statistics to:
+
+`artifacts/section5-visual-parity/`
+
+Artifacts are ignored by Git. Run `node
+tools/section5-visual-parity-audit.mjs --reference-only` to capture
+**only the public reference** if locally authorized artwork is not ready.
+These output screenshots are for local visual review, not redistribution.
+
+Interpret the pixel difference as a diagnostic. Animation frames,
+font rasterization and the provider's proprietary effects may differ.
+Only the user can approve the final visual review. The focused four-width
+behavioral QA remains independent from this artwork-dependent audit.
+
+
+## Four-phone responsive geometry findings — 4 November
+
+The completed [read-only GitHub audit](https://github.com/Arrjack8847/testing-4/actions/runs/41777241046)
+captured the live source and the then-current implementation at 320, 360, 390 and
+430px phone widths. The audit succeeded at gathering DOM geometry, but its
+first version had two **measurement errors**: `.cgv-tl-title` selected the
+first timeline event title rather than the main heading, and the
+`RUNNING ORDER` eyebrow selector did not match. Some source screenshots
+at larger widths also showed a lingering cover/hero layer, because the audit
+did not wait long enough before opening. These screenshots must not be used
+as evidence of exact visual parity. Selectors and opening waits are now
+corrected, with a screenshot-occlusion guard.
+
+The **valid timeline-row coordinates** measured before the CSS correction:
+
+| Width | Reference first-row y | Reference row x / width | Old local row x / width | Reference section height | Old local section height |
+| --- | ---: | --- | --- | ---: | ---: |
+| 320 | 265.92 | 28 / 264 | 20 / 280 | 739.23 | 651 |
+| 360 | 213.03 | 28 / 304 | 28 / 304 | 651.28 | 651 |
+| 390 | 213.03 | 28 / 334 | 28 / 334 | 651.28 | 651 |
+| 430 | 213.03 | 28 / 374 | 48 / 334 | 651.28 | 651 |
+
+At 320px the source headline spans **two lines**, adding ~52.89px
+of height, and rows 3 and 4 wrap to heights 86.31px and 67.88px
+respectively; the final content row ends at y=643.23 and the source
+panel ends at y=739.23, leaving 96px bottom padding. The narrower local
+single-line headline had suppressed these wraps and was visibly wrong.
+
+CSS now uses:
+- 320px: 28px side padding; 74px time column + 34px gap; two-line 46px
+  script heading; 96px bottom padding; border x=23 / right=23.
+- 430px: expand the inner max-width from 390 to 430px and remove
+  children’s fixed 334px maximum; the expected timeline is x=28 / width=374.
+- 360 and 390px: leave the already matched x/y geometry unchanged.
+
+Two new focused Playwright tests independently assert the 320px and
+430px reference coordinates. A refreshed four-width source audit and
+focused CI must pass **on the new head commit** before these corrections
+are treated as verified. Permission-cleared WebPs remain necessary
+for pixel-level artwork comparison; no source assets are in Git.

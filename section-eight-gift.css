@@ -371,3 +371,281 @@
   78%{transform:translate3d(-13px,-9px,0) rotate(12deg)}
   100%{transform:translate3d(15px,-13px,0) rotate(-8deg)}
 }
+
+
+/* Section 8 expanded wishlist: first-card geometry from the 390px
+   read-only source measurement (185.5px item, 68x68px product thumbs).
+   Apply only when disclosed; the already-calibrated closed Gift stays untouched.
+   Source imagery is NOT committed: customer/licensed local art remains optional. */
+.gift-eight-wishlist:not([hidden]) {
+  padding-bottom: 16px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item {
+  grid-template-columns: 68px minmax(0,1fr);
+  align-items: center;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-thumb {
+  width: 68px;
+  height: 68px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child {
+  min-height: 185.5px;
+  align-items: stretch;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child > div:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-actions {
+  margin-top: auto;
+  padding-top: 12px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-thumb {
+  align-self: start;
+}
+
+
+/* Visual audit 41786898384: the 390px wishlist panel and first item now
+   match their measured heights, but the source uses borderless separated
+   rows (not individual rounded tiles) and the expanded section has an
+   extra ~47px from the demo notice. Keep safe demo notice visible without
+   adding flow height. Do not alter the default/collapsed section geometry. */
+.gift-eight-wishlist:not([hidden]) {
+  background: #fff;
+  border-radius: 16px;
+  padding-bottom: 10px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-wishlist-intro {
+  margin-bottom: 11px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-items {
+  gap: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  min-width: 0;
+  padding: 14px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #59364c;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:not(:last-child) {
+  border-bottom: 1px solid #d9cbd2;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child {
+  min-height: 185.5px;
+  padding-top: 14px;
+  padding-bottom: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(2) {
+  min-height: 140.5px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) {
+  min-height: 98.6px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item > div:last-child {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  min-width: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-thumb {
+  align-self: start;
+  width: 68px;
+  height: 68px;
+  margin: 0;
+  border: 1px solid #e1d3dc;
+  border-radius: 10px;
+  background: #fff;
+  color: #793d70;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item h4 {
+  margin: 0 0 4px;
+  color: #59364c;
+  font: 400 16px/1.3 'EB Garamond',Georgia,serif;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item p {
+  margin: 0;
+  color: #82617a;
+  font: 500 9px/1.4 'EB Garamond',Georgia,serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-actions {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-actions {
+  margin-top: 10px;
+  padding-top: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-actions span,
+.gift-eight-wishlist:not([hidden]) .gift-eight-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 12px #44243e16;
+  color: #753c67;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 1.8px;
+  font: 500 10px/1.3 'EB Garamond',Georgia,serif;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-actions button {
+  background: #7b3d6e;
+  box-shadow: none;
+  color: #fff;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(2) .gift-eight-actions button {
+  display: none;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) .gift-eight-actions button {
+  background: #fff;
+  color: #753c67;
+}
+.gift-eight .gift-eight-disclaimer:not([hidden]) {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 17px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.25;
+  color: #e5cedf;
+  opacity: .8;
+}
+/* At 320px the source and local browser both scale 68px thumbnails to
+   ~64.9px. Keep base row heights here; applying measured visual pixels as
+   CSS min-heights would double-scale the rows. */
+@media(min-width:351px) and (max-width:374px) {
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child { min-height: 182.1px; }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(2) { min-height: 137.9px; }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) { min-height: 96.8px; }
+}
+@media(min-width:415px) {
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child { min-height: 138.3px; }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(2) { min-height: 117.9px; }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) { min-height: 97.7px; }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+
+/* Source geometry checkpoints from four-viewport audit 41786898384:
+   At 430px, the Send Gift button was 51.6px too low; the expanded
+   wishlist top was 12.2px too high. Other widths' button positions
+   already matched within ~1px and must not move. This only changes
+   large-phone anchoring; the 430px closed section min-height stays 923px. */
+@media(min-width:415px) {
+  .gift-eight-send {
+    margin-top: 21px; /* 73px - 52px, align source CTA Y 308.4 */
+  }
+  .gift-eight-trigger {
+    min-width: 183px;
+    min-height: 48px; /* Source large-phone CTA: 183×47.8px */
+  }
+  .gift-eight-wishlist:not([hidden]) {
+    margin-top: 98px; /* restore source wishlist Y ~667.6 */
+  }
+}
+
+
+/* Source audit (run 41789080486): 390px panel was +9.3px tall solely
+   because the unconfigured third item's subtitle added an extra line.
+   Short demo labels remain truthful while restoring the reference's
+   single-line source captions. Width-specific wishlist anchoring does
+   not change the closed Gift scene or other workers' sections. */
+@media (max-width:350px) {
+  .gift-eight-wishlist:not([hidden]) {
+    margin-top:84px; /* source wishlist top 798.1px; prior local 748.1px */
+  }
+}
+@media (min-width:351px) and (max-width:374px) {
+  .gift-eight-wishlist:not([hidden]) {
+    margin:55px 2px -10px; /* source 360px panel x=30.2, y=676.4 */
+  }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-wishlist-intro {
+    margin-bottom:31px; /* source first card sits 101px below panel top */
+  }
+}
+@media (min-width:415px) {
+  .gift-eight-wishlist:not([hidden]) {
+    margin:92px 1px -6px; /* source 430px panel x=29.5, y=666.5 */
+  }
+}
+
+
+/* Original, independently drawn gift appliance thumbnails. These are generic
+   illustrations, not Philips product photography or vendor-owned artwork.
+   A user-authorized reference-dev photo, when available on localhost, wins
+   over these selectors through higher specificity. */
+.gift-eight .gift-eight-thumb-rice {
+  background:#fff url("./assets/section8-rice-cooker-original.svg") center / contain no-repeat;
+  font-size:0;
+}
+.gift-eight .gift-eight-thumb-kettle {
+  background:#fff url("./assets/section8-kettle-original.svg") center / contain no-repeat;
+  font-size:0;
+}
+.gift-eight .gift-eight-item:nth-child(3) .gift-eight-thumb {
+  background:#fff url("./assets/section8-giftcard-original.svg") center / contain no-repeat;
+  font-size:0;
+}
+
+
+/* Original blush butterfly fallback: always visible even when private
+   comparison artwork is unavailable. Native vector wing art and CSS motion
+   avoid publishing or hotlinking the reference site's assets. The original
+   local authorized image, when present, takes priority by specificity. */
+.gift-eight .gift-eight-butterfly{
+  opacity:.87;
+  visibility:visible;
+  animation:gift-eight-butterfly-drift 5.6s ease-in-out infinite;
+}
+.gift-eight .gift-eight-bfly-wing{
+  background-image:url("./assets/section8-blush-wing-original.svg");
+}
+
+
+/* Expanded wishlist background resets were hiding the original fallback
+   illustrations. Reapply their images with higher specificity, and always
+   prefer verified local comparison photos if supplied on localhost. */
+.gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-rice {
+  background: #fff url("./assets/section8-rice-cooker-original.svg") center / contain no-repeat;
+}
+.gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-kettle {
+  background: #fff url("./assets/section8-kettle-original.svg") center / contain no-repeat;
+}
+.gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) .gift-eight-thumb {
+  background: #fff url("./assets/section8-giftcard-original.svg") center / contain no-repeat;
+}
+.gift-eight[data-gift-thumb-rice="reference-local"] .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-rice {
+  background: #fff url("./assets/reference-dev/gift-rice-cooker.jpg") center / contain no-repeat;
+}
+.gift-eight[data-gift-thumb-kettle="reference-local"] .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-kettle {
+  background: #fff url("./assets/reference-dev/gift-kettle.webp") center / contain no-repeat;
+}
