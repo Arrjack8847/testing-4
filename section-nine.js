@@ -42,25 +42,53 @@
   else{inView=true;section.querySelectorAll('.s9-reveal').forEach(e=>e.classList.add('s9-in'));}
   document.addEventListener('visibilitychange',syncMotion);
   motion.addEventListener?.('change',syncMotion);
-  // Source art for authorized research only: never fetch vendor URLs at runtime.
-  if(new URLSearchParams(location.search).get('section9Reference')==='1'){
+  // Reference files are optional and remain Git-ignored. At localhost the developer
+  // preview automatically uses locally staged artwork; public sites keep the original
+  // CSS illustration. ?section9Reference=0 disables auto mode when comparing designs.
+  const referenceMode=new URLSearchParams(location.search).get('section9Reference');
+  const localPreview=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+  const tryReference=referenceMode==='1'||(localPreview&&referenceMode!=='0');
+  if(tryReference){
+    const paperUrl='./assets/reference-dev/section9/paper.webp';
+    const butterflyUrl='./assets/reference-dev/section9/bfly_1.webp';
     const art=document.getElementById('s9ReferenceArt');
-    art.addEventListener('load',()=>section.classList.add('s9-reference-loaded'),{once:true});
-    art.addEventListener('error',()=>{section.dataset.referenceArt='missing';},{once:true});
-    art.src='./assets/reference-dev/section9/paper.webp';
-    // Opt-in sprite, split into two flapping wing backgrounds by Section 9 CSS.
-    // Preflight the locally supplied file so a missing download retains original CSS wings.
-    const sprite=new Image();
-    sprite.addEventListener('load',()=>{
-      if(sprite.naturalWidth>0&&sprite.naturalHeight>0){
-        section.classList.add('s9-reference-butterfly-loaded');
-        section.dataset.referenceButterfly='loaded';
-      }
-    },{once:true});
-    sprite.addEventListener('error',()=>{
-      section.dataset.referenceButterfly='missing';
-    },{once:true});
-    sprite.src='./assets/reference-dev/section9/bfly_1.webp';
+    const loadPaper=()=>{
+      if(!art)return;
+      art.addEventListener('load',()=>{
+        if(art.naturalWidth>0)section.classList.add('s9-reference-loaded');
+      },{once:true});
+      art.addEventListener('error',()=>{section.dataset.referenceArt='missing';},{once:true});
+      art.src=paperUrl;
+    };
+    const loadButterfly=()=>{
+      const sprite=new Image();
+      sprite.addEventListener('load',()=>{
+        if(sprite.naturalWidth>0&&sprite.naturalHeight>0){
+          section.classList.add('s9-reference-butterfly-loaded');
+          section.dataset.referenceButterfly='loaded';
+        }
+      },{once:true});
+      sprite.addEventListener('error',()=>{
+        section.dataset.referenceButterfly='missing';
+      },{once:true});
+      sprite.src=butterflyUrl;
+    };
+    if(referenceMode==='1'){
+      // Explicit mode is useful when testing missing-image fallback.
+      loadPaper();
+      loadButterfly();
+    }else{
+      // HEAD preflight means an absent file never replaces the CSS fallback
+      // with a broken <img>. The server is local; no vendor URL is fetched.
+      const loadIfPresent=async(url,onPresent)=>{
+        try{
+          const response=await fetch(url,{method:'HEAD',cache:'no-store'});
+          if(response.ok)onPresent();
+        }catch(_){/* Local server unavailable; CSS artwork remains visible. */}
+      };
+      void loadIfPresent(paperUrl,loadPaper);
+      void loadIfPresent(butterflyUrl,loadButterfly);
+    }
   }
   form.addEventListener('submit',event=>{
     event.preventDefault();
