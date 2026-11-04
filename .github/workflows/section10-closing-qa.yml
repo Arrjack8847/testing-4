@@ -5,6 +5,7 @@ on:
       - main
       - feat/section10-closing-reference-20261104
       - fix/section10-contact-footer-parity-20261104
+      - feat/section10-reverse-motion-parity-20261104
     paths:
       - index.html
       - section-ten.css
@@ -12,6 +13,7 @@ on:
       - tests/section-ten.spec.mjs
       - tools/section10-live-reference.mjs
       - tools/section10-compare.mjs
+      - tools/section10-motion-reference.mjs
       - stage-section10-art.ps1
       - .github/workflows/section10-closing-qa.yml
   workflow_dispatch:
@@ -91,5 +93,35 @@ jobs:
         with:
           name: section10-matched-visual-qa
           path: section10-visual-qa/
+          retention-days: 7
+          if-no-files-found: warn
+
+  closing-motion-observation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Stage existing source artwork privately inside ephemeral runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/reference-dev
+          git fetch --no-tags origin refs/heads/assets/shared-artwork-20261104
+          git show FETCH_HEAD:assets/scene.webp > assets/reference-dev/scene.webp
+      - name: Record source/local Section 10 entrance, reversal and reveal timing
+        run: node tools/section10-motion-reference.mjs
+      - name: Upload 390px scroll-motion evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section10-motion-evidence
+          path: section10-motion-evidence/
           retention-days: 7
           if-no-files-found: warn
