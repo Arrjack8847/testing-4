@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - feat/section10-closing-reference-20261104
+      - fix/section10-contact-footer-parity-20261104
     paths:
       - index.html
       - section-ten.css
