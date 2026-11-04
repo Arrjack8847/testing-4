@@ -206,10 +206,43 @@ try {
     const local=results.local.assets||[];
     const localNames=new Set(local.map(x=>x.filename));
     const sourceNames=new Set(original.map(x=>x.filename));
+    // Filename equality is insufficient: another vendor pack can contain
+    // the same filename. Compare full source URLs and only explicitly
+    // recognized local-stage mappings as equivalent references.
+    const stageMappings=new Map([
+      ['paper.webp','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp'],
+      ['arch_event.svg','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg']
+    ]);
+    const identity=(asset)=>{
+      if(asset.url==='[inline data URI]')return asset.url;
+      let u;
+      try{u=new URL(asset.url);}catch{return asset.url;}
+      if((u.hostname==='127.0.0.1'||u.hostname==='localhost') &&
+         u.pathname.startsWith('/assets/reference-dev/')){
+        return stageMappings.get(u.pathname.split('/').pop())||asset.url;
+      }
+      return u.href;
+    };
+    const localIdentities=new Set(local.map(identity));
+    const originalIdentities=new Set(original.map(identity));
+    // A URL that appears in computed CSS is not evidence that it rendered.
+    // Require a successful network response for each observed source image.
+    const brokenAssets=(arr)=>arr.filter(asset=>
+      asset.url!=='[inline data URI]'&&
+      (asset.requestFailure||!Number.isInteger(asset.httpStatus)||
+       asset.httpStatus<200||asset.httpStatus>=400)
+    );
+    const originalUnavailable=brokenAssets(original);
+    const localUnavailable=brokenAssets(local);
     report.differences.push({
       width,height,
       referenceAssetsNotMatchedByFilename:original.filter(x=>!localNames.has(x.filename)),
       localAssetsNotFoundInReference:local.filter(x=>!sourceNames.has(x.filename)),
+      // These are strict URL-identity checks, not image-byte comparisons.
+      referenceAssetsNotMatchedBySourceIdentity:original.filter(x=>!localIdentities.has(identity(x))),
+      localAssetsNotMatchedBySourceIdentity:local.filter(x=>!originalIdentities.has(identity(x))),
+      sourceAssetsWithoutSuccessfulLoad:originalUnavailable,
+      localAssetsWithoutSuccessfulLoad:localUnavailable,
       referenceFontVariants:results.reference.visibleFonts||[],
       localFontVariants:results.local.visibleFonts||[],
       referenceCssDrawnElements:results.reference.cssDrawingTotal??null,
@@ -233,9 +266,12 @@ console.log('Section 4 asset report: '+outDir+'/section4-original-assets.json');
 if(report.errors.length){
   console.error('Incomplete source/local inspection: '+report.errors.length+' issue(s). No exact-match claim.');
   process.exitCode=2;
-} else if(report.differences.some(x=>x.referenceAssetsNotMatchedByFilename.length)){
-  console.error('Reference assets remain unmatched. Compare JSON inventory before modifying artwork.');
+} else if(report.differences.some(x=>
+  x.referenceAssetsNotMatchedBySourceIdentity.length||
+  x.sourceAssetsWithoutSuccessfulLoad.length||
+  x.localAssetsWithoutSuccessfulLoad.length)){
+  console.error('Exact source-asset identity/load checks failed. Inspect the JSON report; filenames alone do not count.');
   process.exitCode=1;
 } else{
-  console.log('All observed asset filenames matched. Verify byte hashes and screenshots separately.');
+  console.log('Observed source asset URLs are accounted for and loaded. Byte hashes, artwork coverage and frame parity remain unverified.');
 }
