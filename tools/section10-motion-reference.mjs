@@ -17,12 +17,14 @@ const spec={
     heading:'.cgv-closing .cgv-eyebrow',message:'.cgv-closing .cgv-lead',
     rule:'.cgv-closing .cgv-rule',signoff:'.cgv-closing .cgv-eyebrow.cgv-d2',
     names:'.cgv-closing .cgv-closing-names',
-    contacts:'.cgv-closing .cgv-contacts',footer:'.cgv-closing .cgv-foot'},
+    contacts:'.cgv-closing .cgv-contacts',footer:'.cgv-closing .cgv-foot',
+    scene:'img[src*="tasik-kayangan/scene.webp"]'},
   local:{section:'#closingMessage',frame:'#closingMessage .closing10-frame',
     heading:'#closingHeading',message:'#closingMessage .closing10-message',
     rule:'#closingMessage .closing10-rule',signoff:'#closingMessage .closing10-signoff',
     names:'#closingMessage .closing10-names',
-    contacts:'#closingMessage .closing10-contacts',footer:'#closingMessage .closing10-credit'}
+    contacts:'#closingMessage .closing10-contacts',footer:'#closingMessage .closing10-credit',
+    scene:'#closingMessage .closing10-source-scene'}
 };
 const deltas=[-650,-370,-170,-30,80,180,265,180,80,-30,-170,-370,-650];
 const delays=[100,550,1400];
@@ -70,11 +72,22 @@ try {
           const obs=await page.evaluate(sel=>{
             const all={};
             for(const [key,q] of Object.entries(sel)){
-              const el=document.querySelector(q);
+              let el=document.querySelector(q);
+              if(key==='scene'&&q.includes('tasik-kayangan/scene.webp')){
+                const images=[...document.querySelectorAll(q)].filter(img=>img.naturalWidth===1080);
+                const ranked=images.map(img=>{
+                  const r=img.getBoundingClientRect();
+                  return {img,score:(r.bottom>0&&r.top<innerHeight?0:10000)+Math.abs(r.top)};
+                }).sort((a,b)=>a.score-b.score);
+                el=ranked[0]?.img||null;
+              }
               if(!el){all[key]=null;continue;}
               const cs=getComputedStyle(el),r=el.getBoundingClientRect();
               all[key]={cls:el.className,opacity:+cs.opacity,
-                transform:cs.transform,y:+r.y.toFixed(2),h:+r.height.toFixed(2),
+                transform:cs.transform,x:+r.x.toFixed(2),y:+r.y.toFixed(2),
+                w:+r.width.toFixed(2),h:+r.height.toFixed(2),
+                objectFit:cs.objectFit,objectPosition:cs.objectPosition,
+                naturalWidth:el instanceof HTMLImageElement?el.naturalWidth:null,
                 inViewport:r.bottom>0&&r.top<innerHeight,
                 transition:cs.transitionDuration,
                 transitionDelay:cs.transitionDelay,
@@ -102,7 +115,7 @@ try {
   if(!reports.source?.samples.length || !reports.local?.samples.length)throw Error('Motion samples incomplete');
   // Human-review aid: summarize observable differences by matched checkpoint.
   // No hard threshold until source behavior is verified and snapshots inspected.
-  const keys=['frame','heading','message','rule','signoff','names','contacts','footer'];
+  const keys=['frame','heading','message','rule','signoff','names','contacts','footer','scene'];
   reports.comparison=[];
   for(let i=0;i<reports.source.samples.length;i++){
     const source=reports.source.samples[i],local=reports.local.samples[i];
@@ -116,6 +129,11 @@ try {
         opacityError:+Math.abs(a.opacity-b.opacity).toFixed(3),
         sourceY:a.y,localY:b.y,
         yError:+Math.abs(a.y-b.y).toFixed(2),
+        xError:+Math.abs(a.x-b.x).toFixed(2),
+        widthError:+Math.abs(a.w-b.w).toFixed(2),
+        heightError:+Math.abs(a.h-b.h).toFixed(2),
+        sourceObjectPosition:a.objectPosition,localObjectPosition:b.objectPosition,
+        sourceTransform:a.transform,localTransform:b.transform,
         sourceInViewport:a.inViewport,localInViewport:b.inViewport,
         sourceClass:a.cls,localClass:b.cls
       };
@@ -129,6 +147,14 @@ try {
       sourceClass:m.sourceClass,localClass:m.localClass
     }))
   );
+  reports.sceneCamera=reports.comparison.map(p=>({
+    delta:p.delta,elapsed:p.time,
+    yError:p.metrics.scene?.yError??null,xError:p.metrics.scene?.xError??null,
+    widthError:p.metrics.scene?.widthError??null,heightError:p.metrics.scene?.heightError??null,
+    sourceTransform:p.metrics.scene?.sourceTransform??null,
+    localTransform:p.metrics.scene?.localTransform??null
+  }));
+  console.log('SECTION10_SCENE_CAMERA '+JSON.stringify(reports.sceneCamera));
   console.log('SECTION10_MOTION_DISCREPANCIES '+JSON.stringify(reports.motionDiscrepancies));
   console.log('SECTION10_MOTION_CHECKPOINTS '+JSON.stringify({
     samples:reports.comparison.length,opacityDifferencesOver015:reports.motionDiscrepancies.length
