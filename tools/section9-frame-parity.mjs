@@ -72,7 +72,7 @@ const pose=async(page,root,butterfly)=>{
       candidates.push({
         selector:(element.id?'#'+element.id:element.tagName.toLowerCase()+
           (typeof element.className==='string'&&element.className?
-            '.'+element.className.trim().split(/\\s+/).slice(0,2).join('.') :'')),
+            '.'+element.className.trim().split(/\s+/).slice(0,2).join('.') :'')),
         image:element.getAttribute('src')||background.slice(0,160),
         visible,rect:box(element),
         animation:style.animationName,animationState:style.animationPlayState,
