@@ -153,8 +153,15 @@ async function comparePixels(browser,aBytes,bBytes){
       const canvas=()=>{const c=document.createElement('canvas');c.width=width;c.height=height;return c};
       const ca=canvas(),cb=canvas(),heat=canvas();
       const c1=ca.getContext('2d'),c2=cb.getContext('2d'),ch=heat.getContext('2d');
-      c1.drawImage(r,0,0,width,height);
-      c2.drawImage(l,0,0,width,height);
+      // Preserve original screenshot dimensions. Scaling both images to
+      // the larger canvas would conceal height/crop discrepancies and
+      // invalidate pixel-difference estimates.
+      c1.fillStyle='#ffffff';
+      c2.fillStyle='#ffffff';
+      c1.fillRect(0,0,width,height);
+      c2.fillRect(0,0,width,height);
+      c1.drawImage(r,0,0);
+      c2.drawImage(l,0,0);
       const da=c1.getImageData(0,0,width,height).data;
       const db=c2.getImageData(0,0,width,height).data;
       const image=ch.createImageData(width,height);
