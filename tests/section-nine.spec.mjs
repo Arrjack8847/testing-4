@@ -4,6 +4,10 @@ async function go(page){
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
   const section=page.locator('#rsvp');
+  // Fail immediately if this run accidentally targets another Git worktree.
+  // Playwright :8000 used to reuse whichever local preview was already running.
+  await expect(section.locator('.s9-petals i')).toHaveCount(8,{timeout:5000});
+  await expect(section.locator('.s9-butterfly-forward')).toHaveCount(1);
   await expect(section).toHaveAttribute('aria-hidden','true');
   await expect(section).toHaveJSProperty('inert',true);
   await page.getByRole('button',{name:'Open Invitation'}).click();
@@ -99,14 +103,23 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     const refs=['#rsvp','#s9RsvpForm','#s9Name','#s9Attendance','#s9Guests','#s9Wish'].map(rect);
     return {overflow:document.documentElement.scrollWidth-innerWidth,
       section:{height:b.height,width:b.width},before:b.top-a.bottom,after:c.top-b.bottom,
-      refs,artSrc:document.getElementById('s9ReferenceArt').getAttribute('src')};
+      refs,artSrc:document.getElementById('s9ReferenceArt').getAttribute('src'),
+      artLoaded:document.querySelector('#rsvp').classList.contains('s9-reference-loaded')};
   });
   expect(m.overflow).toBeLessThanOrEqual(1);
   expect(Math.abs(m.before)).toBeLessThanOrEqual(1);
   expect(Math.abs(m.after)).toBeLessThanOrEqual(1);
   expect(m.section.width).toBe(page.viewportSize().width);
   expect(m.section.height).toBeGreaterThanOrEqual(1150);
-  expect(m.artSrc).toBeNull();
+  // Localhost automatically loads optional private reference art when present.
+  // Either a verified local image or the CSS fallback is legitimate; never
+  // require the src to be null when the developer has staged paper.webp.
+  if(m.artSrc!==null){
+    expect(m.artSrc).toBe('./assets/reference-dev/section9/paper.webp');
+    expect(m.artLoaded).toBe(true);
+  }else{
+    expect(m.artLoaded).toBe(false);
+  }
   for(const r of m.refs){expect(r).toBeTruthy();expect(r.x).toBeGreaterThanOrEqual(-1);
     expect(r.x+r.width).toBeLessThanOrEqual(page.viewportSize().width+1);}
   if(testInfo.project.name==='iphone-390'){
@@ -170,12 +183,24 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(frame.noticeTop).toBeGreaterThan(frame.bottom);
     expect(frame.noticeBottom).toBeLessThan(m.section.height-6);
 
-    const flight=await section.locator('.s9-butterfly').evaluate(el=>({
-      top:parseFloat(getComputedStyle(el).top),
-      duration:getComputedStyle(el).animationDuration
-    }));
-    expect(Math.abs(flight.top-(m.section.height-80))).toBeLessThan(2);
-    expect(flight.duration).toBe('16s');
+    const flights=await section.evaluate(el=>Object.fromEntries(
+      ['.s9-butterfly','.s9-butterfly-forward'].map(selector=>{
+        const sprite=el.querySelector(selector),style=getComputedStyle(sprite);
+        return [selector,{
+          top:parseFloat(style.top),duration:style.animationDuration,
+          delay:style.animationDelay,name:style.animationName,
+          pointerEvents:style.pointerEvents,ariaHidden:sprite.getAttribute('aria-hidden')
+        }];
+      })
+    ));
+    expect(Math.abs(flights['.s9-butterfly'].top-(m.section.height-12))).toBeLessThan(2);
+    expect(flights['.s9-butterfly'].duration).toBe('13s');
+    expect(flights['.s9-butterfly'].delay).toBe('7.5s');
+    expect(flights['.s9-butterfly-forward'].name).toBe('s9-flight-forward');
+    expect(Math.abs(flights['.s9-butterfly-forward'].top-(m.section.height-72))).toBeLessThan(2);
+    expect(flights['.s9-butterfly-forward'].duration).toBe('16s');
+    expect(flights['.s9-butterfly-forward'].ariaHidden).toBe('true');
+    expect(flights['.s9-butterfly-forward'].pointerEvents).toBe('none');
     expect(Math.abs(exact.wall.y-756.88)).toBeLessThan(4);
     const measured=await page.evaluate(()=>{const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;const r=e.getBoundingClientRect(),b=document.querySelector('#rsvp').getBoundingClientRect();return {x:+r.x.toFixed(1),y:+(r.y-b.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};}; return ({
       eyebrow:rect('#rsvp .s9-eyebrow'),heading:rect('#rsvpHeading'),
@@ -207,12 +232,18 @@ test('Local reference mode loads split-wing sprite only with explicit opt-in',as
   await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
   await expect(section).toHaveAttribute('data-reference-art','loaded');
   await expect(section).toHaveAttribute('data-reference-butterfly','loaded');
-  const wing=section.locator('.s9-wing-left');
-  const style=await wing.evaluate(el=>({image:getComputedStyle(el).backgroundImage,
-    size:getComputedStyle(el).backgroundSize,animation:getComputedStyle(el).animationName}));
-  expect(style.image).toContain('assets/reference-dev/section9/bfly_1.webp');
-  expect(style.size).toBe('200% 100%');
-  expect(style.animation).toBe('s9-sprite-flap-left');
+  const wings=section.locator('.s9-butterfly > .s9-wing-left, .s9-butterfly-forward > .s9-wing-left');
+  await expect(wings).toHaveCount(2);
+  const styles=await wings.evaluateAll(elements=>elements.map(el=>({
+    image:getComputedStyle(el).backgroundImage,
+    size:getComputedStyle(el).backgroundSize,
+    animation:getComputedStyle(el).animationName
+  })));
+  for(const style of styles){
+    expect(style.image).toContain('assets/reference-dev/section9/bfly_1.webp');
+    expect(style.size).toBe('200% 100%');
+    expect(style.animation).toBe('s9-sprite-flap-left');
+  }
 });
 test('Plain localhost root automatically loads locally staged paper and butterfly',async({page})=>{
   // Harmless generated fixture; no vendor artwork enters Git or CI.
@@ -250,8 +281,10 @@ test('Missing optional butterfly sprite gracefully falls back to CSS art',async(
   const section=page.locator('#rsvp');
   await expect(section).toHaveAttribute('data-reference-butterfly','missing');
   await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
-  const style=await section.locator('.s9-wing-left').evaluate(el=>getComputedStyle(el).backgroundImage);
-  expect(style).toContain('radial-gradient');
+  const backgrounds=await section.locator('.s9-butterfly > .s9-wing-left, .s9-butterfly-forward > .s9-wing-left').evaluateAll(
+    wings=>wings.map(wing=>getComputedStyle(wing).backgroundImage));
+  expect(backgrounds).toHaveLength(2);
+  for(const background of backgrounds)expect(background).toContain('radial-gradient');
 });
 test('Animation pauses outside view and Reduced Motion remains legible',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
@@ -260,9 +293,181 @@ test('Animation pauses outside view and Reduced Motion remains legible',async({p
   const state=await section.evaluate(el=>({
     headingOpacity:getComputedStyle(el.querySelector('.s9-heading')).opacity,
     butterfly:getComputedStyle(el.querySelector('.s9-butterfly')).animationName,
-    image:el.querySelector('.s9-reference-art').getAttribute('src')
+    forwardButterfly:getComputedStyle(el.querySelector('.s9-butterfly-forward')).animationName,
+    image:el.querySelector('.s9-reference-art').getAttribute('src'),
+    imageNaturalWidth:el.querySelector('.s9-reference-art').naturalWidth,
+    referenceLoaded:el.classList.contains('s9-reference-loaded')
   }));
   expect(state.headingOpacity).toBe('1');
   expect(state.butterfly).toBe('none');
-  expect(state.image).toBeNull();
+  expect(state.forwardButterfly).toBe('none');
+  // Reduced Motion affects decorative animations, not optional private paper.
+  if(state.image!==null){
+    expect(state.image).toBe('./assets/reference-dev/section9/paper.webp');
+    // The optional image can still be decoding when the invitation opens.
+    // Wait for the actual load event rather than assuming network timing.
+    await expect(section).toHaveClass(/s9-reference-loaded/);
+    expect(await section.locator('.s9-reference-art').evaluate(el=>el.naturalWidth)).toBeGreaterThan(0);
+  }else{
+    expect(state.referenceLoaded).toBe(false);
+  }
+});
+
+test('Section 9 keeps opposing flight directions at animation checkpoints',async({page})=>{
+  const {section}=await go(page);
+  const tracks=await section.evaluate(el=>{
+    const checkpoint=(selector,animationName,t1,t2)=>{
+      const target=el.querySelector(selector);
+      const animation=target.getAnimations().find(a=>a.animationName===animationName);
+      if(!animation)return {found:false};
+      animation.pause();
+      animation.currentTime=t1;
+      const x1=target.getBoundingClientRect().x;
+      animation.currentTime=t2;
+      const x2=target.getBoundingClientRect().x;
+      return {found:true,x1,x2};
+    };
+    return {
+      east:checkpoint('.s9-butterfly-forward','s9-flight-forward',4000,8000),
+      west:checkpoint('.s9-butterfly','s9-flight',9000,12000),
+    };
+  });
+  expect(tracks.east.found).toBe(true);
+  expect(tracks.west.found).toBe(true);
+  expect(tracks.east.x2-tracks.east.x1).toBeGreaterThan(40);
+  expect(tracks.west.x1-tracks.west.x2).toBeGreaterThan(35);
+});
+
+test('Section 9 petals are decorative, scroll-contained and reduced-motion safe',async({page})=>{
+  const {section}=await go(page);
+  const petals=section.locator('.s9-petals i');
+  await expect(petals).toHaveCount(8);
+  await expect(section.locator('.s9-petals')).toHaveAttribute('aria-hidden','true');
+  const initial=await section.evaluate(el=>{
+    const layer=el.querySelector('.s9-petals'),petal=layer.querySelector('i');
+    const lr=layer.getBoundingClientRect(),sr=el.getBoundingClientRect();
+    return {
+      pointer:getComputedStyle(layer).pointerEvents,
+      overflow:getComputedStyle(layer).overflow,
+      petalStack:parseInt(getComputedStyle(layer).zIndex,10),
+      contentStack:parseInt(getComputedStyle(el.querySelector('.s9-inner')).zIndex,10),
+      animation:getComputedStyle(petal).animationName,
+      left:lr.left-sr.left,right:sr.right-lr.right,
+      top:lr.top-sr.top,bottom:sr.bottom-lr.bottom
+    };
+  });
+  expect(initial.pointer).toBe('none');
+  expect(initial.overflow).toBe('hidden');
+  // The live reference shows petals passing over the wishes cards.
+  expect(initial.petalStack).toBeGreaterThan(initial.contentStack);
+  expect(initial.animation).toBe('s9-petal-drift');
+  for(const side of ['left','right','top','bottom'])expect(Math.abs(initial[side])).toBeLessThanOrEqual(1);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const reduced=await petals.first().evaluate(el=>({
+    animation:getComputedStyle(el).animationName,
+    opacity:getComputedStyle(el).opacity
+  }));
+  expect(reduced.animation).toBe('none');
+  expect(reduced.opacity).toBe('0');
+  await page.evaluate(()=>document.getElementById('closingMessage')
+    .scrollIntoView({block:'start',behavior:'instant'}));
+  await page.evaluate(()=>document.getElementById('rsvp')
+    .scrollIntoView({block:'start',behavior:'instant'}));
+  await expect(section).toBeInViewport();
+});
+
+test('Section 9 captures entry middle exit and reverse scroll on four phones',async({page},testInfo)=>{
+  const {section,errors}=await go(page);
+  await page.waitForTimeout(1900);
+  const viewport=page.viewportSize();
+  const stages=['entry','middle','exit','reverse-middle'];
+  for(const stage of stages){
+    await page.evaluate(({stage,viewHeight})=>{
+      const target=document.getElementById('rsvp');
+      const rect=target.getBoundingClientRect();
+      const height=rect.height;
+      const desiredTop=stage==='entry'?
+        Math.min(viewHeight*.7,height*.3):
+        (stage==='exit'?
+          -(height-Math.min(180,viewHeight*.3)):
+          -(height/2-viewHeight/2));
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:Math.round(window.scrollY+rect.top-desiredTop),
+        behavior:'instant'});
+    },{stage,viewHeight:viewport.height});
+    await page.waitForTimeout(240);
+    const metrics=await section.evaluate(el=>{
+      const bounds=el.getBoundingClientRect();
+      const selectors=['.s9-inner','.s9-heading','.s9-form','.s9-wall','.s9-wish','.s9-petals'];
+      const parts=selectors.map(selector=>{
+        const r=el.querySelector(selector).getBoundingClientRect();
+        return {selector,left:r.left,right:r.right,width:r.width,
+          clientWidth:el.querySelector(selector).clientWidth,
+          scrollWidth:el.querySelector(selector).scrollWidth};
+      });
+      return {visible:bounds.top<innerHeight&&bounds.bottom>0,
+        width:bounds.width,overflow:document.documentElement.scrollWidth-innerWidth,
+        active:el.classList.contains('s9-active'),parts};
+    });
+    expect(metrics.visible,stage).toBe(true);
+    expect(metrics.width,stage).toBe(viewport.width);
+    expect(metrics.overflow,stage).toBeLessThanOrEqual(1);
+    expect(metrics.active,stage).toBe(true);
+    for(const part of metrics.parts){
+      expect(part.left,stage+' '+part.selector).toBeGreaterThanOrEqual(-1);
+      expect(part.right,stage+' '+part.selector).toBeLessThanOrEqual(viewport.width+1);
+      const overhang=part.scrollWidth-part.clientWidth;
+      if(part.selector==='.s9-inner'){
+        // The ivory arch intentionally extends 13px outside its content column;
+        // its scrollWidth is ~17px greater, but the SECTION clips it and the
+        // document still has zero horizontal overflow (asserted above).
+        expect(overhang,stage+' decorative frame overhang').toBeGreaterThanOrEqual(10);
+        expect(overhang,stage+' decorative frame overhang').toBeLessThanOrEqual(22);
+      }else{
+        expect(overhang,stage+' '+part.selector).toBeLessThanOrEqual(2);
+      }
+    }
+    await page.screenshot({
+      path:testInfo.outputPath('s9-'+stage+'-'+testInfo.project.name+'.png'),
+      animations:'allow'
+    });
+  }
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(section.locator('.s9-heading')).toBeVisible();
+  const animations=await section.evaluate(el=>({
+    west:getComputedStyle(el.querySelector('.s9-butterfly')).animationName,
+    east:getComputedStyle(el.querySelector('.s9-butterfly-forward')).animationName,
+    petals:getComputedStyle(el.querySelector('.s9-petals i')).animationName,
+  }));
+  expect(animations).toEqual({west:'none',east:'none',petals:'none'});
+  expect(errors).toEqual([]);
+});
+
+test('Section 9 butterfly x tracks match archived 390px reference frames',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Reference positions measured at 390px');
+  const {section}=await go(page);
+  const tracks=await section.evaluate(el=>{
+    const sample=(selector,name,ms)=>{
+      const target=el.querySelector(selector);
+      const animation=target.getAnimations().find(item=>item.animationName===name);
+      if(!animation)return null;
+      animation.pause();
+      animation.currentTime=ms;
+      return target.getBoundingClientRect().x;
+    };
+    return {
+      eastStart:sample('.s9-butterfly-forward','s9-flight-forward',8800),
+      eastEnd:sample('.s9-butterfly-forward','s9-flight-forward',13600),
+      westStart:sample('.s9-butterfly','s9-flight',10000),
+      westEnd:sample('.s9-butterfly','s9-flight',13600),
+    };
+  });
+  // These times are reconstructed from the previous local flight's 21-frame
+  // animation clock, not copied from the vendor's JavaScript.
+  // Reference observations: east 121→319px; west 302→147px.
+  const source={eastStart:121,eastEnd:319,westStart:302,westEnd:147};
+  for(const [key,expected] of Object.entries(source)){
+    expect(tracks[key],key+' must be a sampled CSS-animation coordinate').not.toBeNull();
+    expect(Math.abs(tracks[key]-expected),key+' at 390px').toBeLessThan(9);
+  }
 });
