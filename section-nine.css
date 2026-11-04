@@ -29,9 +29,9 @@
 .s9-frame i:nth-child(2){right:-10px;top:-42px;border-width:1px 1px 0 0}
 .s9-frame i:nth-child(3){left:-10px;bottom:-46px;border-width:0 0 1px 1px}
 .s9-frame i:nth-child(4){right:-10px;bottom:-46px;border-width:0 1px 1px 0}
-.s9-eyebrow{max-width:250px;margin:0 auto 12px;color:#7e6479;
+.s9-eyebrow{max-width:234px;margin:0 auto 12px;color:#7e6479;
   font:400 11px/1.65 'EB Garamond',Georgia,serif;letter-spacing:4.95px;text-transform:uppercase}
-.s9-heading{font:400 52px/1.15 'Pinyon Script',cursive;color:#7b3d6e;margin:0 0 36px}
+.s9-heading{font:400 52px/1.15 'Pinyon Script',cursive;color:#7b3d6e;letter-spacing:normal;text-shadow:none;margin:0 0 36px}
 .s9-form{display:flex;flex-direction:column;gap:18px;max-width:100%;margin:0 auto}
 .s9-field{text-align:left;min-width:0}
 .s9-field label{display:block;font:400 11px/1.65 'EB Garamond',Georgia,serif;
@@ -52,7 +52,7 @@
 .s9-form-status.s9-feedback-visible{position:static;width:auto;height:auto;overflow:visible;
   clip-path:none;white-space:normal;margin:0 auto;max-width:34ch;
   font:400 11px/1.45 system-ui,sans-serif;color:#77586f}
-.s9-note{font:400 14px/1.35 'EB Garamond',Georgia,serif;color:#796678;margin:-18px auto 0}
+.s9-note{font:400 14px/1.35 'EB Garamond',Georgia,serif;color:#796678;margin:0 auto}
 .s9-form-status.s9-feedback-visible + .s9-note{margin-top:0}
 .s9-wall{display:grid;gap:12px;padding-right:4px;margin-top:44px;text-align:left}
 .s9-wish{padding:16px 18px;background:#fff;border:0;
