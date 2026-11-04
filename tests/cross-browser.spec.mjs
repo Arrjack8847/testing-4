@@ -229,20 +229,21 @@ test('Section 5 provides an accessible gallery without falsely populated photos'
 });
 
 
-test('Section 9 RSVP form is accessible and preview-only',async({page})=>{
+test('Section 9 submits only with API confirmation across browser engines',async({page})=>{
+  await page.route('**/api/rsvp',async route=>{const body=route.request().postDataJSON();await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,saved:true,receipt:body.requestId})});});
   const errors=await load(page),section=page.locator('#rsvp');
   await expect(section).toHaveJSProperty('inert',true);
   await open(page);
   await expect(section).toHaveJSProperty('inert',false);
   await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.getElementById('rsvp').scrollIntoView({block:'start',behavior:'instant'});});
   await expect(section.getByRole('heading',{name:'RSVP & Wishes'})).toBeVisible();
-  await expect(section.locator('#s9FormStatus')).toContainText('not sent or stored');
+  await expect(section.locator('#s9FormStatus')).toContainText('save it privately');
   await section.locator('#s9Name').fill('Test Guest');
   await section.locator('#s9Attendance').selectOption('no');
   await section.getByRole('button',{name:'Send RSVP'}).click();
   await expect(section.locator('#s9Preview')).toBeVisible();
   await expect(section.locator('#s9PreviewGuests')).toHaveText('Not attending');
-  await expect(section.locator('#s9FormStatus')).toContainText('not sent or saved');
+  await expect(section.locator('#s9FormStatus')).toContainText('received and saved');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
