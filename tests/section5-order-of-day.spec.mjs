@@ -368,3 +368,67 @@ test('390px particle canvas opacity and CSS pixel coverage remain source-calibra
   expect(metrics.alpha).toBeLessThan(180);
   expect(errors).toEqual([]);
 });
+
+test('320px reference wraps the script heading and expands the timeline section to 739px',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='small-phone','Measured source at 320 × 568');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {section,errors}=await toOrder(page);
+  await page.evaluate(()=>document.fonts.ready);
+  const m=await section.evaluate(el=>{
+    const base=el.getBoundingClientRect();
+    const box=n=>{const r=n.getBoundingClientRect();return {
+      x:r.left-base.left,y:r.top-base.top,width:r.width,height:r.height
+    }};
+    return {
+      section:box(el),
+      eyebrow:box(el.querySelector('.order-eyebrow')),
+      heading:box(el.querySelector('.order-heading')),
+      rows:[...el.querySelectorAll('.order-entry')].map(box),
+      border:getComputedStyle(el.querySelector('.order-inner'),'::before').inset
+    };
+  });
+  const near=(actual,expected,tolerance=1.5)=>
+    expect(Math.abs(actual-expected)).toBeLessThanOrEqual(tolerance);
+  near(m.section.height,739.23);
+  near(m.eyebrow.x,28);
+  near(m.eyebrow.y,96);
+  near(m.heading.x,28);
+  near(m.heading.y,126.14);
+  near(m.heading.height,105.78);
+  const rowY=[265.92,333.05,385.05,471.36,539.23,591.23];
+  const rowH=[67.13,52,86.31,67.88,52,52];
+  m.rows.forEach((r,i)=>{
+    near(r.x,28);
+    near(r.width,264);
+    near(r.y,rowY[i]);
+    near(r.height,rowH[i]);
+  });
+  expect(errors).toEqual([]);
+});
+
+test('430px reference uses the full 374px timeline instead of a capped 334px column',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='large-phone','Measured source at 430 × 932');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {section,errors}=await toOrder(page);
+  await page.evaluate(()=>document.fonts.ready);
+  const m=await section.evaluate(el=>{
+    const root=el.getBoundingClientRect();
+    const box=n=>{const r=n.getBoundingClientRect();return{
+      x:r.left-root.left,y:r.top-root.top,width:r.width,height:r.height}};
+    return {height:root.height,
+      eyebrow:box(el.querySelector('.order-eyebrow')),
+      heading:box(el.querySelector('.order-heading')),
+      rows:[...el.querySelectorAll('.order-entry')].map(box)};
+  });
+  expect(Math.abs(m.height-651.28)).toBeLessThan(1.5);
+  expect(m.eyebrow.x).toBe(28);
+  expect(m.eyebrow.width).toBe(374);
+  expect(m.heading.x).toBe(28);
+  expect(m.heading.width).toBe(374);
+  m.rows.forEach((r,i)=>{
+    expect(r.x).toBe(28);
+    expect(r.width).toBe(374);
+    expect(Math.abs(r.y-[213.03,280.16,332.16,399.28,451.28,503.28][i])).toBeLessThan(1.5);
+  });
+  expect(errors).toEqual([]);
+});
