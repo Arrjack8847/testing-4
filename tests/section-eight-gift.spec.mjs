@@ -305,3 +305,39 @@ test('Authorized local product thumbnails replace placeholder glyphs without ext
   expect(assets.kettle).not.toContain('lazcdn.com');
   expect(faults).toEqual([]);
 });
+
+
+test('Expanded Gift cards never create a gap before RSVP or horizontal page scrolling',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  const button=gift.locator('#giftEightTrigger');
+  const before=await gift.evaluate(el=>el.getBoundingClientRect().height);
+  await button.click();
+  await expect(button).toHaveAttribute('aria-expanded','true');
+  const measurements=await gift.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const next=document.getElementById('rsvp').getBoundingClientRect();
+    const bank=el.querySelector('#giftEightBanks');
+    const wishlist=el.querySelector('#giftEightWishlist');
+    return {
+      height:r.height,
+      gap:next.top-r.bottom,
+      overflow:document.documentElement.scrollWidth-innerWidth,
+      bankWidth:bank.clientWidth,
+      bankScrollableWidth:bank.scrollWidth,
+      bankVisible:getComputedStyle(bank).display!=='none',
+      wishlistVisible:getComputedStyle(wishlist).display!=='none'
+    };
+  });
+  expect(measurements.height).toBeGreaterThanOrEqual(before);
+  expect(Math.abs(measurements.gap)).toBeLessThanOrEqual(1);
+  expect(measurements.overflow).toBeLessThanOrEqual(1);
+  expect(measurements.bankScrollableWidth).toBeGreaterThan(measurements.bankWidth);
+  expect(measurements.bankVisible).toBe(true);
+  expect(measurements.wishlistVisible).toBe(true);
+  await button.click();
+  await expect(button).toHaveAttribute('aria-expanded','false');
+  await expect(gift.locator('#giftEightBanks')).toBeHidden();
+  await expect(gift.locator('#giftEightWishlist')).toBeHidden();
+  expect(faults).toEqual([]);
+});
