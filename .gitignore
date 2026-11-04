@@ -19,3 +19,6 @@ assets/gallery/reference/
 section7-method-evidence/
 section7-shell-evidence/
 section7-reference-evidence/
+
+# Section 4 browser-generated asset inventory (local investigation only)
+section4-exact-audit/
