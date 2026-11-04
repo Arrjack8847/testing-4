@@ -53,10 +53,13 @@
 .s9-rsvp.s9-active .s9-petals i{animation-play-state:running}
 
 .s9-inner{max-width:390px;position:relative;z-index:2;margin:0 auto}
-/* Source's cgv-tframe: a tall, pointed-arch ivory panel, not four loose
-   25px corner brackets. Framing is original CSS, no vendor frame asset copied. */
+/* Source's cgv-tframe: tall, pointed-arch ivory panel, not loose brackets.
+   390px Windows QA measured the frame bottom at y=1170.6, 5.6px below the
+   accepted reference range (<1165). Raise the bottom by 8px without moving
+   form controls, wishes or the Section 8/10 seams. This original CSS frame
+   does not contain vendor artwork. */
 .s9-frame{
-  position:absolute;top:-91px;bottom:-37px;left:-13px;right:-13px;
+  position:absolute;top:-91px;bottom:-29px;left:-13px;right:-13px;
   z-index:-1;pointer-events:none;opacity:1;overflow:visible;
   /* Let the original paper texture remain faintly visible beneath the ivory arch. */
   background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,252,253,.84));
