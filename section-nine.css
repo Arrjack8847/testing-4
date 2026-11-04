@@ -22,6 +22,35 @@
 .s9-rsvp.s9-reference-loaded .s9-reference-art{display:block}
 .s9-rsvp.s9-reference-loaded .s9-original-paper{display:none}
 .s9-art-wash{position:absolute;inset:0;background:linear-gradient(#faf7fb21,#faf7fb12 58%,#faf7fb0d)}
+/* Subtle, original CSS petals: the reference's RSVP view has intermittent
+   drifting lilac/pink accents. The layer is isolated to Section 9 and never
+   captures taps, focus, or scrolling. It is animation-paused offscreen. */
+.s9-petals{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+.s9-petals i{
+  display:block;position:absolute;top:-28px;left:var(--s9-x,20%);width:var(--s9-w,9px);
+  height:calc(var(--s9-w,9px) * .56);border-radius:75% 8% 70% 18%;
+  background:linear-gradient(120deg,#e9cde2,#b89bc9 72%,#a98dbd);
+  box-shadow:0 0 3px #b397bf24;opacity:0;
+  transform-origin:center;animation:s9-petal-drift var(--s9-duration,11s) linear
+    var(--s9-delay,0s) infinite;animation-play-state:paused;
+}
+.s9-petals i:nth-child(1){--s9-x:12%;--s9-w:9px;--s9-duration:10.8s;--s9-delay:-6.1s;--s9-sway:52px}
+.s9-petals i:nth-child(2){--s9-x:31%;--s9-w:7px;--s9-duration:13.2s;--s9-delay:-2.6s;--s9-sway:-44px}
+.s9-petals i:nth-child(3){--s9-x:64%;--s9-w:12px;--s9-duration:12.4s;--s9-delay:-7.8s;--s9-sway:38px}
+.s9-petals i:nth-child(4){--s9-x:84%;--s9-w:8px;--s9-duration:11.7s;--s9-delay:-3.9s;--s9-sway:-70px}
+.s9-petals i:nth-child(5){--s9-x:48%;--s9-w:6px;--s9-duration:14s;--s9-delay:-9.3s;--s9-sway:65px}
+.s9-petals i:nth-child(6){--s9-x:75%;--s9-w:10px;--s9-duration:12.9s;--s9-delay:-11s;--s9-sway:-48px}
+.s9-petals i:nth-child(7){--s9-x:23%;--s9-w:8px;--s9-duration:15.5s;--s9-delay:-12s;--s9-sway:34px}
+.s9-petals i:nth-child(8){--s9-x:92%;--s9-w:7px;--s9-duration:13.7s;--s9-delay:-5s;--s9-sway:-56px}
+@keyframes s9-petal-drift{
+  0%{opacity:0;transform:translate3d(0,-25px,0) rotate(0deg)}
+  9%{opacity:.58}
+  48%{opacity:.52;transform:translate3d(calc(var(--s9-sway,45px) / 2),620px,0) rotate(135deg)}
+  90%{opacity:.36}
+  100%{opacity:0;transform:translate3d(var(--s9-sway,45px),1280px,0) rotate(305deg)}
+}
+.s9-rsvp.s9-active .s9-petals i{animation-play-state:running}
+
 .s9-inner{max-width:390px;position:relative;z-index:2;margin:0 auto}
 /* Source's cgv-tframe: a tall, pointed-arch ivory panel, not four loose
    25px corner brackets. Framing is original CSS, no vendor frame asset copied. */
@@ -178,6 +207,7 @@
 @keyframes s9-flap-right{from{transform:scaleX(-1) rotateY(10deg)}to{transform:scaleX(-1) rotateY(74deg)}}
 @media(max-width:350px){.s9-rsvp{padding-inline:20px}.s9-row2{gap:10px}.s9-eyebrow{letter-spacing:4px}.s9-heading{font-size:48px}}
 @media(prefers-reduced-motion:reduce){
+ .s9-rsvp .s9-petals i{animation:none!important;opacity:0!important}
  .s9-rsvp .s9-butterfly,.s9-rsvp .s9-butterfly-forward,.s9-rsvp .s9-wing{animation:none!important}
  .s9-rsvp .s9-butterfly,.s9-rsvp .s9-butterfly-forward{opacity:0!important}
  .s9-rsvp.s9-reveal-ready .s9-reveal{opacity:1!important;transform:none!important;transition:none!important}
