@@ -59,6 +59,14 @@ test('Section 4 event cards, countdown and edge positions fit each phone viewpor
       cards:cards.map(x=>({left:x.left,right:x.right,height:x.height,top:x.top,bottom:x.bottom})),
       links:links.map(({box:x,isMap})=>({width:x.width,height:x.height,left:x.left,right:x.right,isMap}))};
   });
+  // Live source four-phone measurements: 320=1742.3, 360=1649.9,
+  // 390=1580.9. At 430 the recovered comparison did not include a
+  // section-height measurement; avoid inventing one.
+  const measuredHeightByWidth={320:1742.3,360:1649.9,390:1580.9};
+  if(Object.prototype.hasOwnProperty.call(measuredHeightByWidth,geometry.width)){
+    expect(Math.abs(geometry.height-measuredHeightByWidth[geometry.width])).toBeLessThanOrEqual(5);
+  }
+  await expect(section.locator('.event-card-links')).not.toHaveClass(/event-reveal/);
   expect(geometry.overflow).toBeLessThanOrEqual(1);
   expect(geometry.height).toBeGreaterThanOrEqual(1581);
   expect(geometry.body.left).toBeGreaterThanOrEqual(-1);
@@ -105,6 +113,11 @@ test('Section 4 source-measured typography, link and countdown styling are retai
       mapMinHeight:map.minHeight,
       gridGap:grid.columnGap,
       tileColor:tile.backgroundColor,
+      timerNumberFontSize:css('.event-countdown-grid strong').fontSize,
+      titleFontSize:css('.event-card-title').fontSize,
+      dateFontSize:css('.event-card-date').fontSize,
+      timeFontSize:time.fontSize,
+      venueFontSize:place.fontSize,
       tileRadius:tile.borderRadius
     };
   });
@@ -119,6 +132,12 @@ test('Section 4 source-measured typography, link and countdown styling are retai
   expect(styles.mapMinHeight).toBe('44px');
   expect(styles.gridGap).toBe('14px');
   expect(styles.tileColor).toBe('rgb(92, 38, 79)');
+  expect(styles.timerNumberFontSize).toBe('28px');
+  expect(styles.titleFontSize).toBe('42px');
+  expect(styles.dateFontSize).toBe('22px');
+  expect(styles.timeFontSize).toBe('14px');
+  expect(styles.venueFontSize).toBe('19px');
+
   expect(styles.tileRadius).toBe('12px');
   expect(errors).toEqual([]);
 });
@@ -386,7 +405,8 @@ test('390px source visual mode keeps full paper edges, true arch SVG and four pu
   expect(visuals.archLoaded).toBe(true);
   expect(visuals.tileCount).toBe(4);
   expect(visuals.tileDisplay).toBe('grid');
-  expect(visuals.tileBackground).toBe('rgb(97, 40, 82)');
+  // The 2026-11-03 live source computed color is rgb(92,38,79); the previous 97,40,82 assertion was stale.
+  expect(visuals.tileBackground).toBe('rgb(92, 38, 79)');
   expect(visuals.timerValue).toMatch(/^\d+$/);
   expect(visuals.venueWeight).toBe('600');
   expect(visuals.directionsCase).toBe('uppercase');
