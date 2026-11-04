@@ -1,0 +1,8 @@
+# Permission-controlled vendor research artwork. Never commit without redistribution rights.
+assets/reference-dev/
+assets/gallery/reference/
+section9-evidence/
+section9-visual-evidence/
+test-results/
+playwright-report/
+node_modules/
