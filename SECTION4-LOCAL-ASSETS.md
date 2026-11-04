@@ -8,8 +8,9 @@ The measured Events section uses:
 |---|---|---|
 | `paper.webp` | https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp | Events paper/background, source natural size 1080x1920 |
 | `arch_event.svg` | https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg | Decorative border around each of two event cards |
+| `bfly_white.webp` | https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp | Paired 22px butterfly wings in original Events source |
 
-The legacy `arch_panel.svg` was incorrectly used in an earlier iteration; `arch_event.svg` superseded it. A hidden `bfly_white.webp` element is requested by the prototype, but the previous DOM audit did not find a visible butterfly in Events, so it is not in this staging list.
+The legacy `arch_panel.svg` was incorrectly used in an earlier iteration; `arch_event.svg` superseded it. A recovered GitHub Actions source DOM capture (run 41670889850, 3 November 2026) confirms that `bfly_white.webp` belongs to the source Events section. The source renders it as **two 22×34px CSS background-image wings**, with `background-size:200% 100%`, left/right positions `0%` and `100%`, inside a **44×34px** wrapper. The captured resting opacity was **0**, so the sprite was not visually apparent in that screenshot. The local prototype now preserves that split-wing structure and initial resting state. Its flight motion still requires direct source verification.
 
 ## Private local staging
 
@@ -132,3 +133,26 @@ are excluded from the visible asset inventory. Review these JSON fields:
 
 **None of these checks replaces the SHA-256 file identity test or full visual
 comparison.** If the live source cannot load, the audit must remain incomplete.
+
+
+## Recovered source screenshot comparison (3 November 2026)
+
+The previous reference browser audit was recovered from GitHub Actions
+[run 41670889850](https://github.com/Arrjack8847/testing-4/actions/runs/41670889850).
+It contains six 390×844 screenshots and source computed-style/layout JSON.
+
+| Recorded frame | Mean RGB difference (0–255) | Pixels differing by more than 30 |
+|---|---:|---:|
+| Top | 18.267 | 9.04% |
+| Middle | 18.360 | 9.38% |
+| Bottom | 19.896 | 11.23% |
+
+These are **old prototype** metrics, not PR #35 results.
+Source and prototype had the original `paper.webp` loaded, almost aligned
+in scroll position, and the correct `arch_event.svg` border. The reference
+also included the split-wing butterfly layer described above. The overall
+remaining differences include provider navigation/commercial overlays absent
+from the prototype and decoration/rendering mismatches; the scores cannot
+isolate every cause by themselves. The full source butterfly flight and petal
+field behavior have not been measured, so **exact parity is not established**.
+No reference screenshot or source-owned art file is committed to this repo.
