@@ -165,6 +165,17 @@ def report(frames):
 if __name__ == "__main__":
     source = json.loads((ROOT / "frames.json").read_text(encoding="utf-8"))
     output = report(source["frames"])
+    middle = output["sections"]["middle"]
+    required = {"leftward", "rightward"}
+    observed = set(middle["referenceGlobalDirections"])
+    if len(source["frames"]) != 21:
+        raise SystemExit("S9_MOTION_AUDIT_INCOMPLETE: Expected 21 paired frames")
+    if not required.issubset(observed):
+        raise SystemExit(
+            "S9_MOTION_AUDIT_INCOMPLETE: Mid-RSVP reference did not expose both "
+            f"global butterfly directions; observed={sorted(observed)}. "
+            "Do not claim trajectory validation from an empty selector."
+        )
     (ROOT / "motion.json").write_text(
         json.dumps(output, indent=2), encoding="utf-8"
     )
