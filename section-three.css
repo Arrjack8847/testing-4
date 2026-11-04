@@ -636,3 +636,49 @@
 .event-section[data-art="reference"] .event-reference-card::after {
   inset:7px;
 }
+
+
+/* Reference evidence: GitHub Actions 41670889850, captured 2026-11-03.
+   The source Events butterfly is a 44x34px paired-wing sprite, not a single
+   image: both halves use the same bfly_white.webp at 200% 100% background
+   size, positioned 0% and 100%. The captured initial parent opacity is 0.
+   Do not invent a flight path before source-motion verification. */
+.event-section .event-reference-butterfly-layer {
+  display:none;
+  pointer-events:none;
+}
+.event-section[data-art="reference"] .event-reference-butterfly-layer {
+  position:absolute;
+  inset:0;
+  z-index:1;
+  display:block;
+  pointer-events:none;
+}
+.event-section .event-reference-butterfly {
+  position:absolute;
+  left:0;
+  top:0;
+  display:block;
+  width:44px;
+  height:34px;
+  opacity:0;
+  filter:drop-shadow(0 6px 5px rgba(40,52,40,.2));
+}
+.event-section .event-reference-butterfly-wing {
+  position:absolute;
+  top:0;
+  display:block;
+  width:22px;
+  height:34px;
+  background-image:var(--event-bfly-source, url("https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp"));
+  background-size:200% 100%;
+  background-repeat:no-repeat;
+}
+.event-section .event-reference-butterfly-left {
+  left:0;
+  background-position:0% 0%;
+}
+.event-section .event-reference-butterfly-right {
+  left:22px;
+  background-position:100% 0%;
+}
