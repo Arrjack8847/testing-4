@@ -116,3 +116,19 @@ positions, and separately verify full interactions and seam behavior.
 **Do not merge PR #35 solely because the local files loaded.** Both
 byte-identity and all 12 visual comparisons must be checked, and any
 remaining original artwork/decorations must be inventoried.
+
+
+## Exact-source audit acceptance gate
+
+A matching filename is **not sufficient**. The updated asset auditor compares
+source URL identities (allowing only the documented locally staged
+`paper.webp` and `arch_event.svg` mappings) and checks each observed image
+for a successful network response. Hidden fallback images and pseudo-elements
+are excluded from the visible asset inventory. Review these JSON fields:
+
+- `referenceAssetsNotMatchedBySourceIdentity`: actual source URLs absent from the local rendering
+- `sourceAssetsWithoutSuccessfulLoad` and `localAssetsWithoutSuccessfulLoad`: failed or unverified source requests
+- `localAssetsNotMatchedBySourceIdentity`: local illustration assets not found on the reference
+
+**None of these checks replaces the SHA-256 file identity test or full visual
+comparison.** If the live source cannot load, the audit must remain incomplete.
