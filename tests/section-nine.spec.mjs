@@ -130,7 +130,7 @@ test('Missing optional butterfly sprite gracefully falls back to CSS art',async(
   const style=await section.locator('.s9-wing-left').evaluate(el=>getComputedStyle(el).backgroundImage);
   expect(style).toContain('radial-gradient');
 });
-,async({page})=>{
+test('Animation pauses outside view and Reduced Motion remains legible',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const {section}=await go(page);
   await expect(section.locator('.s9-heading')).toBeVisible();
