@@ -9,7 +9,9 @@ const OUTPUT='section10-visual-qa';
 const SOURCE='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en';
 const LOCAL='http://127.0.0.1:8000';
 await mkdir(OUTPUT,{recursive:true});
-const server=spawn('python3',['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
+// Use the Windows Python launcher locally and python3 on GitHub Actions/Linux.
+const python=process.platform==='win32'?'py':'python3';
+const server=spawn(python,['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 let result={checkedAt:new Date().toISOString(),viewport:{width:390,height:844}};
 const selectors={
