@@ -173,9 +173,22 @@ async function inspect(label,viewport){
         });
         report.interaction.status='captured';
 
+        // Ensure source and local wishlist panels have actually entered the
+        // viewport and completed their reveal transitions BEFORE measuring.
+        // The reference uses translateY(52px) scale(.955) offscreen; sampling
+        // at the earlier 650ms checkpoint produced intermittent ~46px false
+        // geometry errors (390px) even though the revealed box was correct.
+        const wishSelector=label==='reference'?'.cgv-acct.cgv-gl':'#giftEightWishlist';
+        const panel=page.locator(wishSelector).first();
+        if(await panel.count()){
+          await panel.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
+          await page.waitForTimeout(1650);
+        }
+
         // Normalize all element coordinates to the Gift section's top so
         // different scroll positions cannot masquerade as visual offsets.
-        // Only geometry and visibility are gathered; no bank/payment data.
+        // This measurement is of the REVEALED layout at all widths. No bank,
+        // payment, copy, purchase or reservation operation is performed.
         report.interaction.expandedGeometry=await root.evaluate(gift=>{
           const root=gift.getBoundingClientRect();
           const rect=node=>{
@@ -183,6 +196,7 @@ async function inspect(label,viewport){
             const b=node.getBoundingClientRect(),css=getComputedStyle(node);
             return {x:+b.x.toFixed(1),y:+(b.y-root.y).toFixed(1),
               width:+b.width.toFixed(1),height:+b.height.toFixed(1),
+              transform:css.transform,opacity:+Number(css.opacity).toFixed(3),
               visible:css.display!=='none'&&css.visibility!=='hidden'&&
                 Number(css.opacity)>.05};
           };
@@ -203,11 +217,7 @@ async function inspect(label,viewport){
         // The reference animates its wishlist into view only after it enters
         // the viewport. A section-level screenshot taken before this scroll
         // can misleadingly show a blank panel. Capture the revealed state.
-        const wishSelector=label==='reference'?'.cgv-acct.cgv-gl':'#giftEightWishlist';
-        const panel=page.locator(wishSelector).first();
         if(await panel.count()){
-          await panel.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
-          await page.waitForTimeout(1350);
           report.interaction.wishlistReveal=await panel.evaluate(node=>{
             const s=getComputedStyle(node),r=node.getBoundingClientRect();
             const children=[...node.querySelectorAll('.cgv-gl-item,.gift-eight-item')].slice(0,3);
