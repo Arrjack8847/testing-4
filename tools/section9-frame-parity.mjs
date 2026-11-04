@@ -41,19 +41,43 @@ const pose=async(page,root,butterfly)=>{
         element.getAttribute('class')||'',element.getAttribute('src')||'',
         element.getAttribute('alt')||'',element.getAttribute('style')||''
       ].join(' ');
-      // Skip unrelated elements without requiring expensive computed styles.
-      if(!/bfly|butterfly|flutter|wing/i.test(identity))continue;
-      const rect=element.getBoundingClientRect(),style=getComputedStyle(element);
-      const visible=rect.width>0&&rect.height>0&&
-        rect.right>0&&rect.bottom>0&&rect.left<viewportWidth&&rect.top<viewportHeight&&
-        style.display!=='none'&&style.visibility!=='hidden'&&Number(style.opacity)>0.04;
+      // Name-based matching alone misses CSS background and pseudo-element
+      // sprites. First skip non-intersecting anonymous nodes cheaply.
+      const named=/bfly|butterfly|flutter|wing/i.test(identity);
+      const rect=element.getBoundingClientRect();
+      const intersects=rect.width>0&&rect.height>0&&
+        rect.right>0&&rect.bottom>0&&rect.left<viewportWidth&&rect.top<viewportHeight;
+      if(!named&&!intersects)continue;
+      const style=getComputedStyle(element);
+      const background=style.backgroundImage||'none';
+      const sprite=/bfly|butterfly|flutter|wing/i.test(background);
+      const pseudos=[];
+      // Track image-backed pseudo-elements without copying CSS rules.
+      if(intersects){
+        for(const pseudo of ['::before','::after']){
+          const ps=getComputedStyle(element,pseudo);
+          const pseudoImage=ps.backgroundImage||'none';
+          if(/bfly|butterfly|flutter|wing/i.test(pseudoImage)||
+             /bfly|butterfly|flutter|wing/i.test(ps.content||'')){
+            pseudos.push({pseudo,image:pseudoImage.slice(0,200),
+              content:(ps.content||'').slice(0,120),
+              opacity:ps.opacity,display:ps.display});
+          }
+        }
+      }
+      const canvasCandidate=element.tagName==='CANVAS'&&intersects;
+      if(!named&&!sprite&&!pseudos.length&&!canvasCandidate)continue;
+      const visible=intersects&&style.display!=='none'&&
+        style.visibility!=='hidden'&&Number(style.opacity)>0.04;
       candidates.push({
         selector:(element.id?'#'+element.id:element.tagName.toLowerCase()+
           (typeof element.className==='string'&&element.className?
-            '.'+element.className.trim().split(/\s+/).slice(0,2).join('.') :'')),
-        image:element.getAttribute('src')||style.backgroundImage.slice(0,160),
+            '.'+element.className.trim().split(/\\s+/).slice(0,2).join('.') :'')),
+        image:element.getAttribute('src')||background.slice(0,160),
         visible,rect:box(element),
-        animation:style.animationName,animationState:style.animationPlayState
+        animation:style.animationName,animationState:style.animationPlayState,
+        pseudoSprites:pseudos,canvasCandidate,
+        sectionAncestor:element.closest('section')?.id||null
       });
     }
     candidates.sort((left,right)=>Number(right.visible)-Number(left.visible));
