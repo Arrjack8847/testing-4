@@ -52,12 +52,12 @@ test('Section 4 event cards, countdown and edge positions fit each phone viewpor
     const sectionBox=el.getBoundingClientRect();
     const body=el.querySelector('.event-body').getBoundingClientRect();
     const cards=[...el.querySelectorAll('.event-reference-card')].map(x=>x.getBoundingClientRect());
-    const links=[...el.querySelectorAll('a')].map(x=>x.getBoundingClientRect());
+    const links=[...el.querySelectorAll('a')].map(x=>({box:x.getBoundingClientRect(),isMap:x.classList.contains('event-map-link')}));
     return {width:innerWidth,height:sectionBox.height,
       overflow:document.documentElement.scrollWidth-innerWidth,
       body:{left:body.left,right:body.right},
       cards:cards.map(x=>({left:x.left,right:x.right,height:x.height,top:x.top,bottom:x.bottom})),
-      links:links.map(x=>({width:x.width,height:x.height,left:x.left,right:x.right}))};
+      links:links.map(({box:x,isMap})=>({width:x.width,height:x.height,left:x.left,right:x.right,isMap}))};
   });
   expect(geometry.overflow).toBeLessThanOrEqual(1);
   expect(geometry.height).toBeGreaterThanOrEqual(1581);
@@ -71,11 +71,55 @@ test('Section 4 event cards, countdown and edge positions fit each phone viewpor
   }
   expect(geometry.cards[1].top).toBeGreaterThan(geometry.cards[0].bottom);
   for(const link of geometry.links){
-    expect(link.height).toBeGreaterThanOrEqual(43);
+    // The reference ghost link measures 42px while its .955 entrance
+    // transform is active. Do not impose the old 43px prototype minimum.
+    expect(link.height).toBeGreaterThanOrEqual(link.isMap ? 41 : 43);
+    if(link.isMap) expect(link.height).toBeLessThanOrEqual(45.5);
     expect(link.left).toBeGreaterThanOrEqual(-1);
     expect(link.right).toBeLessThanOrEqual(geometry.width+1);
   }
   await section.screenshot({path:testInfo.outputPath('section4-events-full.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+});
+
+test('Section 4 source-measured typography, link and countdown styling are retained',async({page})=>{
+  const {section,errors}=await openEvents(page);
+  const styles=await section.evaluate(el=>{
+    const css=(selector)=>getComputedStyle(el.querySelector(selector));
+    const time=css('.event-card-time');
+    const diamond=css('.event-card-diamond');
+    const place=css('.event-card-place');
+    const address=css('.event-card-address');
+    const map=css('.event-map-link');
+    const grid=css('.event-countdown-grid');
+    const tile=css('.event-countdown-grid span');
+    return {
+      timeBottomMargin:time.marginBottom,
+      diamondFontSize:diamond.fontSize,
+      diamondLineHeight:diamond.lineHeight,
+      diamondBottomMargin:diamond.marginBottom,
+      placeBottomMargin:place.marginBottom,
+      addressFontSize:address.fontSize,
+      addressLineHeight:address.lineHeight,
+      addressBottomMargin:address.marginBottom,
+      mapMinHeight:map.minHeight,
+      gridGap:grid.columnGap,
+      tileColor:tile.backgroundColor,
+      tileRadius:tile.borderRadius
+    };
+  });
+  expect(styles.timeBottomMargin).toBe('18px');
+  expect(styles.diamondFontSize).toBe('18px');
+  expect(styles.diamondLineHeight).toBe('29.7px');
+  expect(styles.diamondBottomMargin).toBe('18px');
+  expect(styles.placeBottomMargin).toBe('0px');
+  expect(styles.addressFontSize).toBe('16px');
+  expect(styles.addressLineHeight).toBe('26.4px');
+  expect(styles.addressBottomMargin).toBe('16px');
+  expect(styles.mapMinHeight).toBe('44px');
+  expect(styles.gridGap).toBe('14px');
+  expect(styles.tileColor).toBe('rgb(92, 38, 79)');
+  expect(styles.tileRadius).toBe('12px');
   expect(errors).toEqual([]);
 });
 
