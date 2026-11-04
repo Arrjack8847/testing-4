@@ -25,7 +25,8 @@
 /* Subtle, original CSS petals: the reference's RSVP view has intermittent
    drifting lilac/pink accents. The layer is isolated to Section 9 and never
    captures taps, focus, or scrolling. It is animation-paused offscreen. */
-.s9-petals{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+/* Petals float over ivory cards like the reference, but never block form controls. */
+.s9-petals{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none}
 .s9-petals i{
   display:block;position:absolute;top:-28px;left:var(--s9-x,20%);width:var(--s9-w,9px);
   height:6px;border-radius:75% 8% 70% 18%;
