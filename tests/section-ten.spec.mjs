@@ -116,3 +116,24 @@ test('Section 10 respects Reduced Motion including when toggled while visible',a
   await expect(closing).not.toHaveAttribute('data-motion-ready');
   await expect(closing.locator('.closing10-message')).toBeVisible();
 });
+
+
+test('Section 10 uses the locally staged reference scene when the WebP endpoint is available',async({page})=>{
+  // Use an original SVG fixture served at the same local path; do not upload
+  // or copy any third-party vendor image into GitHub Actions.
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#d7c1dd"/></svg>';
+  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+    status:200,contentType:'image/svg+xml',body:svg
+  }));
+  await page.goto('/');
+  const section=page.locator('#closingMessage');
+  await expect(section).toHaveAttribute('data-artwork','local-reference');
+  const image=section.locator('.closing10-source-scene');
+  await expect(image).toHaveJSProperty('naturalWidth',1080);
+  await expect(image).toBeVisible();
+  await expect(section.locator('.closing10-message')).toContainText('greatest honour');
+  await page.getByRole('button',{name:'Open Invitation',exact:true}).click();
+  await page.evaluate(()=>document.getElementById('closingMessage').scrollIntoView({block:'center',behavior:'instant'}));
+  await expect(image).toBeInViewport();
+  await expect(section).toHaveAttribute('data-artwork','local-reference');
+});
