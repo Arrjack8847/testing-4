@@ -307,7 +307,9 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('#galleryViewCaption')).toHaveText('The Bride');
   await expect(page.locator('#galleryPosition')).toHaveText('2 / 2');
-  await page.getByRole('button',{name:'Next photo'}).click();
+  // Source viewer has no visible arrow buttons; keep keyboard photo navigation.
+  await expect(page.getByRole('button',{name:'Next photo'})).toBeHidden();
+  await page.keyboard.press('ArrowRight');
   await expect(page.locator('#galleryViewCaption')).toHaveText('Together');
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
