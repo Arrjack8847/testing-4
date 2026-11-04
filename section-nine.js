@@ -23,7 +23,7 @@
   const syncCover=()=>{
     const closed=invitation.dataset.state!=='opened';
     section.inert=closed;section.setAttribute('aria-hidden',String(closed));
-    if(closed){form.reset();guests.disabled=false;preview.hidden=true;previewText='';
+    if(closed){form.reset();guests.disabled=false;shareWish.closest('label').hidden=true;preview.hidden=true;previewText='';
       status.classList.remove('s9-feedback-visible');status.textContent='Submit your RSVP to save it privately.';}
     syncMotion();
   };
