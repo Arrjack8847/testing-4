@@ -207,3 +207,129 @@
     animation:none!important;
   }
 }
+
+
+/* Screenshot comparison, 390×844: hidden default Gift content and
+   278px/14px horizontal bank strip after Send Gift. */
+.gift-eight-send{position:relative;margin-top:26px}
+.gift-eight-trigger{
+  position:relative;z-index:4;
+  min-width:175px;min-height:46px;
+  padding:10px 24px;letter-spacing:2.7px;
+  background:#fffaf5;color:#6b3159;
+}
+.gift-eight-bank-list[hidden],.gift-eight-wishlist[hidden]{display:none!important}
+.gift-eight-bank-list:not([hidden]){
+  display:flex;
+  align-items:stretch;gap:14px;
+  width:calc(100% + 28px);
+  overflow-x:auto;overflow-y:hidden;
+  padding:0 28px 5px 0;
+  margin: -20px 0 0;
+  scroll-snap-type:x mandatory;
+  scroll-padding-left:0;
+  scrollbar-width:none;
+  touch-action:pan-x;
+}
+.gift-eight-bank-list::-webkit-scrollbar{display:none}
+.gift-eight-bank{
+  flex:0 0 278px;
+  min-height:230px;
+  scroll-snap-align:start;
+  padding:29px 18px 24px;
+  border:1px solid rgba(143,96,128,.2);
+  border-radius:15px;
+  background:
+    radial-gradient(ellipse at 30% 15%,rgba(250,244,250,.92),transparent 74%),
+    linear-gradient(150deg,#fffafc,#f8edf8);
+  text-align:center;box-shadow:0 9px 18px #2a122b18;
+}
+.gift-eight-bank-name{
+  color:#653454;letter-spacing:4px;
+  font:600 12px/1.4 'EB Garamond',Georgia,serif;
+  text-transform:uppercase;
+}
+.gift-eight-account{
+  margin:18px 0 8px;
+  color:#643752;
+  letter-spacing:1.6px;
+  font:600 17px/1.4 'EB Garamond',Georgia,serif;
+}
+.gift-eight-holder{
+  color:#6b5164;min-height:27px;
+  font:400 14px/1.4 'EB Garamond',Georgia,serif;
+}
+.gift-eight-copy{
+  min-height:44px;margin-top:8px;
+  padding:9px 20px;border:0;
+  border-radius:999px;background:#f2e7ee;color:#653757;
+  text-transform:uppercase;
+  letter-spacing:1.45px;
+  font:600 11px/1.55 'EB Garamond',Georgia,serif;
+}
+.gift-eight-wishlist:not([hidden]){
+  display:block;
+  margin:44px 6px 0;
+  padding:23px 13px 29px;
+  border-radius:18px 18px 10px 10px;
+  background:rgba(255,252,253,.98);
+  box-shadow:0 7px 28px #250e1d28;
+  color:#5c264f;
+}
+.gift-eight-wishlist h3{
+  color:#6b365d;
+  font:500 12px/1.6 'EB Garamond',Georgia,serif;
+  letter-spacing:4px;
+}
+.gift-eight-wishlist-intro{
+  margin:6px 0 19px;color:#78556f;
+  font:400 14px/1.55 'EB Garamond',Georgia,serif;
+}
+.gift-eight-item{
+  grid-template-columns:54px minmax(0,1fr);
+  min-height:95px;gap:9px;padding:9px;
+  background:#fff;border:1px solid #eadddf;
+  border-radius:12px;
+  box-shadow:0 4px 15px #3c173213;
+  color:#59364c;
+}
+.gift-eight-thumb{
+  background:linear-gradient(145deg,#f8f2f4,#e7dce3);
+  color:#936f89;
+}
+.gift-eight-item h4{color:#59364c}
+.gift-eight-item p{color:#846f7b}
+.gift-eight-actions span{color:#6b3759}
+.gift-eight-actions button:disabled{background:#f1e7ed;color:#67455d}
+.gift-eight-disclaimer{
+  max-width:37ch;margin:19px auto 0;
+  color:#e4cddd;
+}
+.gift-eight-petals{
+  position:absolute;inset:0;z-index:3;
+  overflow:hidden;pointer-events:none;
+}
+.gift-eight-petals i{
+  position:absolute;width:7px;height:12px;
+  background:linear-gradient(125deg,#efcfec,#b88bc1);
+  border-radius:75% 5% 80% 15%;
+  opacity:.58;transform:rotate(33deg);
+  animation:gift-eight-petal-fall 11s linear infinite;
+}
+.gift-eight-petals i:nth-child(1){left:18%;top:12%;animation-delay:-4s;animation-duration:12s}
+.gift-eight-petals i:nth-child(2){left:73%;top:4%;animation-delay:-7s;animation-duration:9s}
+.gift-eight-petals i:nth-child(3){left:49%;top:34%;animation-delay:-3s;animation-duration:13s}
+.gift-eight-petals i:nth-child(4){left:81%;top:49%;animation-delay:-5s;animation-duration:10s}
+.gift-eight-petals i:nth-child(5){left:20%;top:67%;animation-delay:-9s;animation-duration:15s}
+.gift-eight-petals i:nth-child(6){left:56%;top:86%;animation-delay:-6s;animation-duration:12s}
+.gift-eight-petals i:nth-child(7){left:33%;top:25%;animation-delay:-1s;animation-duration:14s}
+.gift-eight-petals i:nth-child(8){left:70%;top:73%;animation-delay:-10s;animation-duration:16s}
+@keyframes gift-eight-petal-fall{
+  0%{transform:translate3d(-10px,-26px,0) rotate(15deg);opacity:0}
+  14%{opacity:.65}
+  79%{opacity:.65}
+  100%{transform:translate3d(24px,95px,0) rotate(195deg);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .gift-eight-petals i{animation:none!important}
+}
