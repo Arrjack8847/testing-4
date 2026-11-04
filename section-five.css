@@ -531,6 +531,12 @@
   object-position:center;
   border-radius:0;
 }
+/* Actual source Gallery viewer uses a 334×249.44 frame for Garden and Lake
+   at 390px, while portrait images use 334×445.33. This orientation-specific
+   ratio comes from the completed 2026-11-04 live source audit, not an estimate. */
+.gallery-dialog[data-gallery-orientation="landscape"] .gallery-viewer-figure {
+  aspect-ratio:334 / 249.44;
+}
 /* Captions remain available to screen readers but not displayed visually. */
 .gallery-dialog #galleryViewCaption {
   position:absolute;
