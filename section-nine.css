@@ -15,8 +15,10 @@
   box-shadow:16px 42px 0 -9px #d4c2d933,34px 95px 0 -17px #a88ab01e}
 .s9-original-paper:before{left:-75px;top:9%}
 .s9-original-paper:after{right:-75px;bottom:13%;transform:rotate(166deg)}
-.s9-reference-art{display:none;position:absolute;left:0;top:0;width:100%;height:100%;
+.s9-reference-art{display:none;position:absolute;left:0;top:-12%;width:100%;height:124%;
   object-fit:cover;object-position:center}
+/* Live reference at 390px: illustrated paper spans approx 1508px behind a 1216px section,
+   extending 12% above and below. The image remains local-only in opt-in comparison mode. */
 .s9-rsvp.s9-reference-loaded .s9-reference-art{display:block}
 .s9-rsvp.s9-reference-loaded .s9-original-paper{display:none}
 .s9-art-wash{position:absolute;inset:0;background:linear-gradient(#faf7fb21,#faf7fb12 58%,#faf7fb0d)}
@@ -30,25 +32,30 @@
 .s9-eyebrow{max-width:250px;margin:0 auto 12px;color:#7e6479;
   font:400 11px/1.65 'EB Garamond',Georgia,serif;letter-spacing:4.95px;text-transform:uppercase}
 .s9-heading{font:400 52px/1.15 'Pinyon Script',cursive;color:#7b3d6e;margin:0 0 36px}
-.s9-form{display:flex;flex-direction:column;gap:24px;max-width:100%;margin:0 auto}
+.s9-form{display:flex;flex-direction:column;gap:18px;max-width:100%;margin:0 auto}
 .s9-field{text-align:left;min-width:0}
 .s9-field label{display:block;font:400 11px/1.65 'EB Garamond',Georgia,serif;
   letter-spacing:3.3px;color:#6f5a6c;text-transform:uppercase;margin:0 0 8px}
-.s9-field input,.s9-field select,.s9-field textarea{appearance:auto;width:100%;min-height:52px;display:block;
-  border-radius:2px;border:1px solid #d2c6d1;background:#ffffffcd;color:#4a2a45;
-  padding:13px 13px;font:400 16px/1.45 'EB Garamond',Georgia,serif}
+.s9-field input,.s9-field select,.s9-field textarea{appearance:auto;width:100%;min-height:58.05px;display:block;
+  border-radius:12px;border:1px solid rgba(126,100,121,.30);background:#fff;color:#4a2a45;
+  padding:14px 16px;font:400 17px/1.65 'EB Garamond',Georgia,serif}
 .s9-field input::placeholder,.s9-field textarea::placeholder{color:#96899b;opacity:1}
-.s9-field select{padding-right:12px}
-.s9-field textarea{min-height:100px;resize:vertical}
+.s9-field select{padding-right:16px}
+.s9-field textarea{min-height:110px;height:110px;resize:vertical}
 .s9-row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
-.s9-submit{align-self:center;min-width:180px;min-height:46px;padding:12px 28px;
-  border:1px solid #b97766;border-radius:2px;background:#b67565;color:#fffaf6;
-  font:400 12px/1.35 'EB Garamond',Georgia,serif;letter-spacing:2.6px;text-transform:uppercase;cursor:pointer}
-.s9-form-status{margin:-12px auto -12px;max-width:33ch;min-height:0;font:400 11px/1.45 system-ui,sans-serif;color:#77586f}
-.s9-note{font:400 14px/1.45 'EB Garamond',Georgia,serif;color:#796678;margin:0 auto}
-.s9-wall{display:grid;gap:12px;margin-top:26px;text-align:left}
-.s9-wish{padding:17px 18px;background:#fffdfec7;border:1px solid #eadde8;
-  border-radius:4px;box-shadow:0 2px 10px #956e9521}
+.s9-submit{align-self:center;margin-top:28.7px;min-width:0;min-height:47.8px;padding:14px 32px;
+  border:0;border-radius:999px;background:#7b3d6e;color:#fff;
+  font:400 12px/1.65 'EB Garamond',Georgia,serif;letter-spacing:3px;text-transform:uppercase;cursor:pointer}
+/* Source status starts empty. Keep the prototype's safety disclosure accessible,
+   but do not let it distort the reference's form spacing until an RSVP is previewed. */
+.s9-form-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.s9-form-status.s9-feedback-visible{position:static;width:auto;height:auto;overflow:visible;
+  clip-path:none;white-space:normal;margin:0 auto;max-width:34ch;
+  font:400 11px/1.45 system-ui,sans-serif;color:#77586f}
+.s9-note{font:400 14px/1.35 'EB Garamond',Georgia,serif;color:#796678;margin:-18px auto 0}
+.s9-wall{display:grid;gap:12px;padding-right:4px;margin-top:44px;text-align:left}
+.s9-wish{padding:16px 18px;background:#fff;border:0;
+  border-radius:14px;box-shadow:0 2px 10px #956e9521}
 .s9-who{display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:#744c72;font-size:15px}
 .s9-who strong{font-weight:600}
 .s9-who span{font-size:12px;color:#907c8b}
@@ -98,6 +105,8 @@
   transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .s9-rsvp.s9-reveal-ready .s9-reveal.s9-in{opacity:1;transform:none}
 .s9-rsvp.s9-reveal-ready .s9-heading{transition-delay:.10s}
+.s9-rsvp.s9-reveal-ready .s9-wish:nth-child(2){transition-delay:.08s}
+.s9-rsvp.s9-reveal-ready .s9-wish:nth-child(3){transition-delay:.16s}
 .s9-rsvp.s9-reveal-ready .s9-form{transition-delay:.2s}
 @keyframes s9-flight{from{transform:translate3d(32px,30px,0) rotate(-16deg)}to{transform:translate3d(-220px,-60px,0) rotate(12deg)}}
 @keyframes s9-flap-left{from{transform:rotateY(10deg)}to{transform:rotateY(74deg)}}
