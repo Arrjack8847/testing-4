@@ -331,3 +331,19 @@
 .dress-section .dress-flight-thorax,
 .dress-section .dress-flight-antenna { display:none; }
 .dress-section[data-flight-ready="true"] .dress-flight { opacity:1; }
+
+
+/* Section 6 source-matched 22% paper wash. */
+/* Reference: .cgv-dress .cgv-wash covers the section at 22% opacity.
+   The wash is outside the paper's parallax transform, behind the text,
+   and uses exactly the reference section's #faf7fb surface colour. */
+.dress-section .dress-paper-wash{display:none}
+.dress-section[data-art="local-webp"][data-scene-status="loaded"] .dress-paper-wash{
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:#faf7fb;
+  opacity:.22;
+}

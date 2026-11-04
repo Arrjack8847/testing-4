@@ -1,0 +1,35 @@
+name: Section 6 paper overlay forensic audit
+on:
+  push:
+    branches:
+      - fix/section6-paper-overlay-flight-20261104
+    paths:
+      - tools/section6-layer-audit.cjs
+      - .github/workflows/section6-layer-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-layers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/sec6-local.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8000/ -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sec6-local.log
+          exit 1
+      - name: Inspect reference/local Section 6 CSS layers
+        run: node tools/section6-layer-audit.cjs
