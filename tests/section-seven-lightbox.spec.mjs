@@ -13,7 +13,7 @@ const devices=[
 ];
 
 for (const [width,height] of devices) {
-  test(`Section 7 source-measured lightbox at ${width}x${height}`, async ({page}) => {
+  test(`Section 7 source-measured lightbox at ${width}x${height}`, async ({page},testInfo) => {
     await page.setViewportSize({width,height});
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.route('**/assets/gallery/reference/*.webp',route=>
@@ -81,6 +81,10 @@ for (const [width,height] of devices) {
     near(m.close.w,42,'close width');
     near(m.close.h,42,'close height');
     expect(m.closeBackground).toBe('rgba(255, 255, 255, 0.15)');
+    await page.screenshot({
+      path:testInfo.outputPath(`section-five-lightbox-together-${width}.png`),
+      animations:'disabled'
+    });
     // Maintain more usable keyboard behavior than the observed source:
     // Escape closes and returns focus to the selected photo.
     await page.keyboard.press('Escape');
@@ -98,6 +102,10 @@ for (const [width,height] of devices) {
       await expect(page.locator('#galleryViewCaption')).toHaveText(caption);
       await expect(page.locator('#galleryViewImage')).toHaveCSS('object-fit','cover');
       await expect(page.locator('.gallery-viewer-navigation')).toBeHidden();
+      await page.screenshot({
+        path:testInfo.outputPath(`section-five-lightbox-${slot===3?'garden':'lake'}-${width}.png`),
+        animations:'disabled'
+      });
       const size=await page.locator('.gallery-viewer-figure').boundingBox();
       near(size.width,width-56,'landscape viewer width');
       near(size.height,(width-56)*4/3,'landscape viewer height');
