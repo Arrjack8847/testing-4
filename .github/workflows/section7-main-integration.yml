@@ -1,0 +1,49 @@
+name: Section 7 — main integration focused QA
+on:
+  push:
+    branches:
+      - integration/section7-gallery-main-20261104
+      - main
+    paths:
+      - index.html
+      - section-five.css
+      - section-five.js
+      - tests/section-five.spec.mjs
+      - .github/workflows/section7-main-integration.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - index.html
+      - section-five.css
+      - section-five.js
+      - tests/section-five.spec.mjs
+      - .github/workflows/section7-main-integration.yml
+permissions:
+  contents: read
+jobs:
+  gallery:
+    name: Four-phone section 7 plus Wedding Gift handoff
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Check site JS syntax
+        run: npm run test:syntax
+      - name: Test the Gallery and main section order at four viewport widths
+        run: npx playwright test tests/section-five.spec.mjs
+      - name: Upload failure traces only
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-main-failure-traces
+          path: test-results/
+          retention-days: 5
+          if-no-files-found: ignore
