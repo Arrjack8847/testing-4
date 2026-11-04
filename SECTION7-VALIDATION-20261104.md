@@ -218,3 +218,101 @@ files are absent in the GitHub Actions checkout. Visual similarity
 must be reassessed on a complete authorized local installation.
 
 Evidence: [captured screenshot run](https://github.com/Arrjack8847/testing-4/actions/runs/41696827091).
+
+## Live shell/artwork gap audit — 390×844, after opening settled
+
+A fresh read-only source/local browser audit captured four scroll checkpoints:
+[Actions 41751442480](https://github.com/Arrjack8847/testing-4/actions/runs/41751442480).
+This distinguishes artwork **inside Gallery** from the opening scene and
+shared floating interface, avoiding duplicate implementation by other workers.
+
+### Most important missing layer: Gallery-specific sticky scenic WebP
+
+The source renders
+`/images/concierge/packs/tasik-kayangan/scene.webp`
+as a **separate sticky image inside Gallery**, not only on the opening
+section. The path through the source DOM is:
+
+```text
+#cgv-gallery
+  .cgv-section-bg.cgv-section-bg-extra  [position: absolute; z-index: 0]
+    img[src*="/scene.webp"]             [position: sticky]
+  .cgv-inner                        [foreground content; z-index: 4]
+```
+
+At the source Gallery's upper scroll checkpoint (390×844), that image
+is **390×844 and pinned at viewport y=0**. At a later checkpoint, the
+image continues to move/clip within Gallery while the section scrolls.
+The page's separate opening `arch.webp` and `peacock.webp` are far
+offscreen by this point and are **not** Gallery-layer artwork.
+
+The local branch does load `scene.webp` as `#masterArt` in the
+Section 1 `#viewport`, but while viewing Gallery:
+- `#masterArt` is `opacity:0` and several thousand pixels offscreen;
+- `#gallery` has a flat `#faf7fb` background and no own sticky
+  `scene.webp` image;
+- the scenic architectural/floral framing seen at the source's Gallery
+  edges is missing even when the existing Section 1 art loads.
+
+This is a confirmed **Section 7 visual implementation gap**.
+The correct implementation should use the locally authorized
+`assets/scene.webp` within a Gallery-only sticky background layer,
+with a measured crop and CSS wash, clipped to Section 7. Avoid
+restarting Section 1's animation clock or letting the new background
+cover Gallery's photo buttons.
+
+### Shared floating overlay (not exclusively Section 7)
+
+The reference uses **fixed**, viewport-anchored UI:
+- preview header: `x=12,y=12,w≈286,h=40`, `z-index:80`;
+- preview order pill: `x≈171.8,y=704,w≈140.2,h=36`, `z-index:80`;
+- floating petal layer: `position:fixed`, `z-index:48`;
+- music disc: `x=322,y=698,w=50,h=50`, `z-index:55`;
+- bottom navigation dock: `x≈34.4,y≈783.2,w≈321.2,h≈42.8`,
+  `z-index:55`;
+- narrow scroll-progress rail: fixed at top `z-index:65`.
+
+The local Gallery viewport currently exposes **none** of these
+equivalent visible shared overlays in GitHub Actions. This is a
+site-shell/integration difference, **not** a missing local photo or
+a reason to edit another section from the Gallery feature branch.
+Coordinate reusable original/authorized equivalents with the
+integration worker; do not copy another company's commercial order
+control into a product.
+
+### Other proven gaps, ordered by impact
+
+1. **Exact photos:** source frames load five original `moody*.webp`;
+   GitHub Actions local Gallery has zero loaded photos. User's Windows
+   local worktree may differ; inspect it separately.
+2. **Gallery sticky scene art:** reference has a 390×844 sticky
+   `scene.webp` background *within the Gallery*; local does not.
+3. **Shared global shell:** petals, music disc, fixed nav and
+   progress/order controls visible at source but absent locally.
+4. **Section order/seam:** source goes Dress Code → Gallery → Wedding
+   Gift. Current Gallery worker branch goes Dress Code → Gallery →
+   RSVP with a different Dress Code background.
+5. **Extra preview height:** at 390px reference Gallery height
+   ≈1358.8px vs local preview ≈1419.7px (+60.9px);
+   at 320px reference ≈1153.9px vs local ≈1214.8px (+60.9px).
+   Placeholder-only disclaimer accounts for excess height; when all
+   five customer or authorized QA WebPs load, code hides it.
+6. **Motion polish:** after source/local timed captures, the reveal
+   poses match at 3s/5s, but source/local transitions differ slightly
+   during the first second/re-entry. Run visual comparisons only after
+   the shared scenic layer and the real photos are visible.
+7. **Photo viewer:** local keyboard/arrow/swipe/escape controls have
+   functional tests, but the source-vs-local *opened modal visual*
+   has not been certified.
+
+**Important:** The large screenshot difference at the source
+Gallery start can include a source gate/hero transition if not allowed
+to settle. The live shell audit explicitly waits for the invitation
+opening to finish before inspecting position and layering.
+Do not call that screenshot by itself evidence that hero scene
+belongs inside the Gallery. The sticky Gallery image above is confirmed
+through DOM ancestry and computed positioning.
+
+**Current decision:** No edit to Section 6, Section 8 or the
+integration shell; this branch remains QA/documentation-only and
+draft PR #26 remains unmerged.
