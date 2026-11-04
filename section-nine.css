@@ -132,3 +132,9 @@
  .s9-rsvp .s9-butterfly{opacity:0!important}
  .s9-rsvp.s9-reveal-ready .s9-reveal{opacity:1!important;transform:none!important;transition:none!important}
 }
+/* Optional explicit consent occupies the reference's under-button note position. */
+.s9-consent{display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  max-width:334px;min-height:27px;text-align:center;}
+.s9-consent input{appearance:auto;flex:0 0 16px;width:16px;height:16px;accent-color:#7b3d6e;
+  padding:0;margin:0;min-height:16px;cursor:pointer;}
+.s9-submit:disabled{opacity:.7;cursor:wait;}
