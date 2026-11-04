@@ -241,7 +241,9 @@ section. The path through the source DOM is:
 ```
 
 At the source Gallery's upper scroll checkpoint (390×844), that image
-is **390×844 and pinned at viewport y=0**. At a later checkpoint, the
+is **390×844 and pinned at viewport y=0**, with `object-fit: cover`
+and `object-position: 50% 50%`. Its clipping parent has
+`overflow:clip`. At a later checkpoint, the
 image continues to move/clip within Gallery while the section scrolls.
 The page's separate opening `arch.webp` and `peacock.webp` are far
 offscreen by this point and are **not** Gallery-layer artwork.
