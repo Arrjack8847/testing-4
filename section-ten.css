@@ -99,20 +99,21 @@
 }
 .section-ten .closing10-contacts {margin:26px auto 0;}
 .section-ten .closing10-contacts-title {
-  margin:0;font:400 11px/1.65 'EB Garamond',Georgia,serif;
-  letter-spacing:4.95px;color:#7e6479;
+  width:max-content;margin:0 auto;opacity:.8;
+  font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:4.95px;color:#7e6479;text-transform:uppercase;
 }
 .section-ten .closing10-contact-row {
-  display:flex;justify-content:center;align-items:center;gap:10px;margin-top:20px;
+  display:flex;justify-content:center;align-items:center;gap:9px;margin-top:12px;
 }
 .section-ten .closing10-contact-row button {
-  min-height:42px;padding:9px 20px;
-  border:1px solid #b6a6b6;border-radius:3px;
+  min-height:44px;margin-top:20px;padding:9px 20px;
+  border:0;border-radius:999px;
   background:#fff;color:#5c264f;
   font:500 12px/1.65 'EB Garamond',Georgia,serif;
-  letter-spacing:3px;
+  letter-spacing:3px;text-transform:uppercase;
 }
-.section-ten .closing10-contact-row button:disabled {opacity:.75;cursor:not-allowed;}
+.section-ten .closing10-contact-row button:disabled {opacity:1;cursor:not-allowed;}
 .section-ten .closing10-credit {
   margin:56px auto 0;
   color:#6f5a6c;font:300 11px/1.65 'EB Garamond',Georgia,serif;
