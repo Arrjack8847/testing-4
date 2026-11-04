@@ -382,3 +382,52 @@ test('390px source-calibrated expanded Gift button and wishlist alignment',async
   expect(data.overflow).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
+
+
+test('Expanded wishlist preserves measured first-card and 68px thumbnail geometry',async({page},testInfo)=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  const trigger=gift.locator('#giftEightTrigger');
+  const collapsedHeight=await gift.evaluate(el=>el.getBoundingClientRect().height);
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded','true');
+  const wishlist=gift.locator('#giftEightWishlist');
+  await expect(wishlist).toBeVisible();
+  const m=await wishlist.evaluate(panel=>{
+    const r=e=>{const b=e.getBoundingClientRect();return {width:b.width,height:b.height};};
+    const products=[...panel.querySelectorAll('.gift-eight-item')];
+    return {
+      panel:r(panel),
+      first:r(products[0]),
+      items:products.map(r),
+      thumbs:[...panel.querySelectorAll('.gift-eight-thumb')].map(r),
+      bottomPadding:getComputedStyle(panel).paddingBottom,
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  expect(m.bottomPadding).toBe('16px');
+  expect(m.items).toHaveLength(3);
+  expect(m.thumbs).toHaveLength(3);
+  for(const thumb of m.thumbs){
+    expect(thumb.width).toBe(68);
+    expect(thumb.height).toBe(68);
+  }
+  expect(m.first.height).toBeGreaterThanOrEqual(185.4);
+  expect(m.overflow).toBeLessThanOrEqual(1);
+  if(testInfo.project.name==='iphone-390'){
+    // Source audit: panel 514.9px; first item 185.5px at 390px.
+    // Tolerance accommodates fallback fonts and non-licensed placeholders.
+    expect(m.panel.height).toBeGreaterThan(490);
+    expect(m.panel.height).toBeLessThan(560);
+  }
+  await wishlist.scrollIntoViewIfNeeded();
+  await wishlist.screenshot({
+    path:testInfo.outputPath('section8-wishlist-expanded.png'),
+    animations:'disabled'
+  });
+  await trigger.click();
+  await expect(wishlist).toBeHidden();
+  const reclosedHeight=await gift.evaluate(el=>el.getBoundingClientRect().height);
+  expect(Math.abs(reclosedHeight-collapsedHeight)).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});
