@@ -29,7 +29,7 @@ After approving, reload the website to see the approved wish. Do not commit or s
 The **current repository is not attached to a dedicated live database or Vercel project**. Existing connected Supabase projects serve other applications and were left unchanged. A deployable Vercel API has been committed under \`api/\`, but it refuses to accept writes until you configure **a dedicated Supabase project**, apply \`database/rsvp_schema.sql\` and provide these Vercel server-only environment variables:
 
 - \`SUPABASE_URL\` — your new project's API URL
-- \`SUPABASE_SERVICE_ROLE_KEY\` — server-only credential; never expose in HTML/JS
+- \`SUPABASE_SECRET_KEY\` — server-only credential; never expose in HTML/JS
 - \`TURNSTILE_SECRET_KEY\` — server-side Cloudflare Turnstile secret
 - \`TURNSTILE_SITE_KEY\` — public Turnstile site key
 - \`ALLOWED_ORIGINS\` — comma-separated explicit HTTPS origins where your invitation is hosted
