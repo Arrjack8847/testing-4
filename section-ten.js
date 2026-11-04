@@ -17,12 +17,16 @@
     const baseY=inner.getBoundingClientRect().top;
     const viewing=ready();
     // Source activates elements when they reach roughly 85% of viewport height.
-    // The former 64px margin exposed the rule/contacts too early on 390px.
+    // Read all geometry before changing any attributes to avoid forced relayout
+    // between each reveal element on every scroll frame.
     const bottomGate=innerHeight*0.85;
-    for(const el of revealEls){
+    const visibility=revealEls.map(el=>{
       const top=baseY+el.offsetTop;
-      const exposed=viewing&&top+el.offsetHeight>0&&top<bottomGate;
-      el.dataset.inView=String(reduced.matches||exposed);
+      return reduced.matches||(viewing&&top+el.offsetHeight>0&&top<bottomGate);
+    });
+    for(let i=0;i<revealEls.length;i++){
+      const next=String(visibility[i]);
+      if(revealEls[i].dataset.inView!==next)revealEls[i].dataset.inView=next;
     }
   };
   const scheduleReveals=()=>{
