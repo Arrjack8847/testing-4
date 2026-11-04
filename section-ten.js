@@ -16,7 +16,9 @@
     revealRaf=0;
     const baseY=inner.getBoundingClientRect().top;
     const viewing=ready();
-    const bottomGate=innerHeight-64;
+    // Source activates elements when they reach roughly 85% of viewport height.
+    // The former 64px margin exposed the rule/contacts too early on 390px.
+    const bottomGate=innerHeight*0.85;
     for(const el of revealEls){
       const top=baseY+el.offsetTop;
       const exposed=viewing&&top+el.offsetHeight>0&&top<bottomGate;
