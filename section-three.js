@@ -106,6 +106,17 @@
   frameProbe.onerror = () => { section.dataset.referenceFrameSource = 'remote'; };
   frameProbe.src = './assets/reference-dev/arch_event.svg';
 
+  // Reuse the original white butterfly sprite for both 22px wing halves.
+  // Its animation is deliberately not guessed: the saved source capture
+  // confirms a transparent resting state but not the complete flight path.
+  const wingProbe = new Image();
+  wingProbe.onload = () => {
+    section.style.setProperty('--event-bfly-source', 'url("./assets/reference-dev/bfly_white.webp")');
+    section.dataset.referenceWingSource = 'local';
+  };
+  wingProbe.onerror = () => { section.dataset.referenceWingSource = 'remote'; };
+  wingProbe.src = './assets/reference-dev/bfly_white.webp';
+
   // Four-phone comparison mode: pin the illustrated plane within Events
   // while letting HTML cards, buttons and countdown scroll normally.
   // Camera shift is bounded and works forwards, backwards, or with JS
