@@ -56,9 +56,9 @@
     const loadPaper=()=>{
       if(!art)return;
       art.addEventListener('load',()=>{
-        if(art.naturalWidth>0)section.classList.add('s9-reference-loaded');
+        if(art.naturalWidth>0){section.classList.add('s9-reference-loaded');section.dataset.referenceArt='loaded';}
       },{once:true});
-      art.addEventListener('error',()=>{section.dataset.referenceArt='missing';},{once:true});
+      art.addEventListener('error',()=>{section.dataset.referenceArt='missing';if(localPreview)console.warn('Section 9 paper.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');},{once:true});
       art.src=paperUrl;
     };
     const loadButterfly=()=>{
@@ -71,6 +71,7 @@
       },{once:true});
       sprite.addEventListener('error',()=>{
         section.dataset.referenceButterfly='missing';
+        if(localPreview)console.warn('Section 9 bfly_1.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');
       },{once:true});
       sprite.src=butterflyUrl;
     };
@@ -81,14 +82,21 @@
     }else{
       // HEAD preflight means an absent file never replaces the CSS fallback
       // with a broken <img>. The server is local; no vendor URL is fetched.
-      const loadIfPresent=async(url,onPresent)=>{
+      const loadIfPresent=async(url,onPresent,kind)=>{
         try{
           const response=await fetch(url,{method:'HEAD',cache:'no-store'});
-          if(response.ok)onPresent();
-        }catch(_){/* Local server unavailable; CSS artwork remains visible. */}
+          if(response.ok || response.status===405){onPresent();return;}
+          if(kind==='paper')section.dataset.referenceArt='missing';
+          else section.dataset.referenceButterfly='missing';
+          console.warn('Section 9 '+kind+' is missing locally (HTTP '+response.status+'). Run ensure-section9-art.ps1.');
+        }catch(error){
+          if(kind==='paper')section.dataset.referenceArt='unavailable';
+          else section.dataset.referenceButterfly='unavailable';
+          console.warn('Section 9 '+kind+' could not be checked. Run start.ps1 again.',error);
+        }
       };
-      void loadIfPresent(paperUrl,loadPaper);
-      void loadIfPresent(butterflyUrl,loadButterfly);
+      void loadIfPresent(paperUrl,loadPaper,'paper');
+      void loadIfPresent(butterflyUrl,loadButterfly,'butterfly');
     }
   }
   const makeId=()=>{

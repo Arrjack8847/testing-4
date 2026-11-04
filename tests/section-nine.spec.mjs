@@ -171,6 +171,7 @@ test('Local reference mode loads split-wing sprite only with explicit opt-in',as
   const section=page.locator('#rsvp');
   await expect(section).toHaveClass(/s9-reference-loaded/);
   await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section).toHaveAttribute('data-reference-art','loaded');
   await expect(section).toHaveAttribute('data-reference-butterfly','loaded');
   const wing=section.locator('.s9-wing-left');
   const style=await wing.evaluate(el=>({image:getComputedStyle(el).backgroundImage,
@@ -191,6 +192,19 @@ test('Plain localhost root automatically loads locally staged paper and butterfl
   await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
   expect(new URL(page.url()).searchParams.has('section9Reference')).toBe(false);
   await page.goto('/?section9Reference=0');
+  await expect(section).not.toHaveClass(/s9-reference-loaded/);
+  await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
+});
+
+test('Missing original Section 9 files report diagnostics rather than silently vanishing',async({page})=>{
+  await page.route('**/assets/reference-dev/section9/*.webp',route=>route.fulfill({
+    status:404,contentType:'text/plain',body:'Not found'
+  }));
+  await page.goto('/');
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveAttribute('data-reference-art','missing');
+  await expect(section).toHaveAttribute('data-reference-butterfly','missing');
   await expect(section).not.toHaveClass(/s9-reference-loaded/);
   await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
   await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');

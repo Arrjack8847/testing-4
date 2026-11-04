@@ -29,6 +29,13 @@ if ($stillMissing.Count -gt 0) {
   throw "Artwork incomplete after download: $($stillMissing -join ', ')"
 }
 
+# Section 9 uses two additional original WebPs that are intentionally excluded
+# from GitHub. Recover them in this local working folder before starting.
+$section9Bootstrap = Join-Path $PSScriptRoot 'ensure-section9-art.ps1'
+if (Test-Path -LiteralPath $section9Bootstrap) {
+  & $section9Bootstrap
+}
+
 $py = Get-Command py -ErrorAction SilentlyContinue
 if ($null -ne $py) {
   Write-Host 'Visit http://localhost:8000 (or http://localhost:8000/?debug=1).' -ForegroundColor Green
