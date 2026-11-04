@@ -553,3 +553,18 @@
     flex-wrap: wrap;
   }
 }
+
+
+/* Source geometry checkpoints from four-viewport audit 41786898384:
+   At 430px, the Send Gift button was 51.6px too low; the expanded
+   wishlist top was 12.2px too high. Other widths' button positions
+   already matched within ~1px and must not move. This only changes
+   large-phone anchoring; the 430px closed section min-height stays 923px. */
+@media(min-width:415px) {
+  .gift-eight-send {
+    margin-top: 21px; /* 73px - 52px, align source CTA Y 308.4 */
+  }
+  .gift-eight-wishlist:not([hidden]) {
+    margin-top: 98px; /* restore source wishlist Y ~667.6 */
+  }
+}
