@@ -10,7 +10,7 @@ function response(){
     end(v){this.body=JSON.parse(v||'{}');}};
 }
 test('unconfigured public API refuses to claim a saved RSVP',async()=>{
-  const names=['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','ALLOWED_ORIGINS'];
+  const names=['SUPABASE_URL','SUPABASE_SECRET_KEY','TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','ALLOWED_ORIGINS'];
   const original=Object.fromEntries(names.map(n=>[n,process.env[n]]));
   try{
     for(const n of names)delete process.env[n];
