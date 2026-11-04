@@ -3,14 +3,28 @@
 // only inside the runner's Git-ignored developer preview directory.
 import {chromium} from '@playwright/test';
 import {mkdir,writeFile} from 'node:fs/promises';
-import {spawn} from 'node:child_process';
+import {spawn,spawnSync} from 'node:child_process';
 const SOURCE='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en';
 const LOCAL='http://127.0.0.1:8000';
 const OUT='section10-motion-evidence';
 await mkdir(OUT,{recursive:true});
-// Use the Windows Python launcher locally and python3 on GitHub Actions/Linux.
-const python=process.platform==='win32'?'py':'python3';
-const server=spawn(python,['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
+// Always use the project's real localhost:8000 server, including its RSVP
+// routes. The generic http.server can produce misleading screenshots and 404s.
+// Resolve Windows' py.exe launcher to python.exe so server.kill stops the child.
+const resolvePython=()=>{
+  if(process.platform!=='win32')return 'python3';
+  for(const executable of ['py','python']){
+    const probe=spawnSync(executable,['-c','import sys;print(sys.executable)'],
+      {encoding:'utf8',timeout:10000});
+    const resolved=probe.stdout?.trim().split(/\r?\n/).at(-1);
+    if(probe.status===0&&resolved)return resolved;
+  }
+  throw new Error('Python interpreter not found');
+};
+const portInUse=await fetch(LOCAL,{signal:AbortSignal.timeout(2000)})
+  .then(()=>true,()=>false);
+if(portInUse)throw new Error('Port 8000 is already in use. Stop the other preview before running Section 10 comparison.');
+const server=spawn(resolvePython(),['-B','tools/dev-server.py'],{stdio:'ignore'});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const spec={
   source:{section:'.cgv-closing',frame:'.cgv-closing .cgv-tframe',
