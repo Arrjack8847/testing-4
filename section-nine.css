@@ -69,8 +69,10 @@
 .s9-preview dt{font-weight:600}.s9-preview dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .s9-preview button{margin-top:12px;min-height:44px;border:1px solid #ad90a8;background:white;color:#5a3952;border-radius:2px}
 .s9-rsvp :is(input,select,textarea,button):focus-visible{outline:3px solid #925c8e;outline-offset:3px}
-.s9-butterfly{position:absolute;z-index:1;top:43%;right:11%;width:52px;height:41px;opacity:.68;pointer-events:none;
-  animation:s9-flight 14s ease-in-out infinite alternate;animation-play-state:paused}
+/* Source audit: butterfly travels right-to-left about 80px above the Section 9
+   bottom, at ~33–34px/s. Source wing sprite is 52×41 and rotated ~-90°. */
+.s9-butterfly{position:absolute;z-index:1;left:0;top:calc(100% - 80px);width:52px;height:41px;opacity:0;pointer-events:none;
+  transform-origin:center center;animation:s9-flight 16s linear 1.5s infinite;animation-play-state:paused}
 .s9-wing{position:absolute;top:3px;width:27px;height:34px;
   background:radial-gradient(ellipse at 60% 40%,#f4eaf7 8%,#b49bbd 57%,#816b9b 92%);
   border-radius:83% 11% 75% 21%;filter:drop-shadow(0 1px 1px #8f7fa9)}
@@ -109,11 +111,24 @@
 .s9-rsvp.s9-reveal-ready .s9-wish:nth-child(2){transition-delay:.08s}
 .s9-rsvp.s9-reveal-ready .s9-wish:nth-child(3){transition-delay:.16s}
 .s9-rsvp.s9-reveal-ready .s9-form{transition-delay:.2s}
-@keyframes s9-flight{from{transform:translate3d(32px,30px,0) rotate(-16deg)}to{transform:translate3d(-220px,-60px,0) rotate(12deg)}}
+/* Approximate the source's JavaScript-driven coordinates from timed read-only Chromium
+   samples, with no third-party animation logic copied. Width is viewport-relative. */
+@keyframes s9-flight{
+  0%{opacity:0;transform:translate3d(calc(100vw + 56px),24px,0) rotate(-80deg) scale(.82)}
+  10%{opacity:1;transform:translate3d(calc(100vw + 2px),18px,0) rotate(-62deg) scale(.82)}
+  20%{opacity:1;transform:translate3d(calc(100vw - 53px),0px,0) rotate(-90deg) scale(.82)}
+  30%{opacity:1;transform:translate3d(calc(100vw - 107px),-3px,0) rotate(-98deg) scale(.82)}
+  45%{opacity:1;transform:translate3d(calc(100vw - 189px),-12px,0) rotate(-63deg) scale(.82)}
+  60%{opacity:1;transform:translate3d(calc(100vw - 270px),-10px,0) rotate(-98deg) scale(.82)}
+  70%{opacity:1;transform:translate3d(calc(100vw - 325px),-7px,0) rotate(-70deg) scale(.82)}
+  85%{opacity:1;transform:translate3d(calc(100vw - 406px),-1px,0) rotate(-106deg) scale(.82)}
+  100%{opacity:0;transform:translate3d(calc(100vw - 488px),-5px,0) rotate(-80deg) scale(.82)}
+}
 @keyframes s9-flap-left{from{transform:rotateY(10deg)}to{transform:rotateY(74deg)}}
 @keyframes s9-flap-right{from{transform:scaleX(-1) rotateY(10deg)}to{transform:scaleX(-1) rotateY(74deg)}}
 @media(max-width:350px){.s9-rsvp{padding-inline:20px}.s9-row2{gap:10px}.s9-eyebrow{letter-spacing:4px}.s9-heading{font-size:48px}}
 @media(prefers-reduced-motion:reduce){
  .s9-rsvp .s9-butterfly,.s9-rsvp .s9-wing{animation:none!important}
+ .s9-rsvp .s9-butterfly{opacity:0!important}
  .s9-rsvp.s9-reveal-ready .s9-reveal{opacity:1!important;transform:none!important;transition:none!important}
 }
