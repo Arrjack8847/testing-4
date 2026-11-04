@@ -1,7 +1,7 @@
 /* Section 9 only. Independent styles calibrated from public 390x844 reference DOM.
    Source WebP is NOT bundled; only optional, local permission-controlled comparison. */
 .s9-rsvp{--s9-bg:#faf7fb;position:relative;z-index:2;isolation:isolate;overflow:hidden;box-sizing:border-box;
-  width:100%;min-height:1215.9px;padding:96px 28px;color:#4a2a45;background:var(--s9-bg);
+  width:100%;min-height:1215.9px;padding:96px 28px 60px;color:#4a2a45;background:var(--s9-bg);
   text-align:center;font:400 18px/1.65 'EB Garamond',Georgia,serif}
 .s9-rsvp *{box-sizing:border-box}
 .s9-art{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
