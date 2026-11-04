@@ -70,6 +70,14 @@ try{
         const select=(re)=>leaves.find(el=>re.test((el.textContent||'').trim()));
         const images=[...root?.querySelectorAll('img,svg,canvas')||[]].map(el=>({...f(el),src:el.currentSrc||el.src||'',natural:el.tagName==='IMG'?[el.naturalWidth,el.naturalHeight]:null}));
         const sampleElements=['input','select','textarea','button','form'].map(s=>({selector:s,items:[...root?.querySelectorAll(s)||[]].slice(0,8).map(f)}));
+        const bfLayer=root?.querySelector('.cgv-bf-layer');
+        const bfBody=root?.querySelector('.cgv-bf');
+        const wings=[...root?.querySelectorAll('.cgv-bf-w')||[]];
+        const anim=el=>el?[...el.getAnimations()].map(a=>({name:a.animationName||'',timing:a.effect?.getTiming?.(),
+           keyframes:a.effect?.getKeyframes?.()?.slice(0,20)})):[];
+        const butterfly={layer:f(bfLayer),body:f(bfBody),wings:wings.map(f),
+          animations:{layer:anim(bfLayer),body:anim(bfBody),wings:wings.map(anim)}};
+        const paper=f(root?.querySelector('.cgv-section-bg img'));
         const sectionNodes=[...document.querySelectorAll('section')];
         const idx=sectionNodes.indexOf(root);
         return {scrollY:+scrollY.toFixed(1),viewport:[innerWidth,innerHeight],overflow:document.documentElement.scrollWidth-innerWidth,
@@ -77,12 +85,12 @@ try{
           deadline:f(select(/Kindly respond by/i)),formTitle:f(select(/RSVP\s*&\s*Wishes/i)),nameLabel:f(select(/Your name/i)),
           attendanceLabel:f(select(/^Attendance$/i)),guestsLabel:f(select(/^Guests$/i)),wishLabel:f(select(/Your wish for the couple/i)),
           firstWish:f(select(/So proud of you both/i)),wishesNote:f(select(/Wishes appear on the wall/i)),
-          images,formElements:sampleElements,
+          images,formElements:sampleElements,paper,butterfly,
           animated:[...root?.querySelectorAll('*')||[]].map(el=>({e:el,c:getComputedStyle(el)})).filter(x=>x.c.animationName!=='none').slice(0,30).map(({e,c})=>({tag:e.tagName,className:typeof e.className==='string'?e.className.slice(0,70):'',animation:c.animationName,duration:c.animationDuration,transform:c.transform})),
           htmlHead:(root?.innerText||'').slice(0,1800)};
       });
       evidence.samples.push({checkpoint:label,tSeconds:delay/1000,metrics:sample});
-      console.log('S9_SAMPLE '+JSON.stringify({checkpoint:label,t:delay/1000,scroll:sample.scrollY,heading:sample.heading,section:sample.section,previous:sample.previous,next:sample.next,deadline:sample.deadline,name:sample.nameLabel,attendance:sample.attendanceLabel,guests:sample.guestsLabel,wish:sample.wishLabel,imgs:sample.images.map(i=>({src:i.src,rect:i.rect})),animated:sample.animated,overflow:sample.overflow}));
+      console.log('S9_SAMPLE '+JSON.stringify({checkpoint:label,t:delay/1000,scroll:sample.scrollY,heading:sample.heading,section:sample.section,previous:sample.previous,next:sample.next,deadline:sample.deadline,name:sample.nameLabel,attendance:sample.attendanceLabel,guests:sample.guestsLabel,wish:sample.wishLabel,imgs:sample.images.map(i=>({src:i.src,rect:i.rect})),paper:sample.paper,butterfly:sample.butterfly,animated:sample.animated,overflow:sample.overflow}));
       await snap('reference-'+label+'-'+delay);
     }
   };
