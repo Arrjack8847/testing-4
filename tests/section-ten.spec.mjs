@@ -22,7 +22,8 @@ test('Section 10 stays last, content matches reference, and never pretends conta
   await expect(closing).toHaveAttribute('aria-hidden','false');
   await expect(closing).toHaveJSProperty('inert',false);
   await expect(closing).toHaveAttribute('data-section','10');
-  await expect(closing).toHaveAttribute('data-artwork','original');
+  await expect(closing).toHaveAttribute('data-artwork','local-reference');
+  await expect(closing.locator('.closing10-source-scene')).toHaveJSProperty('naturalWidth',1080);
   await expect(closing.locator('h2')).toHaveText('Until we meet');
   await expect(closing.locator('.closing10-message')).toHaveText(
     'It would be the greatest honour of our lives to have you beside us as two families become one. Thank you — for every prayer, every wish, and every mile travelled.'
@@ -122,7 +123,7 @@ test('Section 10 uses the locally staged reference scene when the WebP endpoint 
   // Use an original SVG fixture served at the same local path; do not upload
   // or copy any third-party vendor image into GitHub Actions.
   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#d7c1dd"/></svg>';
-  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+  await page.route('**/assets/section10/scene.webp',route=>route.fulfill({
     status:200,contentType:'image/svg+xml',body:svg
   }));
   await page.goto('/');
@@ -300,7 +301,7 @@ test('Section 10 CSS matches measured reference stagger and duration',async({pag
 test('Section 10 artwork camera pins through the Section 9 seam and reverses at four widths',async({page})=>{
   // This is a neutral local fixture. Third-party WebPs are never committed to QA.
   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#d7c1dd"/></svg>';
-  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+  await page.route('**/assets/section10/scene.webp',route=>route.fulfill({
     status:200,contentType:'image/svg+xml',body:svg
   }));
   await openInvitation(page);
@@ -345,7 +346,7 @@ test('Section 10 artwork camera pins through the Section 9 seam and reverses at 
 test('Section 9→10 visual seam has no blank frame, overlap, or camera jump on reversal',async({page},testInfo)=>{
   // Isolated original 1080×1920 fixture, never distributes vendor artwork.
   const sceneFixture='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#ddd0e7"/><circle cx="540" cy="900" r="280" fill="#9c8cbd"/></svg>';
-  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+  await page.route('**/assets/section10/scene.webp',route=>route.fulfill({
     status:200,contentType:'image/svg+xml',body:sceneFixture
   }));
   const errors=await openInvitation(page);
@@ -430,7 +431,7 @@ test('Section 10 reveal state does not thrash DOM on stationary scroll frames',a
 
 test('Section 10 staged scene follows measured camera drift and stops under Reduced Motion',async({page},testInfo)=>{
   const fixture='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#d7c1dd"/></svg>';
-  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+  await page.route('**/assets/section10/scene.webp',route=>route.fulfill({
     status:200,contentType:'image/svg+xml',body:fixture
   }));
   await openInvitation(page);
@@ -464,4 +465,20 @@ test('Section 10 staged scene follows measured camera drift and stops under Redu
   await page.emulateMedia({reducedMotion:'reduce'});
   await expect(closing).not.toHaveAttribute('data-motion-ready');
   await expect.poll(()=>scene.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+});
+
+test('Section 10 approved production artwork loads at the ordinary URL and degrades safely',async({page})=>{
+  await page.goto('/');
+  const scene=page.locator('#closingMessage .closing10-source-scene');
+  const section=page.locator('#closingMessage');
+  await expect(section).toHaveAttribute('data-artwork','local-reference');
+  await expect(scene).toHaveJSProperty('naturalWidth',1080);
+  const response=await page.request.get('/assets/section10/scene.webp');
+  expect(response.ok()).toBe(true);
+  expect(response.headers()['content-type']).toContain('image/webp');
+  await page.route('**/assets/section10/scene.webp',route=>route.abort());
+  await page.reload();
+  await expect(section).toHaveAttribute('data-artwork','original');
+  await page.getByRole('button',{name:'Open Invitation',exact:true}).click();
+  await expect(section.locator('#closingHeading')).toHaveText('Until we meet');
 });

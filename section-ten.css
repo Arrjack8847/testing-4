@@ -42,7 +42,7 @@
    transparent strips, without scaling or distorting the moving artwork. */
 .section-ten[data-artwork="local-reference"] .closing10-sticky-art::before {
   content:"";position:absolute;inset:0;pointer-events:none;
-  background:url('./assets/reference-dev/scene.webp') center/cover no-repeat;
+  background:url('./assets/section10/scene.webp') center/cover no-repeat;
 }
 .section-ten .closing10-source-scene {
   display:none;position:absolute;inset:0;width:100%;height:100%;
