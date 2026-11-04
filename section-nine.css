@@ -34,18 +34,18 @@
   transform-origin:center;animation:s9-petal-drift var(--s9-duration,11s) linear
     var(--s9-delay,0s) infinite;animation-play-state:paused;
 }
-.s9-petals i:nth-child(1){--s9-x:12%;--s9-w:9px;--s9-duration:10.8s;--s9-delay:-6.1s;--s9-sway:52px}
-.s9-petals i:nth-child(2){--s9-x:31%;--s9-w:7px;--s9-duration:13.2s;--s9-delay:-2.6s;--s9-sway:-44px}
-.s9-petals i:nth-child(3){--s9-x:64%;--s9-w:12px;--s9-duration:12.4s;--s9-delay:-7.8s;--s9-sway:38px}
-.s9-petals i:nth-child(4){--s9-x:84%;--s9-w:8px;--s9-duration:11.7s;--s9-delay:-3.9s;--s9-sway:-70px}
-.s9-petals i:nth-child(5){--s9-x:48%;--s9-w:6px;--s9-duration:14s;--s9-delay:-9.3s;--s9-sway:65px}
-.s9-petals i:nth-child(6){--s9-x:75%;--s9-w:10px;--s9-duration:12.9s;--s9-delay:-11s;--s9-sway:-48px}
-.s9-petals i:nth-child(7){--s9-x:23%;--s9-w:8px;--s9-duration:15.5s;--s9-delay:-12s;--s9-sway:34px}
-.s9-petals i:nth-child(8){--s9-x:92%;--s9-w:7px;--s9-duration:13.7s;--s9-delay:-5s;--s9-sway:-56px}
+.s9-petals i:nth-child(1){--s9-x:12%;--s9-w:9px;--s9-duration:10.8s;--s9-delay:-6.1s;--s9-sway:52px;--s9-half:26px}
+.s9-petals i:nth-child(2){--s9-x:31%;--s9-w:7px;--s9-duration:13.2s;--s9-delay:-2.6s;--s9-sway:-44px;--s9-half:-22px}
+.s9-petals i:nth-child(3){--s9-x:64%;--s9-w:12px;--s9-duration:12.4s;--s9-delay:-7.8s;--s9-sway:38px;--s9-half:19px}
+.s9-petals i:nth-child(4){--s9-x:84%;--s9-w:8px;--s9-duration:11.7s;--s9-delay:-3.9s;--s9-sway:-70px;--s9-half:-35px}
+.s9-petals i:nth-child(5){--s9-x:48%;--s9-w:6px;--s9-duration:14s;--s9-delay:-9.3s;--s9-sway:65px;--s9-half:32px}
+.s9-petals i:nth-child(6){--s9-x:75%;--s9-w:10px;--s9-duration:12.9s;--s9-delay:-11s;--s9-sway:-48px;--s9-half:-24px}
+.s9-petals i:nth-child(7){--s9-x:23%;--s9-w:8px;--s9-duration:15.5s;--s9-delay:-12s;--s9-sway:34px;--s9-half:17px}
+.s9-petals i:nth-child(8){--s9-x:92%;--s9-w:7px;--s9-duration:13.7s;--s9-delay:-5s;--s9-sway:-56px;--s9-half:-28px}
 @keyframes s9-petal-drift{
   0%{opacity:0;transform:translate3d(0,-25px,0) rotate(0deg)}
   9%{opacity:.58}
-  48%{opacity:.52;transform:translate3d(calc(var(--s9-sway,45px) / 2),620px,0) rotate(135deg)}
+  48%{opacity:.52;transform:translate3d(var(--s9-half,22px),620px,0) rotate(135deg)}
   90%{opacity:.36}
   100%{opacity:0;transform:translate3d(var(--s9-sway,45px),1280px,0) rotate(305deg)}
 }
