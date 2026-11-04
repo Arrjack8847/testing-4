@@ -99,6 +99,12 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(exact.buttonBg).toBe('rgb(123, 61, 110)');
     expect(exact.buttonRadius).toBe('999px');
     expect(exact.wishRadius).toBe('14px');
+    const flight=await section.locator('.s9-butterfly').evaluate(el=>({
+      top:parseFloat(getComputedStyle(el).top),
+      duration:getComputedStyle(el).animationDuration
+    }));
+    expect(Math.abs(flight.top-(m.section.height-80))).toBeLessThan(2);
+    expect(flight.duration).toBe('16s');
     expect(Math.abs(exact.wall.y-756.88)).toBeLessThan(4);
     const measured=await page.evaluate(()=>{const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;const r=e.getBoundingClientRect(),b=document.querySelector('#rsvp').getBoundingClientRect();return {x:+r.x.toFixed(1),y:+(r.y-b.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};}; return ({
       eyebrow:rect('#rsvp .s9-eyebrow'),heading:rect('#rsvpHeading'),
