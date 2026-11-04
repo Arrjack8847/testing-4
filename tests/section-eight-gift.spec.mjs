@@ -514,3 +514,19 @@ test('Published wishlist icons use original assets and preserve local authorized
   }
   expect(faults).toEqual([]);
 });
+
+
+test('Original plum botanical fallback uses self-contained relief artwork',async({page})=>{
+  const {gift,faults}=await openGift(page);
+  const response=await page.request.get('/assets/section8-plum-botanical-original.svg');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('image/svg+xml');
+  const svg=await response.text();
+  expect(svg).toContain('id="velvetNoise"');
+  expect(svg).toContain('id="relief"');
+  expect(svg).toContain('feTurbulence');
+  expect(svg).not.toMatch(/https?:\/\//i);
+  const source=await gift.locator('.gift-eight-art').evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(source).toContain('section8-plum-botanical-original.svg');
+  expect(faults).toEqual([]);
+});

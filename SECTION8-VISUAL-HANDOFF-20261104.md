@@ -115,3 +115,13 @@ The authorized local reference image still overrides the fallback for
 comparison. The new test checks default loading, animation visibility,
 local-only request behavior and Reduced Motion protection. This is a
 design substitute, **not** a verified frame-identical source butterfly.
+
+## Original plum background texture refinement
+
+The independently drawn SVG background now includes static velvet-like grain,
+darker tint and subtly shadowed botanical fronds/blooms using standard SVG
+filters. The change does not affect Section 8's dimensions or the title/CTA,
+and avoids third-party image redistribution. Source artwork remains
+materially different; a vendor image may still be used **only for authorized
+local comparisons** and only when the local file is present. Current-head
+browser performance and screenshots must still be checked before merge.
