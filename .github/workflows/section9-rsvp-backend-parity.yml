@@ -11,6 +11,7 @@ on:
       - tools/section9-frame-parity.mjs
       - tools/section9-frame-stats.py
       - tools/section9-butterfly-trajectory.py
+      - tests/test_section9_butterfly_audit.py
       - .github/workflows/section9-rsvp-backend-parity.yml
   pull_request:
     paths:
@@ -26,6 +27,7 @@ on:
       - tools/section9-frame-parity.mjs
       - tools/section9-frame-stats.py
       - tools/section9-butterfly-trajectory.py
+      - tests/test_section9_butterfly_audit.py
       - .github/workflows/section9-rsvp-backend-parity.yml
   workflow_dispatch:
 permissions:
@@ -84,6 +86,8 @@ jobs:
               (out/name).write_bytes(data)
           print('Staged 2 WebP files in Git-ignored research-only folder')
           PY
+      - name: Regression-test visible butterfly time windows and wrap rejection
+        run: python3 -m unittest discover -s tests -p 'test_section9_butterfly_audit.py' -v
       - name: Capture 21 paired animation frames
         run: |
           python3 tools/dev-server.py >/tmp/s9-local-server.log 2>&1 &
