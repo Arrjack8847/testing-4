@@ -13,6 +13,18 @@
     };
     art.src='./assets/reference-dev/band_plum.webp';
   }
+  // The blush wing image is separate from the plum background.
+  // Load local authorized artwork for visual QA; never hotlink the vendor.
+  if(local){
+    const butterfly=new Image();
+    butterfly.onload=()=>{
+      if(butterfly.naturalWidth>0&&butterfly.naturalHeight>0)
+        section.dataset.giftButterfly='reference-local';
+    };
+    butterfly.onerror=()=>{section.dataset.giftButterfly='unavailable';};
+    butterfly.src='./assets/reference-dev/bfly_blush.webp';
+  }
+
   function syncAccess(){
     const closed=invitation.dataset.state!=='opened';
     section.inert=closed;
