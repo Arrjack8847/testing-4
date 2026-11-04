@@ -1,0 +1,103 @@
+// Read-only source/local Section 10 reveal-and-reverse study at 390x844.
+// No source artwork is committed: the workflow stages the already uploaded WebP
+// only inside the runner's Git-ignored developer preview directory.
+import {chromium} from '@playwright/test';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+const SOURCE='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en';
+const LOCAL='http://127.0.0.1:8000';
+const OUT='section10-motion-evidence';
+await mkdir(OUT,{recursive:true});
+const server=spawn('python3',['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
+const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const spec={
+  source:{section:'.cgv-closing',frame:'.cgv-closing .cgv-tframe',
+    heading:'.cgv-closing .cgv-eyebrow',message:'.cgv-closing .cgv-lead',
+    rule:'.cgv-closing .cgv-rule',signoff:'.cgv-closing .cgv-eyebrow.cgv-d2',
+    names:'.cgv-closing .cgv-closing-names',
+    contacts:'.cgv-closing .cgv-contacts',footer:'.cgv-closing .cgv-foot'},
+  local:{section:'#closingMessage',frame:'#closingMessage .closing10-frame',
+    heading:'#closingHeading',message:'#closingMessage .closing10-message',
+    rule:'#closingMessage .closing10-rule',signoff:'#closingMessage .closing10-signoff',
+    names:'#closingMessage .closing10-names',
+    contacts:'#closingMessage .closing10-contacts',footer:'#closingMessage .closing10-credit'}
+};
+const deltas=[-650,-370,-170,-30,80,180,265,180,80,-30,-170,-370,-650];
+const delays=[100,550,1400];
+const reports={checkedAt:new Date().toISOString(),viewport:'390x844',deltas,delays};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+try {
+  let ok=false;
+  for(let i=0;i<45;i++){
+    try{const r=await fetch(LOCAL); if(r.ok){ok=true;break;}}catch{}
+    await wait(200);
+  }
+  if(!ok)throw Error('Local preview server did not start');
+  for(const [kind,url] of [['source',SOURCE],['local',LOCAL]]) {
+    const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,reducedMotion:'no-preference'});
+    const page=await context.newPage();
+    try{
+      const errors=[];page.on('pageerror',e=>errors.push(e.message));
+      const response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:70000});
+      await wait(kind==='source'?3500:350);
+      const open=page.getByRole('button',{name:'Open Invitation',exact:true});
+      if(await open.count())await open.first().click({timeout:12000});
+      await page.evaluate(()=>document.fonts.ready);
+      if(kind==='local') await page.waitForFunction(()=>document.querySelector('#closingMessage')?.dataset.artwork==='local-reference');
+      await wait(kind==='source'?2200:800);
+      await page.evaluate(()=>{
+        document.documentElement.style.scrollBehavior='auto';
+        window.scrollTo({top:0,behavior:'instant'});
+      });
+      await wait(300);
+      const samples=[];
+      for(let idx=0;idx<deltas.length;idx++){
+        const delta=deltas[idx];
+        const meta=await page.evaluate(({sel,delta})=>{
+          const el=document.querySelector(sel);
+          if(!el)throw Error('Closing section missing: '+sel);
+          const top=el.getBoundingClientRect().top+scrollY;
+          const max=document.documentElement.scrollHeight-innerHeight;
+          const target=Math.max(0,Math.min(max,top+delta));
+          window.scrollTo({top:target,behavior:'instant'});
+          return {top,max,target};
+        },{sel:spec[kind].section,delta});
+        let prev=0;
+        for(const ms of delays){
+          await wait(ms-prev);prev=ms;
+          const obs=await page.evaluate(sel=>{
+            const all={};
+            for(const [key,q] of Object.entries(sel)){
+              const el=document.querySelector(q);
+              if(!el){all[key]=null;continue;}
+              const cs=getComputedStyle(el),r=el.getBoundingClientRect();
+              all[key]={cls:el.className,opacity:+cs.opacity,
+                transform:cs.transform,y:+r.y.toFixed(2),h:+r.height.toFixed(2),
+                inViewport:r.bottom>0&&r.top<innerHeight,
+                transition:cs.transitionDuration,
+                activeAnimations:el.getAnimations().filter(a=>a.playState==='running').length};
+            }
+            return {scrollY:window.scrollY,style:all};
+          },spec[kind]);
+          samples.push({index:idx,delta,elapsed:ms,meta,...obs});
+          if([3,4,6,8,10,12].includes(idx)&&[100,1400].includes(ms)){
+            await page.screenshot({path:OUT+'/'+kind+'-'+String(idx).padStart(2,'0')+'-'+ms+'ms.png',animations:'allow'});
+          }
+        }
+      }
+      reports[kind]={url,httpStatus:response?.status(),errors,samples};
+      console.log('SECTION10_MOTION_'+kind.toUpperCase()+' '+JSON.stringify(samples.map(s=>({
+        n:s.index,d:s.delta,t:s.elapsed,scrollY:s.scrollY,
+        h:[s.style.heading?.opacity,s.style.heading?.transform,s.style.heading?.cls],
+        c:[s.style.contacts?.opacity,s.style.contacts?.transform,s.style.contacts?.cls],
+        f:[s.style.footer?.opacity,s.style.footer?.transform,s.style.footer?.cls]
+      }))));
+    }finally{await context.close();}
+  }
+  if(!reports.source?.samples.length || !reports.local?.samples.length)throw Error('Motion samples incomplete');
+}catch(e){
+  reports.error=String(e);console.log('SECTION10_MOTION_AUDIT_ERROR '+String(e));process.exitCode=1;
+}finally{
+  await writeFile(OUT+'/motion.json',JSON.stringify(reports,null,2));
+  await browser.close();server.kill('SIGTERM');
+}
