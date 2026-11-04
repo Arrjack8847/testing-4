@@ -1,0 +1,60 @@
+name: All-section animation and transition QA
+
+on:
+  pull_request:
+    paths:
+      - tests/all-section-motion.spec.mjs
+      - .github/workflows/all-sections-motion-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  motion:
+    name: Motion transitions (${{ matrix.project }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [small-phone, android-360, iphone-390, large-phone]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium test dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Stage temporary reference art in test runner only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',
+            Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          root='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'
+          for name in names:
+              data=urlopen(Request(root+name,headers={'User-Agent':'Mozilla/5.0'}),
+                timeout=40).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP',name
+              Path('assets',name).write_bytes(data)
+          print('Temporary motion-test artwork staged; never committed.')
+          PY
+      - name: Forward and reverse scroll animation checks
+        run: npx playwright test tests/all-section-motion.spec.mjs --project=${{ matrix.project }} --workers=1
+      - name: Upload motion screenshots and camera measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-transitions-${{ matrix.project }}
+          path: |
+            test-results/**/*motion*.png
+            test-results/**/*motion*.json
+          if-no-files-found: warn
+          retention-days: 7
