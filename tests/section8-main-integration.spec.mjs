@@ -1,6 +1,10 @@
 import {test,expect} from '@playwright/test';
 // Protect the merged Gallery, Section 9 RSVP API and Section 10 from Section 8 integration.
 test('new Section 8 replaces placeholder while preserving Gallery, RSVP and closing',async({page})=>{
+  // The global scene's parallax and reveal animation can keep an offscreen
+  // button moving during an automatic scroll on taller phone viewports.
+  // Verify click semantics with motion disabled; motion has separate tests.
+  await page.emulateMedia({reducedMotion:'reduce'});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
   const gift=page.locator('#weddingGift');
@@ -31,6 +35,11 @@ test('new Section 8 replaces placeholder while preserving Gallery, RSVP and clos
   await expect(gift).toHaveAttribute('aria-hidden','false');
   const btn=gift.getByRole('button',{name:/Send Gift/});
   await expect(btn).toHaveAttribute('aria-expanded','false');
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('weddingGift').scrollIntoView({behavior:'instant',block:'start'});
+  });
+  await expect(btn).toBeInViewport();
   await btn.click();
   await expect(btn).toHaveAttribute('aria-expanded','true');
   await expect(gift.locator('#giftEightBanks')).toBeVisible();
