@@ -13,7 +13,12 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
-from dev_server import DevelopmentHandler, database
+import importlib.util
+spec=importlib.util.spec_from_file_location("rsvp_dev_server",ROOT/"tools"/"dev-server.py")
+server_module=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(server_module)
+DevelopmentHandler=server_module.DevelopmentHandler
+database=server_module.database
 
 class RSVPTests(unittest.TestCase):
     @classmethod
