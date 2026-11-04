@@ -483,3 +483,64 @@ test('Section 7 integration preserves Wedding Gift, RSVP and closing order from 
   expect(sections.galleryNumber).toBe('7');
   expect(sections.giftHeading).toMatch(/Wedding Gift/i);
 });
+
+
+test('Gallery five-photo viewer supports swipe navigation and fits mobile widths',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.route('**/assets/gallery/reference/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:testImage}));
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=1');
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
+  const groom=gallery.locator('[data-gallery-slot="2"]');
+  await groom.click();
+  const dialog=page.getByRole('dialog',{name:'Wedding photo viewer'});
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('#galleryPosition')).toHaveText('3 / 5');
+  await expect(page.locator('#galleryViewCaption')).toHaveText('The Groom');
+  const bounds=await dialog.evaluate(el=>{
+    const box=el.getBoundingClientRect();
+    const close=el.querySelector('.gallery-viewer-close').getBoundingClientRect();
+    const nav=[...el.querySelectorAll('.gallery-viewer-navigation button')].map(x=>x.getBoundingClientRect());
+    const img=el.querySelector('#galleryViewImage').getBoundingClientRect();
+    return {
+      box:{x:box.x,y:box.y,right:box.right,bottom:box.bottom},
+      close:[close.width,close.height],nav:nav.map(r=>[r.width,r.height]),
+      img:{x:img.x,right:img.right,y:img.y,bottom:img.bottom},
+      viewport:[innerWidth,innerHeight]
+    };
+  });
+  expect(bounds.box.x).toBeGreaterThanOrEqual(-1);
+  expect(bounds.box.right).toBeLessThanOrEqual(bounds.viewport[0]+1);
+  expect(bounds.box.y).toBeGreaterThanOrEqual(-1);
+  expect(bounds.box.bottom).toBeLessThanOrEqual(bounds.viewport[1]+1);
+  expect(bounds.close[0]).toBeGreaterThanOrEqual(44);
+  expect(bounds.close[1]).toBeGreaterThanOrEqual(44);
+  for(const [w,h] of bounds.nav){
+    expect(w).toBeGreaterThanOrEqual(44);
+    expect(h).toBeGreaterThanOrEqual(44);
+  }
+  expect(bounds.img.x).toBeGreaterThanOrEqual(bounds.box.x-1);
+  expect(bounds.img.right).toBeLessThanOrEqual(bounds.box.right+1);
+
+  // User-facing mobile swipe behavior, not merely keyboard arrows.
+  const swipe=async(direction)=>{
+    await dialog.evaluate((d)=>{
+      const start=d<0?240:100,end=d<0?90:250;
+      const startTouch=new Touch({identifier:1,target:document.getElementById('galleryDialog'),clientX:start,clientY:360});
+      const endTouch=new Touch({identifier:1,target:document.getElementById('galleryDialog'),clientX:end,clientY:360});
+      const node=document.getElementById('galleryDialog');
+      node.dispatchEvent(new TouchEvent('touchstart',{bubbles:true,touches:[startTouch],changedTouches:[startTouch]}));
+      node.dispatchEvent(new TouchEvent('touchend',{bubbles:true,touches:[],changedTouches:[endTouch]}));
+    },direction);
+  };
+  await swipe(-1);
+  await expect(page.locator('#galleryPosition')).toHaveText('4 / 5');
+  await expect(page.locator('#galleryViewCaption')).toHaveText('The Garden');
+  await swipe(1);
+  await expect(page.locator('#galleryPosition')).toHaveText('3 / 5');
+  await expect(page.locator('#galleryViewCaption')).toHaveText('The Groom');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(groom).toBeFocused();
+  expect(errors).toEqual([]);
+});
