@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <!-- Original Section 6 embossed botanical paper; no source-site image data. -->
+  <defs>
+    <linearGradient id="paper" x1="0" x2="0" y1="0" y2="1">
+      <stop stop-color="#eae1ed"/>
+      <stop offset=".12" stop-color="#faf7fb"/>
+      <stop offset=".75" stop-color="#faf7fb"/>
+      <stop offset="1" stop-color="#e7dcea"/>
+    </linearGradient>
+    <radialGradient id="light"><stop stop-color="#fffefa" stop-opacity=".78"/><stop offset="1" stop-color="#fffefa" stop-opacity="0"/></radialGradient>
+    <linearGradient id="petal" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fbf6fa"/><stop offset=".55" stop-color="#e7d4e7"/><stop offset="1" stop-color="#cbb1ce"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="#bbc7b5"/><stop offset="1" stop-color="#809b91"/></linearGradient>
+    <filter id="fibers" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".32 .44" numOctaves="2" seed="27" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".12"/></feComponentTransfer>
+    </filter>
+    <g id="bloom" stroke="#b79ab7" stroke-width=".45">
+      <ellipse cx="0" cy="-8" rx="4.8" ry="7.8" fill="url(#petal)"/>
+      <ellipse cx="0" cy="-8" rx="4.8" ry="7.8" fill="url(#petal)" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-8" rx="4.8" ry="7.8" fill="url(#petal)" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-8" rx="4.8" ry="7.8" fill="url(#petal)" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-8" rx="4.8" ry="7.8" fill="url(#petal)" transform="rotate(288)"/>
+      <circle r="2.6" fill="#d4b888" stroke="#9c8057"/>
+    </g>
+    <g id="sprig" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-3 -15 C38 22 6 82 42 124 S45 226 21 283" stroke="#879c90" stroke-width="1.6"/>
+      <path d="M14 31 Q39 7 44 37 Q32 46 14 31Z M22 67 Q-4 52 -6 73 Q8 87 22 67Z
+               M31 106 Q51 80 59 99 Q53 124 31 106Z
+               M45 145 Q16 132 20 160 Q34 166 45 145Z
+               M45 186 Q68 165 75 187 Q61 201 45 186Z
+               M26 246 Q-2 224 0 256 Q14 260 26 246Z" fill="url(#leaf)" stroke="#8aab9a" stroke-width=".6"/>
+      <path d="M14 31L39 34 M22 67L0 72 M31 106L54 103 M45 145L24 153 M45 186L68 186 M26 246L5 250"
+            stroke="#eff3e6" stroke-width=".45"/>
+      <use href="#bloom" transform="translate(25 54) scale(.63)"/>
+      <use href="#bloom" transform="translate(49 168) scale(.9)"/>
+      <use href="#bloom" transform="translate(19 235) scale(.65)"/>
+    </g>
+  </defs>
+  <rect width="390" height="844" fill="url(#paper)"/>
+  <rect width="390" height="844" fill="url(#light)" opacity=".75"/>
+  <rect width="390" height="844" fill="#e4d7ea" filter="url(#fibers)" opacity=".095"/>
+  <path d="M-9 242 C56 258 67 309 106 318 M394 546 C338 530 328 504 291 485" stroke="#d2bbd5" stroke-width="1.2" fill="none" opacity=".14"/>
+  <g opacity=".36">
+    <use href="#sprig" transform="translate(-10 39) rotate(-8) scale(.75)"/>
+    <use href="#sprig" transform="translate(400 254) rotate(173) scale(.81)"/>
+    <use href="#sprig" transform="translate(-17 508) rotate(1) scale(.83)"/>
+    <use href="#sprig" transform="translate(402 812) rotate(184) scale(.84)"/>
+  </g>
+  <g opacity=".21" stroke="#c2a6c6" stroke-width="1.1" fill="none">
+    <path d="M-17 331 C31 315 58 333 55 366 Q49 390 29 382 Q17 374 31 364"/>
+    <path d="M402 112 C360 127 333 108 333 82 Q336 65 352 76"/>
+    <path d="M-17 754 C33 724 68 757 58 781 Q49 796 29 782"/>
+    <path d="M402 591 C363 559 324 578 326 608 Q336 634 354 619"/>
+  </g>
+  <g opacity=".32" fill="#f9f4ee" stroke="#dac6d5" stroke-width=".6">
+    <circle cx="36" cy="317" r="1.5"/><circle cx="359" cy="214" r="1.8"/>
+    <circle cx="344" cy="668" r="1.6"/><circle cx="48" cy="688" r="1.9"/>
+    <circle cx="23" cy="474" r="1.5"/><circle cx="371" cy="416" r="1.6"/>
+  </g>
+  <!-- Clear centre intentionally preserved for live typography and swatches. -->
+</svg>

@@ -1,0 +1,53 @@
+name: Section 6 Dress Code integration checks
+on:
+  push:
+    branches:
+      - integration/section6-approved-main-20261104
+      - main
+    paths:
+      - index.html
+      - dress-code.css
+      - dress-code.js
+      - assets/section6/**
+      - tests/section-six-dress.spec.mjs
+      - .github/workflows/section6-main-integration.yml
+  pull_request:
+    paths:
+      - index.html
+      - dress-code.css
+      - dress-code.js
+      - assets/section6/**
+      - tests/section-six-dress.spec.mjs
+permissions:
+  contents: read
+jobs:
+  dress-code:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify script syntax
+        run: node --check dress-code.js
+      - name: Verify approved Section 6 artwork is local
+        shell: python
+        run: |
+          import hashlib
+          from pathlib import Path
+          expected={
+            'assets/section6/paper.webp':'1a6beba7a3ded69a651d4efcb9e69a706d58a1e4f9cffacaa26c39313b757006',
+            'assets/section6/bfly_1.webp':'685b727e858b04507a2aeb658a30e0bde98cde976dc37b8be0f771bbbb77add4'
+          }
+          for name,sha in expected.items():
+            data=Path(name).read_bytes()
+            assert data[:4]==b'RIFF' and data[8:12]==b'WEBP',name
+            assert hashlib.sha256(data).hexdigest()==sha,name
+            print('Verified',name,len(data))
+      - name: Check 36 mobile Dress Code cases
+        run: npx playwright test tests/section-six-dress.spec.mjs
