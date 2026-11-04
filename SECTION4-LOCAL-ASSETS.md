@@ -53,7 +53,9 @@ node .\tools\section4-exact-asset-audit.mjs
 ~~~
 
 The script checks the public `#cgv-events` source and local `#eventDetails`
-at 320×568, 360×740, 390×844 and 430×932. It inspects image sources,
+at 320×568, 360×740, 390×844 and 430×932. At each size it visits
+three scroll positions (top, middle, bottom), so lazy-loaded/deferred
+source artwork can be detected rather than omitted by a top-only scan. It inspects image sources,
 CSS background/border/mask/content URLs (including pseudo-elements), fonts,
 CSS-drawn moving elements and recorded network outcomes.
 
@@ -66,3 +68,21 @@ is reported as an error, never treated as a passing exact-asset check.
 opacity, masking, animation, appearance, or usage rights. After inventory,
 verify the permitted originals by hash and run screenshot comparison. Original
 CSS petal silhouettes remain approximate until inspected and resolved.
+
+
+## Byte-for-byte identity proof for the two identified assets
+
+After permitted local staging, run this independent read-only hash checker:
+
+~~~powershell
+cd D:\testing-4
+node .\tools\section4-source-hashes.mjs
+~~~
+
+Its ignored local report is `section4-exact-audit/section4-source-hashes.json`.
+`EXACT_MATCH` means source and local bytes had identical SHA-256 hashes in
+this check. `BYTE_MISMATCH` means they differed, and `UNVERIFIED` means
+source access or a local file was missing. This check does **not** download
+artwork to disk or include vendor assets in GitHub. Exact byte identity for
+these two files cannot establish that the entire section has all original
+artwork, fonts, animations, or pixel-identical rendering.
