@@ -47,7 +47,7 @@ const inspect=()=>{
     srcKind:el.src.includes('/couples/')?'source-couple':el.src.includes('/gallery/')?'local-gallery':'other'
   }));
   return {
-    scrollY:round(scrollY),scrollHeight:document.documentElement.scrollHeight,
+    scrollY:Math.round(scrollY*100)/100,scrollHeight:document.documentElement.scrollHeight,
     gallery:fmt(gallery),dialogs,fixed,mainImgs,focused:fmt(document.activeElement),
     openDialogs:[...document.querySelectorAll('dialog')].filter(el=>el.open).length
   };
