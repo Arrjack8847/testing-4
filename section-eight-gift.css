@@ -371,3 +371,39 @@
   78%{transform:translate3d(-13px,-9px,0) rotate(12deg)}
   100%{transform:translate3d(15px,-13px,0) rotate(-8deg)}
 }
+
+
+/* Section 8 expanded wishlist: first-card geometry from the 390px
+   read-only source measurement (185.5px item, 68x68px product thumbs).
+   Apply only when disclosed; the already-calibrated closed Gift stays untouched.
+   Source imagery is NOT committed: customer/licensed local art remains optional. */
+.gift-eight-wishlist:not([hidden]) {
+  padding-bottom: 16px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item {
+  grid-template-columns: 68px minmax(0,1fr);
+  align-items: center;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-thumb {
+  width: 68px;
+  height: 68px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child {
+  min-height: 185.5px;
+  align-items: stretch;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child > div:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-actions {
+  margin-top: auto;
+  padding-top: 12px;
+}
+.gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child .gift-eight-thumb {
+  align-self: start;
+}
