@@ -378,6 +378,9 @@
     <!-- Section 8: Wedding Gift; vendor sample details are deliberately non-transactional. -->
     <section id="weddingGift" class="gift-eight" data-section="8" aria-labelledby="giftEightHeading" aria-hidden="true" inert data-gift-artwork="original" data-gift-butterfly="unavailable">
       <div class="gift-eight-art" aria-hidden="true"></div>
+      <div class="gift-eight-petals" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
       <!-- Local-only blossom butterfly for the Gift-to-RSVP handoff. -->
       <div class="gift-eight-butterfly" aria-hidden="true">
         <i class="gift-eight-bfly-wing gift-eight-bfly-left"></i>
@@ -388,7 +391,7 @@
         <h2 id="giftEightHeading" class="gift-eight-heading gift-eight-reveal">Wedding Gift</h2>
         <p class="gift-eight-intro gift-eight-reveal">Your presence at our wedding is the greatest gift of all. However, if you wish to bless us with a gift, you may do so through the details provided below.</p>
         <div class="gift-eight-send gift-eight-reveal">
-          <button class="gift-eight-trigger" id="giftEightTrigger" type="button" aria-expanded="false" aria-controls="giftEightBanks"><span aria-hidden="true">🎁</span> Send Gift</button>
+          <button class="gift-eight-trigger" id="giftEightTrigger" type="button" aria-expanded="false" aria-controls="giftEightBanks giftEightWishlist"><span aria-hidden="true">🎁</span> Send Gift</button>
           <div class="gift-eight-bank-list" id="giftEightBanks" hidden>
             <article class="gift-eight-bank" data-gift-bank="0">
               <h4 class="gift-eight-bank-name">Maybank</h4>
@@ -406,7 +409,7 @@
             </article>
           </div>
         </div>
-        <div class="gift-eight-wishlist gift-eight-reveal">
+        <div class="gift-eight-wishlist gift-eight-reveal" id="giftEightWishlist" hidden>
           <h3>Gift Wishlist</h3>
           <p class="gift-eight-wishlist-intro">Reserve a gift so no two guests buy the same one.</p>
           <div class="gift-eight-items">
