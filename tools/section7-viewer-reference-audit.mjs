@@ -117,7 +117,14 @@ for(const [site,url] of urls)for(const viewport of viewports){
     if(site==='reference'&&record.buttonCount){
       record.additionalPhotoViewers=[];
       const closeViewer=page.locator('.cgv-lightbox button').first();
-      if(await closeViewer.isVisible()) await closeViewer.click({timeout:10000});
+      // At 320px the live source header's EN control overlays the viewer
+      // close button. Invoke its native click handler directly for this
+      // measurement-only audit so we can inspect the other photo frames.
+      // Keep this obstruction recorded as a separate source UX issue.
+      if(await closeViewer.isVisible()){
+        record.sourceCloseObstructedAt320=viewport.width===320;
+        await closeViewer.evaluate(el=>el.click());
+      }
       const photoSelector='#cgv-gallery img[src*="/couples/"]';
       const total=await page.locator(photoSelector).count();
       record.sourcePhotoCount=total;
@@ -148,7 +155,7 @@ for(const [site,url] of urls)for(const viewport of viewports){
         });
         record.additionalPhotoViewers.push({index:n,...measured});
         if(!measured.opened)throw new Error('Reference photo '+n+' did not open viewer');
-        await closeViewer.click({timeout:10000});
+        await closeViewer.evaluate(el=>el.click());
       }
     }
     record.status='captured';
