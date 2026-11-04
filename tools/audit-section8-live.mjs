@@ -121,7 +121,34 @@ async function inspect(label,viewport){
                 rect:(()=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()})),
             copy:copy.map(x=>({visible:getComputedStyle(x).display!=='none',
               rect:(()=>{const r=x.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()})),
-            active:document.activeElement?.outerHTML.slice(0,400)
+            active:document.activeElement?.outerHTML.slice(0,400),
+            layout:(()=>{
+              const gift=document.querySelector('#cgv-gift,#weddingGift');
+              if(!gift)return null;
+              const rect=el=>{
+                if(!el)return null;
+                const b=el.getBoundingClientRect();
+                return {x:+b.x.toFixed(1),y:+b.y.toFixed(1),
+                  width:+b.width.toFixed(1),height:+b.height.toFixed(1)};
+              };
+              const findText=(selector,text)=>[...gift.querySelectorAll(selector)]
+                .find(x=>x.textContent?.trim().toLowerCase().includes(text));
+              const btn=findText('button','send gift');
+              const wish=findText('h2,h3,h4','gift wishlist');
+              const text=findText('p','reserve a gift');
+              const copyCards=copy.map(x=>x.closest('article')||x.parentElement?.parentElement);
+              const allImgs=[...gift.querySelectorAll('img')];
+              return {
+                section:rect(gift),
+                button:rect(btn),
+                wishHeader:rect(wish),
+                wishPanel:rect(wish?.parentElement),
+                wishText:rect(text),
+                bankCards:copyCards.map(rect),
+                productImages:allImgs.map(e=>({rect:rect(e),src:e.currentSrc||e.src})),
+                overflow:document.documentElement.scrollWidth-innerWidth
+              };
+            })()
           };
         });
         report.interaction.status='captured';
