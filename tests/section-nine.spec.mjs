@@ -4,6 +4,10 @@ async function go(page){
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
   const section=page.locator('#rsvp');
+  // Fail immediately if this run accidentally targets another Git worktree.
+  // Playwright :8000 used to reuse whichever local preview was already running.
+  await expect(section.locator('.s9-petals i')).toHaveCount(8,{timeout:5000});
+  await expect(section.locator('.s9-butterfly-forward')).toHaveCount(1);
   await expect(section).toHaveAttribute('aria-hidden','true');
   await expect(section).toHaveJSProperty('inert',true);
   await page.getByRole('button',{name:'Open Invitation'}).click();
@@ -99,14 +103,23 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     const refs=['#rsvp','#s9RsvpForm','#s9Name','#s9Attendance','#s9Guests','#s9Wish'].map(rect);
     return {overflow:document.documentElement.scrollWidth-innerWidth,
       section:{height:b.height,width:b.width},before:b.top-a.bottom,after:c.top-b.bottom,
-      refs,artSrc:document.getElementById('s9ReferenceArt').getAttribute('src')};
+      refs,artSrc:document.getElementById('s9ReferenceArt').getAttribute('src'),
+      artLoaded:document.querySelector('#rsvp').classList.contains('s9-reference-loaded')};
   });
   expect(m.overflow).toBeLessThanOrEqual(1);
   expect(Math.abs(m.before)).toBeLessThanOrEqual(1);
   expect(Math.abs(m.after)).toBeLessThanOrEqual(1);
   expect(m.section.width).toBe(page.viewportSize().width);
   expect(m.section.height).toBeGreaterThanOrEqual(1150);
-  expect(m.artSrc).toBeNull();
+  // Localhost automatically loads optional private reference art when present.
+  // Either a verified local image or the CSS fallback is legitimate; never
+  // require the src to be null when the developer has staged paper.webp.
+  if(m.artSrc!==null){
+    expect(m.artSrc).toBe('./assets/reference-dev/section9/paper.webp');
+    expect(m.artLoaded).toBe(true);
+  }else{
+    expect(m.artLoaded).toBe(false);
+  }
   for(const r of m.refs){expect(r).toBeTruthy();expect(r.x).toBeGreaterThanOrEqual(-1);
     expect(r.x+r.width).toBeLessThanOrEqual(page.viewportSize().width+1);}
   if(testInfo.project.name==='iphone-390'){
