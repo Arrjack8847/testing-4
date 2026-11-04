@@ -6,8 +6,9 @@
   "scripts": {
     "test:mobile": "playwright test",
     "test:source": "python3 tools/check-source.py",
-    "test:syntax": "node --check scene.js && node --check phone-qa.js && node --check section-two.js && node --check section-couple.js && node --check section-couple-reference.js && node --check section-three.js && node --check section-four.js && node --check order-program.js && node --check section-five.js && node --check section-six.js && node --check reference-continuation.js && node --check section-nine.js && node --check section-ten.js",
-    "test:crossbrowser": "playwright test --config playwright.crossbrowser.config.mjs"
+    "test:syntax": "node --check scene.js && node --check phone-qa.js && node --check section-two.js && node --check section-couple.js && node --check section-couple-reference.js && node --check section-three.js && node --check section-four.js && node --check order-program.js && node --check section-five.js && node --check section-six.js && node --check reference-continuation.js && node --check section-nine.js && node --check section-ten.js && node --check section-nine.js",
+    "test:crossbrowser": "playwright test --config playwright.crossbrowser.config.mjs",
+    "test:rsvp-api": "python3 -m unittest discover -s tests -p 'test_rsvp_api.py'"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"
