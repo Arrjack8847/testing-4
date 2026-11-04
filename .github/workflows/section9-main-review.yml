@@ -26,6 +26,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Validate script syntax
         run: node --check reference-continuation.js && node --check section-nine.js && node --check section-ten.js
+      - name: Run real RSVP API and privacy tests
+        run: python3 -m unittest discover -s tests -p 'test_rsvp_api.py'
       - name: Four-phone Section 8–9–10 suite
         run: npx playwright test tests/section-nine.spec.mjs tests/section-ten.spec.mjs tests/section-six.spec.mjs --workers=2
       - name: Save diagnostics
