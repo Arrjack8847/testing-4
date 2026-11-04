@@ -107,6 +107,28 @@ test('Section 4 source-art is the development default and leaves earlier section
   await expect(page.locator('#message')).toHaveAttribute('data-section','2');
 });
 
+test('Section 4 uses staged local files for both source-art layers when present',async({page})=>{
+  // The CI fixture uses tiny synthetic SVGs, not copyrighted vendor files.
+  // This checks local path selection only; exact source identity is checked
+  // separately by the permission-gated staging script.
+  const syntheticSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="white"/></svg>';
+  for (const suffix of ['paper.webp','arch_event.svg']) {
+    await page.route('**/assets/reference-dev/'+suffix,route=>route.fulfill({
+      status:200,contentType:'image/svg+xml',body:syntheticSVG
+    }));
+  }
+  const {section,errors}=await openEvents(page);
+  await expect(section).toHaveAttribute('data-reference-paper-source','local');
+  await expect(section).toHaveAttribute('data-reference-frame-source','local');
+  await expect(section).toHaveAttribute('data-reference-paper','loaded');
+  await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
+    'src','./assets/reference-dev/paper.webp');
+  const frameSource = await section.locator('.event-reference-card').first().evaluate(
+    el=>getComputedStyle(el,'::before').borderImageSource);
+  expect(frameSource).toContain('assets/reference-dev/arch_event.svg');
+  expect(errors).toEqual([]);
+});
+
 test('Section 4 pin-camera stays bounded, returns on backward scroll, and respects Reduced Motion',async({page})=>{
   const {section}=await openEvents(page);
   const top=await section.evaluate(el=>el.getBoundingClientRect().top+scrollY);
