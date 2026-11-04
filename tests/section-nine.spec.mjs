@@ -125,6 +125,21 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(exact.buttonBg).toBe('rgb(123, 61, 110)');
     expect(exact.buttonRadius).toBe('999px');
     expect(exact.wishRadius).toBe('14px');
+    const wishStyles=await section.evaluate(el=>{
+      const note=el.querySelector('#s9WishesNote'),who=el.querySelector('.s9-who'),
+        city=who.querySelector('span'),firstCard=el.querySelector('.s9-wish');
+      return {
+        noticeHeight:note.getBoundingClientRect().height,
+        noticeLineHeight:parseFloat(getComputedStyle(note).lineHeight),
+        nameFontSize:getComputedStyle(who).fontSize,
+        cityTransform:getComputedStyle(city).textTransform,
+        cardHeight:firstCard.getBoundingClientRect().height
+      };
+    });
+    expect(wishStyles.noticeHeight).toBeLessThanOrEqual(wishStyles.noticeLineHeight+1);
+    expect(wishStyles.nameFontSize).toBe('18px');
+    expect(wishStyles.cityTransform).toBe('uppercase');
+    expect(wishStyles.cardHeight).toBeGreaterThan(90);
     const frame=await section.locator('.s9-frame').evaluate(el=>{
       const r=el.getBoundingClientRect(),s=document.getElementById('rsvp').getBoundingClientRect();
       return {top:r.top-s.top,left:r.left-s.left,width:r.width,
