@@ -122,6 +122,10 @@
     if (!available.has(index)) return;
     const choices = navigation();
     active = index;
+    // The reference uses tall 3:4 photo frames for Together/Bride/Groom,
+    // but a shorter landscape frame for Garden/Lake. Switch frame geometry
+    // with the active image, including keyboard and swipe navigation.
+    dialog.dataset.galleryOrientation = index >= 3 ? 'landscape' : 'portrait';
     viewImage.src = buttons[index].querySelector('.gallery-image').src;
     viewImage.alt = PHOTOS[index].alt;
     viewCaption.textContent = PHOTOS[index].caption;
