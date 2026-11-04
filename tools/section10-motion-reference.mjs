@@ -75,6 +75,9 @@ try {
                 transform:cs.transform,y:+r.y.toFixed(2),h:+r.height.toFixed(2),
                 inViewport:r.bottom>0&&r.top<innerHeight,
                 transition:cs.transitionDuration,
+                transitionDelay:cs.transitionDelay,
+                transitionTiming:cs.transitionTimingFunction,
+                animationDelay:cs.animationDelay,
                 activeAnimations:el.getAnimations().filter(a=>a.playState==='running').length};
             }
             return {scrollY:window.scrollY,style:all};
