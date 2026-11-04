@@ -67,8 +67,21 @@ async function capture(browser,url,id,viewport){
   try{
     const response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
     if(!response?.ok())throw new Error(id+' returned HTTP '+response?.status());
-    const open=page.getByRole('button',{name:'Open Invitation'}).first();
-    if(await open.count() && await open.isVisible())await open.click();
+    // The source constructs its cover asynchronously. Never silently skip
+    // the opening interaction: doing so captured the hero over the timeline
+    // at 360/390/430px and produced misleading geometry screenshots.
+    await page.waitForTimeout(id==='reference'?1800:250);
+    const buttons=page.getByRole('button',{name:'Open Invitation'});
+    let opened=false;
+    for(let i=0;i<await buttons.count();i++){
+      if(await buttons.nth(i).isVisible()){
+        await buttons.nth(i).click({timeout:15000});
+        opened=true;
+        break;
+      }
+    }
+    if(!opened)throw new Error('Open Invitation button not visible; do not compare cover artwork as Section 5');
+    await page.waitForTimeout(id==='reference'?1400:350);
     await page.locator(selector).waitFor({state:'attached',timeout:15000});
     await page.evaluate(()=>document.fonts.ready);
     const element=page.locator(selector).first();
@@ -76,7 +89,7 @@ async function capture(browser,url,id,viewport){
       document.documentElement.style.scrollBehavior='auto';
       el.scrollIntoView({block:'start',behavior:'instant'});
     });
-    await page.waitForTimeout(650);
+    await page.waitForTimeout(id==='reference'?1300:650);
     const details=await element.evaluate((el,id)=>{
       const section=el.getBoundingClientRect();
       const style=getComputedStyle(el);
@@ -91,9 +104,13 @@ async function capture(browser,url,id,viewport){
         };
       };
       const q=s=>el.querySelector(s);
+      const normalized=s=>(s||'').trim().replace(/\s+/g,' ').toLowerCase();
+      const exactText=t=>[...el.querySelectorAll('h1,h2,h3,h4,p,div,span,small,strong,time')]
+        .filter(n=>normalized(n.textContent)===normalized(t))
+        .sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length)[0]||null;
       const rows=[...el.querySelectorAll(id==='reference'?'.cgv-tl-row':'.order-entry')];
-      const label=q(id==='reference'?'.cgv-tl-kicker':'.order-eyebrow');
-      const heading=q(id==='reference'?'.cgv-tl-title':'.order-heading');
+      const label=id==='reference'?exactText('Running order'):q('.order-eyebrow');
+      const heading=id==='reference'?exactText('Order of the Day'):q('.order-heading');
       const time=q(id==='reference'?'.cgv-tl-time':'.order-time');
       const butterfly=q(id==='reference'?'.cgv-bf':'#orderButterflyFlight');
       return {
@@ -103,9 +120,24 @@ async function capture(browser,url,id,viewport){
         artworkStatus:el.dataset.artworkStatus||null,
         eyebrow:box(label),heading:box(heading),time:box(time),
         rows:rows.map(box),butterfly:box(butterfly),
-        horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+        horizontalOverflow:document.documentElement.scrollWidth-innerWidth,
+        scrollY,visibleSectionTop:section.top,
+        centerHit:(()=>{
+          const px=Math.min(innerWidth-1,Math.max(1,section.left+section.width/2));
+          const py=Math.min(innerHeight-45,Math.max(80,section.top+Math.min(280,section.height/2)));
+          const hit=document.elementFromPoint(px,py);
+          return {
+            belongsToSection:hit===el||el.contains(hit),
+            tag:hit?.tagName||null,
+            className:typeof hit?.className==='string'?hit.className.slice(0,100):null
+          };
+        })()
       };
     },id);
+    if(id==='reference' && !details.centerHit.belongsToSection){
+      throw new Error('Reference timeline remains obscured by '+JSON.stringify(details.centerHit)+
+        ' after opening/scroll. Reject screenshot instead of claiming parity.');
+    }
     if(id==='local'){
       await page.waitForFunction(()=>{
         const status=document.querySelector('#runningOrder')?.dataset.artworkStatus;
