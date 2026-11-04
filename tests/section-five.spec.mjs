@@ -485,3 +485,52 @@ test('Section 7 integration preserves Wedding Gift, RSVP and closing order from 
   expect(sections.galleryNumber).toBe('7');
   expect(sections.giftHeading).toMatch(/Wedding Gift/i);
 });
+
+
+test('Section 7 has seamless Dress Code and Wedding Gift handoffs at every mobile width',async({page},testInfo)=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  // Viewer photo fixtures are local only; background artwork remains under
+  // the own-section sticky scene rather than spilling into Wedding Gift.
+  await page.route('**/assets/gallery/reference/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:testImage}));
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=1');
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5);
+  const metrics=await page.evaluate(()=>{
+    const dress=document.getElementById('dressCode');
+    const gallery=document.getElementById('gallery');
+    const gift=document.getElementById('weddingGift');
+    const image=gallery.querySelector('.gallery-scene-image');
+    const r=el=>el.getBoundingClientRect();
+    const d=r(dress),g=r(gallery),w=r(gift),s=r(image);
+    return {
+      width:innerWidth,
+      order:dress.nextElementSibling===gallery&&gallery.nextElementSibling===gift,
+      dressGap:g.top-d.bottom,
+      giftGap:w.top-g.bottom,
+      galleryWidth:g.width,
+      imageWidth:s.width,
+      galleryPaper:getComputedStyle(gallery).backgroundColor,
+      giftPaper:getComputedStyle(gift).backgroundColor,
+      galleryOverflow:getComputedStyle(gallery).overflow,
+      galleryImagePointer:getComputedStyle(image).pointerEvents,
+      galleryHeight:g.height,
+      giftDocTop:w.top+scrollY,
+      galleryDocTop:g.top+scrollY
+    };
+  });
+  expect(metrics.order).toBe(true);
+  expect(Math.abs(metrics.dressGap)).toBeLessThanOrEqual(1);
+  expect(Math.abs(metrics.giftGap)).toBeLessThanOrEqual(1);
+  expect(Math.abs(metrics.galleryWidth-metrics.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(metrics.imageWidth-metrics.width)).toBeLessThanOrEqual(1);
+  expect(metrics.galleryPaper).toBe('rgb(250, 247, 251)');
+  expect(metrics.giftPaper).toBe('rgb(92, 38, 79)');
+  expect(metrics.galleryOverflow).toBe('clip');
+  expect(metrics.galleryImagePointer).toBe('none');
+  await page.evaluate(y=>scrollTo({top:y-innerHeight/2,behavior:'instant'}),metrics.galleryDocTop);
+  await page.screenshot({path:testInfo.outputPath('section-five-dress-gallery-seam.png'),animations:'disabled'});
+  await page.evaluate(y=>scrollTo({top:y-innerHeight/2,behavior:'instant'}),metrics.giftDocTop);
+  await expect(page.locator('#weddingGift')).toBeInViewport();
+  await page.screenshot({path:testInfo.outputPath('section-five-gallery-gift-seam.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+});
