@@ -166,6 +166,10 @@ async function capture(browser,url,id,viewport){
         const hidden=[];
         for(const node of document.body.querySelectorAll('*')){
           if(node===section || section.contains(node) || node.contains(section))continue;
+          // The source's fixed canvas (cgv-petals) is actual invitation
+          // artwork. Removing it would corrupt the reference comparison.
+          // Only non-canvas preview chrome may be temporarily concealed.
+          if(node.tagName==='CANVAS')continue;
           const style=getComputedStyle(node);
           if(!['fixed','sticky'].includes(style.position))continue;
           if(style.visibility==='hidden'||style.display==='none')continue;
