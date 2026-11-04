@@ -170,12 +170,24 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(frame.noticeTop).toBeGreaterThan(frame.bottom);
     expect(frame.noticeBottom).toBeLessThan(m.section.height-6);
 
-    const flight=await section.locator('.s9-butterfly').evaluate(el=>({
-      top:parseFloat(getComputedStyle(el).top),
-      duration:getComputedStyle(el).animationDuration
-    }));
-    expect(Math.abs(flight.top-(m.section.height-80))).toBeLessThan(2);
-    expect(flight.duration).toBe('16s');
+    const flights=await section.evaluate(el=>Object.fromEntries(
+      ['.s9-butterfly','.s9-butterfly-forward'].map(selector=>{
+        const sprite=el.querySelector(selector),style=getComputedStyle(sprite);
+        return [selector,{
+          top:parseFloat(style.top),duration:style.animationDuration,
+          delay:style.animationDelay,name:style.animationName,
+          pointerEvents:style.pointerEvents,ariaHidden:sprite.getAttribute('aria-hidden')
+        }];
+      })
+    ));
+    expect(Math.abs(flights['.s9-butterfly'].top-(m.section.height-12))).toBeLessThan(2);
+    expect(flights['.s9-butterfly'].duration).toBe('16s');
+    expect(flights['.s9-butterfly'].delay).toBe('5s');
+    expect(flights['.s9-butterfly-forward'].name).toBe('s9-flight-forward');
+    expect(Math.abs(flights['.s9-butterfly-forward'].top-(m.section.height-72))).toBeLessThan(2);
+    expect(flights['.s9-butterfly-forward'].duration).toBe('16s');
+    expect(flights['.s9-butterfly-forward'].ariaHidden).toBe('true');
+    expect(flights['.s9-butterfly-forward'].pointerEvents).toBe('none');
     expect(Math.abs(exact.wall.y-756.88)).toBeLessThan(4);
     const measured=await page.evaluate(()=>{const rect=selector=>{const e=document.querySelector(selector);if(!e)return null;const r=e.getBoundingClientRect(),b=document.querySelector('#rsvp').getBoundingClientRect();return {x:+r.x.toFixed(1),y:+(r.y-b.y).toFixed(1),width:+r.width.toFixed(1),height:+r.height.toFixed(1)};}; return ({
       eyebrow:rect('#rsvp .s9-eyebrow'),heading:rect('#rsvpHeading'),
@@ -260,9 +272,11 @@ test('Animation pauses outside view and Reduced Motion remains legible',async({p
   const state=await section.evaluate(el=>({
     headingOpacity:getComputedStyle(el.querySelector('.s9-heading')).opacity,
     butterfly:getComputedStyle(el.querySelector('.s9-butterfly')).animationName,
+    forwardButterfly:getComputedStyle(el.querySelector('.s9-butterfly-forward')).animationName,
     image:el.querySelector('.s9-reference-art').getAttribute('src')
   }));
   expect(state.headingOpacity).toBe('1');
   expect(state.butterfly).toBe('none');
+  expect(state.forwardButterfly).toBe('none');
   expect(state.image).toBeNull();
 });
