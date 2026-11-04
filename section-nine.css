@@ -68,6 +68,30 @@
   border-radius:83% 11% 75% 21%;filter:drop-shadow(0 1px 1px #8f7fa9)}
 .s9-wing-left{left:0;transform-origin:right center;animation:s9-flap-left .41s ease-in-out infinite alternate}
 .s9-wing-right{right:0;transform:scaleX(-1);transform-origin:left center;animation:s9-flap-right .41s ease-in-out infinite alternate}
+/* Authorized local visual comparison: use the two halves of the 52x41 WebP sprite.
+   The image is never bundled, hotlinked, or fetched in normal mode. */
+.s9-rsvp.s9-reference-butterfly-loaded .s9-wing{
+  top:0;width:50%;height:100%;border-radius:0;filter:none;
+  background-image:url('./assets/reference-dev/section9/bfly_1.webp');
+  background-repeat:no-repeat;background-size:200% 100%
+}
+.s9-rsvp.s9-reference-butterfly-loaded .s9-wing-left{
+  left:0;background-position:0 0;transform-origin:100% 50%;
+  animation:s9-sprite-flap-left .22727s ease-in-out infinite alternate
+}
+.s9-rsvp.s9-reference-butterfly-loaded .s9-wing-right{
+  right:0;background-position:100% 0;transform-origin:0 50%;
+  animation:s9-sprite-flap-right .22727s ease-in-out -.065s infinite alternate;
+  transform:none
+}
+@keyframes s9-sprite-flap-left{
+  from{transform:perspective(210px) rotateY(-8deg)}
+  to{transform:perspective(210px) rotateY(-72deg)}
+}
+@keyframes s9-sprite-flap-right{
+  from{transform:perspective(210px) rotateY(8deg)}
+  to{transform:perspective(210px) rotateY(72deg)}
+}
 .s9-rsvp.s9-active .s9-butterfly,.s9-rsvp.s9-active .s9-wing{animation-play-state:running}
 .s9-rsvp:not(.s9-active) .s9-wing{animation-play-state:paused}
 .s9-rsvp.s9-reveal-ready .s9-reveal{opacity:0;transform:translate3d(0,52px,0) scale(.955);
