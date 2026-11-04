@@ -136,6 +136,34 @@
   };
   wish.addEventListener('input',syncConsent);
   syncConsent();
+  // Vercel production requires a human-verification token; local SQLite
+  // preview does not. Site key is public, secret stays on the server.
+  let captchaToken='',captchaWidget=null;
+  const setupCaptcha=async()=>{
+    try{
+      const response=await fetch('/api/rsvp/status',{cache:'no-store'});
+      if(!response.ok)return;
+      const info=await response.json();
+      if(!info.accepting||!info.captchaSiteKey)return;
+      const area=document.createElement('div');area.id='s9CaptchaArea';
+      area.setAttribute('aria-label','Anti-spam verification');
+      button.before(area);
+      const script=document.createElement('script');
+      script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async=true;script.defer=true;
+      script.onload=()=>{
+        if(!window.turnstile)return;
+        captchaWidget=window.turnstile.render(area,{
+          sitekey:info.captchaSiteKey,
+          callback:token=>{captchaToken=token;},
+          'expired-callback':()=>{captchaToken='';}
+        });
+      };
+      script.onerror=()=>feedback('Verification is unavailable. RSVPs cannot be sent right now.');
+      document.head.append(script);
+    }catch(_){/* Static preview or offline: do not claim a working backend. */}
+  };
+  void setupCaptcha();
   const markEdited=()=>{
     if(!busy){requestId=null;preview.hidden=true;previewText='';}
   };
@@ -154,7 +182,7 @@
     const payload={
       requestId:requestId||makeId(),name:clean,attendance:attendance.value,
       guests:attendance.value==='yes'?Number(guests.value):0,
-      wish:wish.value.trim(),shareWish:Boolean(shareWish.checked&&wish.value.trim())
+      wish:wish.value.trim(),shareWish:Boolean(shareWish.checked&&wish.value.trim()),captchaToken
     };
     requestId=payload.requestId;
     busy=true;button.disabled=true;button.textContent='Sending…';
@@ -178,6 +206,9 @@
       feedback('RSVP received and saved. Thank you!');
       void refreshWishes();
       requestId=null;
+      if(captchaWidget!==null&&window.turnstile?.reset){
+        window.turnstile.reset(captchaWidget);captchaToken='';
+      }
     }catch(error){
       preview.hidden=true;
       feedback(error.message||'Unable to save your RSVP. Please try again.');
