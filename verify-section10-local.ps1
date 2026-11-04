@@ -1,5 +1,6 @@
 param(
-  [switch]$SkipBrowserInstall
+  [switch]$SkipBrowserInstall,
+  [switch]$IncludeMotionAudit
 )
 
 # Run Section 10's four-phone browser tests locally without GitHub Actions.
@@ -76,6 +77,15 @@ try {
   & npx playwright test tests/section-ten.spec.mjs --workers=2
   if ($LASTEXITCODE -ne 0) { throw 'One or more Section 10 browser tests failed.' }
   Write-Host 'Section 10 browser tests passed on this local checkout.' -ForegroundColor Green
+  if ($IncludeMotionAudit) {
+    # The motion script owns its own Python server; release our port first.
+    Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+    $server = $null
+    Write-Host 'Recording local vs live reference motion at 39 checkpoints...' -ForegroundColor Cyan
+    & node tools/section10-motion-reference.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Section 10 source/local motion audit failed.' }
+    Write-Host 'Motion evidence is in .\section10-motion-evidence\motion.json.' -ForegroundColor Green
+  }
 } finally {
   if ($null -ne $server) {
     Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
