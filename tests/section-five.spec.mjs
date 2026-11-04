@@ -463,3 +463,18 @@ test('Section 7 uses its own sticky scene.webp and source wash without blocking 
   await page.keyboard.press('Escape');
   expect(errors).toEqual([]);
 });
+
+test('Section 7 integration preserves Wedding Gift, RSVP and closing order from main',async({page})=>{
+  await page.goto('/');
+  const sections=await page.evaluate(()=>({
+    ids:[...document.querySelectorAll('#gallery,#weddingGift,#rsvp,#closingMessage')]
+      .map(x=>x.id),
+    directNext:document.getElementById('gallery')?.nextElementSibling?.id,
+    galleryNumber:document.getElementById('gallery')?.dataset.section,
+    giftHeading:document.querySelector('#weddingGift h2')?.textContent?.trim()||''
+  }));
+  expect(sections.ids).toEqual(['gallery','weddingGift','rsvp','closingMessage']);
+  expect(sections.directNext).toBe('weddingGift');
+  expect(sections.galleryNumber).toBe('7');
+  expect(sections.giftHeading).toMatch(/Wedding Gift/i);
+});
