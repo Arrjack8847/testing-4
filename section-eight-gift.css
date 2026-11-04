@@ -536,11 +536,9 @@
   color: #e5cedf;
   opacity: .8;
 }
-@media(max-width:350px) {
-  .gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child { min-height: 177.2px; }
-  .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(2) { min-height: 134.2px; }
-  .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) { min-height: 94.2px; }
-}
+/* At 320px the source and local browser both scale 68px thumbnails to
+   ~64.9px. Keep base row heights here; applying measured visual pixels as
+   CSS min-heights would double-scale the rows. */
 @media(min-width:351px) and (max-width:374px) {
   .gift-eight-wishlist:not([hidden]) .gift-eight-item:first-child { min-height: 182.1px; }
   .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(2) { min-height: 137.9px; }
