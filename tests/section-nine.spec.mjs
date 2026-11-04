@@ -181,8 +181,8 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
       })
     ));
     expect(Math.abs(flights['.s9-butterfly'].top-(m.section.height-12))).toBeLessThan(2);
-    expect(flights['.s9-butterfly'].duration).toBe('16s');
-    expect(flights['.s9-butterfly'].delay).toBe('5s');
+    expect(flights['.s9-butterfly'].duration).toBe('13s');
+    expect(flights['.s9-butterfly'].delay).toBe('7.5s');
     expect(flights['.s9-butterfly-forward'].name).toBe('s9-flight-forward');
     expect(Math.abs(flights['.s9-butterfly-forward'].top-(m.section.height-72))).toBeLessThan(2);
     expect(flights['.s9-butterfly-forward'].duration).toBe('16s');
@@ -279,4 +279,29 @@ test('Animation pauses outside view and Reduced Motion remains legible',async({p
   expect(state.butterfly).toBe('none');
   expect(state.forwardButterfly).toBe('none');
   expect(state.image).toBeNull();
+});
+
+test('Section 9 keeps opposing flight directions at animation checkpoints',async({page})=>{
+  const {section}=await go(page);
+  const tracks=await section.evaluate(el=>{
+    const checkpoint=(selector,animationName,t1,t2)=>{
+      const target=el.querySelector(selector);
+      const animation=target.getAnimations().find(a=>a.animationName===animationName);
+      if(!animation)return {found:false};
+      animation.pause();
+      animation.currentTime=t1;
+      const x1=target.getBoundingClientRect().x;
+      animation.currentTime=t2;
+      const x2=target.getBoundingClientRect().x;
+      return {found:true,x1,x2};
+    };
+    return {
+      east:checkpoint('.s9-butterfly-forward','s9-flight-forward',4000,8000),
+      west:checkpoint('.s9-butterfly','s9-flight',9000,12000),
+    };
+  });
+  expect(tracks.east.found).toBe(true);
+  expect(tracks.west.found).toBe(true);
+  expect(tracks.east.x2-tracks.east.x1).toBeGreaterThan(40);
+  expect(tracks.west.x1-tracks.west.x2).toBeGreaterThan(35);
 });
