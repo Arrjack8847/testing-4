@@ -395,7 +395,7 @@
         </div>
       </div>
     </section>
-    <!-- Section 9: RSVP & Wishes. Source-measured 390x844 layout; demo-only guest form. -->
+    <!-- Section 9: RSVP & Wishes. Source-measured; live submissions require RSVP API. -->
     <section class="s9-rsvp" id="rsvp" data-section="9" aria-labelledby="rsvpHeading" aria-hidden="true" inert>
       <div class="s9-art" aria-hidden="true">
         <div class="s9-original-paper"></div>
@@ -437,20 +437,20 @@
             <textarea id="s9Wish" name="wish" maxlength="300" rows="3" placeholder="Write a few warm words…"></textarea>
           </div>
           <button class="s9-submit" type="submit">Send RSVP</button>
-          <p id="s9FormStatus" class="s9-form-status" role="status" aria-live="polite">Preview only — submissions are not sent or stored.</p>
-          <p class="s9-note">Wishes appear on the wall below and are visible to all guests.</p>
+          <p id="s9FormStatus" class="s9-form-status" role="status" aria-live="polite">Submit your RSVP to save it privately.</p>
+          <label class="s9-note s9-consent" for="s9ShareWish"><input type="checkbox" id="s9ShareWish" name="shareWish"> Allow my wish to appear publicly after review.</label>
         </form>
         <div class="s9-preview" id="s9Preview" hidden>
-          <p>Your RSVP preview has not been sent.</p>
+          <p id="s9ReceiptState">Your RSVP has been saved privately. Wishes appear publicly only after approval.</p>
           <dl>
             <dt>Name</dt><dd id="s9PreviewName"></dd>
             <dt>Attendance</dt><dd id="s9PreviewAttendance"></dd>
             <dt>Guests</dt><dd id="s9PreviewGuests"></dd>
             <dt>Wish</dt><dd id="s9PreviewWish"></dd>
           </dl>
-          <button type="button" id="s9Copy">Copy preview text</button>
+          <button type="button" id="s9Copy">Copy confirmation</button>
         </div>
-        <div class="s9-wall" id="wishesWall" aria-label="Example guest wishes">
+        <div class="s9-wall" id="wishesWall" aria-label="Guest wishes and design examples">
           <article class="s9-wish s9-reveal">
             <div class="s9-who"><strong>Aunty Zaharah</strong><span>Kajang</span></div>
             <p>“So proud of you both. See you at the wedding!”</p>
