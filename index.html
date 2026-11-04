@@ -365,6 +365,13 @@
     <!-- Section 7: original gallery. No photos are invented or embedded. -->
     <section class="gallery-section" id="gallery" data-section="7"
       aria-labelledby="galleryHeading" aria-hidden="true" inert>
+      <!-- Section 7 owns a second sticky use of the locally stored scene.webp.
+           Keep this behind Gallery content, separate from Section 1's hero. -->
+      <div class="gallery-scene-backdrop" aria-hidden="true">
+        <img class="gallery-scene-image" src="./assets/scene.webp" alt=""
+          loading="lazy" decoding="async" draggable="false">
+        <div class="gallery-scene-wash"></div>
+      </div>
       <div class="gallery-atmosphere" aria-hidden="true">
         <span class="gallery-halo"></span>
         <span class="gallery-flora gallery-flora-left">❧</span>
@@ -374,34 +381,34 @@
         <span class="gallery-spark gallery-spark-three">✧</span>
       </div>
       <div class="gallery-content">
-        <p class="gallery-eyebrow gallery-reveal">A collection of moments</p>
+        <p class="gallery-eyebrow gallery-reveal">Moments</p>
         <div class="gallery-flourish gallery-reveal" aria-hidden="true"><span></span>✦<span></span></div>
-        <h2 id="galleryHeading" class="gallery-heading gallery-reveal">Our Memories</h2>
-        <p class="gallery-intro gallery-reveal">Little moments, beautiful memories, and a story still unfolding.</p>
-        <div class="gallery-photos">
+        <h2 id="galleryHeading" class="gallery-heading gallery-reveal">Our Gallery</h2>
+        <div class="gallery-photos" aria-label="Five wedding gallery frames">
           <button type="button" class="gallery-photo gallery-photo-feature gallery-reveal" data-gallery-slot="0" disabled>
-            <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 01</span><span class="gallery-photo-note">Awaiting your photograph</span></span>
-          </button>
-          <div class="gallery-photo-pair">
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="1" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">Photo 02</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="2" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 03</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-          </div>
-          <div class="gallery-photo-pair gallery-photo-pair-last">
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="3" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">Photo 04</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-            <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="4" disabled>
-              <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Photo 05</span><span class="gallery-photo-note">Add a photograph</span></span>
-            </button>
-          </div>
+      <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">Together</span><span class="gallery-photo-note">Awaiting your photograph</span></span>
+      <span class="gallery-frame-caption" aria-hidden="true">Together</span>
+     </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="1" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">The Bride</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Bride</span>
+      </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="2" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">The Groom</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Groom</span>
+      </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="3" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">❦</span><span class="gallery-slot-label">The Garden</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Garden</span>
+      </button>
+          <button type="button" class="gallery-photo gallery-photo-small gallery-reveal" data-gallery-slot="4" disabled>
+       <span class="gallery-photo-placeholder"><span class="gallery-placeholder-icon" aria-hidden="true">✧</span><span class="gallery-slot-label">The Lake</span><span class="gallery-photo-note">Photo pending</span></span>
+       <span class="gallery-frame-caption" aria-hidden="true">The Lake</span>
+      </button>
         </div>
+        <p class="gallery-intro gallery-reveal">Tap a frame to view</p>
+        <p class="gallery-reference-note" hidden>Local comparison only: files in assets/gallery/reference/ are for authorized review, not for reuse in commercial invitations without the owner’s permission.</p>
         <p class="gallery-disclaimer gallery-reveal">Gallery preview — the couple's photographs have not been provided yet.</p>
-        <p class="gallery-ending gallery-reveal">And so our story continues…</p>
-        <span class="gallery-ending-symbol" aria-hidden="true">❧</span>
       </div>
     </section>
     <section class="reference-continuation ref-gifts" id="weddingGift" aria-labelledby="giftHeading" aria-hidden="true" inert>
