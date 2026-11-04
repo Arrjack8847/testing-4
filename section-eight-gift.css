@@ -344,3 +344,28 @@
   background:#fff url("./assets/reference-dev/gift-kettle.webp") center/contain no-repeat;
   font-size:0;
 }
+
+
+/* At the Gift handoff the source blush butterfly flies around the upper
+   edge, not the bottom; dimensions remain a frame-calibrated approximation. */
+.gift-eight-butterfly{
+  left:42%;top:21px;bottom:auto;
+  width:32px;height:28px;
+  z-index:5;
+}
+.gift-eight-bfly-wing{
+  top:0;width:17px;height:25px;
+}
+.gift-eight-bfly-left{left:0}
+.gift-eight-bfly-right{right:0}
+.gift-eight-bfly-body{
+  left:14px;top:6px;
+  width:3px;height:18px;
+}
+@keyframes gift-eight-butterfly-drift{
+  0%{transform:translate3d(15px,-13px,0) rotate(-8deg)}
+  32%{transform:translate3d(-24px,11px,0) rotate(8deg)}
+  58%{transform:translate3d(-49px,2px,0) rotate(-3deg)}
+  78%{transform:translate3d(-13px,-9px,0) rotate(12deg)}
+  100%{transform:translate3d(15px,-13px,0) rotate(-8deg)}
+}
