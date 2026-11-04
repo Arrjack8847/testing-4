@@ -54,7 +54,7 @@
 .order-section .order-leaf-right{top:59%;left:auto;right:-45px;transform:rotate(180deg);animation-delay:-5.5s}
 .order-section[data-art="reference"] .order-leaf{display:none}
 .order-section .order-inner{
-  position:relative;z-index:2;max-width:390px;width:100%;min-height:651px;
+  position:relative;z-index:2;max-width:430px;width:100%;min-height:651px;
   padding:35px clamp(17px,5vw,26px) 34px;margin:0 auto;
   display:flex;flex-direction:column;align-items:center;
 }
@@ -173,16 +173,16 @@
   box-shadow:0 0 0 1px rgba(255,237,232,.06) inset;
 }
 .order-section .order-eyebrow{
-  width:100%;max-width:334px;
+  width:100%;max-width:100%;
   color:rgba(255,248,238,.88);font:400 11px/1.65 'EB Garamond',Georgia,serif;
   letter-spacing:.45em;text-transform:uppercase;margin:0 0 12px;
 }
 .order-section h2.order-heading{
   color:rgb(243,223,240);font-size:46px;line-height:1.15;
-  width:100%;max-width:334px;margin:0 auto 34px;text-shadow:0 2px 7px rgba(23,8,19,.35);
+  width:100%;max-width:100%;margin:0 auto 34px;text-shadow:0 2px 7px rgba(23,8,19,.35);
   white-space:nowrap;
 }
-.order-section .order-timeline{max-width:334px;padding-left:0;}
+.order-section .order-timeline{max-width:100%;padding-left:0;}
 .order-section .order-timeline::before{
   top:12px;bottom:30px;left:91px;
   background:linear-gradient(to bottom,rgba(238,216,210,.45),rgba(238,216,210,.22));
@@ -215,15 +215,15 @@
 .order-section[data-art="reference"] .order-stage-original{opacity:0;}
 .order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{object-fit:cover;object-position:center;}
 @media(max-width:350px){
-  .order-section .order-inner{padding-inline:20px;}
-  .order-section .order-inner::before{left:13px;right:13px;}
+  .order-section .order-inner{padding-inline:28px;}
+  .order-section .order-inner::before{left:23px;right:23px;}
   .order-section .order-timeline{max-width:100%;}
-  .order-section .order-entry{grid-template-columns:68px minmax(0,1fr);gap:23px;}
-  .order-section .order-timeline::before{left:76px;}
-  .order-section .order-entry::before{left:71px;}
-  .order-section .order-time{padding-left:0;font-size:11px;}
+  .order-section .order-entry{grid-template-columns:74px minmax(0,1fr);gap:34px;}
+  .order-section .order-timeline::before{left:91px;}
+  .order-section .order-entry::before{left:86px;}
+  .order-section .order-time{padding-left:0;font-size:12px;}
   .order-section .order-event-text strong{font-size:17px;}
-  .order-section h2.order-heading{font-size:clamp(38px,12vw,46px);}
+  .order-section h2.order-heading{font-size:46px;white-space:normal;}
 }
 
 
@@ -326,3 +326,7 @@
   text-align:left;pointer-events:none;
 }
 .order-section .order-artwork-notice[hidden]{display:none!important}
+
+/* Four-phone source audit, 4 November: preserve the source's two-line
+   headline and 739px natural height at 320px, and allow full 374px
+   timeline width at 430px. These width rules do not change 360/390px. */
