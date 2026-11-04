@@ -237,3 +237,38 @@ test('Section 10 reveals and hides individual blocks on forward and reverse scro
   expect(await opacity(footer)).toBeLessThan(0.03);
   await expect(closing).toHaveAttribute('data-revealed','true');
 });
+
+
+test('Section 10 reference trigger boundaries match the source at 390x844',async({page},testInfo)=>{
+  if(testInfo.project.name!=='iphone-390')return;
+  await openInvitation(page);
+  const c=page.locator('#closingMessage');
+  const goto=async(delta)=>page.evaluate(delta=>{
+    const e=document.querySelector('#closingMessage');
+    window.scrollTo({top:e.getBoundingClientRect().top+window.scrollY+delta,behavior:'instant'});
+  },delta);
+  const check=async(selector,expected)=>{
+    await expect(c.locator(selector)).toHaveAttribute('data-in-view',String(expected));
+  };
+  // Confirmed reference source '.in' activation checkpoints from the 390x844
+  // read-only motion.json measurements, not arbitrary design preferences.
+  await goto(-370);
+  await check('.closing10-message',true);
+  await check('.closing10-rule',false);
+  await goto(-170);
+  await check('.closing10-rule',true);
+  await check('.closing10-signoff',true);
+  await goto(-30);
+  await check('.closing10-contacts',false);
+  await goto(80);
+  await check('.closing10-contacts',true);
+  await check('.closing10-credit',false);
+  await goto(180);
+  await check('.closing10-credit',true);
+  await goto(80);
+  await check('.closing10-credit',false);
+  await goto(-30);
+  await check('.closing10-contacts',false);
+  await goto(-370);
+  await check('.closing10-rule',false);
+});
