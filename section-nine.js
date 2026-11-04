@@ -23,7 +23,7 @@
     const closed=invitation.dataset.state!=='opened';
     section.inert=closed;section.setAttribute('aria-hidden',String(closed));
     if(closed){form.reset();guests.disabled=false;preview.hidden=true;previewText='';
-      status.textContent='Preview only — submissions are not sent or stored.';}
+      status.classList.remove('s9-feedback-visible');status.textContent='Preview only — submissions are not sent or stored.';}
     syncMotion();
   };
   syncCover();
@@ -76,12 +76,12 @@
     previewText=['Wedding RSVP — not submitted','Name: '+clean,'Attendance: '+fields.attendance.textContent,
       'Guests: '+fields.guests.textContent,'Wish: '+fields.wish.textContent].join('\n');
     preview.hidden=false;
-    status.textContent='This is a local preview only. Your response was not sent or saved.';
+    status.classList.add('s9-feedback-visible');status.textContent='This is a local preview only. Your response was not sent or saved.';
   });
   name.addEventListener('input',()=>name.setCustomValidity(''));
   copy.addEventListener('click',async()=>{
     if(!previewText)return;
-    try{await navigator.clipboard.writeText(previewText);status.textContent='Preview copied. Nothing was sent.';}
-    catch{status.textContent='Copy unavailable. Please select and copy your preview manually.';}
+    try{await navigator.clipboard.writeText(previewText);status.classList.add('s9-feedback-visible');status.textContent='Preview copied. Nothing was sent.';}
+    catch{status.classList.add('s9-feedback-visible');status.textContent='Copy unavailable. Please select and copy your preview manually.';}
   });
 })();
