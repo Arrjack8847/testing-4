@@ -6,3 +6,9 @@ node_modules/
 test-results/
 playwright-report/
 section5-live-evidence/
+
+# Private RSVPs and local data (never publish)
+.private/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal

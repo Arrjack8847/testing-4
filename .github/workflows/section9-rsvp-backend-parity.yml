@@ -1,0 +1,87 @@
+name: Section 9 persistent RSVP and frame parity
+on:
+  push:
+    branches: [feat/section9-rsvp-persistence-visual-audit-20261104]
+  pull_request:
+    paths:
+      - index.html
+      - section-nine.js
+      - section-nine.css
+      - tools/dev-server.py
+      - tools/rsvp-admin.py
+      - tests/section-nine.spec.mjs
+      - tests/test_rsvp_api.py
+      - .github/workflows/section9-rsvp-backend-parity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rsvp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Validate server, privacy and persistence with real HTTP requests
+        run: python3 -m unittest discover -s tests -p 'test_rsvp_api.py' -v
+      - name: Validate Section 9 browser scripts
+        run: node --check section-nine.js
+      - name: Verify unconfigured Vercel API rejects fake writes
+        run: node --test tests/rsvp-serverless.test.cjs
+      - name: Four-phone Section 9 and 10 integration
+        run: npx playwright test tests/section-nine.spec.mjs tests/section-six.spec.mjs tests/section-ten.spec.mjs --workers=2
+      - name: Save test evidence without storing guest data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section9-api-qa
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 7
+  visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Stage ephemeral reference artwork for private comparison only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen,Request
+          out=Path('assets/reference-dev/section9')
+          out.mkdir(parents=True,exist_ok=True)
+          files={
+              'paper.webp':'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp',
+              'bfly_1.webp':'https://undangankahwin.com/images/concierge/packs/serambi-ungu/bfly_1.webp'
+          }
+          for name,url in files.items():
+              data=urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=40).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP',name
+              (out/name).write_bytes(data)
+          print('Staged 2 WebP files in Git-ignored research-only folder')
+          PY
+      - name: Capture 21 paired animation frames
+        run: |
+          python3 tools/dev-server.py >/tmp/s9-local-server.log 2>&1 &
+          node tools/section9-frame-parity.mjs
+      - name: Measure pixel differences without false parity claims
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 tools/section9-frame-stats.py
+      - name: Save reference and local visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section9-21-frame-visual-audit
+          path: section9-frame-audit/
+          if-no-files-found: warn
+          retention-days: 7

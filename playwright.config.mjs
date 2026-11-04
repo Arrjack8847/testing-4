@@ -23,7 +23,7 @@ export default defineConfig({
     { name: 'large-phone', use: { viewport: { width: 430, height: 932 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true } }
   ],
   webServer: {
-    command: 'python3 -m http.server 8000 --bind 127.0.0.1',
+    command: 'python3 tools/dev-server.py',
     port: 8000,
     timeout: 20_000,
     reuseExistingServer: !process.env.CI
