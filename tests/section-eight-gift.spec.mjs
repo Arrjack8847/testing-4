@@ -57,10 +57,12 @@ test('Section 8 uses the actual source content order without unsafe fake transac
   await expect(trigger).toHaveAttribute('aria-expanded','false');
   await expect(gift.locator('#giftEightBanks')).toBeHidden();
   await expect(gift.locator('#giftEightWishlist')).toBeHidden();
+  await expect(gift.locator('#giftEightDisclaimer')).toBeHidden();
   await trigger.click();
   await expect(trigger).toHaveAttribute('aria-expanded','true');
   await expect(gift.locator('#giftEightBanks')).toBeVisible();
   await expect(gift.locator('#giftEightWishlist')).toBeVisible();
+  await expect(gift.locator('#giftEightDisclaimer')).toBeVisible();
   await expect(gift.getByRole('heading',{name:'Gift Wishlist'})).toBeVisible();
   const carousel=await gift.locator('#giftEightBanks').evaluate(el=>({
     width:el.getBoundingClientRect().width,
@@ -84,6 +86,7 @@ test('Section 8 uses the actual source content order without unsafe fake transac
   await expect(trigger).toHaveAttribute('aria-expanded','false');
   await expect(gift.locator('#giftEightBanks')).toBeHidden();
   await expect(gift.locator('#giftEightWishlist')).toBeHidden();
+  await expect(gift.locator('#giftEightDisclaimer')).toBeHidden();
   await expect(gift.locator('.gift-eight-disclaimer')).toContainText('not enabled');
   expect(faults).toEqual([]);
 });
