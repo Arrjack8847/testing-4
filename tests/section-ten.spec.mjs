@@ -160,8 +160,9 @@ test('Section 10 contact pills and footer follow the measured source geometry',a
     const row=el.querySelector('.closing10-contact-row');
     const buttons=[...row.querySelectorAll('button')];
     const credit=el.querySelector('.closing10-credit');
+    const rule=el.querySelector('.closing10-rule');
     return {contact:box(contact),label:box(label),row:box(row),
-      buttons:buttons.map(box),credit:box(credit)};
+      buttons:buttons.map(box),credit:box(credit),rule:box(rule)};
   });
   expect(Math.abs(m.contact.height-94.14)).toBeLessThan(1.5);
   expect(Math.abs(m.row.height-64)).toBeLessThan(1);
@@ -178,5 +179,7 @@ test('Section 10 contact pills and footer follow the measured source geometry',a
   if(testInfo.project.name==='iphone-390'){
     expect(Math.abs(m.buttons[0].width-83)).toBeLessThan(3);
     expect(Math.abs(m.buttons[1].width-128)).toBeLessThan(3);
+    expect(Math.abs(m.label.width-99.81)).toBeLessThan(2);
+    expect(Math.abs(m.rule.width-80)).toBeLessThan(1);
   }
 });
