@@ -1,0 +1,49 @@
+name: Section 6 pixel parity audit (reference vs local)
+on:
+  push:
+    branches:
+      - feat/section6-dress-code-reference-20261103
+    paths:
+      - tools/section6-pixel-audit.py
+      - .github/workflows/section6-pixel-parity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pixel-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test browser and image tooling
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python3 -m pip install Pillow
+      - name: Start development site
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/sec6-local.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8000/ -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sec6-local.log
+          exit 1
+      - name: Capture ephemeral 320/360/390/430 reference and local screenshots
+        run: npm run compare:section6
+      - name: Quantify pixel parity without redistributing reference screenshots
+        run: python3 tools/section6-pixel-audit.py
+      - name: Upload numerical evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-pixel-parity-numerical-report
+          path: artifacts/section6-compare/pixel-parity.json
+          retention-days: 7
+          if-no-files-found: warn
