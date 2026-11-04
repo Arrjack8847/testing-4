@@ -8,7 +8,8 @@ import {join} from 'node:path';
 
 const files=[
   {name:'paper.webp',url:'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp'},
-  {name:'arch_event.svg',url:'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg'}
+  {name:'arch_event.svg',url:'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg'},
+  {name:'bfly_white.webp',url:'https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp'}
 ];
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const results=[];
@@ -55,4 +56,4 @@ const mismatches=results.filter(x=>x.status==='BYTE_MISMATCH');
 const unverified=results.filter(x=>x.status==='UNVERIFIED');
 if(mismatches.length){console.error('Source/local bytes differ. Do not claim exact original assets.');process.exitCode=1;}
 else if(unverified.length){console.error('Source/local identity could not be verified. No 1:1 claim.');process.exitCode=2;}
-else console.log('Both identified Section 4 source assets match byte-for-byte. Check missing artwork and visual parity separately.');
+else console.log('All three identified Section 4 source assets match byte-for-byte. Check missing artwork and visual parity separately.');
