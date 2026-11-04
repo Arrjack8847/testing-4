@@ -5,6 +5,8 @@ on:
       - feat/section7-reference-validation-20261104
     paths:
       - tools/section7-shell-audit.mjs
+      - index.html
+      - section-five.css
       - .github/workflows/section7-shell-audit.yml
   workflow_dispatch:
 permissions:
