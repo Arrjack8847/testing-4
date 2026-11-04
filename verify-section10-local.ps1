@@ -22,17 +22,24 @@ try {
     throw 'npx is required.'
   }
 
-  $pythonExe = $null
-  $pythonArgs = @()
-  if (Get-Command py -ErrorAction SilentlyContinue) {
-    $pythonExe = 'py'
-    $pythonArgs = @('-B', 'tools/dev-server.py')
+  # Launch python.exe directly: stopping the Windows py.exe launcher can
+  # leave its child server alive, causing later localhost:8000 conflicts.
+  $pythonLauncher = if (Get-Command py -ErrorAction SilentlyContinue) {
+    'py'
   } elseif (Get-Command python -ErrorAction SilentlyContinue) {
-    $pythonExe = 'python'
-    $pythonArgs = @('-B', 'tools/dev-server.py')
+    'python'
   } else {
     throw 'Python is required to run the local preview server.'
   }
+  $pythonExe = (& $pythonLauncher -c 'import sys;print(sys.executable)' | Select-Object -Last 1)
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pythonExe)) {
+    throw 'Could not resolve the Python interpreter executable.'
+  }
+  $pythonExe = $pythonExe.Trim()
+  if (-not (Test-Path -LiteralPath $pythonExe -PathType Leaf)) {
+    throw "Python interpreter not found: $pythonExe"
+  }
+  $pythonArgs = @('-B', 'tools/dev-server.py')
 
   # Running against another worker's server gives false results.
   # Refuse to reuse occupied port 8000, rather than testing wrong code.
