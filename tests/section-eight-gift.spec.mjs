@@ -199,6 +199,8 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
       wing:wcss.backgroundImage,
       butterflyVisibility:bcss.visibility,
       butterflyOpacity:parseFloat(bcss.opacity),
+      butterflyWidth:butterfly.getBoundingClientRect().width,
+      butterflyTop:butterfly.getBoundingClientRect().top-el.getBoundingClientRect().top,
       overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
@@ -206,6 +208,9 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
   expect(visual.wing).toContain('reference-dev/bfly_blush.webp');
   expect(visual.butterflyVisibility).toBe('visible');
   expect(visual.butterflyOpacity).toBeGreaterThan(.8);
+  expect(visual.butterflyWidth).toBeGreaterThanOrEqual(25);
+  expect(visual.butterflyWidth).toBeLessThanOrEqual(40);
+  expect(visual.butterflyTop).toBeLessThan(70);
   expect(visual.overflow).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
