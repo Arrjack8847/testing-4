@@ -37,11 +37,21 @@
   background:radial-gradient(ellipse 85% 50% at 50% 50%,#fffaf6c7,transparent 80%);
   transform:translate3d(0,var(--closing10-sticky-y,0px),0);
 }
+/* The camera pans the licensed local scene up to 24px vertically.
+   Paint the unshifted same scene below it so the parallax never exposes
+   transparent strips, without scaling or distorting the moving artwork. */
+.section-ten[data-artwork="local-reference"] .closing10-sticky-art::before {
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url('./assets/section10/scene.webp') center/cover no-repeat;
+}
 .section-ten .closing10-source-scene {
   display:none;position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;object-position:center;opacity:1;
 }
-.section-ten[data-artwork="local-reference"] .closing10-source-scene {display:block;}
+.section-ten[data-artwork="local-reference"] .closing10-source-scene {
+  display:block;
+  transform:translate3d(0,var(--closing10-scene-y,0px),0);
+}
 /* No section-wide top veil over the exact staged reference scene. */
 .section-ten[data-artwork="local-reference"]::before {display:none;}
 .section-ten[data-artwork="local-reference"] .ref-environment::before,
@@ -84,7 +94,7 @@
   color:#6f5a6c;font:400 18px/1.65 'EB Garamond',Georgia,serif;
 }
 .section-ten .closing10-rule {
-  width:76px;height:1px;margin:26px auto;
+  width:80px;height:1px;margin:26px auto;
   background:linear-gradient(90deg,transparent,#7e6479,transparent);
 }
 .section-ten .closing10-signoff {margin:0 0 2px;color:#7e6479;}
@@ -99,20 +109,21 @@
 }
 .section-ten .closing10-contacts {margin:26px auto 0;}
 .section-ten .closing10-contacts-title {
-  margin:0;font:400 11px/1.65 'EB Garamond',Georgia,serif;
-  letter-spacing:4.95px;color:#7e6479;
+  width:max-content;margin:0 auto;opacity:.8;
+  font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:3.08px;color:#7e6479;text-transform:uppercase;
 }
 .section-ten .closing10-contact-row {
-  display:flex;justify-content:center;align-items:center;gap:10px;margin-top:20px;
+  display:flex;justify-content:center;align-items:center;gap:9px;margin-top:12px;
 }
 .section-ten .closing10-contact-row button {
-  min-height:42px;padding:9px 20px;
-  border:1px solid #b6a6b6;border-radius:3px;
+  min-height:44px;margin-top:20px;padding:9px 20px;
+  border:0;border-radius:999px;
   background:#fff;color:#5c264f;
   font:500 12px/1.65 'EB Garamond',Georgia,serif;
-  letter-spacing:3px;
+  letter-spacing:3px;text-transform:uppercase;
 }
-.section-ten .closing10-contact-row button:disabled {opacity:.75;cursor:not-allowed;}
+.section-ten .closing10-contact-row button:disabled {opacity:1;cursor:not-allowed;}
 .section-ten .closing10-credit {
   margin:56px auto 0;
   color:#6f5a6c;font:300 11px/1.65 'EB Garamond',Georgia,serif;
@@ -125,16 +136,23 @@
 .section-ten .closing10-reveal {opacity:1;transform:none;}
 .section-ten[data-motion-ready="true"] .closing10-reveal {
   opacity:0;transform:translate3d(0,52px,0) scale(.955);
-  transition:opacity .8s ease,transform .9s cubic-bezier(.22,.9,.24,1);
+  transition:opacity 1s ease,transform 1.1s cubic-bezier(.22,.9,.24,1);
   transition-delay:var(--closing10-delay,0ms);
 }
-.section-ten[data-motion-ready="true"][data-revealed="true"] .closing10-reveal {
+.section-ten[data-motion-ready="true"] .closing10-reveal[data-in-view="true"] {
   opacity:1;transform:none;
 }
-.section-ten .closing10-message,.section-ten .closing10-rule {--closing10-delay:100ms;}
-.section-ten .closing10-signoff,.section-ten .closing10-names,.section-ten .closing10-contacts {--closing10-delay:220ms;}
-.section-ten .closing10-credit,.section-ten .closing10-disclosure {--closing10-delay:340ms;}
+/* Delays measured from live Tasik Kayangan computed styles on 390x844.
+   One discrete stagger per closing element, including reverse scroll. */
 .section-ten .closing10-frame {--closing10-delay:0ms;}
+.section-ten #closingHeading {--closing10-delay:150ms;}
+.section-ten .closing10-message {--closing10-delay:300ms;}
+.section-ten .closing10-rule {--closing10-delay:450ms;}
+.section-ten .closing10-signoff {--closing10-delay:600ms;}
+.section-ten .closing10-names {--closing10-delay:750ms;}
+.section-ten .closing10-contacts {--closing10-delay:900ms;}
+.section-ten .closing10-credit {--closing10-delay:1050ms;}
+.section-ten .closing10-disclosure {--closing10-delay:1050ms;}
 @media(max-width:350px){
   .reference-continuation.ref-closing.section-ten {padding-inline:17px;padding-top:200px;padding-bottom:210px;}
   .section-ten .closing10-inner {max-width:300px;}
@@ -147,4 +165,5 @@
   .section-ten .closing10-reveal {opacity:1!important;transform:none!important;transition:none!important;}
   .section-ten .ref-vine {animation:none!important;}
   .section-ten .closing10-sticky-art {transform:none!important;}
+  .section-ten .closing10-source-scene {transform:none!important;}
 }

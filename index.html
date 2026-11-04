@@ -168,6 +168,13 @@
         <span class="event-flower event-flower-right">❧</span>
         <img class="event-source-butterfly" id="eventSourceButterfly" alt="" decoding="async">
       </div>
+      <!-- Section 4 source butterfly layer for authorized local comparison. -->
+      <span class="event-reference-butterfly-layer" aria-hidden="true">
+        <span class="event-reference-butterfly">
+          <i class="event-reference-butterfly-wing event-reference-butterfly-left"></i>
+          <i class="event-reference-butterfly-wing event-reference-butterfly-right"></i>
+        </span>
+      </span>
       <span class="event-petal-field" aria-hidden="true">
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
@@ -195,7 +202,7 @@
           <span class="event-card-diamond event-reveal" aria-hidden="true">❖</span>
           <h3 class="event-card-place event-reveal">Grand Ballroom, St. Regis Kuala Lumpur</h3>
           <p class="event-card-address event-reveal">6, Jalan Stesen Sentral 2, 50470 Kuala Lumpur</p>
-          <div class="event-card-links event-reveal">
+          <div class="event-card-links">
             <a class="event-map-link event-reveal" target="_blank" rel="noopener noreferrer"
               href="https://www.google.com/maps/search/?api=1&amp;query=The+St+Regis+Kuala+Lumpur">Open in Maps</a>
             <a class="event-map-link event-waze-link event-reveal" target="_blank" rel="noopener noreferrer"
@@ -323,6 +330,8 @@
         <div class="dress-art-original"></div>
         <img class="dress-source-scene" id="dressSourceScene" alt="">
       </div>
+      <!-- Dress Code source-measured 22% paper wash, independent of parallax. -->
+      <div class="dress-paper-wash" aria-hidden="true"></div>
       <!-- Licensed local WebP butterfly, split into two 3D wings.
            Time-based flight stays independent of the paper's scroll parallax. -->
       <div class="dress-flight" id="dressFlight" aria-hidden="true">
@@ -414,7 +423,7 @@
       </div>
     </section>
     <!-- Section 8: Wedding Gift; vendor sample details are deliberately non-transactional. -->
-    <section id="weddingGift" class="gift-eight" data-section="8" aria-labelledby="giftEightHeading" aria-hidden="true" inert data-gift-artwork="original" data-gift-butterfly="unavailable">
+    <section id="weddingGift" class="gift-eight" data-section="8" aria-labelledby="giftEightHeading" aria-hidden="true" inert data-gift-artwork="original" data-gift-butterfly="original">
       <div class="gift-eight-art" aria-hidden="true"></div>
       <div class="gift-eight-petals" aria-hidden="true">
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
@@ -454,28 +463,28 @@
             <article class="gift-eight-item">
               <div class="gift-eight-thumb gift-eight-thumb-rice" aria-hidden="true">✧</div>
               <div><h4>Philips Avance Collection Rice Cooker HD3175/62</h4>
-                <p>Shopee · Example item, stock unverified</p>
+                <p>Shopee · Demo</p>
                 <div class="gift-eight-actions"><span>View on Shopee</span><button type="button" disabled title="No reservation service connected">Reserve</button></div>
               </div>
             </article>
             <article class="gift-eight-item">
               <div class="gift-eight-thumb gift-eight-thumb-kettle" aria-hidden="true">❦</div>
               <div><h4>Philips 1.7L Kettle 1000 Series HD9314</h4>
-                <p>Lazada · Example item, reservation unverified</p>
+                <p>Lazada · Demo</p>
                 <div class="gift-eight-actions"><span>View on Lazada</span><button type="button" disabled title="No verified reservation state">Reserved</button></div>
               </div>
             </article>
             <article class="gift-eight-item">
               <div class="gift-eight-thumb" aria-hidden="true">✦</div>
               <div><h4>IKEA Gift Card</h4>
-                <p>Example item · Purchase link not configured</p>
                 <div class="gift-eight-actions"><button type="button" disabled title="No verified purchase destination">Buy</button></div>
               </div>
             </article>
           </div>
         </div>
-        <p class="gift-eight-disclaimer gift-eight-reveal" id="giftEightDisclaimer" hidden>Demonstration only. Bank transfers, purchases and reservations are not enabled.</p>
       </div>
+      <!-- Preserve Section 8 source-measured height while retaining a clear demo notice. -->
+      <p class="gift-eight-disclaimer gift-eight-reveal" id="giftEightDisclaimer" hidden>Demonstration only. Bank transfers, purchases and reservations are not enabled.</p>
     </section>
     <!-- Section 9: RSVP & Wishes. Source-measured; live submissions require RSVP API. -->
     <section class="s9-rsvp" id="rsvp" data-section="9" aria-labelledby="rsvpHeading" aria-hidden="true" inert>
@@ -587,7 +596,7 @@
   </main>
   <dialog class="gallery-dialog" id="galleryDialog" aria-label="Wedding photo viewer">
     <div class="gallery-viewer">
-      <button type="button" id="galleryClose" class="gallery-viewer-close" aria-label="Close photo viewer">×</button>
+      <button type="button" id="galleryClose" class="gallery-viewer-close" aria-label="Close photo viewer">✕</button>
       <figure class="gallery-viewer-figure">
         <img id="galleryViewImage" alt="">
         <figcaption id="galleryViewCaption"></figcaption>

@@ -28,9 +28,17 @@ def main():
         refs={x["version"]:x for x in dom if x["width"]==w}
         a=np.asarray(Image.open(ROOT/f"reference-section-{w}.png").convert("RGB"))
         b=np.asarray(Image.open(ROOT/f"local-section-{w}.png").convert("RGB"))
-        if a.shape!=b.shape:
-            results[str(w)]={"error":f"dimensions don't match: {a.shape} vs {b.shape}"}
-            continue
+        # Chromium may round the same fractional CSS section height up/down
+        # by one raster row after a fractional scroll position. Compare only
+        # common rows in that case; report the rounding discrepancy.
+        reference_shape, local_shape = a.shape, b.shape
+        if a.shape != b.shape:
+            if a.shape[1:] != b.shape[1:] or abs(a.shape[0]-b.shape[0])>1:
+                results[str(w)]={"error":f"dimensions differ: {a.shape} vs {b.shape}"}
+                continue
+            common_height=min(a.shape[0],b.shape[0])
+            a=a[:common_height,:,:]
+            b=b[:common_height,:,:]
         h,width,_=a.shape
         yy,xx=np.indices((h,width))
         masks={
@@ -65,6 +73,8 @@ def main():
                  for x,y in pts if 0<=y<h]
         results[str(w)]={
             "dimensions":[w,h],
+            "referenceRasterSize":list(reference_shape[:2]),
+            "localRasterSize":list(local_shape[:2]),
             "regions":r,
             "bestPaperEdgeShift":best,
             "colorSamples":samples,

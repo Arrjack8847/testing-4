@@ -101,7 +101,7 @@ test('reduced-motion preserves legible timeline without animation or camera move
   expect(Math.abs(Number(cam))).toBeLessThan(.01);
 });
 
-test('root URL shows a clear warning when reference WebPs are missing (never substitute SVG)',async({page})=>{
+test('root URL shows independently drawn plum relief when reference WebPs are unavailable',async({page})=>{
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:404,body:'Permission-cleared file not installed'}));
   const {section}=await toOrder(page);
@@ -111,6 +111,8 @@ test('root URL shows a clear warning when reference WebPs are missing (never sub
   await expect(section).toHaveAttribute('data-band-status','failed');
   await expect(section).toHaveAttribute('data-butterfly-status','failed');
   await expect(section).toHaveAttribute('data-artwork-status','missing');
+  await expect(section).toHaveAttribute('data-background-renderer','original-svg');
+  await expect(section.locator('#orderArtworkNotice')).toContainText('original illustrated botanical relief');
   await expect(section.locator('#orderArtworkNotice')).toBeVisible();
   await expect(section.locator('#orderArtworkNotice')).toContainText('band_plum.webp, bfly_blush.webp');
   const state=await section.evaluate(el=>({
@@ -118,7 +120,7 @@ test('root URL shows a clear warning when reference WebPs are missing (never sub
     notice:getComputedStyle(el.querySelector('#orderArtworkNotice')).display,
     sourceUrl:el.querySelector('#orderSourceBand').src
   }));
-  expect(state.background).not.toContain('order-plum-emboss-original.svg');
+  expect(state.background).toContain('order-plum-emboss-original.svg');
   expect(state.background).not.toContain('undangankahwin.com');
   expect(state.notice).not.toBe('none');
   expect(state.sourceUrl).toContain('/assets/reference-dev/band_plum.webp');
@@ -134,6 +136,7 @@ test('plain root uses exact local WebPs with cover geometry and no vendor hotlin
   await expect(section).toHaveAttribute('data-band-status','loaded');
   await expect(section).toHaveAttribute('data-butterfly-status','loaded');
   await expect(section).toHaveAttribute('data-artwork-status','ready');
+  await expect(section).toHaveAttribute('data-background-renderer','reference-webp');
   await expect(section.locator('#orderArtworkNotice')).toBeHidden();
   const result=await section.evaluate(el=>{
     const style=getComputedStyle(el);
@@ -158,6 +161,7 @@ test('missing butterfly is reported while a valid local background remains activ
   await expect(section).toHaveAttribute('data-band-status','loaded');
   await expect(section).toHaveAttribute('data-butterfly-status','failed');
   await expect(section).toHaveAttribute('data-artwork-status','partial');
+  await expect(section).toHaveAttribute('data-background-renderer','reference-webp');
   const msg=section.locator('#orderArtworkNotice');
   await expect(msg).toBeVisible();
   await expect(msg).toContainText('bfly_blush.webp');
@@ -205,7 +209,7 @@ test('source-like fixed canvas paints rose petals only while timeline is visible
   expect(errors).toEqual([]);
 });
 
-test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',async({page})=>{
+test('sprite butterfly traverses lower panel right-to-left with mirrored 3D wing flaps',async({page})=>{
   const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:fixture}));
@@ -221,16 +225,20 @@ test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',asyn
       return {width:css.width,height:css.height,bg:css.backgroundSize,
         position:css.backgroundPosition,transform:css.transform};
     });
-    return {x:Number(el.dataset.x),direction:el.dataset.direction,
+    return {x:Number(el.dataset.x),y:Number(el.dataset.y),direction:el.dataset.direction,
       width:getComputedStyle(el).width,height:getComputedStyle(el).height,wing};
   });
   const before=await getState();
   await page.waitForTimeout(1150);
   const after=await getState();
-  expect(before.direction).toBe('right');
-  expect(after.direction).toBe('right');
-  expect(after.x-before.x).toBeGreaterThan(28);
-  expect(after.x-before.x).toBeLessThan(66);
+  expect(before.direction).toBe('left');
+  expect(after.direction).toBe('left');
+  expect(after.x-before.x).toBeLessThan(-28);
+  expect(after.x-before.x).toBeGreaterThan(-65);
+  for (const y of [before.y,after.y]) {
+    expect(y).toBeGreaterThan(540);
+    expect(y).toBeLessThan(625);
+  }
   expect(after.width).toBe('46px');
   expect(after.height).toBe('35px');
   expect(after.wing[0].width).toBe('23px');
@@ -312,5 +320,119 @@ test('390px timeline text and six row baselines match measured source geometry',
   expect(m.timeStyle.textAlign).toBe('right');
   expect(m.titleStyle.size).toBe('17px');
   expect(m.eyebrowStyle.size).toBe('11px');
+  expect(errors).toEqual([]);
+});
+
+test('Section 5 animated effects stop at Section 6 viewport without changing Dress Code',async({page})=>{
+  const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:fixture}));
+  const {section,errors}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  const dress=page.locator('#dressCode');
+  await expect(dress).toBeAttached();
+  await page.evaluate(()=>{
+    document.getElementById('dressCode').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(dress).toBeInViewport();
+  await expect(section).toHaveAttribute('data-petal-motion','paused');
+  await expect(section).toHaveAttribute('data-butterfly-motion','paused');
+  const both=await section.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const d=document.getElementById('dressCode').getBoundingClientRect();
+    return {gap:d.top-r.bottom,overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(Math.abs(both.gap)).toBeLessThanOrEqual(1);
+  expect(both.overflow).toBeLessThanOrEqual(1);
+  await page.evaluate(()=>{
+    document.getElementById('runningOrder').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  expect(errors).toEqual([]);
+});
+
+test('390px particle canvas opacity and CSS pixel coverage remain source-calibrated',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','390 × 844 source baseline');
+  const {section,errors}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  await page.waitForTimeout(260);
+  const metrics=await section.locator('#orderPetalCanvas').evaluate(el=>{
+    const d=el.getContext('2d').getImageData(0,0,el.width,el.height).data;
+    let count=0,alpha=0;
+    for(let i=3;i<d.length;i+=4) if(d[i]) { count++;alpha+=d[i]; }
+    const r=el.getBoundingClientRect();
+    const scale=(el.width/r.width)*(el.height/r.height);
+    return {pixels:count/scale,alpha:count?alpha/count:0};
+  });
+  expect(metrics.pixels).toBeGreaterThan(450);
+  expect(metrics.pixels).toBeLessThan(2300);
+  expect(metrics.alpha).toBeGreaterThan(65);
+  expect(metrics.alpha).toBeLessThan(180);
+  expect(errors).toEqual([]);
+});
+
+test('320px reference wraps the script heading and expands the timeline section to 739px',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='small-phone','Measured source at 320 × 568');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {section,errors}=await toOrder(page);
+  await page.evaluate(()=>document.fonts.ready);
+  const m=await section.evaluate(el=>{
+    const base=el.getBoundingClientRect();
+    const box=n=>{const r=n.getBoundingClientRect();return {
+      x:r.left-base.left,y:r.top-base.top,width:r.width,height:r.height
+    }};
+    return {
+      section:box(el),
+      eyebrow:box(el.querySelector('.order-eyebrow')),
+      heading:box(el.querySelector('.order-heading')),
+      rows:[...el.querySelectorAll('.order-entry')].map(box),
+      border:getComputedStyle(el.querySelector('.order-inner'),'::before').inset
+    };
+  });
+  const near=(actual,expected,tolerance=1.5)=>
+    expect(Math.abs(actual-expected)).toBeLessThanOrEqual(tolerance);
+  near(m.section.height,739.23);
+  near(m.eyebrow.x,28);
+  near(m.eyebrow.y,96);
+  near(m.heading.x,28);
+  near(m.heading.y,126.14);
+  near(m.heading.height,105.78);
+  const rowY=[265.92,333.05,385.05,471.36,539.23,591.23];
+  const rowH=[67.13,52,86.31,67.88,52,52];
+  m.rows.forEach((r,i)=>{
+    near(r.x,28);
+    near(r.width,264);
+    near(r.y,rowY[i]);
+    near(r.height,rowH[i]);
+  });
+  expect(errors).toEqual([]);
+});
+
+test('430px reference uses the full 374px timeline instead of a capped 334px column',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='large-phone','Measured source at 430 × 932');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {section,errors}=await toOrder(page);
+  await page.evaluate(()=>document.fonts.ready);
+  const m=await section.evaluate(el=>{
+    const root=el.getBoundingClientRect();
+    const box=n=>{const r=n.getBoundingClientRect();return{
+      x:r.left-root.left,y:r.top-root.top,width:r.width,height:r.height}};
+    return {height:root.height,
+      eyebrow:box(el.querySelector('.order-eyebrow')),
+      heading:box(el.querySelector('.order-heading')),
+      rows:[...el.querySelectorAll('.order-entry')].map(box)};
+  });
+  expect(Math.abs(m.height-651.28)).toBeLessThan(1.5);
+  expect(m.eyebrow.x).toBe(28);
+  expect(m.eyebrow.width).toBe(374);
+  expect(m.heading.x).toBe(28);
+  expect(m.heading.width).toBe(374);
+  m.rows.forEach((r,i)=>{
+    expect(r.x).toBe(28);
+    expect(r.width).toBe(374);
+    expect(Math.abs(r.y-[213.03,280.16,332.16,399.28,451.28,503.28][i])).toBeLessThan(1.5);
+  });
   expect(errors).toEqual([]);
 });

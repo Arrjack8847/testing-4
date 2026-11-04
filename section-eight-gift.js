@@ -21,7 +21,7 @@
       if(butterfly.naturalWidth>0&&butterfly.naturalHeight>0)
         section.dataset.giftButterfly='reference-local';
     };
-    butterfly.onerror=()=>{section.dataset.giftButterfly='unavailable';};
+    butterfly.onerror=()=>{section.dataset.giftButterfly='original';};
     butterfly.src='./assets/reference-dev/bfly_blush.webp';
   }
 

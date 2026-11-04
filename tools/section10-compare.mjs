@@ -3,13 +3,28 @@
 // to Git, and never performs external interactions beyond opening the preview.
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 
 const OUTPUT='section10-visual-qa';
 const SOURCE='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en';
 const LOCAL='http://127.0.0.1:8000';
 await mkdir(OUTPUT,{recursive:true});
-const server=spawn('python3',['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
+// Use the real RSVP-aware preview server. Do not silently connect to another
+// worker's existing localhost:8000 and measure the wrong checkout.
+const resolvePython=()=>{
+  if(process.platform!=='win32')return 'python3';
+  for(const executable of ['py','python']){
+    const probe=spawnSync(executable,['-c','import sys;print(sys.executable)'],
+      {encoding:'utf8',timeout:10000});
+    const resolved=probe.stdout?.trim().split(/\r?\n/).at(-1);
+    if(probe.status===0&&resolved)return resolved;
+  }
+  throw new Error('Python interpreter not found');
+};
+const portInUse=await fetch(LOCAL,{signal:AbortSignal.timeout(2000)})
+  .then(()=>true,()=>false);
+if(portInUse)throw new Error('Port 8000 is already in use. Stop the other preview before running Section 10 comparison.');
+const server=spawn(resolvePython(),['-B','tools/dev-server.py'],{stdio:'ignore'});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 let result={checkedAt:new Date().toISOString(),viewport:{width:390,height:844}};
 const selectors={
@@ -41,12 +56,31 @@ async function visit(kind,url){
     // Wait for images and layout shifts before matching section-end coordinates.
     await page.waitForTimeout(kind==='source'?1800:750);
     await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';window.scrollTo(0,document.documentElement.scrollHeight);});
-    await page.waitForTimeout(1450);
+    // Wait through the source footer's 1.05s delay plus 1.1s transition.
+    // An earlier 1.45s wait measured an element still moving.
+    await page.waitForTimeout(3100);
+    const contactDetails=await page.evaluate(kind=>{
+      const el=document.querySelector(kind==='source'?'.cgv-closing .cgv-contacts':'#closingMessage .closing10-contacts');
+      if(!el)return null;
+      return [el,...el.querySelectorAll('*')].slice(0,35).map(n=>{
+        const r=n.getBoundingClientRect(),st=getComputedStyle(n);
+        return {tag:n.tagName,cls:String(n.className),text:(n.textContent||'').trim().slice(0,70),
+          x:+r.x.toFixed(2),y:+r.y.toFixed(2),w:+r.width.toFixed(2),h:+r.height.toFixed(2),
+          margin:st.margin,padding:st.padding,display:st.display,
+          font:st.font,letterSpacing:st.letterSpacing,border:st.border,
+          opacity:st.opacity,transform:st.transform};
+      });
+    },kind);
     const rects=await page.evaluate(sel=>{
       const fields={};
       const item=q=>{
-        const el= (q.includes('tasik-kayangan/scene.webp'))
-          ? [...document.querySelectorAll('img[src*="tasik-kayangan/scene.webp"]')].find(e=>e.getBoundingClientRect().width>300)
+        const sourceArt=[...document.querySelectorAll('img[src*="tasik-kayangan/scene.webp"]')];
+        const visibleArt=sourceArt.filter(e=>{
+          const r=e.getBoundingClientRect();
+          return e.naturalWidth===1080&&r.width>300&&r.bottom>0&&r.top<innerHeight;
+        }).sort((a,b)=>Math.abs(a.getBoundingClientRect().top)-Math.abs(b.getBoundingClientRect().top));
+        const el=q.includes('tasik-kayangan/scene.webp')
+          ? (visibleArt[0]||sourceArt.find(e=>e.getBoundingClientRect().width>300))
           : document.querySelector(q);
         if(!el)return null;
         const r=el.getBoundingClientRect(),s=getComputedStyle(el);
@@ -67,7 +101,7 @@ async function visit(kind,url){
         fields};
     },selectors[kind]);
     await page.screenshot({path:OUTPUT+'/'+kind+'-exit-390x844.png',animations:'disabled'});
-    const exit=rects;
+    const exit={...rects,contactDetails};
     const region=selectors[kind].section;
     await page.evaluate(q=>{
       const e=document.querySelector(q);
@@ -102,9 +136,11 @@ try{
     }
   }
   if(result.source.fields.scene?.naturalWidth!==1080)throw new Error('Unexpected source scene image dimensions.');
+  if(result.source.fields.scene?.y< -1000)throw new Error('Selected source scene is off-screen; reference screenshot comparison would be unreliable.');
   if(result.local.fields.scene?.naturalWidth!==1080)throw new Error('Shared artwork was not loaded.');
   console.log('SECTION10_MATCHED_VISUAL_GEOMETRY '+JSON.stringify(result.geometryDifferences));
   console.log('SECTION10_MATCHED_ART '+JSON.stringify({source:result.source.fields.scene,local:result.local.fields.scene}));
+  console.log('SECTION10_CONTACT_DETAILS '+JSON.stringify({source:result.source.contactDetails,local:result.local.contactDetails}));
 }catch(e){
   result.error=String(e);
   console.error('SECTION10_VISUAL_QA_ERROR '+String(e));

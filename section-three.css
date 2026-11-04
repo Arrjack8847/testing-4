@@ -444,7 +444,7 @@
   background:transparent;
   border:solid transparent;
   border-width:200px 28px 26px;
-  border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg");
+  border-image-source:var(--event-arch-source, url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg"));
   border-image-slice:200 28 26 fill;
   border-image-width:200px 28px 26px;
   border-image-repeat:stretch;
@@ -635,4 +635,132 @@
 }
 .event-section[data-art="reference"] .event-reference-card::after {
   inset:7px;
+}
+
+
+/* Reference evidence: GitHub Actions 41670889850, captured 2026-11-03.
+   The source Events butterfly is a 44x34px paired-wing sprite, not a single
+   image: both halves use the same bfly_white.webp at 200% 100% background
+   size, positioned 0% and 100%. The captured initial parent opacity is 0.
+   Do not invent a flight path before source-motion verification. */
+.event-section .event-reference-butterfly-layer {
+  display:none;
+  pointer-events:none;
+}
+.event-section[data-art="reference"] .event-reference-butterfly-layer {
+  position:absolute;
+  inset:0;
+  z-index:1;
+  display:block;
+  pointer-events:none;
+}
+.event-section .event-reference-butterfly {
+  position:absolute;
+  left:0;
+  top:0;
+  display:block;
+  width:44px;
+  height:34px;
+  opacity:0;
+  filter:drop-shadow(0 6px 5px rgba(40,52,40,.2));
+}
+.event-section .event-reference-butterfly-wing {
+  position:absolute;
+  top:0;
+  display:block;
+  width:22px;
+  height:34px;
+  background-image:var(--event-bfly-source, url("https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp"));
+  background-size:200% 100%;
+  background-repeat:no-repeat;
+}
+.event-section .event-reference-butterfly-left {
+  left:0;
+  background-position:0% 0%;
+}
+.event-section .event-reference-butterfly-right {
+  left:22px;
+  background-position:100% 0%;
+}
+
+
+/* -----------------------------------------------------------------------
+   Measured Section 4 typography/card-detail correction.
+   Source: recovered Chromium source/prototype DOM audit (Nov 3, 390x844).
+   Scoped to Events only. Keep the measured arch/paper/section geometry.
+   ----------------------------------------------------------------------- */
+.event-section[data-art="reference"] .event-card-time {
+  margin-bottom:18px;
+}
+.event-section[data-art="reference"] .event-card-diamond {
+  font:18px/29.7px 'EB Garamond',Georgia,serif;
+  margin-bottom:18px;
+}
+.event-section[data-art="reference"] .event-card-place {
+  margin-bottom:0;
+}
+.event-section[data-art="reference"] .event-card-address {
+  font:400 16px/26.4px 'EB Garamond',Georgia,serif;
+  margin-bottom:16px;
+}
+.event-section[data-art="reference"] .event-map-link {
+  min-height:44px;
+  box-shadow:0 2px 10px rgba(70,24,60,.16);
+}
+.event-section[data-art="reference"] .event-countdown-grid {
+  width:322px;
+  gap:14px;
+  margin-bottom:23px;
+}
+.event-section[data-art="reference"] .event-countdown-grid span {
+  min-height:75.5px;
+  height:75.5px;
+  border-radius:12px;
+  background:#5c264f;
+  box-shadow:0 8px 22px rgba(70,24,60,.24);
+}
+.event-section[data-art="reference"] .event-calendar-link {
+  box-shadow:0 12px 34px rgba(60,45,30,.35);
+}
+
+
+/* Recovered four-phone source audit (2026-11-04):
+   320: source Events 1742.3px, earlier local 1581px.
+   360: source Events 1649.9px, earlier local 1581px.
+   390: measured source Events 1580.9px.
+   The linear narrow-screen height target maintains the original section
+   boundary without adding a fake standalone scene or scrolling container. */
+@media (max-width:390px) {
+  .event-section[data-art="reference"] .event-body {
+    min-height:max(1581px, calc(2478px - 230vw));
+  }
+}
+/* The source uses 42/22/14/19px at 320px too; old prototype shrank these
+   to 40/20/13/18px under its narrow-device override. */
+@media (max-width:350px) {
+  .event-section[data-art="reference"] .event-card-title {
+    font-size:42px;
+    line-height:69.3px;
+  }
+  .event-section[data-art="reference"] .event-card-date {
+    font-size:22px;
+    line-height:36.3px;
+  }
+  .event-section[data-art="reference"] .event-card-time {
+    font-size:14px;
+    line-height:23.1px;
+  }
+  .event-section[data-art="reference"] .event-card-place {
+    font-size:19px;
+    line-height:31.35px;
+  }
+}
+/* The source countdown numbers use 28px at all four measured widths,
+   and the source address color is #6f5a6c, not the older rose tone. */
+.event-section[data-art="reference"] .event-countdown-grid strong {
+  font-size:28px;
+  line-height:28px;
+}
+.event-section[data-art="reference"] .event-card-address {
+  color:#6f5a6c;
 }

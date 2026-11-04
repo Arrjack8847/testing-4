@@ -70,7 +70,19 @@
       section.dataset.referencePaper = paper.naturalWidth > 0 ? 'loaded' : 'failed';
     }, {once:true});
     paper.addEventListener('error', () => { section.dataset.referencePaper = 'failed'; }, {once:true});
-    paper.src = artRoot + 'packs/tasik-kayangan/paper.webp';
+    // Only use a locally staged original when it is really present.
+    // Keep the existing remote comparison URL as a fallback.
+    const localPaper = './assets/reference-dev/paper.webp';
+    const paperProbe = new Image();
+    paperProbe.onload = () => {
+      section.dataset.referencePaperSource = 'local';
+      paper.src = localPaper;
+    };
+    paperProbe.onerror = () => {
+      section.dataset.referencePaperSource = 'remote';
+      paper.src = artRoot + 'packs/tasik-kayangan/paper.webp';
+    };
+    paperProbe.src = localPaper;
   }
   if (butterfly) {
     section.dataset.referenceButterfly = 'loading';
@@ -82,6 +94,28 @@
     }, {once:true});
     butterfly.src = artRoot + 'packs/anggerik-nirmala/bfly_white.webp';
   }
+
+  // arch_event.svg is the measured Events frame art (not arch_panel.svg).
+  // Prefer the same source SVG staged locally; the CSS retains the remote URL
+  // unless a real local SVG successfully loads.
+  const frameProbe = new Image();
+  frameProbe.onload = () => {
+    section.style.setProperty('--event-arch-source', 'url("./assets/reference-dev/arch_event.svg")');
+    section.dataset.referenceFrameSource = 'local';
+  };
+  frameProbe.onerror = () => { section.dataset.referenceFrameSource = 'remote'; };
+  frameProbe.src = './assets/reference-dev/arch_event.svg';
+
+  // Reuse the original white butterfly sprite for both 22px wing halves.
+  // Its animation is deliberately not guessed: the saved source capture
+  // confirms a transparent resting state but not the complete flight path.
+  const wingProbe = new Image();
+  wingProbe.onload = () => {
+    section.style.setProperty('--event-bfly-source', 'url("./assets/reference-dev/bfly_white.webp")');
+    section.dataset.referenceWingSource = 'local';
+  };
+  wingProbe.onerror = () => { section.dataset.referenceWingSource = 'remote'; };
+  wingProbe.src = './assets/reference-dev/bfly_white.webp';
 
   // Four-phone comparison mode: pin the illustrated plane within Events
   // while letting HTML cards, buttons and countdown scroll normally.

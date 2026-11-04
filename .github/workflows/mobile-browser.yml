@@ -29,7 +29,11 @@ permissions:
 jobs:
   chromium-mobile:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [small-phone, android-360, iphone-390, large-phone]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -57,12 +61,12 @@ jobs:
           print('Verified 25 original WebPs for ephemeral testing.')
           PY
       - name: Run real mobile Chromium tests
-        run: npm run test:mobile
+        run: npm run test:mobile -- --project=${{ matrix.project }} --workers=2
       - name: Upload Section 2 mobile visual QA captures
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: section-two-mobile-screenshots
+          name: section-two-mobile-screenshots-${{ matrix.project }}
           path: test-results/**/*section-two*.png
           if-no-files-found: warn
           retention-days: 14
@@ -70,7 +74,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: section-three-mobile-screenshots
+          name: section-three-mobile-screenshots-${{ matrix.project }}
           path: test-results/**/*section-three*.png
           if-no-files-found: warn
           retention-days: 14
@@ -78,7 +82,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: section-four-mobile-screenshots
+          name: section-four-mobile-screenshots-${{ matrix.project }}
           path: test-results/**/*section-four*.png
           if-no-files-found: warn
           retention-days: 14
@@ -86,7 +90,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: section-five-mobile-screenshots
+          name: section-five-mobile-screenshots-${{ matrix.project }}
           path: test-results/**/*section-five*.png
           if-no-files-found: warn
           retention-days: 14
@@ -94,7 +98,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: section-six-mobile-screenshots
+          name: section-six-mobile-screenshots-${{ matrix.project }}
           path: test-results/**/*section-six*.png
           if-no-files-found: warn
           retention-days: 14
