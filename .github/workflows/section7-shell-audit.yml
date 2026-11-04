@@ -1,0 +1,36 @@
+name: Section 7 gallery scenery and fixed shell audit
+on:
+  push:
+    branches:
+      - feat/section7-reference-validation-20261104
+    paths:
+      - tools/section7-shell-audit.mjs
+      - .github/workflows/section7-shell-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    name: Fixed scene artwork and Gallery DOM ancestry
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node --check tools/section7-shell-audit.mjs
+      - name: Inspect reference and local Gallery with gate settled
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section7-shell-server.log 2>&1 &
+          node tools/section7-shell-audit.mjs
+      - name: Save source/local shell metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section7-shell-metadata
+          path: section7-shell-evidence/shell.json
+          if-no-files-found: warn
+          retention-days: 7
