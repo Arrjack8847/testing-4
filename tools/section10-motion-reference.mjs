@@ -95,6 +95,39 @@ try {
     }finally{await context.close();}
   }
   if(!reports.source?.samples.length || !reports.local?.samples.length)throw Error('Motion samples incomplete');
+  // Human-review aid: summarize observable differences by matched checkpoint.
+  // No hard threshold until source behavior is verified and snapshots inspected.
+  const keys=['frame','heading','message','rule','signoff','names','contacts','footer'];
+  reports.comparison=[];
+  for(let i=0;i<reports.source.samples.length;i++){
+    const source=reports.source.samples[i],local=reports.local.samples[i];
+    if(!local || source.delta!==local.delta || source.elapsed!==local.elapsed)throw Error('Mismatched source/local motion checkpoints');
+    const metrics={};
+    for(const k of keys){
+      const a=source.style[k],b=local.style[k];
+      if(!a||!b)continue;
+      metrics[k]={
+        sourceOpacity:a.opacity,localOpacity:b.opacity,
+        opacityError:+Math.abs(a.opacity-b.opacity).toFixed(3),
+        sourceY:a.y,localY:b.y,
+        yError:+Math.abs(a.y-b.y).toFixed(2),
+        sourceInViewport:a.inViewport,localInViewport:b.inViewport,
+        sourceClass:a.cls,localClass:b.cls
+      };
+    }
+    reports.comparison.push({delta:source.delta,time:source.elapsed,metrics});
+  }
+  reports.motionDiscrepancies=reports.comparison.flatMap(p=>
+    Object.entries(p.metrics).filter(([_,m])=>m.opacityError>.15).map(([element,m])=>({
+      element,delta:p.delta,elapsed:p.time,
+      sourceOpacity:m.sourceOpacity,localOpacity:m.localOpacity,error:m.opacityError,
+      sourceClass:m.sourceClass,localClass:m.localClass
+    }))
+  );
+  console.log('SECTION10_MOTION_DISCREPANCIES '+JSON.stringify(reports.motionDiscrepancies));
+  console.log('SECTION10_MOTION_CHECKPOINTS '+JSON.stringify({
+    samples:reports.comparison.length,opacityDifferencesOver015:reports.motionDiscrepancies.length
+  }));
 }catch(e){
   reports.error=String(e);console.log('SECTION10_MOTION_AUDIT_ERROR '+String(e));process.exitCode=1;
 }finally{
