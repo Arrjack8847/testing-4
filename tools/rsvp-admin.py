@@ -14,8 +14,8 @@ p.add_argument("value",nargs="?")
 args=p.parse_args()
 with database() as db:
     if args.action=="list":
-        for row in db.execute("SELECT receipt,guest_name,attendance,guests,consent,approval,created_at FROM rsvps ORDER BY created_at DESC LIMIT 100"):
-            print(row["receipt"],"|",row["guest_name"],"|",row["attendance"],"| guests:",row["guests"],"| publish consent:",bool(row["consent"]),"|",row["approval"],"|",row["created_at"])
+        for row in db.execute("SELECT receipt,guest_name,attendance,guests,wish,consent,approval,created_at FROM rsvps ORDER BY created_at DESC LIMIT 100"):
+            print(row["receipt"],"|",row["guest_name"],"|",row["attendance"],"| guests:",row["guests"],"| wish:",repr(row["wish"]),"| publish consent:",bool(row["consent"]),"|",row["approval"],"|",row["created_at"])
     elif args.action in ("approve","reject","delete"):
         if not args.value:p.error("You must supply the receipt UUID.")
         if args.action=="approve":
