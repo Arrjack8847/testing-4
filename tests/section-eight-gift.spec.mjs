@@ -359,6 +359,7 @@ test('390px source-calibrated expanded Gift button and wishlist alignment',async
       banks:get('#giftEightBanks'),
       firstCard:get('.gift-eight-bank'),
       wishlist:get('#giftEightWishlist'),
+      wishlistIntro:get('.gift-eight-wishlist-intro'),
       overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
@@ -372,6 +373,12 @@ test('390px source-calibrated expanded Gift button and wishlist alignment',async
   expect(data.firstCard.width).toBeLessThan(282);
   expect(data.wishlist.y).toBeGreaterThan(646);
   expect(data.wishlist.y).toBeLessThan(664);
+  expect(data.wishlist.x).toBeGreaterThanOrEqual(27.5);
+  expect(data.wishlist.x).toBeLessThanOrEqual(28.5);
+  expect(data.wishlist.width).toBeGreaterThanOrEqual(333);
+  expect(data.wishlist.width).toBeLessThanOrEqual(335);
+  expect(data.wishlistIntro.x).toBeGreaterThanOrEqual(45);
+  expect(data.wishlistIntro.x).toBeLessThanOrEqual(47);
   expect(data.overflow).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
