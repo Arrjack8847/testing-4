@@ -96,6 +96,9 @@ try {
           }
           function scanStyle(el,pseudo){
             const style=getComputedStyle(el,pseudo);
+            // Hidden pseudo-elements can retain a URL in computed styles,
+            // even when a later CSS override prevents any painting.
+            if(style.display==='none'||style.visibility==='hidden')return;
             for(const field of ['backgroundImage','borderImageSource','maskImage','webkitMaskImage','listStyleImage','content']){
               const val=style[field]||'';
               urlPattern.lastIndex=0;
@@ -116,6 +119,10 @@ try {
           }
           for(const el of visited){
             if(['SCRIPT','STYLE','NOSCRIPT'].includes(el.tagName))continue;
+            // Avoid counting hidden fallback layers and their URLs as artwork
+            // actually visible in the Events section.
+            if(!el.getClientRects().length ||
+               getComputedStyle(el).visibility==='hidden')continue;
             if(el.tagName==='CANVAS')canvasCount++;
             if(el.tagName.toLowerCase()==='svg')inlineSvgCount++;
             const motion=getComputedStyle(el).animationName;
