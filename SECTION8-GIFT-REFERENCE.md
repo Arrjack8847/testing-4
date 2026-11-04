@@ -80,3 +80,52 @@ No neighbor's content was edited to bypass it.
 Remaining: review latest 390px screenshot overlays, bank popup behavior,
 item geometry/typography, authorized photo/assets, petal/butterfly motion
 and source-to-local exit after Gallery and before RSVP.
+
+## Local Section 8 artwork integration (latest)
+
+The two files from the local-only download instructions must be placed here
+on the developer's Windows computer:
+
+    D:\testing-4\assets\reference-dev\band_plum.webp
+    D:\testing-4\assets\reference-dev\bfly_blush.webp
+
+Both are separate, independently loaded CSS visuals when the page is opened
+on localhost/127.0.0.1; neither file is required in the Git history.
+
+- The existing code automatically selects the plum background when
+  band_plum.webp decodes successfully and sets
+  data-gift-artwork="reference-local".
+- Section 8 now detects bfly_blush.webp independently and sets
+  data-gift-butterfly="reference-local" on valid local image decode.
+  A paired wing element is placed near the Gift→RSVP exit. Without the
+  image the butterfly remains hidden. It deliberately cannot hotlink
+  any vendor URL on public production.
+- Wing flutter and 5.6s float are **our approximation** based on the
+  source exit screenshot, not a confirmed pixel-accurate animation path.
+  The source screenshot showed a blush butterfly at the lower Gift band,
+  rather than necessarily throughout the main Gift header. Reduced Motion
+  stops all wing and float animation.
+- Playwright tests mock valid local WebP bytes, assert both status
+  attributes, CSS URLs, hidden fallback, absence of remote requests, and
+  reduced-motion behavior. Mock tests confirm wiring, not that the
+  user's local downloads exist or that their artwork rights are verified.
+
+Local checkout:
+
+    cd D:\testing-4
+    git fetch origin
+    git switch feat/section8-wedding-gift-reference-20261104
+    git pull --ff-only origin feat/section8-wedding-gift-reference-20261104
+    Test-Path .\assets\reference-dev\band_plum.webp
+    Test-Path .\assets\reference-dev\bfly_blush.webp
+    powershell -ExecutionPolicy Bypass -File .\start.ps1
+
+Open http://localhost:8000/ , tap Open Invitation, scroll to the Gift
+section. In DevTools Console, run:
+
+    document.querySelector('#weddingGift')?.dataset
+
+Expected values for both valid downloaded files:
+giftArtwork = "reference-local"; giftButterfly = "reference-local".
+The missing-file fallback has giftArtwork = "original" and
+giftButterfly = "unavailable".
