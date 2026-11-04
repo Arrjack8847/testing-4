@@ -444,7 +444,7 @@
   background:transparent;
   border:solid transparent;
   border-width:200px 28px 26px;
-  border-image-source:url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg");
+  border-image-source:var(--event-arch-source, url("https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg"));
   border-image-slice:200 28 26 fill;
   border-image-width:200px 28px 26px;
   border-image-repeat:stretch;
