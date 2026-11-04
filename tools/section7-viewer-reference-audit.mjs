@@ -112,6 +112,45 @@ for(const [site,url] of urls)for(const viewport of viewports){
       record.issue='No matching actual gallery photograph to inspect';
       throw new Error(record.issue);
     }
+    // Inspect every actual reference photo, not just the first portrait.
+    // Especially important for Garden/Lake landscape crops in the full-screen viewer.
+    if(site==='reference'&&record.buttonCount){
+      record.additionalPhotoViewers=[];
+      const closeViewer=page.locator('.cgv-lightbox button').first();
+      if(await closeViewer.isVisible()) await closeViewer.click({timeout:10000});
+      const photoSelector='#cgv-gallery img[src*="/couples/"]';
+      const total=await page.locator(photoSelector).count();
+      record.sourcePhotoCount=total;
+      if(total<5)throw new Error('Expected five Gallery source photographs, found '+total);
+      for(let n=1;n<5;n++){
+        const photo=page.locator(photoSelector).nth(n);
+        await photo.scrollIntoViewIfNeeded();
+        await photo.click({timeout:12000});
+        await page.waitForTimeout(300);
+        const measured=await page.evaluate(()=>{
+          const lightbox=document.querySelector('.cgv-lightbox');
+          const image=lightbox?.querySelector('img');
+          const close=lightbox?.querySelector('button');
+          const rect=el=>{
+            if(!el)return null;
+            const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+            return {x:+r.x.toFixed(2),y:+r.y.toFixed(2),
+              w:+r.width.toFixed(2),h:+r.height.toFixed(2),
+              position:s.position,objectFit:s.objectFit,
+              border:s.border,borderRadius:s.borderRadius,
+              background:s.backgroundColor,boxShadow:s.boxShadow};
+          };
+          return {opened:Boolean(lightbox&&getComputedStyle(lightbox).display!=='none'),
+            overlay:rect(lightbox),image:rect(image),close:rect(close),
+            photoNatural:image?[image.naturalWidth,image.naturalHeight]:null,
+            frame:rect(image?.parentElement),
+            alt:image?.getAttribute('alt')||''};
+        });
+        record.additionalPhotoViewers.push({index:n,...measured});
+        if(!measured.opened)throw new Error('Reference photo '+n+' did not open viewer');
+        await closeViewer.click({timeout:10000});
+      }
+    }
     record.status='captured';
     console.log('SECTION7_VIEWER_AUDIT '+JSON.stringify(record).slice(0,27000));
   }catch(error){record.status='error';record.error=String(error);
