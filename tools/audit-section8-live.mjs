@@ -146,6 +146,26 @@ async function inspect(label,viewport){
                 wishText:rect(text),
                 bankCards:copyCards.map(rect),
                 productImages:allImgs.map(e=>({rect:rect(e),src:e.currentSrc||e.src})),
+                productImageAncestors:allImgs.slice(0,3).map(img=>{
+                  const levels=[];let node=img;
+                  for(let i=0;i<6&&node&&node!==gift;i++,node=node.parentElement){
+                    levels.push({
+                      tag:node.tagName,
+                      className:typeof node.className==='string'?node.className.slice(0,80):'',
+                      rect:rect(node)
+                    });
+                  }
+                  return levels;
+                }),
+                wishlistLabelMatches:[...gift.querySelectorAll('h2,h3,h4,div,p,span')]
+                  .filter(n=>n.children.length===0&&/gift wishlist/i.test(n.textContent||''))
+                  .slice(0,5)
+                  .map(node=>({tag:node.tagName,rect:rect(node),
+                    parentRect:rect(node.parentElement),
+                    grandparentRect:rect(node.parentElement?.parentElement)})),
+                localWishlistIntro:rect(gift.querySelector('.gift-eight-wishlist-intro')),
+                localFirstProductCard:rect(gift.querySelector('.gift-eight-item')),
+                localFirstThumbnail:rect(gift.querySelector('.gift-eight-thumb')),
                 overflow:document.documentElement.scrollWidth-innerWidth
               };
             })()
@@ -155,6 +175,10 @@ async function inspect(label,viewport){
         if(viewport.width===390){
           await page.screenshot({path:folder+'/'+label+'-390-sendgift-open.png',
             animations:'allow',timeout:18000});
+          try{
+            await root.screenshot({path:folder+'/'+label+'-390-gift-expanded-full.png',
+              animations:'disabled',timeout:25000});
+          }catch(error){report.errors.push('expanded full screenshot: '+String(error).slice(0,190));}
         }
       }
     }catch(e){report.interaction.status='error';report.interaction.error=String(e).slice(0,400);}
