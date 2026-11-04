@@ -73,13 +73,15 @@ for(const [site,url] of urls)for(const viewport of viewports){
     await page.evaluate(y=>{document.documentElement.style.scrollBehavior='auto';scrollTo({top:y,behavior:'instant'});},top-viewport.height*.3);
     await page.waitForTimeout(1400);
     record.before=await page.evaluate(inspect);
-    // Source frames present their photographs as role=img; they are not
-    // accessible "View photo 1" buttons. Click the actual image to learn
-    // whether its parent opens a lightbox, rather than inferring no viewer.
-    const referenceBtn=page.getByRole('img',{name:'Together',exact:true}).first();
+    // The live source images have no accessible alt/role name, so selecting
+    // getByRole('img', {name:'Together'}) silently misses them. Target the
+    // real first Gallery photograph by its source path, then inspect its
+    // ancestors and the overlay produced by an actual tap.
+    const referenceBtn=page.locator('#cgv-gallery img[src*="/couples/"]').first();
     const localBtn=page.locator('#gallery [data-gallery-slot="0"]').first();
     const buttonToClick=site==='reference'?referenceBtn:localBtn;
     record.buttonCount=await buttonToClick.count();
+    record.clickSelector=site==='reference'?'#cgv-gallery img[src*="/couples/"]':'#gallery [data-gallery-slot="0"]';
     if(site==='reference'&&record.buttonCount){
       record.sourceImageAncestors=await buttonToClick.evaluate(el=>{
         const chain=[];
@@ -106,7 +108,10 @@ for(const [site,url] of urls)for(const viewport of viewports){
         await page.waitForTimeout(250);
         record.afterEscape=await page.evaluate(inspect);
       }else record.issue='Clicked photo button disabled';
-    }else record.issue='No matching photo open control';
+    }else {
+      record.issue='No matching actual gallery photograph to inspect';
+      throw new Error(record.issue);
+    }
     record.status='captured';
     console.log('SECTION7_VIEWER_AUDIT '+JSON.stringify(record).slice(0,27000));
   }catch(error){record.status='error';record.error=String(error);
