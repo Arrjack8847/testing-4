@@ -327,3 +327,33 @@ test('Section 6 butterfly respects reduced-motion preferences',async({page})=>{
   expect(Math.abs(result.x-(result.width-64))).toBeLessThanOrEqual(2);
   expect(Number(result.opacity)).toBeGreaterThan(.8);
 });
+
+
+test('Section 6 uses the 22 percent source paper wash above the static WebP, below content',async({page})=>{
+  const {dress,errors}=await openDress(page);
+  await expect.poll(()=>dress.getAttribute('data-scene-status'),{timeout:5000}).toBe('loaded');
+  const wash=await dress.evaluate(section=>{
+    const e=section.querySelector('.dress-paper-wash');
+    const st=getComputedStyle(e),box=e.getBoundingClientRect(),sectionBox=section.getBoundingClientRect();
+    const paper=section.querySelector('#dressSourceScene');
+    const art=section.querySelector('.dress-art');
+    return {
+      display:st.display,position:st.position,opacity:st.opacity,
+      background:st.backgroundColor,zIndex:st.zIndex,
+      sameSectionDimensions:Math.abs(box.width-sectionBox.width)<1&&Math.abs(box.height-sectionBox.height)<1,
+      nextAfterPaper:art.nextElementSibling===e,
+      beforeFlight:e.nextElementSibling?.id==='dressFlight',
+      loaded:paper.naturalWidth===1080&&paper.naturalHeight===1920
+    };
+  });
+  expect(wash.display).toBe('block');
+  expect(wash.position).toBe('absolute');
+  expect(wash.opacity).toBe('0.22');
+  expect(wash.background).toBe('rgb(250, 247, 251)');
+  expect(wash.zIndex).toBe('0');
+  expect(wash.sameSectionDimensions).toBe(true);
+  expect(wash.nextAfterPaper).toBe(true);
+  expect(wash.beforeFlight).toBe(true);
+  expect(wash.loaded).toBe(true);
+  expect(errors).toEqual([]);
+});
