@@ -129,3 +129,56 @@ Expected values for both valid downloaded files:
 giftArtwork = "reference-local"; giftButterfly = "reference-local".
 The missing-file fallback has giftArtwork = "original" and
 giftButterfly = "unavailable".
+
+
+## 4 November source-driven Gift interaction and visual correction
+
+The completed reference 390×844 screenshots show:
+
+- Default: embossed plum floral band and thin white double frame, Wedding
+  Gift script heading, intro, cream Send Gift button, drifting petals.
+  Bank cards and wishlist **are not visible** at the mid/exit checkpoints.
+- After tapping Send Gift: a horizontally swipeable pair of bank cards
+  appears (first card ~278px wide, with ~14px gap and part of the next
+  card visible). The ivory rounded Gift Wishlist panel follows beneath.
+- Reference bank account identifiers and claimed wishlist stocks **must
+  not** be copied into this demo. No money transfers, purchases or
+  reservations can occur without verified customer configurations.
+
+The implementation now keeps the bank carousel, wishlist and demo notice
+hidden by default, and opens/closes them together behind an accessible
+Send Gift disclosure. The bank row is swipeable and the wishlist is an
+ivory card. A subtle optional blush butterfly and eight original CSS
+petals decorate the band with Reduced Motion support.
+
+### Private, rights-confirmed local reference artwork paths
+
+    assets/reference-dev/band_plum.webp
+    assets/reference-dev/bfly_blush.webp
+    assets/reference-dev/gift-rice-cooker.jpg
+    assets/reference-dev/gift-kettle.webp
+
+The first two are already supported by the developer preview. The two
+photo slots now auto-detect local image downloads (not hotlinks). An
+optional script for rights-confirmed retrieval:
+
+    powershell -ExecutionPolicy Bypass -File .\download-section8-thumbnails.ps1 -IHavePermission
+
+These downloaded third-party files remain gitignored. They are not
+distributed or published by this branch.
+
+### Repeat QA locally
+
+    cd D:\testing-4
+    git fetch origin
+    git switch feat/section8-wedding-gift-reference-20261104
+    git pull --ff-only origin feat/section8-wedding-gift-reference-20261104
+    powershell -ExecutionPolicy Bypass -File .\start.ps1
+
+In Chrome Device Toolbar compare full Gift band, the expanded bank
+carousel, wishlist, and Gallery→Gift→RSVP seams at 320×568, 360×740,
+390×844, and 430×932. The modified source/local audit now captures
+expanded-panel geometry as well as screenshots. Script typography and
+the four closed-state overall heights were measured; background artwork
+presence, image licensing, bank carousel animation and motion remain
+subject to visual inspection. No pixel-perfect claim.
