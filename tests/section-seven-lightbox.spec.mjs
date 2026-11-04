@@ -31,6 +31,7 @@ for (const [width,height] of devices) {
     await expect(dialog).toBeVisible();
     await expect(page.getByRole('button',{name:'Close photo viewer'})).toBeFocused();
     await expect(page.locator('#galleryViewCaption')).toHaveText('Together');
+    await expect(dialog).toHaveAttribute('data-gallery-orientation','portrait');
     await expect(page.locator('.gallery-viewer-navigation')).toBeHidden();
     const m=await page.evaluate(()=>{
       const measure=selector=>{
@@ -112,12 +113,14 @@ for (const [width,height] of devices) {
         path:testInfo.outputPath(`section-five-lightbox-${slot===3?'garden':'lake'}-${width}.png`),
         animations:'disabled'
       });
-      // The source audit for landscape viewer dimensions is still pending;
-      // don't lock an unmeasured portrait ratio into landscape tests.
+      // Source audit 41787968236 recorded Garden/Lake outer frame 334x249.44
+      // at 390px, white 6px border and 16px radius. Scale that ratio by
+      // measured responsive frame width at each phone size.
+      await expect(dialog).toHaveAttribute('data-gallery-orientation','landscape');
       const size=await page.locator('.gallery-viewer-figure').boundingBox();
-      expect(size?.width).toBeGreaterThan(0);
-      expect(size?.height).toBeGreaterThan(0);
-      expect(size?.width).toBeLessThanOrEqual(width);
+      near(size.width,width-56,'landscape viewer width');
+      near(size.height,(width-56)*249.44/334,'landscape viewer height');
+      near(size.y,(height-size.height)/2,'landscape viewer center');
       await page.getByRole('button',{name:'Close photo viewer'}).click();
       await expect(dialog).not.toBeVisible();
       await expect(frame).toBeFocused();
