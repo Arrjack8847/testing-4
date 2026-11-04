@@ -504,6 +504,7 @@
 }
 .gallery-dialog .gallery-viewer-figure {
   box-sizing:border-box;
+  position:relative;
   display:block;
   flex:none;
   width:min(100%, calc((100dvh - 112px)*.75));
@@ -518,6 +519,8 @@
   background:transparent;
 }
 .gallery-dialog #galleryViewImage {
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
   max-width:none;
