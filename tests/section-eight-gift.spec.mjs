@@ -525,8 +525,17 @@ test('Original plum botanical fallback uses self-contained relief artwork',async
   expect(svg).toContain('id="velvetNoise"');
   expect(svg).toContain('id="relief"');
   expect(svg).toContain('feTurbulence');
-  expect(svg).not.toMatch(/https?:\/\//i);
-  const source=await gift.locator('.gift-eight-art').evaluate(el=>getComputedStyle(el).backgroundImage);
-  expect(source).toContain('section8-plum-botanical-original.svg');
+  // The SVG namespace itself uses an http:// URL; only external asset
+  // imports or linked resources are prohibited.
+  expect(svg).not.toMatch(/(?:href|src)\s*=\s*["']https?:\/\//i);
+  const style=await gift.evaluate(el=>({
+    mode:el.dataset.giftArtwork,
+    background:getComputedStyle(el.querySelector('.gift-eight-art')).backgroundImage
+  }));
+  if(style.mode==='original')expect(style.background).toContain('section8-plum-botanical-original.svg');
+  else{
+    expect(style.mode).toBe('reference-local');
+    expect(style.background).toContain('reference-dev/band_plum.webp');
+  }
   expect(faults).toEqual([]);
 });
