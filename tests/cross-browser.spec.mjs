@@ -230,28 +230,20 @@ test('Section 5 provides an accessible gallery without falsely populated photos'
 });
 
 
-test('Section 6 RSVP preview is accessible, validated and not falsely sent',async({page})=>{
-  const errors=await load(page);
-  const section=page.locator('#rsvp');
-  await expect(section).toHaveAttribute('aria-hidden','true');
+test('Section 9 RSVP form is accessible and preview-only',async({page})=>{
+  const errors=await load(page),section=page.locator('#rsvp');
   await expect(section).toHaveJSProperty('inert',true);
   await open(page);
-  await expect(section).toHaveAttribute('aria-hidden','false');
   await expect(section).toHaveJSProperty('inert',false);
-  await page.evaluate(()=>{
-    document.documentElement.style.scrollBehavior='auto';
-    document.getElementById('rsvp').scrollIntoView({block:'start',behavior:'instant'});
-  });
-  await expect(section).toBeInViewport();
-  await expect(page.getByRole('heading',{level:2,name:'Kindly Respond'})).toBeVisible();
-  await expect(section.locator('#rsvpWarning')).toContainText('will not be sent');
-  await section.locator('#rsvpName').fill('Test Guest');
-  await section.getByRole('radio',{name:'Regretfully declines'}).check();
-  await section.getByRole('button',{name:'Preview RSVP — not sent'}).click();
-  await expect(section.locator('#rsvpPreview')).toBeVisible();
-  await expect(section.locator('#rsvpPreviewGuests')).toHaveText('Not attending');
-  await expect(section.locator('.rsvp-preview-disclosure')).toContainText('has not been submitted');
-  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
-  expect(overflow).toBeLessThanOrEqual(1);
+  await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.getElementById('rsvp').scrollIntoView({block:'start',behavior:'instant'});});
+  await expect(section.getByRole('heading',{name:'RSVP & Wishes'})).toBeVisible();
+  await expect(section.locator('#s9FormStatus')).toContainText('not sent or stored');
+  await section.locator('#s9Name').fill('Test Guest');
+  await section.locator('#s9Attendance').selectOption('no');
+  await section.getByRole('button',{name:'Send RSVP'}).click();
+  await expect(section.locator('#s9Preview')).toBeVisible();
+  await expect(section.locator('#s9PreviewGuests')).toHaveText('Not attending');
+  await expect(section.locator('#s9FormStatus')).toContainText('not sent or saved');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });

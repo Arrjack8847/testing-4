@@ -1,0 +1,148 @@
+/* Section 10: independent Tasik Kayangan closing scene.
+   Based on measured 390x844 live source geometry. No vendor art is bundled.
+   Optional locally staged reference scene: assets/reference-dev/scene.webp; source use requires artwork rights. */
+.reference-continuation.ref-closing.section-ten {
+  --closing10-purple:#7e6479;
+  --closing10-ink:#4a2a45;
+  display:block;
+  position:relative;
+  box-sizing:border-box;
+  min-height:1109px;
+  padding:215px 28px 230px;
+  overflow:hidden;
+  isolation:isolate;
+  background:#f2ecf3;
+  color:var(--closing10-ink);
+  font:400 18px/1.65 'EB Garamond',Georgia,serif;
+  text-align:center;
+}
+.section-ten::before {
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,#e3d5e5 0,transparent 105px);
+  opacity:.85;pointer-events:none;
+}
+.section-ten .ref-environment {position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.section-ten .ref-environment::before {
+  content:"";position:absolute;inset:0;z-index:1;opacity:.2;
+  background:url('./assets/couple-botanical-edges-original.svg') center center / 100% 100% no-repeat;
+  mask-image:linear-gradient(to bottom,transparent,black 16%,black 87%,transparent);
+}
+.section-ten .ref-environment::after {display:none;}
+.section-ten .ref-vine {opacity:.18;animation-play-state:paused;}
+.section-ten[data-active="true"] .ref-vine {animation-play-state:running;}
+.section-ten .ref-light-b {opacity:.3;}
+.section-ten .closing10-sticky-art {
+  position:absolute;top:0;left:0;right:0;height:100dvh;
+  min-height:568px;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 85% 50% at 50% 50%,#fffaf6c7,transparent 80%);
+  transform:translate3d(0,var(--closing10-sticky-y,0px),0);
+}
+.section-ten .closing10-source-scene {
+  display:none;position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;opacity:1;
+}
+.section-ten[data-artwork="local-reference"] .closing10-source-scene {display:block;}
+.section-ten[data-artwork="local-reference"] .ref-environment::before,
+.section-ten[data-artwork="local-reference"] .ref-vine,
+.section-ten[data-artwork="local-reference"] .ref-light {display:none;}
+.section-ten .closing10-inner {
+  position:relative;z-index:2;box-sizing:border-box;
+  width:100%;max-width:334px;height:664px;margin:0 auto;
+  padding-top:52px;
+}
+.section-ten .closing10-inner::before {
+  content:"";position:absolute;z-index:-1;
+  left:-12px;right:-12px;top:0;bottom:0;
+  background:radial-gradient(closest-side,#fffbf6db,#fffbf68c 62%,transparent);
+  pointer-events:none;
+}
+.section-ten .closing10-frame {
+  position:absolute;left:2px;right:2px;top:40px;
+  height:688px;border:1px solid #7e64794d;
+  z-index:-1;pointer-events:none;
+}
+.section-ten .closing10-frame::before,
+.section-ten .closing10-frame::after {
+  content:"";position:absolute;width:13px;height:13px;
+  border:1px solid #7e647977;transform:rotate(45deg);
+}
+.section-ten .closing10-frame::before {top:-7px;left:-7px;}
+.section-ten .closing10-frame::after {top:-7px;right:-7px;}
+.section-ten .closing10-corner {position:absolute;width:13px;height:13px;
+ border:1px solid #7e647977;transform:rotate(45deg);z-index:0;}
+.section-ten .closing10-corner-bl {bottom:-7px;left:-7px;}
+.section-ten .closing10-corner-br {bottom:-7px;right:-7px;}
+.section-ten .closing10-label {
+  margin:0 0 12px;color:#7e6479;
+  font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:4.95px;text-transform:uppercase;
+}
+.section-ten .closing10-message {
+  max-width:292px;margin:0 auto;
+  color:#6f5a6c;font:400 18px/1.65 'EB Garamond',Georgia,serif;
+}
+.section-ten .closing10-rule {
+  width:76px;height:1px;margin:26px auto;
+  background:linear-gradient(90deg,transparent,#7e6479,transparent);
+}
+.section-ten .closing10-signoff {margin:0 0 2px;color:#7e6479;}
+.section-ten .closing10-names {
+  margin:24px auto 0;color:#5c264f;
+  font:400 56px/1.65 'Pinyon Script',cursive;
+  letter-spacing:0;
+}
+.section-ten .closing10-names span {display:block;height:92px;line-height:92px;}
+.section-ten .closing10-names .closing10-ampersand {
+  height:42px;line-height:42px;font-size:39px;
+}
+.section-ten .closing10-contacts {margin:26px auto 0;}
+.section-ten .closing10-contacts-title {
+  margin:0;font:400 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:4.95px;color:#7e6479;
+}
+.section-ten .closing10-contact-row {
+  display:flex;justify-content:center;align-items:center;gap:10px;margin-top:20px;
+}
+.section-ten .closing10-contact-row button {
+  min-height:42px;padding:9px 20px;
+  border:1px solid #b6a6b6;border-radius:3px;
+  background:#fff;color:#5c264f;
+  font:500 12px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:3px;
+}
+.section-ten .closing10-contact-row button:disabled {opacity:.75;cursor:not-allowed;}
+.section-ten .closing10-credit {
+  margin:56px auto 0;
+  color:#6f5a6c;font:300 11px/1.65 'EB Garamond',Georgia,serif;
+  letter-spacing:2.75px;text-transform:uppercase;
+}
+.section-ten .closing10-disclosure {
+  margin:20px auto 0;max-width:35ch;
+  font:400 11px/1.4 system-ui,sans-serif;color:#786879;
+}
+.section-ten .closing10-reveal {opacity:1;transform:none;}
+.section-ten[data-motion-ready="true"] .closing10-reveal {
+  opacity:0;transform:translate3d(0,52px,0) scale(.955);
+  transition:opacity .8s ease,transform .9s cubic-bezier(.22,.9,.24,1);
+  transition-delay:var(--closing10-delay,0ms);
+}
+.section-ten[data-motion-ready="true"][data-revealed="true"] .closing10-reveal {
+  opacity:1;transform:none;
+}
+.section-ten .closing10-message,.section-ten .closing10-rule {--closing10-delay:100ms;}
+.section-ten .closing10-signoff,.section-ten .closing10-names,.section-ten .closing10-contacts {--closing10-delay:220ms;}
+.section-ten .closing10-credit,.section-ten .closing10-disclosure {--closing10-delay:340ms;}
+.section-ten .closing10-frame {--closing10-delay:0ms;}
+@media(max-width:350px){
+  .reference-continuation.ref-closing.section-ten {padding-inline:17px;padding-top:200px;padding-bottom:210px;}
+  .section-ten .closing10-inner {max-width:300px;}
+  .section-ten .closing10-frame {left:0;right:0;}
+  .section-ten .closing10-message {max-width:265px;}
+  .section-ten .closing10-label,.section-ten .closing10-contacts-title,.section-ten .closing10-signoff {letter-spacing:3.5px;}
+  .section-ten .closing10-names {font-size:53px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .section-ten .closing10-reveal {opacity:1!important;transform:none!important;transition:none!important;}
+  .section-ten .ref-vine {animation:none!important;}
+  .section-ten .closing10-sticky-art {transform:none!important;}
+}

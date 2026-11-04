@@ -1,0 +1,150 @@
+/* Independently drawn continuation scenes for the Tasik Kayangan research prototype.
+   No third-party reference imagery, bank details, or photographs are bundled. */
+.reference-continuation {
+  --ref-ink:#735f78;
+  position:relative;z-index:2;isolation:isolate;overflow:hidden;
+  min-height:100dvh;padding:clamp(88px,12dvh,126px) clamp(15px,4.6vw,27px) clamp(92px,12dvh,134px);
+  background:
+    radial-gradient(ellipse 80% 37% at 50% 24%,#fff6eea8,transparent 80%),
+    radial-gradient(ellipse 55% 35% at 4% 72%,#d5bddbcc,transparent 80%),
+    radial-gradient(ellipse 55% 35% at 100% 73%,#d5bddbcc,transparent 80%),
+    linear-gradient(#ded0e1 0%,#f8eff0 34%,#fff8ee 59%,#ded0e1 100%);
+  color:var(--ref-ink);text-align:center;
+}
+.ref-dress {background:
+  radial-gradient(ellipse at 50% 40%,#fff9ed 0%,transparent 61%),
+  linear-gradient(180deg,#ded0e1 0%,#f4e7ee 35%,#fcf5eb 72%,#ded0e1 100%)}
+.ref-gifts {background:
+  radial-gradient(ellipse at 50% 45%,#fff9ed 0%,transparent 61%),
+  linear-gradient(180deg,#e3d3e1 0%,#f5e9ed 30%,#fff9ef 69%,#e3d3e1 100%)}
+.ref-closing {background:
+  radial-gradient(ellipse at 50% 45%,#fff8e9 0%,transparent 70%),
+  linear-gradient(180deg,#e3d5e5,#f4e8ed 45%,#d4c0d8 100%);display:grid;place-items:center;}
+.reference-continuation::before {
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.33;
+  background-image:radial-gradient(#fffaf1 1px,transparent 1.6px);
+  background-size:37px 43px;
+}
+.reference-continuation .ref-environment {position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.reference-continuation .ref-vine {position:absolute;top:12%;bottom:8%;width:clamp(58px,21%,120px);opacity:.37;
+  background:
+    radial-gradient(ellipse 32px 66px at 65% 14%,#927e99 10%,transparent 65%),
+    radial-gradient(ellipse 30px 80px at 16% 32%,#98a78b 12%,transparent 68%),
+    radial-gradient(ellipse 28px 73px at 84% 48%,#b19ab6 15%,transparent 69%),
+    radial-gradient(ellipse 40px 96px at 21% 70%,#8c9f81 12%,transparent 68%),
+    radial-gradient(ellipse 24px 62px at 70% 92%,#c5a4bd 17%,transparent 66%);
+  filter:blur(.3px);transform:translate3d(0,var(--ref-camera-y,0px),0);
+  animation:ref-leaf-breathe 12s ease-in-out infinite alternate;}
+.reference-continuation .ref-vine-left {left:-42px}
+.reference-continuation .ref-vine-right {right:-42px;scale:-1 1;animation-delay:-6s}
+.reference-continuation .ref-light {position:absolute;top:15%;left:50%;width:280px;height:280px;
+  border-radius:50%;transform:translateX(-50%);border:1px solid #d0b79966;box-shadow:0 0 0 16px #fdf5e026,0 0 50px #e6cfb94b}
+.reference-continuation .ref-light-b {top:50%;width:340px;height:340px;opacity:.53}
+.reference-continuation .ref-content {position:relative;z-index:1;max-width:390px;margin:0 auto;min-width:0}
+.reference-continuation .ref-kicker,.ref-wishes .ref-kicker {color:#a08570;font:500 10px/1.6 'Cinzel',Georgia,serif;
+  letter-spacing:.19em;text-transform:uppercase;margin:0 0 12px}
+.reference-continuation .ref-script,.ref-wishes .ref-script {font:400 clamp(51px,14vw,72px)/1.02 'Pinyon Script',cursive;
+  margin:0 auto 17px;color:#886883;text-shadow:0 2px 12px #fff8f4bb}
+.reference-continuation .ref-intro {margin:0 auto 34px;max-width:30ch;
+  font:400 clamp(17px,4.4vw,21px)/1.55 'EB Garamond',Georgia,serif}
+.reference-continuation .ref-disclosure,.ref-wishes .ref-disclosure {max-width:35ch;margin:30px auto 0;
+  font:400 12px/1.6 system-ui,sans-serif;color:#836f81}
+.ref-timeline {list-style:none;padding:0 0 0 12px;margin:36px auto 10px;text-align:left;max-width:350px;position:relative}
+.ref-timeline::before {content:"";position:absolute;left:78px;top:24px;bottom:28px;width:1px;background:linear-gradient(#c7a88d,#b998af,#c7a88d)}
+.ref-timeline li {display:grid;grid-template-columns:78px minmax(0,1fr);gap:17px;min-height:92px;position:relative;}
+.ref-timeline li::before {content:"";position:absolute;top:18px;left:62px;width:9px;height:9px;background:#d5af87;border:2px solid #fffaf3;border-radius:50%;box-shadow:0 0 0 1px #c5a8a6}
+.ref-timeline time {font:500 10px/1.5 'Cinzel',Georgia,serif;color:#947287;text-align:left;padding-top:15px}
+.ref-timeline li>div {min-width:0;padding:9px 11px 20px 13px;border-left:1px solid #c9adc03d;}
+.ref-timeline strong {display:block;color:#735a78;font:400 22px/1.2 'EB Garamond',Georgia,serif}
+.ref-timeline span {display:block;font:400 15px/1.45 'EB Garamond',Georgia,serif;color:#8f7888;margin-top:5px}
+.ref-palettes {display:grid;gap:24px}
+.ref-palette,.ref-gift-card {background:#fffcf7e3;border:1px solid #cdbba9;border-radius:110px 110px 14px 14px / 68px 68px 14px 14px;
+  padding:45px 22px 30px;box-shadow:0 14px 38px #6a4b7520;}
+.ref-palette-title {font:500 10px/1.4 'Cinzel',Georgia,serif;text-transform:uppercase;letter-spacing:.14em;color:#a28076}
+.ref-palette h3,.ref-gift-card h3 {font:400 31px/1.15 'EB Garamond',Georgia,serif;margin:10px auto 18px;color:#765b73}
+.ref-palettes p:last-child {font:400 16px/1.5 'EB Garamond',Georgia,serif}
+.ref-swatches {display:flex;gap:12px;justify-content:center;align-items:center;margin:20px auto}
+.ref-swatches i {display:block;background:var(--swatch);width:clamp(48px,16vw,64px);height:clamp(48px,16vw,64px);
+  border-radius:50%;border:3px solid #fdf7f0;box-shadow:0 0 0 1px #bfb0a388,0 3px 8px #58475630}
+.ref-gift-card {border-radius:24px;margin:20px auto;padding:35px 23px;max-width:350px}
+.ref-gift-card .ref-gift-icon {font:33px/1 Georgia,serif;color:#bda17d}
+.ref-gift-card p {font:400 17px/1.5 'EB Garamond',Georgia,serif}
+.ref-gift-card button {display:block;width:100%;max-width:240px;margin:22px auto 10px;
+  min-height:46px;border-radius:30px;border:1px solid #c5b1c3;background:#c7b8c6;color:#4d4053;
+  font:500 11px/1.4 'Cinzel',Georgia,serif;cursor:not-allowed}
+.ref-gift-card small {display:block;font:400 11px/1.5 system-ui,sans-serif;color:#896e7d}
+.ref-wishes {max-width:390px;margin:60px auto 0;text-align:center;padding:30px 0 0;border-top:1px solid #bea9a98a}
+.ref-wishes .ref-script {font-size:clamp(45px,13vw,62px)}
+.ref-wish {margin:20px auto;padding:24px 17px;background:#fffcf8b8;border:1px solid #cfb9af;border-radius:13px}
+.ref-wish > span {color:#b99d78}
+.ref-wish p {font:italic 18px/1.5 'EB Garamond',Georgia,serif;color:#70586f}
+.ref-wish small {font:400 10px/1.6 'Cinzel',Georgia,serif;text-transform:uppercase;color:#967b8b}
+.ref-closing .ref-closing-message {max-width:28ch;font:400 23px/1.5 'EB Garamond',Georgia,serif;margin:60px auto 25px}
+.ref-closing .ref-closing-names {font:400 clamp(44px,12vw,61px)/1.2 'Pinyon Script',cursive;color:#795c79;margin:0 auto 30px}
+.ref-closing .ref-closing-names span {color:#b59b76;font-size:.7em}
+.ref-closing .ref-finish {font:34px Georgia,serif;color:#bba17f;margin:45px auto 0}
+.reference-continuation[data-reveal-ready="true"] .ref-reveal {opacity:0;transform:translate3d(0,30px,0) scale(.984);
+  transition:opacity .9s ease,transform .95s cubic-bezier(.2,.7,.15,1)}
+.reference-continuation[data-reveal-ready="true"] .ref-reveal.ref-in-view {opacity:1;transform:none}
+@keyframes ref-leaf-breathe {from{opacity:.28;translate:0 -7px}to{opacity:.49;translate:0 8px}}
+.reference-continuation button:focus-visible {outline:3px solid #84688d;outline-offset:4px}
+@media(max-width:350px) {
+  .reference-continuation {padding-inline:12px}
+  .ref-timeline {padding-left:2px}
+  .ref-timeline li {gap:7px}
+  .ref-timeline li::before {left:62px}
+  .ref-timeline::before {left:78px}
+  .ref-palette,.ref-gift-card {padding-inline:14px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .reference-continuation .ref-vine {animation:none!important;transform:none!important}
+  .reference-continuation[data-reveal-ready="true"] .ref-reveal {opacity:1!important;transform:none!important;transition:none!important}
+}
+
+/* 390px reference measurements: timeline ~651px, attire ~679px,
+   gift ~990px, closing ~1109px; keep content-based growth when needed. */
+.ref-program {min-height:651px;padding-top:34px;padding-bottom:30px}
+.ref-program .ref-script {font-size:clamp(43px,12.5vw,56px);margin-bottom:7px}
+.ref-program .ref-intro {margin-bottom:8px;font-size:17px}
+.ref-program .ref-timeline {margin:8px auto 3px}
+.ref-program .ref-timeline li {min-height:63px}
+.ref-program .ref-timeline li::before {left:74px;top:12px}
+.ref-program .ref-timeline::before {left:78px;top:17px;bottom:18px}
+.ref-program .ref-timeline li>div {padding:3px 10px 8px 11px}
+.ref-program .ref-timeline time {padding-top:10px}
+.ref-program .ref-timeline strong {font-size:19px}
+.ref-program .ref-timeline span {font-size:13px;margin-top:1px}
+.ref-program .ref-disclosure {margin-top:12px}
+.ref-dress {min-height:679px;padding-top:43px;padding-bottom:44px}
+.ref-dress .ref-intro {margin-bottom:19px}
+.ref-dress .ref-palettes {gap:17px}
+.ref-dress .ref-palette {padding:23px 16px 13px}
+.ref-dress .ref-palette h3 {font-size:25px;margin:6px auto 9px}
+.ref-dress .ref-palette .ref-swatches {margin:10px auto}
+.ref-dress .ref-swatches i {width:49px;height:49px}
+.ref-dress .ref-palette p:last-child {font-size:14px;margin:8px auto 0}
+.ref-dress .ref-disclosure {margin-top:14px}
+.ref-gifts {min-height:990px}
+.ref-closing {min-height:1109px}
+@media(max-width:350px) {
+  .ref-program {padding-top:44px}
+  .ref-program .ref-timeline li {min-height:72px}
+}
+
+/* Reuse our own Section 3 botanical/lakeside artwork for a continuous
+   environment without bundling or hotlinking any additional provider images. */
+.reference-continuation .ref-environment::before {
+ content:"";position:absolute;inset:0;opacity:.20;pointer-events:none;
+ background:url("./assets/couple-botanical-edges-original.svg") center center / 100% 100% no-repeat;
+ -webkit-mask-image:linear-gradient(to bottom,transparent,black 13%,black 88%,transparent);
+ mask-image:linear-gradient(to bottom,transparent,black 13%,black 88%,transparent);
+}
+.reference-continuation .ref-environment::after {
+ content:"";position:absolute;left:0;right:0;bottom:0;height:112px;
+ background:url("./assets/couple-lake-finish-original.svg") center bottom / 100% auto no-repeat;
+ opacity:.22;pointer-events:none;
+ -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 70%);
+ mask-image:linear-gradient(to bottom,transparent 0%,black 70%);
+}
+.reference-continuation .ref-vine {z-index:1}
+.reference-continuation .ref-light {z-index:0}
