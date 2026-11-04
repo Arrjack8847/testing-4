@@ -8,7 +8,9 @@ const SOURCE='https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?l
 const LOCAL='http://127.0.0.1:8000';
 const OUT='section10-motion-evidence';
 await mkdir(OUT,{recursive:true});
-const server=spawn('python3',['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
+// Use the Windows Python launcher locally and python3 on GitHub Actions/Linux.
+const python=process.platform==='win32'?'py':'python3';
+const server=spawn(python,['-m','http.server','8000','--bind','127.0.0.1'],{stdio:'ignore'});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const spec={
   source:{section:'.cgv-closing',frame:'.cgv-closing .cgv-tframe',
