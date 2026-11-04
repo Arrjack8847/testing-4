@@ -1,0 +1,43 @@
+name: Section 5 focused reference and seam QA
+on:
+  push:
+    branches: [fix/section5-main-motion-regression-20261104]
+    paths:
+      - order-program.js
+      - order-program.css
+      - tests/section5-order-of-day.spec.mjs
+      - .github/workflows/section5-focused-regression.yml
+  pull_request:
+    paths:
+      - order-program.js
+      - order-program.css
+      - tests/section5-order-of-day.spec.mjs
+      - .github/workflows/section5-focused-regression.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  section5:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Syntax check
+        run: node --check order-program.js && node --check scene.js
+      - name: Test Order of the Day across 320, 360, 390, 430px
+        run: npx playwright test tests/section5-order-of-day.spec.mjs --workers=2
+      - name: Keep mobile evidence and browser traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-focused-reference-qa
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: warn
