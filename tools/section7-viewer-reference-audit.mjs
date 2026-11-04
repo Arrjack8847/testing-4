@@ -60,11 +60,8 @@ for(const [site,url] of urls)for(const viewport of viewports){
   const record={site,viewport,status:'started'};
   output.records.push(record);
   try{
-    if(site==='local'){
-      const gif=Buffer.from('UklGRlIAAABXRUJQVlA4IEYAAADwAQCdASoBAAEADsD+JaQAA3AAAAAA', 'base64');
-      await page.route('**/assets/gallery/reference/*.webp',route=>
-        route.fulfill({status:200,contentType:'image/webp',body:gif}));
-    }
+    // Temporary WebPs are pre-staged in the private CI runner and remain local.
+    // Do not use synthetic pixels: the viewer must open real decoded images.
     await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
     await page.waitForTimeout(1050);
     const button=page.getByRole('button',{name:'Open Invitation'});
