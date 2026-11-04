@@ -34,7 +34,7 @@ try {
       const page = await context.newPage();
       const responses = new Map();
       const failures = [];
-      page.on('response',res=>responses.set(res.url(),res.status()));
+      page.on('response',res=>responses.set(res.url(),{status:res.status(),type:res.request().resourceType()}));
       page.on('requestfailed',req=>failures.push({
         url:req.url(),error:req.failure()?.errorText||'failed'
       }));
@@ -60,6 +60,9 @@ try {
           const assetMap=new Map();
           const fontMap=new Map();
           const cssDrawing=[];
+          let canvasCount=0;
+          let inlineSvgCount=0;
+          let animatedElementCount=0;
           const visited=[section,...section.querySelectorAll('*')];
           const urlPattern=/url\(\s*['"]?([^"')]+)['"]?\s*\)/gi;
           function addAsset(raw,role,tag,pseudo){
@@ -102,6 +105,10 @@ try {
           }
           for(const el of visited){
             if(['SCRIPT','STYLE','NOSCRIPT'].includes(el.tagName))continue;
+            if(el.tagName==='CANVAS')canvasCount++;
+            if(el.tagName.toLowerCase()==='svg')inlineSvgCount++;
+            const motion=getComputedStyle(el).animationName;
+            if(motion && motion!=='none')animatedElementCount++;
             if(el.tagName==='IMG')addAsset(el.currentSrc||el.src,'image src',el.tagName,'element');
             if(el.tagName==='SOURCE')addAsset(el.src,'source src',el.tagName,'element');
             if(el.tagName==='VIDEO')addAsset(el.poster,'video poster',el.tagName,'element');
@@ -119,19 +126,23 @@ try {
             assets:[...assetMap.values()].sort((a,b)=>a.url.localeCompare(b.url)),
             visibleFonts:[...fontMap].map(([name,count])=>({name,count})),
             cssDrawnMovingElements:cssDrawing.slice(0,50),
-            cssDrawingTotal:cssDrawing.length
+            cssDrawingTotal:cssDrawing.length,
+            canvasCount,inlineSvgCount,animatedElementCount
           };
         },site.selector);
         for(const asset of inventory.assets||[]){
-          asset.httpStatus=responses.get(asset.url)||null;
+          asset.httpStatus=responses.get(asset.url)?.status??null;
           asset.requestFailure=failures.find(x=>x.url===asset.url)?.error||null;
         }
+        inventory.fontNetworkResources=[...responses].filter(([,value])=>value.type==='font').map(([url,value])=>({url,status:value.status}));
         results[site.name]=inventory;
         report.entries.push({site:site.name,width,height,inventory,
           requestFailures:failures.slice(0,30)});
         console.log('SECTION4_ASSET_INVENTORY '+JSON.stringify({
           site:site.name,width,height,assets:inventory.assets?.map(a=>a.filename),
           fonts:inventory.visibleFonts,drawn:inventory.cssDrawingTotal,
+          inlineSvg:inventory.inlineSvgCount,canvas:inventory.canvasCount,
+          animated:inventory.animatedElementCount,
           error:inventory.error
         }));
       }catch(error){
@@ -154,6 +165,12 @@ try {
       referenceFontVariants:results.reference.visibleFonts||[],
       localFontVariants:results.local.visibleFonts||[],
       referenceCssDrawnElements:results.reference.cssDrawingTotal??null,
+      referenceInlineSvgs:results.reference.inlineSvgCount??null,
+      localInlineSvgs:results.local.inlineSvgCount??null,
+      referenceCanvasElements:results.reference.canvasCount??null,
+      localCanvasElements:results.local.canvasCount??null,
+      referenceFontNetworkResources:results.reference.fontNetworkResources||[],
+      localFontNetworkResources:results.local.fontNetworkResources||[],
       localCssDrawnElements:results.local.cssDrawingTotal??null,
       referenceError:results.reference.error||null,
       localError:results.local.error||null
