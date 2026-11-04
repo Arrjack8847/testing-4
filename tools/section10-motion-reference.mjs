@@ -27,7 +27,8 @@ const spec={
     scene:'#closingMessage .closing10-source-scene'}
 };
 const deltas=[-650,-370,-170,-30,80,180,265,180,80,-30,-170,-370,-650];
-const delays=[100,550,1400];
+// Include a fully settled frame after the source footer's 1.05s delay + 1s opacity transition.
+const delays=[100,550,1400,2300];
 const reports={checkedAt:new Date().toISOString(),viewport:'390x844',deltas,delays};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 try {
@@ -98,7 +99,7 @@ try {
             return {scrollY:window.scrollY,style:all};
           },spec[kind]);
           samples.push({index:idx,delta,elapsed:ms,meta,...obs});
-          if([3,4,6,8,10,12].includes(idx)&&[100,1400].includes(ms)){
+          if([3,4,6,8,10,12].includes(idx)&&[100,1400,2300].includes(ms)){
             await page.screenshot({path:OUT+'/'+kind+'-'+String(idx).padStart(2,'0')+'-'+ms+'ms.png',animations:'allow'});
           }
         }
@@ -154,7 +155,36 @@ try {
     sourceTransform:p.metrics.scene?.sourceTransform??null,
     localTransform:p.metrics.scene?.localTransform??null
   }));
+  // Scene integrity: silently accepting a missing/invalid source or local
+  // image would make a 'successful' camera audit misleading.
+  const settledClosing=reports.comparison.filter(p=>p.time===2300&&p.delta>=80&&p.delta<=265);
+  if(!settledClosing.length)throw Error('No settled camera checkpoints were collected');
+  const cameraIssues=[];
+  for(const p of settledClosing){
+    const a=reports.source.samples.find(s=>s.delta===p.delta&&s.elapsed===p.time);
+    const b=reports.local.samples.find(s=>s.delta===p.delta&&s.elapsed===p.time);
+    if(a?.style.scene?.naturalWidth!==1080||b?.style.scene?.naturalWidth!==1080){
+      cameraIssues.push({delta:p.delta,problem:'Reference scene missing or unexpected naturalWidth'});
+    }
+    const m=p.metrics.scene;
+    if(!m||m.widthError>1||m.heightError>1||m.xError>1){
+      cameraIssues.push({delta:p.delta,problem:'Source/local scene dimensions or X crop differ',metrics:m||null});
+    }
+  }
+  reports.cameraGate={settledCheckpoints:settledClosing.length,issues:cameraIssues};
+  reports.opacitySummary={
+    rawSampleCount:reports.comparison.length,
+    mismatchesOver015:reports.motionDiscrepancies.length,
+    settledMismatchesOver015:reports.comparison
+      .filter(p=>p.time===2300)
+      .flatMap(p=>Object.entries(p.metrics)
+        .filter(([key,m])=>key!=='scene'&&m.opacityError>.15)
+        .map(([key,m])=>({delta:p.delta,element:key,error:m.opacityError})))
+  };
+  console.log('SECTION10_CAMERA_GATE '+JSON.stringify(reports.cameraGate));
+  console.log('SECTION10_OPACITY_SUMMARY '+JSON.stringify(reports.opacitySummary));
   console.log('SECTION10_SCENE_CAMERA '+JSON.stringify(reports.sceneCamera));
+  if(cameraIssues.length)throw Error('Section 10 background camera input could not be validated');
   console.log('SECTION10_MOTION_DISCREPANCIES '+JSON.stringify(reports.motionDiscrepancies));
   console.log('SECTION10_MOTION_CHECKPOINTS '+JSON.stringify({
     samples:reports.comparison.length,opacityDifferencesOver015:reports.motionDiscrepancies.length
