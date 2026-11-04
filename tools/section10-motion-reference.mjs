@@ -67,9 +67,14 @@ try {
           window.scrollTo({top:target,behavior:'instant'});
           return {top,max,target};
         },{sel:spec[kind].section,delta});
-        let prev=0;
+        // Schedule each checkpoint against a monotonic clock, rather than
+        // sleeping relative to the previous one. Screenshots are expensive and
+        // otherwise delay later samples (especially 550ms) without reporting it.
+        const movedAt=performance.now();
         for(const ms of delays){
-          await wait(ms-prev);prev=ms;
+          const remaining=ms-(performance.now()-movedAt);
+          if(remaining>0)await wait(remaining);
+          const actualElapsedMs=+(performance.now()-movedAt).toFixed(1);
           const obs=await page.evaluate(sel=>{
             const all={};
             for(const [key,q] of Object.entries(sel)){
@@ -98,7 +103,7 @@ try {
             }
             return {scrollY:window.scrollY,style:all};
           },spec[kind]);
-          samples.push({index:idx,delta,elapsed:ms,meta,...obs});
+          samples.push({index:idx,delta,elapsed:ms,actualElapsedMs,driftMs:+(actualElapsedMs-ms).toFixed(1),meta,...obs});
           if([3,4,6,8,10,12].includes(idx)&&[100,1400,2300].includes(ms)){
             await page.screenshot({path:OUT+'/'+kind+'-'+String(idx).padStart(2,'0')+'-'+ms+'ms.png',animations:'allow'});
           }
@@ -118,9 +123,21 @@ try {
   // No hard threshold until source behavior is verified and snapshots inspected.
   const keys=['frame','heading','message','rule','signoff','names','contacts','footer','scene'];
   reports.comparison=[];
+  reports.timingAccuracy={targetMilliseconds:delays,largestDriftMs:0,unreliableCheckpoints:[]};
   for(let i=0;i<reports.source.samples.length;i++){
     const source=reports.source.samples[i],local=reports.local.samples[i];
     if(!local || source.delta!==local.delta || source.elapsed!==local.elapsed)throw Error('Mismatched source/local motion checkpoints');
+    // Do not count a timing mismatch as a visual defect when source and
+    // local samples were collected at substantially different real times.
+    const timingGapMs=Math.abs(source.actualElapsedMs-local.actualElapsedMs);
+    const worstDriftMs=Math.max(Math.abs(source.driftMs),Math.abs(local.driftMs));
+    const timingReliable=timingGapMs<=80&&worstDriftMs<=160;
+    reports.timingAccuracy.largestDriftMs=Math.max(reports.timingAccuracy.largestDriftMs,worstDriftMs);
+    if(!timingReliable)reports.timingAccuracy.unreliableCheckpoints.push({
+      delta:source.delta,targetMs:source.elapsed,
+      sourceActualMs:source.actualElapsedMs,localActualMs:local.actualElapsedMs,
+      timingGapMs:+timingGapMs.toFixed(1)
+    });
     const metrics={};
     for(const k of keys){
       const a=source.style[k],b=local.style[k];
@@ -139,10 +156,12 @@ try {
         sourceClass:a.cls,localClass:b.cls
       };
     }
-    reports.comparison.push({delta:source.delta,time:source.elapsed,metrics});
+    reports.comparison.push({delta:source.delta,time:source.elapsed,
+      sourceActualMs:source.actualElapsedMs,localActualMs:local.actualElapsedMs,
+      timingReliable,metrics});
   }
   reports.motionDiscrepancies=reports.comparison.flatMap(p=>
-    Object.entries(p.metrics).filter(([_,m])=>m.opacityError>.15).map(([element,m])=>({
+    Object.entries(p.metrics).filter(([_,m])=>p.timingReliable&&m.opacityError>.15).map(([element,m])=>({
       element,delta:p.delta,elapsed:p.time,
       sourceOpacity:m.sourceOpacity,localOpacity:m.localOpacity,error:m.opacityError,
       sourceClass:m.sourceClass,localClass:m.localClass
@@ -176,11 +195,12 @@ try {
     rawSampleCount:reports.comparison.length,
     mismatchesOver015:reports.motionDiscrepancies.length,
     settledMismatchesOver015:reports.comparison
-      .filter(p=>p.time===2300)
+      .filter(p=>p.time===2300&&p.timingReliable)
       .flatMap(p=>Object.entries(p.metrics)
         .filter(([key,m])=>key!=='scene'&&m.opacityError>.15)
         .map(([key,m])=>({delta:p.delta,element:key,error:m.opacityError})))
   };
+  console.log('SECTION10_TIMING_ACCURACY '+JSON.stringify(reports.timingAccuracy));
   console.log('SECTION10_CAMERA_GATE '+JSON.stringify(reports.cameraGate));
   console.log('SECTION10_OPACITY_SUMMARY '+JSON.stringify(reports.opacitySummary));
   console.log('SECTION10_SCENE_CAMERA '+JSON.stringify(reports.sceneCamera));
