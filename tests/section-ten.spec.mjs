@@ -400,3 +400,29 @@ test('Section 9→10 visual seam has no blank frame, overlap, or camera jump on 
   }
   expect(errors).toEqual([]);
 });
+
+
+test('Section 10 reveal state does not thrash DOM on stationary scroll frames',async({page})=>{
+  await openInvitation(page);
+  await page.evaluate(()=>{
+    const el=document.querySelector('#closingMessage');
+    window.scrollTo({top:el.getBoundingClientRect().top+scrollY+125,behavior:'instant'});
+  });
+  await expect(page.locator('#closingHeading')).toHaveAttribute('data-in-view','true');
+  await page.waitForTimeout(120);
+  const changes=await page.evaluate(async()=>{
+    const els=[...document.querySelectorAll('#closingMessage .closing10-reveal')];
+    const changes=[];
+    const observer=new MutationObserver(records=>changes.push(...records));
+    for(const el of els)observer.observe(el,{attributes:true,attributeFilter:['data-in-view']});
+    try{
+      for(let i=0;i<12;i++){
+        dispatchEvent(new Event('scroll'));
+        await new Promise(resolve=>requestAnimationFrame(resolve));
+      }
+      await new Promise(resolve=>requestAnimationFrame(resolve));
+      return changes.length;
+    }finally{observer.disconnect();}
+  });
+  expect(changes).toBe(0);
+});
