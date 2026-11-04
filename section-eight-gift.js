@@ -78,11 +78,13 @@
   const trigger=section.querySelector('#giftEightTrigger');
   const banks=section.querySelector('#giftEightBanks');
   const wishlist=section.querySelector('#giftEightWishlist');
-  if(trigger&&banks&&wishlist){
+  const disclaimer=section.querySelector('#giftEightDisclaimer');
+  if(trigger&&banks&&wishlist&&disclaimer){
     trigger.addEventListener('click',()=>{
       const expanded=trigger.getAttribute('aria-expanded')==='true';
       banks.hidden=expanded;
       wishlist.hidden=expanded;
+      disclaimer.hidden=expanded;
       trigger.setAttribute('aria-expanded',String(!expanded));
     });
   }
