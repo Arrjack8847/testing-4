@@ -317,6 +317,8 @@ test('Section 9 petals are decorative, scroll-contained and reduced-motion safe'
     return {
       pointer:getComputedStyle(layer).pointerEvents,
       overflow:getComputedStyle(layer).overflow,
+      petalStack:parseInt(getComputedStyle(layer).zIndex,10),
+      contentStack:parseInt(getComputedStyle(el.querySelector('.s9-inner')).zIndex,10),
       animation:getComputedStyle(petal).animationName,
       left:lr.left-sr.left,right:sr.right-lr.right,
       top:lr.top-sr.top,bottom:sr.bottom-lr.bottom
@@ -324,6 +326,8 @@ test('Section 9 petals are decorative, scroll-contained and reduced-motion safe'
   });
   expect(initial.pointer).toBe('none');
   expect(initial.overflow).toBe('hidden');
+  // The live reference shows petals passing over the wishes cards.
+  expect(initial.petalStack).toBeGreaterThan(initial.contentStack);
   expect(initial.animation).toBe('s9-petal-drift');
   for(const side of ['left','right','top','bottom'])expect(Math.abs(initial[side])).toBeLessThanOrEqual(1);
   await page.emulateMedia({reducedMotion:'reduce'});
