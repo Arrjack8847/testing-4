@@ -215,7 +215,7 @@
 .order-section[data-art="reference"] .order-stage-original{opacity:0;}
 .order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{object-fit:cover;object-position:center;}
 @media(max-width:350px){
-  .order-section .order-inner{padding-inline:28px;}
+  .order-section .order-inner{padding-inline:28px;padding-bottom:96px;}
   .order-section .order-inner::before{left:23px;right:23px;}
   .order-section .order-timeline{max-width:100%;}
   .order-section .order-entry{grid-template-columns:74px minmax(0,1fr);gap:34px;}
