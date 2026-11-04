@@ -101,7 +101,11 @@ async function openInvitation(page){
   }
   await page.getByRole('heading',{name:'Our Gallery',exact:true}).first()
     .waitFor({state:'attached',timeout:15000});
-  await page.waitForTimeout(850);
+  // Live reference performs a long opening camera/reveal sequence. Measuring
+  // after only 850ms samples a transient DOM/scroll state and falsely reports
+  // a much shorter Gallery (e.g. 1094px vs settled ~1359px at 390px).
+  // The dedicated shell audit measured the settled reference after 5200ms.
+  await page.waitForTimeout(5200);
 }
 async function setScroll(page,y){
   await page.evaluate(y=>{
@@ -129,9 +133,22 @@ async function staticCapture(site,url,viewport){
     if(start.error)throw Error(start.error);
     const top=start.section.box.docY;
     const sectionHeight=start.section.box.height;
+    // Trigger reference/localhost lazy-loading before capturing the first image.
+    await setScroll(page,top+150);
+    await page.waitForTimeout(900);
+    await page.waitForFunction(() => {
+      const section=[...document.querySelectorAll('h1,h2,h3,h4')]
+        .find(el=>(el.textContent||'').trim()==='Our Gallery')?.closest('section');
+      if(!section)return false;
+      const images=[...section.querySelectorAll('img')]
+        .filter(el=>el.getAttribute('alt') &&
+          /wedding couple together|the bride|the groom|the wedding garden|the lakeside scene/i.test(el.getAttribute('alt')));
+      return images.length===5 && images.every(el=>el.complete&&el.naturalWidth>0);
+    },{timeout:20000}).catch(()=>{});
+    await page.evaluate(()=>document.fonts.ready);
     for(const [stage,relative] of [['start',0],['middle',sectionHeight/2],['end',Math.max(0,sectionHeight-viewport.height*.65)]]){
       await setScroll(page,top+relative);
-      await page.waitForTimeout(850);
+      await page.waitForTimeout(1200);
       await page.screenshot({path:OUT+'/'+site+'-'+viewport.width+'-'+stage+'.png',animations:'disabled'});
     }
     record.data=await page.evaluate(sampleGallery);
@@ -161,6 +178,7 @@ async function timeline(site,url){
     await openInvitation(page);
     const first=await page.evaluate(sampleGallery);
     if(first.error)throw Error(first.error);
+    await page.evaluate(()=>document.fonts.ready);
     const headingTop=first.heading.box.docY;
     const sectionBottom=first.section.box.docY+first.section.box.height;
     const log=async name=>{
