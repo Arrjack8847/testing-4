@@ -142,6 +142,23 @@ test('Local reference mode loads split-wing sprite only with explicit opt-in',as
   expect(style.size).toBe('200% 100%');
   expect(style.animation).toBe('s9-sprite-flap-left');
 });
+test('Plain localhost root automatically loads locally staged paper and butterfly',async({page})=>{
+  // Harmless generated fixture; no vendor artwork enters Git or CI.
+  const transparentPng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/2XcAAAAASUVORK5CYII=','base64');
+  await page.route('**/assets/reference-dev/section9/*.webp',route=>route.fulfill({
+    status:200,contentType:'image/png',body:transparentPng
+  }));
+  await page.goto('/');
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveClass(/s9-reference-loaded/);
+  await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
+  expect(new URL(page.url()).searchParams.has('section9Reference')).toBe(false);
+  await page.goto('/?section9Reference=0');
+  await expect(section).not.toHaveClass(/s9-reference-loaded/);
+  await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
+});
+
 test('Missing optional butterfly sprite gracefully falls back to CSS art',async({page})=>{
   await page.route('**/assets/reference-dev/section9/bfly_1.webp',route=>route.fulfill({status:404,body:'not found'}));
   await page.goto('/?section9Reference=1');
