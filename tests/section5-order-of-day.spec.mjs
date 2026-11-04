@@ -205,7 +205,7 @@ test('source-like fixed canvas paints rose petals only while timeline is visible
   expect(errors).toEqual([]);
 });
 
-test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',async({page})=>{
+test('sprite butterfly traverses lower panel right-to-left with mirrored 3D wing flaps',async({page})=>{
   const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:fixture}));
@@ -221,16 +221,20 @@ test('sprite butterfly traverses left-to-right with mirrored 3D wing flaps',asyn
       return {width:css.width,height:css.height,bg:css.backgroundSize,
         position:css.backgroundPosition,transform:css.transform};
     });
-    return {x:Number(el.dataset.x),direction:el.dataset.direction,
+    return {x:Number(el.dataset.x),y:Number(el.dataset.y),direction:el.dataset.direction,
       width:getComputedStyle(el).width,height:getComputedStyle(el).height,wing};
   });
   const before=await getState();
   await page.waitForTimeout(1150);
   const after=await getState();
-  expect(before.direction).toBe('right');
-  expect(after.direction).toBe('right');
-  expect(after.x-before.x).toBeGreaterThan(28);
-  expect(after.x-before.x).toBeLessThan(66);
+  expect(before.direction).toBe('left');
+  expect(after.direction).toBe('left');
+  expect(after.x-before.x).toBeLessThan(-28);
+  expect(after.x-before.x).toBeGreaterThan(-65);
+  for (const y of [before.y,after.y]) {
+    expect(y).toBeGreaterThan(540);
+    expect(y).toBeLessThan(625);
+  }
   expect(after.width).toBe('46px');
   expect(after.height).toBe('35px');
   expect(after.wing[0].width).toBe('23px');
@@ -312,5 +316,55 @@ test('390px timeline text and six row baselines match measured source geometry',
   expect(m.timeStyle.textAlign).toBe('right');
   expect(m.titleStyle.size).toBe('17px');
   expect(m.eyebrowStyle.size).toBe('11px');
+  expect(errors).toEqual([]);
+});
+
+test('Section 5 animated effects stop at Section 6 viewport without changing Dress Code',async({page})=>{
+  const fixture=Buffer.from('UklGRiwAAABXRUJQVlA4ICAAAABwAQCdASoKABAAAgA0JZQCdAGIQAD+7e02x7gwm7AwAA==','base64');
+  await page.route('**/assets/reference-dev/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:fixture}));
+  const {section,errors}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  const dress=page.locator('#dressCode');
+  await expect(dress).toBeAttached();
+  await page.evaluate(()=>{
+    document.getElementById('dressCode').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(dress).toBeInViewport();
+  await expect(section).toHaveAttribute('data-petal-motion','paused');
+  await expect(section).toHaveAttribute('data-butterfly-motion','paused');
+  const both=await section.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const d=document.getElementById('dressCode').getBoundingClientRect();
+    return {gap:d.top-r.bottom,overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  expect(Math.abs(both.gap)).toBeLessThanOrEqual(1);
+  expect(both.overflow).toBeLessThanOrEqual(1);
+  await page.evaluate(()=>{
+    document.getElementById('runningOrder').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  await expect(section).toHaveAttribute('data-butterfly-motion','running');
+  expect(errors).toEqual([]);
+});
+
+test('390px particle canvas opacity and CSS pixel coverage remain source-calibrated',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','390 × 844 source baseline');
+  const {section,errors}=await toOrder(page);
+  await expect(section).toHaveAttribute('data-petal-motion','running');
+  await page.waitForTimeout(260);
+  const metrics=await section.locator('#orderPetalCanvas').evaluate(el=>{
+    const d=el.getContext('2d').getImageData(0,0,el.width,el.height).data;
+    let count=0,alpha=0;
+    for(let i=3;i<d.length;i+=4) if(d[i]) { count++;alpha+=d[i]; }
+    const r=el.getBoundingClientRect();
+    const scale=(el.width/r.width)*(el.height/r.height);
+    return {pixels:count/scale,alpha:count?alpha/count:0};
+  });
+  expect(metrics.pixels).toBeGreaterThan(450);
+  expect(metrics.pixels).toBeLessThan(2300);
+  expect(metrics.alpha).toBeGreaterThan(65);
+  expect(metrics.alpha).toBeLessThan(180);
   expect(errors).toEqual([]);
 });
