@@ -1,4 +1,7 @@
 name: Section 5 timed motion trace (diagnostic)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 on:
   push:
     branches: [fix/section5-main-motion-regression-20261104]
