@@ -267,3 +267,39 @@ preview and a finer-grained embossed floral texture; those are not
 part of Section 5's isolated code scope. The live copyrighted WebP
 has not been committed. Visual parity beyond layout and typography
 must not be claimed from geometry tests alone.
+
+
+## 4 November — final reference-image visual audit tool
+
+The final screenshot comparison requires the actual permission-cleared local
+`band_plum.webp` and `bfly_blush.webp` files under the ignored
+`assets/reference-dev/` directory. **Neither reference image is committed
+or downloaded automatically by the audit.**
+
+With the Section 5 regression branch running at `http://localhost:8000/`:
+
+```powershell
+cd D:\testing-4
+node tools/section5-visual-parity-audit.mjs
+```
+
+The tool first checks that both local assets exist and have RIFF/WebP
+signatures. If either is missing or invalid, it stops before claiming
+visual parity and reports the missing filename.
+
+If both are available, it opens the live reference and local invitation
+at **320×568, 360×740, 390×844 and 430×932**, captures each full timeline
+panel, and writes screenshot pairs, difference heatmaps, element geometry,
+per-pixel mean absolute error, and mismatch coverage statistics to:
+
+`artifacts/section5-visual-parity/`
+
+Artifacts are ignored by Git. Run `node
+tools/section5-visual-parity-audit.mjs --reference-only` to capture
+**only the public reference** if locally authorized artwork is not ready.
+These output screenshots are for local visual review, not redistribution.
+
+Interpret the pixel difference as a diagnostic. Animation frames,
+font rasterization and the provider's proprietary effects may differ.
+Only the user can approve the final visual review. The focused four-width
+behavioral QA remains independent from this artwork-dependent audit.
