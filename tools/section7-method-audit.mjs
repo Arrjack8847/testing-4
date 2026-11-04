@@ -131,10 +131,9 @@ async function staticCapture(site,url,viewport){
     await openInvitation(page);
     const start=await page.evaluate(sampleGallery);
     if(start.error)throw Error(start.error);
-    const top=start.section.box.docY;
-    const sectionHeight=start.section.box.height;
+    const warmupTop=start.section.box.docY;
     // Trigger reference/localhost lazy-loading before capturing the first image.
-    await setScroll(page,top+150);
+    await setScroll(page,warmupTop+150);
     await page.waitForTimeout(900);
     await page.waitForFunction(() => {
       const section=[...document.querySelectorAll('h1,h2,h3,h4')]
@@ -145,7 +144,24 @@ async function staticCapture(site,url,viewport){
           /wedding couple together|the bride|the groom|the wedding garden|the lakeside scene/i.test(el.getAttribute('alt')));
       return images.length===5 && images.every(el=>el.complete&&el.naturalWidth>0);
     },{timeout:20000}).catch(()=>{});
+    // In localhost the fifth onload hides a development disclaimer,
+    // reducing Gallery height by ~61px. Intrinsic image readiness alone is
+    // not enough: the DOM can still be waiting to apply the has-image class.
+    if(site==='local'){
+      await page.waitForFunction(() => {
+        const gallery=document.getElementById('gallery');
+        if(!gallery) return false;
+        const images=gallery.querySelectorAll('.gallery-photo.has-image');
+        const note=gallery.querySelector('.gallery-disclaimer');
+        return images.length===5 && note && note.hidden===true;
+      },null,{timeout:20000}).catch(()=>{});
+    }
     await page.evaluate(()=>document.fonts.ready);
+    // IMPORTANT: read top and height AFTER the photos and disclaimer settle,
+    // otherwise comparison stages use outdated section height and positions.
+    const stable=await page.evaluate(sampleGallery);
+    const top=stable.section.box.docY;
+    const sectionHeight=stable.section.box.height;
     for(const [stage,relative] of [['start',0],['middle',sectionHeight/2],['end',Math.max(0,sectionHeight-viewport.height*.65)]]){
       await setScroll(page,top+relative);
       await page.waitForTimeout(1200);
