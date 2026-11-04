@@ -486,3 +486,26 @@ test('Expanded source geometry stays within measured tolerance at all four phone
   expect(Math.abs(measured.rsvpGap)).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
+
+
+test('Published wishlist icons use original assets and preserve local authorized photo overrides',async({page})=>{
+  const {gift,faults}=await openGift(page);
+  await gift.locator('#giftEightTrigger').click();
+  const items=gift.locator('.gift-eight-item');
+  const illustrations=[
+    'section8-rice-cooker-original.svg',
+    'section8-kettle-original.svg',
+    'section8-giftcard-original.svg'
+  ];
+  for(let i=0;i<illustrations.length;i++){
+    const url='/assets/'+illustrations[i];
+    const response=await page.request.get(url);
+    expect(response.status(),url+' must load on default localhost').toBe(200);
+    expect(response.headers()['content-type']).toContain('image/svg+xml');
+    expect(await response.text()).toContain('<svg ');
+    const tile=items.nth(i).locator('.gift-eight-thumb');
+    const style=await tile.evaluate(el=>getComputedStyle(el).backgroundImage);
+    expect(style).toContain(illustrations[i]);
+  }
+  expect(faults).toEqual([]);
+});

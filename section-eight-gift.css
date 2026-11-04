@@ -597,3 +597,21 @@
     margin:92px 1px -6px; /* source 430px panel x=29.5, y=666.5 */
   }
 }
+
+
+/* Original, independently drawn gift appliance thumbnails. These are generic
+   illustrations, not Philips product photography or vendor-owned artwork.
+   A user-authorized reference-dev photo, when available on localhost, wins
+   over these selectors through higher specificity. */
+.gift-eight .gift-eight-thumb-rice {
+  background:#fff url("./assets/section8-rice-cooker-original.svg") center / contain no-repeat;
+  font-size:0;
+}
+.gift-eight .gift-eight-thumb-kettle {
+  background:#fff url("./assets/section8-kettle-original.svg") center / contain no-repeat;
+  font-size:0;
+}
+.gift-eight .gift-eight-item:nth-child(3) .gift-eight-thumb {
+  background:#fff url("./assets/section8-giftcard-original.svg") center / contain no-repeat;
+  font-size:0;
+}

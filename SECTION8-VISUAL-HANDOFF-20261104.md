@@ -91,3 +91,16 @@ evidence are inspected.**
 Artwork remains a rights-gated issue: the original source has heavily
 embossed plum botanical art and two branded photos; the published fallback
 uses an independently created SVG and nontransactional placeholders.
+
+## Original-art substitute improvement
+
+Added three entirely original vector illustrations for the rice cooker,
+kettle, and gift-card placeholders (each 68×68 viewBox). No brand logos,
+product photographs, or website artwork were copied. Their public/default
+paths are in assets/section8-*-original.svg. Private local comparison
+photos still override the rice/kettle illustrations only after a real
+successful local image load, with no remote hotlink.
+
+These help match the *subject matter* but do **not** create exact source
+photography parity. The source's embossed plum texture likewise remains
+rights-gated; a separate original SVG supplies the production background.
