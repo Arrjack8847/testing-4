@@ -215,7 +215,7 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
   expect(faults).toEqual([]);
 });
 
-test('Missing private butterfly remains invisible without fetching vendor URLs',async({page})=>{
+test('Missing private butterfly uses original animated fallback without vendor hotlinks',async({page})=>{
   const requested=[];
   page.on('request',req=>{
     if(/bfly_blush|band_plum/i.test(req.url()))requested.push(req.url());
@@ -224,12 +224,17 @@ test('Missing private butterfly remains invisible without fetching vendor URLs',
   const value=await gift.evaluate(el=>({
     status:el.dataset.giftButterfly,
     visibility:getComputedStyle(el.querySelector('.gift-eight-butterfly')).visibility,
+    opacity:parseFloat(getComputedStyle(el.querySelector('.gift-eight-butterfly')).opacity),
     background:getComputedStyle(el.querySelector('.gift-eight-bfly-left')).backgroundImage
   }));
-  expect(['unavailable','reference-local']).toContain(value.status);
-  if(value.status==='unavailable'){
-    expect(value.visibility).toBe('hidden');
-    expect(value.background).toBe('none');
+  expect(['original','reference-local']).toContain(value.status);
+  expect(value.visibility).toBe('visible');
+  expect(value.opacity).toBeGreaterThan(.8);
+  if(value.status==='original'){
+    expect(value.background).toContain('section8-blush-wing-original.svg');
+    const img=await page.request.get('/assets/section8-blush-wing-original.svg');
+    expect(img.status()).toBe(200);
+    expect(img.headers()['content-type']).toContain('image/svg+xml');
   }
   expect(requested.every(url=>new URL(url).hostname==='127.0.0.1')).toBe(true);
 });

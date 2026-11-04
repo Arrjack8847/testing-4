@@ -615,3 +615,17 @@
   background:#fff url("./assets/section8-giftcard-original.svg") center / contain no-repeat;
   font-size:0;
 }
+
+
+/* Original blush butterfly fallback: always visible even when private
+   comparison artwork is unavailable. Native vector wing art and CSS motion
+   avoid publishing or hotlinking the reference site's assets. The original
+   local authorized image, when present, takes priority by specificity. */
+.gift-eight .gift-eight-butterfly{
+  opacity:.87;
+  visibility:visible;
+  animation:gift-eight-butterfly-drift 5.6s ease-in-out infinite;
+}
+.gift-eight .gift-eight-bfly-wing{
+  background-image:url("./assets/section8-blush-wing-original.svg");
+}

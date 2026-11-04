@@ -104,3 +104,14 @@ successful local image load, with no remote hotlink.
 These help match the *subject matter* but do **not** create exact source
 photography parity. The source's embossed plum texture likewise remains
 rights-gated; a separate original SVG supplies the production background.
+
+## Original animated butterfly fallback
+
+The production/default Section 8 now has a custom drawn blush butterfly
+wing vector at assets/section8-blush-wing-original.svg, which follows the
+existing flutter/drift motion at the Gallery→Gift edge. Previously the
+butterfly disappeared entirely when the private bfly_blush.webp was absent.
+The authorized local reference image still overrides the fallback for
+comparison. The new test checks default loading, animation visibility,
+local-only request behavior and Reduced Motion protection. This is a
+design substitute, **not** a verified frame-identical source butterfly.
