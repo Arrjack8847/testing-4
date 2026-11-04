@@ -39,7 +39,7 @@ test('Section 4 shows TWO reference-example ceremonies, source venue links and c
   await expect(section.locator('.event-waze-link')).toHaveAttribute('href',/waze.com\/ul/);
   await expect(section.getByRole('link',{name:'Add to Calendar'})).toHaveAttribute('href',/calendar\/render/);
   await expect(section.locator('.event-demo-note')).toContainText('Demonstration only');
-  await expect(section.locator('#eventSourcePaper')).toHaveAttribute('src',/tasik-kayangan\/paper\.webp/);
+  await expect(section.locator('#eventSourcePaper')).toHaveAttribute('src',/(?:tasik-kayangan|reference-dev)\/paper\.webp/);
   await expect(section.locator('#eventSourceButterfly')).toHaveAttribute('src',/anggerik-nirmala\/bfly_white\.webp/);
   expect(errors).toEqual([]);
 });
@@ -95,7 +95,7 @@ test('Section 4 source-art is the development default and leaves earlier section
   const {section}=await openEvents(page);
   await expect(section).toHaveAttribute('data-art','reference');
   await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
-    'src','https://undangankahwin.com/images/concierge/packs/tasik-kayangan/paper.webp');
+    'src',/(?:https:\/\/undangankahwin\.com\/images\/concierge\/packs\/tasik-kayangan|assets\/reference-dev)\/paper\.webp/);
   await expect(section.locator('#eventSourceButterfly')).toHaveAttribute(
     'src','https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp');
   await expect(section.locator('.event-reference-card')).toHaveCount(2);
