@@ -402,23 +402,30 @@ test('Expanded wishlist preserves measured first-card and 68px thumbnail geometr
       items:products.map(r),
       thumbs:[...panel.querySelectorAll('.gift-eight-thumb')].map(r),
       bottomPadding:getComputedStyle(panel).paddingBottom,
+      rowGap:getComputedStyle(panel.querySelector('.gift-eight-items')).rowGap,
+      firstBackground:getComputedStyle(products[0]).backgroundColor,
       overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
-  expect(m.bottomPadding).toBe('16px');
+  expect(m.bottomPadding).toBe('10px');
+  expect(m.rowGap).toBe('0px');
+  expect(m.firstBackground).toBe('rgba(0, 0, 0, 0)');
   expect(m.items).toHaveLength(3);
   expect(m.thumbs).toHaveLength(3);
   for(const thumb of m.thumbs){
     expect(thumb.width).toBe(68);
     expect(thumb.height).toBe(68);
   }
-  expect(m.first.height).toBeGreaterThanOrEqual(185.4);
+  const sourceFirst={ 'small-phone':177.2, 'android-360':182.1,
+    'iphone-390':185.5, 'large-phone':138.3 }[testInfo.project.name];
+  expect(m.first.height).toBeGreaterThanOrEqual(sourceFirst-10);
+  expect(m.first.height).toBeLessThanOrEqual(sourceFirst+16);
   expect(m.overflow).toBeLessThanOrEqual(1);
   if(testInfo.project.name==='iphone-390'){
     // Source audit: panel 514.9px; first item 185.5px at 390px.
     // Tolerance accommodates fallback fonts and non-licensed placeholders.
-    expect(m.panel.height).toBeGreaterThan(490);
-    expect(m.panel.height).toBeLessThan(560);
+    expect(m.panel.height).toBeGreaterThan(500);
+    expect(m.panel.height).toBeLessThan(530);
   }
   await wishlist.scrollIntoViewIfNeeded();
   await wishlist.screenshot({
