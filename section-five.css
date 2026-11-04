@@ -441,3 +441,102 @@
   position:relative;
   z-index:4;
 }
+
+
+/* Section 7: audited full-screen photo viewer, 2026-11-04.
+   The source's .cgv-lightbox is a full viewport rgba(50,42,34,.9) overlay.
+   Source frame: viewport width - 56px, aspect ratio 3:4, 6px white border,
+   16px radius, centered vertically; close at right 22px/top 22px, 42px circle.
+   Keep native <dialog> for Escape, focus containment and focus restoration.
+   No visible caption/count/previous-next controls exist in the source viewer. */
+.gallery-dialog {
+  box-sizing:border-box;
+  position:fixed;
+  inset:0;
+  margin:0;
+  width:100vw;
+  max-width:none;
+  height:100vh;
+  height:100dvh;
+  max-height:none;
+  padding:28px;
+  overflow:hidden;
+  border:0;
+  border-radius:0;
+  background:rgba(50,42,34,.9);
+  color:#fff;
+  box-shadow:none;
+}
+.gallery-dialog[open] {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.gallery-dialog::backdrop {
+  background:transparent;
+  backdrop-filter:none;
+}
+.gallery-dialog .gallery-viewer {
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+}
+.gallery-dialog .gallery-viewer-close {
+  box-sizing:border-box;
+  position:absolute;
+  z-index:5;
+  top:22px;
+  right:22px;
+  align-self:auto;
+  width:42px;
+  height:42px;
+  min-width:42px;
+  min-height:42px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  color:#fff;
+  font:400 22px/1 system-ui,sans-serif;
+}
+.gallery-dialog .gallery-viewer-figure {
+  box-sizing:border-box;
+  display:block;
+  flex:none;
+  width:min(100%, calc((100dvh - 112px)*.75));
+  height:auto;
+  aspect-ratio:3 / 4;
+  min-height:0;
+  margin:0;
+  padding:0;
+  border:6px solid #fff;
+  border-radius:16px;
+  overflow:hidden;
+  background:transparent;
+}
+.gallery-dialog #galleryViewImage {
+  width:100%;
+  height:100%;
+  max-width:none;
+  max-height:none;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+  border-radius:0;
+}
+/* Captions remain available to screen readers but not displayed visually. */
+.gallery-dialog #galleryViewCaption {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+.gallery-dialog .gallery-viewer-navigation {display:none;}
