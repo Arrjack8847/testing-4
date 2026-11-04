@@ -295,3 +295,48 @@ test('Section 10 CSS matches measured reference stagger and duration',async({pag
     expect(m.timing).toContain('cubic-bezier(0.22, 0.9, 0.24, 1)');
   });
 });
+
+
+test('Section 10 artwork camera pins through the Section 9 seam and reverses at four widths',async({page})=>{
+  // This is a neutral local fixture. Third-party WebPs are never committed to QA.
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#d7c1dd"/></svg>';
+  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+    status:200,contentType:'image/svg+xml',body:svg
+  }));
+  await openInvitation(page);
+  const section=page.locator('#closingMessage');
+  const scene=section.locator('.closing10-source-scene');
+  await expect(section).toHaveAttribute('data-artwork','local-reference');
+  await expect(scene).toHaveJSProperty('naturalWidth',1080);
+  const params=await section.evaluate(el=>{
+    const prev=el.previousElementSibling;
+    const a=el.getBoundingClientRect(),b=prev.getBoundingClientRect();
+    return {sectionTop:a.top+scrollY,travel:Math.max(0,el.offsetHeight-innerHeight),
+      gap:a.top-b.bottom};
+  });
+  expect(Math.abs(params.gap)).toBeLessThanOrEqual(1);
+  expect(params.travel).toBeGreaterThan(50);
+  const camera=section.locator('.closing10-sticky-art');
+
+  const checkAt=async(fraction)=>{
+    const offset=params.travel*fraction;
+    await page.evaluate(({top,offset})=>{
+      scrollTo({top:top+offset,behavior:'instant'});
+    },{top:params.sectionTop,offset});
+    await expect.poll(async()=>{
+      return camera.evaluate(el=>Math.abs(el.getBoundingClientRect().top));
+    },{timeout:3000,intervals:[50,100,150]}).toBeLessThan(2);
+    const state=await section.evaluate(el=>({
+      art:el.dataset.artwork,
+      active:el.dataset.active,
+      cameraOffset:parseFloat(el.style.getPropertyValue('--closing10-sticky-y'))||0
+    }));
+    expect(state.art).toBe('local-reference');
+    expect(state.active).toBe('true');
+    expect(Math.abs(state.cameraOffset-offset)).toBeLessThan(2);
+    await expect(scene).toBeInViewport();
+  };
+
+  // Pin the same scene on entry, midway and exit, including a reverse traversal.
+  for(const fraction of [0.05,0.5,0.95,0.5,0.05]) await checkAt(fraction);
+});
