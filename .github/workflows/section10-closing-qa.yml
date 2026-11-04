@@ -19,6 +19,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# Avoid stacking older Section 10 QA runs while parallel workers commit.
+concurrency:
+  group: section10-closing-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   closing-reference:
     runs-on: ubuntu-24.04
