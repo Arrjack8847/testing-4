@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/section7-real-art-check.yml
       - tools/section7-real-art-pixel-report.py
+      - tools/section7-method-audit.mjs
   workflow_dispatch:
 permissions:
   contents: read
