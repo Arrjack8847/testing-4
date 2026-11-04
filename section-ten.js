@@ -45,6 +45,11 @@
     const travel=Math.max(0,section.offsetHeight-window.innerHeight);
     const offset=Math.max(0,Math.min(travel,-rect.top));
     section.style.setProperty('--closing10-sticky-y',offset.toFixed(2)+'px');
+    // Matched 390x844 screenshot measurements show the original scene moves
+    // ~4.38% of the closing section's scroll travel while the frame is pinned.
+    // This affects only locally staged reference artwork, not the fallback art.
+    const sceneY=Math.max(-24,Math.min(16,-5.587-rect.top*0.043788));
+    section.style.setProperty('--closing10-scene-y',sceneY.toFixed(2)+'px');
   };
   const schedule=()=>{if(!raf&&visible&&ready())raf=requestAnimationFrame(paint);};
   const syncMotion=()=>{
@@ -53,6 +58,7 @@
       section.dataset.revealed='true';
       stop();
       section.style.setProperty('--closing10-sticky-y','0px');
+      section.style.setProperty('--closing10-scene-y','0px');
       scheduleReveals();
     }else{
       section.dataset.motionReady='true';
