@@ -45,6 +45,24 @@ const pose=async(page,root,butterfly)=>{
         transform:style.transform,opacity:style.opacity
       };
     };
+    // Floating sprites can belong to a global layer outside #cgv-rsvp.
+    // Track each DOM instance by stable index and its relation to the
+    // current Section 9 viewport, including 120px of the closing seam.
+    const sectionRect=section?.getBoundingClientRect()||null;
+    const nearbyGlobalButterflies=[...document.querySelectorAll(butterfly)]
+      .map((element,index)=>{
+        const rect=element.getBoundingClientRect();
+        const nearSection=!!sectionRect&&rect.bottom>sectionRect.top-100&&
+          rect.top<sectionRect.bottom+120;
+        return {
+          index,withinSection:belongsToSection(element),
+          visible:activeSprite(element),nearSection,
+          containerClass:typeof element.parentElement?.className==='string'?
+            element.parentElement.className.slice(0,160):'',
+          rect:box(element),
+        };
+      })
+      .filter(item=>item.visible&&item.nearSection);
     const candidates=[];
     const viewportWidth=innerWidth,viewportHeight=innerHeight;
     for(const element of document.querySelectorAll('*')){
@@ -104,6 +122,7 @@ const pose=async(page,root,butterfly)=>{
       sectionButterflyCount:sectionSprites.length,
       sectionButterflyIndex:bf?sectionSprites.indexOf(bf):null,
       visibleSectionSprites:sectionSprites.filter(activeSprite).map(box),
+      nearbyGlobalButterflies,
       referenceSelectorWasVisible:activeSprite(legacyBf)&&belongsToSection(legacyBf),
       visibleButterflyCandidates,
       butterflyCandidates:candidates.slice(0,12),
@@ -148,7 +167,7 @@ try{
         original.screenshot({path:output+'/reference-'+name+'.png',animations:'allow',timeout:25000}),
         local.screenshot({path:output+'/local-'+name+'.png',animations:'allow',timeout:25000}),
         pose(original,'#cgv-rsvp','.cgv-bf'),
-        pose(local,'#rsvp','.s9-butterfly')
+        pose(local,'#rsvp','.s9-butterfly,.s9-butterfly-forward')
       ]);
       metrics.frames.push({checkpoint:label,elapsedMs:Date.now()-t0,
         files:['reference-'+name+'.png','local-'+name+'.png'],
@@ -168,6 +187,10 @@ try{
     localVisibleSectionSprites:countVisible('local'),
     referenceSectionSpriteCounts:[...new Set(metrics.frames.map(
       frame=>frame.original?.sectionButterflyCount||0))],
+    referenceNearbyGlobalSamples:metrics.frames.reduce((n,frame)=>
+      n+(frame.original?.nearbyGlobalButterflies?.length||0),0),
+    localNearbyGlobalSamples:metrics.frames.reduce((n,frame)=>
+      n+(frame.local?.nearbyGlobalButterflies?.length||0),0),
     note:'Only sprites inside the target section are used for pose; visible global candidates are diagnostic.'
   }));
   fs.writeFileSync(output+'/frames.json',JSON.stringify(metrics,null,2));
