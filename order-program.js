@@ -76,26 +76,30 @@
   if(observer)reveals.forEach(el=>observer.observe(el));
   else reveals.forEach(el=>el.classList.add('order-in-view'));
 
-  // Source observation: the timeline butterfly is a 46×35px paired-wing
-  // WebP with two 23px halves. It traverses left-to-right (~44px/second),
-  // then returns. The source's petals are drawn on a fixed 300px-wide canvas.
+  // Source observation: two single-direction passages separated by holds.
+  // First, right-to-left at ~39px/s near y=570–610. Later, left-to-right
+  // at ~44px/s near y=540–575. Each waits outside before changing direction.
+  // The source petals are drawn on a fixed 300px-wide canvas.
   // This is an independent implementation, not copied vendor animation code.
   const butterfly=section.querySelector('#orderButterflyFlight');
   const wings=butterfly ? [...butterfly.querySelectorAll('.order-bf-wing')] : [];
   const canvas=section.querySelector('#orderPetalCanvas');
   const ctx=canvas?.getContext('2d', {alpha:true}) || null;
   let petalVisible=false;
+  let visiblePixels=false;
   let petalFrame=0;
   let lastFrame=0;
   let elapsed=0;
+  let flightElapsed=0;
+  let ambientWasActive=false;
   let canvasWidth=0;
   let canvasHeight=0;
   const colors=['#e4cadd','#f5e4e9','#ac8baa','#d7b0cb','#ead8e6'];
   // Each petal has a fixed deterministic seed; no random jitter or
   // new particle allocation is performed on individual animation frames.
-  const particles=Array.from({length:8},(_,i)=>({
+  const particles=Array.from({length:16},(_,i)=>({
     x:((i*0.61803398875+.13)%1),y:((i*.38196601125+.26)%1),
-    speed:11+(i%4)*5,phase:i*2.17,size:1.8+(i%3)*.55,
+    speed:11+(i%4)*5,phase:i*2.17,size:2.2+(i%3)*.6,
     color:colors[i%colors.length]
   }));
   if(ctx)section.dataset.petalRenderer='canvas';
@@ -119,7 +123,7 @@
     for(const petal of particles){
       const x=petal.x*canvasWidth+Math.sin(t*.85+petal.phase)*14;
       const y=((petal.y*range+t*petal.speed)%range)-40;
-      const a=.16+.15*(.5+.5*Math.sin(t*1.25+petal.phase));
+      const a=.48+.24*(.5+.5*Math.sin(t*1.25+petal.phase));
       ctx.save();
       ctx.translate(x,y);
       ctx.rotate(Math.sin(t*1.8+petal.phase)*1.1+petal.phase*.3);
@@ -136,19 +140,46 @@
   }
   function paintButterfly(t){
     if(!butterfly)return;
-    // Source measurements: x=-68 -> -30 -> +44 over ~3s while entering,
-    // then near the far-right edge later; use a smooth reversing traversal.
-    const left=-70;
-    const right=section.clientWidth+70;
-    const span=right-left;
-    const travel=(t*44)%(span*2);
-    const outbound=travel<=span;
-    const x=outbound?left+travel:right-(travel-span);
-    const y=54+Math.sin(t*1.18)*7+Math.sin(t*2.6)*3;
-    const rotation=(outbound?1.27:-1.43)+Math.sin(t*2.05)*.16;
+    // Timed source: x 427.9 -> 387.5 -> 320 -> -54.6 on the first pass,
+    // then -54.6 -> 14.5 -> 101.9 -> 444.6 on a separate return.
+    const entryX=section.clientWidth+38;
+    const exitX=-55;
+    // Source contains two distinct scripted passes. On a second recording,
+    // the butterfly traveled -55 -> +445 at ~44px/s with reversed body
+    // rotation and paused at the right edge for at least five seconds.
+    // Exact inter-pass delays are unmeasured; use conservative pauses.
+    const reverseExit=section.clientWidth+55;
+    const firstDuration=(entryX-exitX)/39;
+    const leftHold=2.5;
+    const returnDuration=(reverseExit-exitX)/44;
+    const rightHold=5;
+    const cycle=firstDuration+leftHold+returnDuration+rightHold;
+    const phase=t%cycle;
+    let x,y,rotation,direction,passage;
+    if(phase<firstDuration){
+      x=entryX-phase*39;
+      y=585+18*Math.cos(phase*.56+.15);
+      direction='left';passage='in-flight';
+    }else if(phase<firstDuration+leftHold){
+      x=exitX;y=585+18*Math.cos(firstDuration*.56+.15);
+      direction='left';passage='paused-at-left';
+    }else if(phase<firstDuration+leftHold+returnDuration){
+      const time=phase-firstDuration-leftHold;
+      x=exitX+time*44;
+      y=556+16*Math.cos(time*.53+.55);
+      direction='right';passage='in-flight';
+    }else{
+      x=reverseExit;
+      y=556+16*Math.cos(returnDuration*.53+.55);
+      direction='right';passage='paused-at-right';
+    }
+    const angle=direction==='left'?-1.43:1.43;
+    rotation=angle+.21*Math.sin(t*1.8+.5);
     butterfly.style.transform='translate3d('+x.toFixed(2)+'px,'+y.toFixed(2)+'px,0) translate(-50%,-50%) rotate('+rotation.toFixed(4)+'rad) scale(.82)';
     butterfly.dataset.x=x.toFixed(2);
-    butterfly.dataset.direction=outbound?'right':'left';
+    butterfly.dataset.y=y.toFixed(2);
+    butterfly.dataset.direction=direction;
+    butterfly.dataset.passage=passage;
     const flap=17+54*Math.abs(Math.sin(t*17.5));
     if(wings[0])wings[0].style.transform='perspective(110px) rotateY('+flap.toFixed(2)+'deg)';
     if(wings[1])wings[1].style.transform='perspective(110px) rotateY('+(-flap).toFixed(2)+'deg)';
@@ -159,21 +190,34 @@
     const dt=lastFrame?Math.min((now-lastFrame)/1000,.06):0;
     lastFrame=now;
     elapsed+=dt;
+    flightElapsed+=dt;
     paintPetals(elapsed);
-    paintButterfly(elapsed);
+    paintButterfly(flightElapsed);
     petalFrame=requestAnimationFrame(animateAmbient);
   }
   function canAnimateAmbient(){
-    return petalVisible && invite.dataset.state==='opened'
+    return petalVisible && visiblePixels && invite.dataset.state==='opened'
       && !document.hidden && !reduced.matches;
   }
   function updateAmbient(){
+    // A section touching the viewport boundary is not actually visible.
+    // IntersectionObserver can report isIntersecting=true for zero-area
+    // edge adjacency; the geometry guard prevents leaking animation into
+    // Section 6 at precisely the 5→6 seam.
+    const rect=section.getBoundingClientRect();
+    visiblePixels=rect.bottom>1 && rect.top<innerHeight-1;
     const active=canAnimateAmbient();
-    section.classList.toggle('order-visible',petalVisible && invite.dataset.state==='opened');
+    section.classList.toggle('order-visible',petalVisible && visiblePixels && invite.dataset.state==='opened');
     section.dataset.petalMotion=active?'running':(reduced.matches?'still':'paused');
+    // Preserve the strict-reference-art policy on main: no substitute
+    // butterfly is claimed when the permission-cleared WebP is unavailable.
     section.dataset.butterflyMotion=section.dataset.butterflyStatus==='loaded'
       ? (active?'running':'paused') : 'unavailable';
     if(active){
+      if(!ambientWasActive){
+        flightElapsed=0;
+        paintButterfly(0);
+      }
       if(!petalFrame){
         lastFrame=0;
         petalFrame=requestAnimationFrame(animateAmbient);
@@ -186,6 +230,7 @@
         else ctx.clearRect(0,0,canvasWidth,canvasHeight);
       }
     }
+    ambientWasActive=active;
   }
   resizeCanvas();
   paintButterfly(0);
@@ -193,7 +238,7 @@
     const ambientObserver=new IntersectionObserver(entries=>{
       petalVisible=entries.some(entry=>entry.isIntersecting);
       updateAmbient();
-    },{threshold:0,rootMargin:'80px 0px'});
+    },{threshold:0,rootMargin:'0px 0px'});
     ambientObserver.observe(section);
   }else{petalVisible=true;}
   addEventListener('resize',()=>{resizeCanvas();updateAmbient();},{passive:true});
@@ -211,6 +256,7 @@
     if (invite.dataset.state!=='opened')return;
     section.style.setProperty('--order-stage-y',(travel+camera).toFixed(2)+'px');
     section.dataset.orderCamera=camera.toFixed(2);
+    updateAmbient();
   }
   function schedule(){if(!frame)frame=requestAnimationFrame(paint)}
   function motionChanged(){
