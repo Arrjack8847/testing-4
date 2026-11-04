@@ -1,7 +1,7 @@
 'use strict';
 // Vercel server-only helpers. Never return the service-role key to browsers.
 const credentials=()=>{
-  const url=process.env.SUPABASE_URL, key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url=process.env.SUPABASE_URL, key=process.env.SUPABASE_SECRET_KEY;
   if(!url||!key||!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url))return null;
   return {url:url.replace(/\/$/,''),key};
 };
@@ -39,7 +39,7 @@ const supabaseRequest=async(route,options={})=>{
   const c=credentials();
   if(!c)throw Error('Missing storage configuration');
   const response=await fetch(c.url+'/rest/v1/'+route,{
-    ...options,headers:{'apikey':c.key,'Authorization':'Bearer '+c.key,
+    ...options,headers:{'apikey':c.key,
       'Content-Type':'application/json',...(options.headers||{})}
   });
   if(!response.ok)throw Error('Storage request failed: HTTP '+response.status);
