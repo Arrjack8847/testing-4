@@ -1,0 +1,44 @@
+name: Section 5 timed motion trace (diagnostic)
+on:
+  push:
+    branches: [fix/section5-main-motion-regression-20261104]
+    paths:
+      - tools/section5-timed-motion-audit.mjs
+      - .github/workflows/section5-timed-motion-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  motion-trace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Validate audit syntax
+        run: node --check tools/section5-timed-motion-audit.mjs
+      - name: Start local static preview
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section5-motion-preview.log 2>&1 &
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:8000/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/section5-motion-preview.log
+          exit 1
+      - name: Capture 390x844 timed butterfly and petal traces
+        run: node tools/section5-timed-motion-audit.mjs
+      - name: Upload diagnostic report (not pixel-parity certification)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-timed-motion-diagnostic
+          path: artifacts/section5-motion-trace/
+          retention-days: 2
+          if-no-files-found: warn
