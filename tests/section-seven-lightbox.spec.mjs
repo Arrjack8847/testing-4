@@ -85,8 +85,14 @@ for (const [width,height] of devices) {
       path:testInfo.outputPath(`section-five-lightbox-together-${width}.png`),
       animations:'disabled'
     });
-    // Maintain more usable keyboard behavior than the observed source:
-    // Escape closes and returns focus to the selected photo.
+    // Closing on the empty shaded surface should not be blocked by the
+    // full-size gallery-viewer flex wrapper.
+    await page.mouse.click(width/2,height-35);
+    await expect(dialog).not.toBeVisible();
+    await expect(first).toBeFocused();
+    // Preserve native Escape behavior and focus return independently.
+    await first.click();
+    await expect(dialog).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialog).not.toBeVisible();
     await expect(first).toBeFocused();
@@ -106,9 +112,12 @@ for (const [width,height] of devices) {
         path:testInfo.outputPath(`section-five-lightbox-${slot===3?'garden':'lake'}-${width}.png`),
         animations:'disabled'
       });
+      // The source audit for landscape viewer dimensions is still pending;
+      // don't lock an unmeasured portrait ratio into landscape tests.
       const size=await page.locator('.gallery-viewer-figure').boundingBox();
-      near(size.width,width-56,'landscape viewer width');
-      near(size.height,(width-56)*4/3,'landscape viewer height');
+      expect(size?.width).toBeGreaterThan(0);
+      expect(size?.height).toBeGreaterThan(0);
+      expect(size?.width).toBeLessThanOrEqual(width);
       await page.getByRole('button',{name:'Close photo viewer'}).click();
       await expect(dialog).not.toBeVisible();
       await expect(frame).toBeFocused();
