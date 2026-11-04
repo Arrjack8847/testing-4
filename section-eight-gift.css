@@ -564,6 +564,10 @@
   .gift-eight-send {
     margin-top: 21px; /* 73px - 52px, align source CTA Y 308.4 */
   }
+  .gift-eight-trigger {
+    min-width: 183px;
+    min-height: 48px; /* Source large-phone CTA: 183×47.8px */
+  }
   .gift-eight-wishlist:not([hidden]) {
     margin-top: 98px; /* restore source wishlist Y ~667.6 */
   }
