@@ -211,7 +211,9 @@
 
 /* Screenshot comparison, 390×844: hidden default Gift content and
    278px/14px horizontal bank strip after Send Gift. */
-.gift-eight-send{position:relative;margin-top:26px}
+/* 390px expanded source audit: button ref y395.6/local y348.1, +47px;
+   wishlist panel ref ~y692/local y653.7, +37px net after -10px margin. */
+.gift-eight-send{position:relative;margin-top:73px}
 .gift-eight-trigger{
   position:relative;z-index:4;
   min-width:175px;min-height:46px;
@@ -269,7 +271,7 @@
 }
 .gift-eight-wishlist:not([hidden]){
   display:block;
-  margin:44px 6px 0;
+  margin:34px 6px 0;
   padding:23px 13px 29px;
   border-radius:18px 18px 10px 10px;
   background:rgba(255,252,253,.98);
