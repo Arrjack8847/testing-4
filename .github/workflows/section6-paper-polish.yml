@@ -1,0 +1,60 @@
+name: Section 6 paper wash, mobile and reference calibration
+on:
+  push:
+    branches:
+      - fix/section6-paper-overlay-flight-20261104
+    paths:
+      - index.html
+      - dress-code.css
+      - dress-code.js
+      - tools/section6-forensic-pixels.py
+      - tools/section6-forensic-reference.cjs
+      - tests/section-six-dress.spec.mjs
+      - .github/workflows/section6-paper-polish.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tools
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python3 -m pip install Pillow numpy
+      - name: Verify Section 6 JS
+        run: node --check dress-code.js
+      - name: Verify mobile Dress Code (four widths)
+        run: npx playwright test tests/section-six-dress.spec.mjs
+      - name: Start local site
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/section6.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8000/ -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/section6.log
+          exit 1
+      - name: Measure isolated reference/local dress geometry and pixel differences
+        run: |
+          node tools/section6-forensic-reference.cjs
+          python3 tools/section6-forensic-pixels.py
+      - name: Upload numerical results only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section6-paper-wash-numeric-comparison
+          path: |
+            artifacts/section6-forensic/numeric-differences.json
+            artifacts/section6-forensic/dom-geometry.json
+          if-no-files-found: warn
+          retention-days: 7
