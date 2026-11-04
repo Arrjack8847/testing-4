@@ -341,3 +341,37 @@ test('Expanded Gift cards never create a gap before RSVP or horizontal page scro
   await expect(gift.locator('#giftEightWishlist')).toBeHidden();
   expect(faults).toEqual([]);
 });
+
+
+test('390px source-calibrated expanded Gift button and wishlist alignment',async({page},testInfo)=>{
+  test.skip(testInfo.project.name!=='iphone-390','Reference screenshot baseline is 390×844');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  await gift.locator('#giftEightTrigger').click();
+  const data=await gift.evaluate(el=>{
+    const base=el.getBoundingClientRect();
+    const get=id=>{
+      const r=el.querySelector(id).getBoundingClientRect();
+      return {x:r.x,y:r.y-base.y,width:r.width,height:r.height};
+    };
+    return {
+      button:get('#giftEightTrigger'),
+      banks:get('#giftEightBanks'),
+      firstCard:get('.gift-eight-bank'),
+      wishlist:get('#giftEightWishlist'),
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  // Independent screenshot measurement: reference button top=395.6,
+  // section top=36.4; the first card top≈420, wishlist top≈692.
+  expect(data.button.y).toBeGreaterThan(351);
+  expect(data.button.y).toBeLessThan(369);
+  expect(data.firstCard.y).toBeGreaterThan(376);
+  expect(data.firstCard.y).toBeLessThan(395);
+  expect(data.firstCard.width).toBeGreaterThan(275);
+  expect(data.firstCard.width).toBeLessThan(282);
+  expect(data.wishlist.y).toBeGreaterThan(646);
+  expect(data.wishlist.y).toBeLessThan(664);
+  expect(data.overflow).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});
