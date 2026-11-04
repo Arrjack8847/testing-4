@@ -314,3 +314,45 @@ Interpret the pixel difference as a diagnostic. Animation frames,
 font rasterization and the provider's proprietary effects may differ.
 Only the user can approve the final visual review. The focused four-width
 behavioral QA remains independent from this artwork-dependent audit.
+
+
+## Four-phone responsive geometry findings — 4 November
+
+The completed [read-only GitHub audit](https://github.com/Arrjack8847/testing-4/actions/runs/41777241046)
+captured the live source and the then-current implementation at 320, 360, 390 and
+430px phone widths. The audit succeeded at gathering DOM geometry, but its
+first version had two **measurement errors**: `.cgv-tl-title` selected the
+first timeline event title rather than the main heading, and the
+`RUNNING ORDER` eyebrow selector did not match. Some source screenshots
+at larger widths also showed a lingering cover/hero layer, because the audit
+did not wait long enough before opening. These screenshots must not be used
+as evidence of exact visual parity. Selectors and opening waits are now
+corrected, with a screenshot-occlusion guard.
+
+The **valid timeline-row coordinates** measured before the CSS correction:
+
+| Width | Reference first-row y | Reference row x / width | Old local row x / width | Reference section height | Old local section height |
+| --- | ---: | --- | --- | ---: | ---: |
+| 320 | 265.92 | 28 / 264 | 20 / 280 | 739.23 | 651 |
+| 360 | 213.03 | 28 / 304 | 28 / 304 | 651.28 | 651 |
+| 390 | 213.03 | 28 / 334 | 28 / 334 | 651.28 | 651 |
+| 430 | 213.03 | 28 / 374 | 48 / 334 | 651.28 | 651 |
+
+At 320px the source headline spans **two lines**, adding ~52.89px
+of height, and rows 3 and 4 wrap to heights 86.31px and 67.88px
+respectively; the final content row ends at y=643.23 and the source
+panel ends at y=739.23, leaving 96px bottom padding. The narrower local
+single-line headline had suppressed these wraps and was visibly wrong.
+
+CSS now uses:
+- 320px: 28px side padding; 74px time column + 34px gap; two-line 46px
+  script heading; 96px bottom padding; border x=23 / right=23.
+- 430px: expand the inner max-width from 390 to 430px and remove
+  children’s fixed 334px maximum; the expected timeline is x=28 / width=374.
+- 360 and 390px: leave the already matched x/y geometry unchanged.
+
+Two new focused Playwright tests independently assert the 320px and
+430px reference coordinates. A refreshed four-width source audit and
+focused CI must pass **on the new head commit** before these corrections
+are treated as verified. Permission-cleared WebPs remain necessary
+for pixel-level artwork comparison; no source assets are in Git.
