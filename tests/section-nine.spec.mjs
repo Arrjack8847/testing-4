@@ -339,3 +339,61 @@ test('Section 9 petals are decorative, scroll-contained and reduced-motion safe'
     .scrollIntoView({block:'start',behavior:'instant'}));
   await expect(section).toBeInViewport();
 });
+
+test('Section 9 captures entry middle exit and reverse scroll on four phones',async({page},testInfo)=>{
+  const {section,errors}=await go(page);
+  await page.waitForTimeout(1900);
+  const viewport=page.viewportSize();
+  const stages=['entry','middle','exit','reverse-middle'];
+  for(const stage of stages){
+    await page.evaluate(({stage,viewHeight})=>{
+      const target=document.getElementById('rsvp');
+      const rect=target.getBoundingClientRect();
+      const height=rect.height;
+      const desiredTop=stage==='entry'?
+        Math.min(viewHeight*.7,height*.3):
+        (stage==='exit'?
+          -(height-Math.min(180,viewHeight*.3)):
+          -(height/2-viewHeight/2));
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:Math.round(window.scrollY+rect.top-desiredTop),
+        behavior:'instant'});
+    },{stage,viewHeight:viewport.height});
+    await page.waitForTimeout(240);
+    const metrics=await section.evaluate(el=>{
+      const bounds=el.getBoundingClientRect();
+      const selectors=['.s9-inner','.s9-heading','.s9-form','.s9-wall','.s9-wish','.s9-petals'];
+      const parts=selectors.map(selector=>{
+        const r=el.querySelector(selector).getBoundingClientRect();
+        return {selector,left:r.left,right:r.right,width:r.width,
+          clientWidth:el.querySelector(selector).clientWidth,
+          scrollWidth:el.querySelector(selector).scrollWidth};
+      });
+      return {visible:bounds.top<innerHeight&&bounds.bottom>0,
+        width:bounds.width,overflow:document.documentElement.scrollWidth-innerWidth,
+        active:el.classList.contains('s9-active'),parts};
+    });
+    expect(metrics.visible,stage).toBe(true);
+    expect(metrics.width,stage).toBe(viewport.width);
+    expect(metrics.overflow,stage).toBeLessThanOrEqual(1);
+    expect(metrics.active,stage).toBe(true);
+    for(const part of metrics.parts){
+      expect(part.left,stage+' '+part.selector).toBeGreaterThanOrEqual(-1);
+      expect(part.right,stage+' '+part.selector).toBeLessThanOrEqual(viewport.width+1);
+      expect(part.scrollWidth-part.clientWidth,stage+' '+part.selector).toBeLessThanOrEqual(2);
+    }
+    await page.screenshot({
+      path:testInfo.outputPath('s9-'+stage+'-'+testInfo.project.name+'.png'),
+      animations:'allow'
+    });
+  }
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(section.locator('.s9-heading')).toBeVisible();
+  const animations=await section.evaluate(el=>({
+    west:getComputedStyle(el.querySelector('.s9-butterfly')).animationName,
+    east:getComputedStyle(el.querySelector('.s9-butterfly-forward')).animationName,
+    petals:getComputedStyle(el.querySelector('.s9-petals i')).animationName,
+  }));
+  expect(animations).toEqual({west:'none',east:'none',petals:'none'});
+  expect(errors).toEqual([]);
+});
