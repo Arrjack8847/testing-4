@@ -48,6 +48,19 @@
     art.addEventListener('load',()=>section.classList.add('s9-reference-loaded'),{once:true});
     art.addEventListener('error',()=>{section.dataset.referenceArt='missing';},{once:true});
     art.src='./assets/reference-dev/section9/paper.webp';
+    // Opt-in sprite, split into two flapping wing backgrounds by Section 9 CSS.
+    // Preflight the locally supplied file so a missing download retains original CSS wings.
+    const sprite=new Image();
+    sprite.addEventListener('load',()=>{
+      if(sprite.naturalWidth>0&&sprite.naturalHeight>0){
+        section.classList.add('s9-reference-butterfly-loaded');
+        section.dataset.referenceButterfly='loaded';
+      }
+    },{once:true});
+    sprite.addEventListener('error',()=>{
+      section.dataset.referenceButterfly='missing';
+    },{once:true});
+    sprite.src='./assets/reference-dev/section9/bfly_1.webp';
   }
   form.addEventListener('submit',event=>{
     event.preventDefault();
