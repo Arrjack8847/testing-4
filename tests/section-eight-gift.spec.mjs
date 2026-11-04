@@ -69,7 +69,7 @@ test('Section 8 uses the actual source content order without unsafe fake transac
     'IKEA Gift Card'
   ]);
   for(const button of await gift.locator('.gift-eight-copy').all()) await expect(button).toBeDisabled();
-  expect(await gift.locator('button:not(:disabled)').count()).toBe(0);
+  expect(await gift.locator('button:not(:disabled):not(.gift-eight-trigger)').count()).toBe(0);
   expect(await gift.locator('a[href]').count()).toBe(0);
   await trigger.click();
   await expect(trigger).toHaveAttribute('aria-expanded','false');
@@ -161,4 +161,72 @@ test('Gallery to Wedding Gift to RSVP scrolls forward and backward without chang
   await expect(page.locator('#rsvp')).toHaveAttribute('data-section','9');
   await expect(gift).toHaveAttribute('aria-hidden','false');
   expect(faults).toEqual([]);
+});
+
+
+test('Authorized downloaded local plum and blush WebPs are detected independently',async({page})=>{
+  // Tiny valid 4×4 image fixture, not the reference vendor artwork.
+  const sample=Buffer.from('UklGRh4AAABXRUJQVlA4TBEAAAAvA8AAAAdQ69rXvP+BiOh/AAA=','base64');
+  await page.route('**/assets/reference-dev/band_plum.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:sample}));
+  await page.route('**/assets/reference-dev/bfly_blush.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:sample}));
+  const {gift,faults}=await openGift(page);
+  await expect(gift).toHaveAttribute('data-gift-artwork','reference-local');
+  await expect(gift).toHaveAttribute('data-gift-butterfly','reference-local');
+  const visual=await gift.evaluate(el=>{
+    const art=getComputedStyle(el.querySelector('.gift-eight-art'));
+    const butterfly=el.querySelector('.gift-eight-butterfly');
+    const wing=el.querySelector('.gift-eight-bfly-left');
+    const bcss=getComputedStyle(butterfly);
+    const wcss=getComputedStyle(wing);
+    return {
+      backdrop:art.backgroundImage,
+      wing:wcss.backgroundImage,
+      butterflyVisibility:bcss.visibility,
+      butterflyOpacity:parseFloat(bcss.opacity),
+      overflow:document.documentElement.scrollWidth-innerWidth
+    };
+  });
+  expect(visual.backdrop).toContain('reference-dev/band_plum.webp');
+  expect(visual.wing).toContain('reference-dev/bfly_blush.webp');
+  expect(visual.butterflyVisibility).toBe('visible');
+  expect(visual.butterflyOpacity).toBeGreaterThan(.8);
+  expect(visual.overflow).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});
+
+test('Missing private butterfly remains invisible without fetching vendor URLs',async({page})=>{
+  const requested=[];
+  page.on('request',req=>{
+    if(/bfly_blush|band_plum/i.test(req.url()))requested.push(req.url());
+  });
+  const {gift}=await openGift(page);
+  const value=await gift.evaluate(el=>({
+    status:el.dataset.giftButterfly,
+    visibility:getComputedStyle(el.querySelector('.gift-eight-butterfly')).visibility,
+    background:getComputedStyle(el.querySelector('.gift-eight-bfly-left')).backgroundImage
+  }));
+  expect(['unavailable','reference-local']).toContain(value.status);
+  if(value.status==='unavailable'){
+    expect(value.visibility).toBe('hidden');
+    expect(value.background).toBe('none');
+  }
+  expect(requested.every(url=>new URL(url).hostname==='127.0.0.1')).toBe(true);
+});
+
+test('Reduced Motion keeps a downloaded blush butterfly still',async({page})=>{
+  const sample=Buffer.from('UklGRh4AAABXRUJQVlA4TBEAAAAvA8AAAAdQ69rXvP+BiOh/AAA=','base64');
+  await page.route('**/assets/reference-dev/bfly_blush.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:sample}));
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift}=await openGift(page);
+  await expect(gift).toHaveAttribute('data-gift-butterfly','reference-local');
+  const timing=await gift.evaluate(el=>({
+    butterfly:getComputedStyle(el.querySelector('.gift-eight-butterfly')).animationName,
+    wings:[...el.querySelectorAll('.gift-eight-bfly-wing')]
+      .map(node=>getComputedStyle(node).animationName)
+  }));
+  expect(timing.butterfly).toBe('none');
+  expect(timing.wings).toEqual(['none','none']);
 });
