@@ -137,3 +137,46 @@ test('Section 10 uses the locally staged reference scene when the WebP endpoint 
   await expect(image).toBeInViewport();
   await expect(section).toHaveAttribute('data-artwork','local-reference');
 });
+
+
+test('Section 10 contact pills and footer follow the measured source geometry',async({page},testInfo)=>{
+  await openInvitation(page);
+  const closing=page.locator('#closingMessage');
+  await page.evaluate(()=>{
+    const el=document.querySelector('#closingMessage');
+    window.scrollTo({top:el.getBoundingClientRect().top+scrollY+90,behavior:'instant'});
+  });
+  await expect(closing).toHaveAttribute('data-revealed','true');
+  await page.waitForTimeout(1300);
+  const m=await closing.evaluate(el=>{
+    const box=(n)=>{const r=n.getBoundingClientRect();return {
+      x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom,
+      radius:getComputedStyle(n).borderTopLeftRadius,
+      transform:getComputedStyle(n).textTransform,
+      opacity:getComputedStyle(n).opacity};
+    };
+    const contact=el.querySelector('.closing10-contacts');
+    const label=el.querySelector('.closing10-contacts-title');
+    const row=el.querySelector('.closing10-contact-row');
+    const buttons=[...row.querySelectorAll('button')];
+    const credit=el.querySelector('.closing10-credit');
+    return {contact:box(contact),label:box(label),row:box(row),
+      buttons:buttons.map(box),credit:box(credit)};
+  });
+  expect(Math.abs(m.contact.height-94.14)).toBeLessThan(1.5);
+  expect(Math.abs(m.row.height-64)).toBeLessThan(1);
+  expect(m.label.transform).toBe('uppercase');
+  expect(m.buttons).toHaveLength(2);
+  for(const b of m.buttons){
+    expect(Math.abs(b.height-44)).toBeLessThan(1);
+    expect(b.transform).toBe('uppercase');
+    expect(parseFloat(b.radius)).toBeGreaterThanOrEqual(20);
+    expect(b.opacity).toBe('1');
+  }
+  expect(Math.abs((m.buttons[1].x-(m.buttons[0].x+m.buttons[0].width))-9)).toBeLessThan(1);
+  expect(Math.abs(m.credit.y-m.contact.bottom-56)).toBeLessThan(1.5);
+  if(testInfo.project.name==='iphone-390'){
+    expect(Math.abs(m.buttons[0].width-83)).toBeLessThan(3);
+    expect(Math.abs(m.buttons[1].width-128)).toBeLessThan(3);
+  }
+});
