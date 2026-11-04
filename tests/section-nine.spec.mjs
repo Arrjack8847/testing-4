@@ -125,6 +125,17 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(exact.buttonBg).toBe('rgb(123, 61, 110)');
     expect(exact.buttonRadius).toBe('999px');
     expect(exact.wishRadius).toBe('14px');
+    const frame=await section.locator('.s9-frame').evaluate(el=>{
+      const r=el.getBoundingClientRect(),s=document.getElementById('rsvp').getBoundingClientRect();
+      return {top:r.top-s.top,left:r.left-s.left,width:r.width,
+        radius:getComputedStyle(el).borderTopLeftRadius,
+        background:getComputedStyle(el).backgroundImage};
+    });
+    expect(Math.abs(frame.top-5)).toBeLessThan(5);
+    expect(frame.left).toBeGreaterThan(8);
+    expect(frame.left).toBeLessThan(22);
+    expect(frame.background).toContain('linear-gradient');
+
     const flight=await section.locator('.s9-butterfly').evaluate(el=>({
       top:parseFloat(getComputedStyle(el).top),
       duration:getComputedStyle(el).animationDuration
