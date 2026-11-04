@@ -13,7 +13,7 @@ const server=spawn('python3',['-m','http.server','8000','--bind','127.0.0.1'],{s
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 let result={checkedAt:new Date().toISOString(),viewport:{width:390,height:844}};
 const selectors={
-  source:{section:'.cgv-closing',inner:'.cgv-closing .cgv-inner',frame:'.cgv-closing .cgv-tframe',heading:'.cgv-closing .cgv-eyebrow',message:'.cgv-closing .cgv-lead',rule:'.cgv-closing .cgv-rule',signoff:'.cgv-closing .cgv-eyebrow.cgv-d2',names:'.cgv-closing .cgv-closing-names',contacts:'.cgv-closing .cgv-contacts',footer:'.cgv-closing .cgv-foot',scene:'img[src*="tasik-kayangan/scene.webp"]'},
+  source:{section:'.cgv-closing',inner:'.cgv-closing .cgv-inner',frame:'.cgv-closing .cgv-tframe',heading:'.cgv-closing .cgv-eyebrow',message:'.cgv-closing .cgv-lead',rule:'.cgv-closing .cgv-rule',signoff:'.cgv-closing .cgv-eyebrow.cgv-d2',names:'.cgv-closing .cgv-closing-names',contacts:'.cgv-closing .cgv-contacts',footer:'.cgv-closing .cgv-foot',scene:'.cgv-closing img[src*="tasik-kayangan/scene.webp"]'},
   local:{section:'#closingMessage',inner:'#closingMessage .closing10-inner',frame:'#closingMessage .closing10-frame',heading:'#closingHeading',message:'#closingMessage .closing10-message',rule:'#closingMessage .closing10-rule',signoff:'#closingMessage .closing10-signoff',names:'#closingMessage .closing10-names',contacts:'#closingMessage .closing10-contacts',footer:'#closingMessage .closing10-credit',scene:'#closingMessage .closing10-source-scene'}
 };
 async function waitServer(){
@@ -45,10 +45,15 @@ async function visit(kind,url){
     const rects=await page.evaluate(sel=>{
       const fields={};
       const item=q=>{
-        const el=document.querySelector(q);
+        const el= (q.includes('tasik-kayangan/scene.webp'))
+          ? [...document.querySelectorAll('img[src*="tasik-kayangan/scene.webp"]')].find(e=>e.getBoundingClientRect().width>300)
+          : document.querySelector(q);
         if(!el)return null;
         const r=el.getBoundingClientRect(),s=getComputedStyle(el);
-        return {x:+r.x.toFixed(2),y:+r.y.toFixed(2),
+        return {transform:s.transform,translate:s.translate,scale:s.scale,
+          transition:s.transition,animation:s.animation,
+          margin:s.margin,padding:s.padding,position:s.position,
+          x:+r.x.toFixed(2),y:+r.y.toFixed(2),
           width:+r.width.toFixed(2),height:+r.height.toFixed(2),
           font:s.font,fontSize:s.fontSize,letterSpacing:s.letterSpacing,
           color:s.color,bg:s.backgroundColor,opacity:s.opacity,
@@ -62,7 +67,26 @@ async function visit(kind,url){
         fields};
     },selectors[kind]);
     await page.screenshot({path:OUTPUT+'/'+kind+'-exit-390x844.png',animations:'disabled'});
-    return {status:response?.status(),errors,...rects};
+    const exit=rects;
+    const region=selectors[kind].section;
+    await page.evaluate(q=>{
+      const e=document.querySelector(q);
+      window.scrollTo(0,e.getBoundingClientRect().top+scrollY+80);
+    },region);
+    await page.waitForTimeout(1800);
+    const checkpoint=await page.evaluate(sel=>{
+      const out={};
+      for(const [name,q] of Object.entries(sel)){
+        const el=document.querySelector(q);
+        if(!el)continue;
+        const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+        out[name]={x:+r.x.toFixed(2),y:+r.y.toFixed(2),width:+r.width.toFixed(2),
+          height:+r.height.toFixed(2),transform:s.transform,opacity:s.opacity};
+      }
+      return {scrollY,items:out};
+    },selectors[kind]);
+    await page.screenshot({path:OUTPUT+'/'+kind+'-entry-390x844.png',animations:'disabled'});
+    return {status:response?.status(),errors,...exit,entryCheckpoint:checkpoint};
   }finally{await context.close();}
 }
 try{
