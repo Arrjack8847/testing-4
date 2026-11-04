@@ -111,6 +111,16 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(r.x+r.width).toBeLessThanOrEqual(page.viewportSize().width+1);}
   if(testInfo.project.name==='iphone-390'){
     expect(Math.abs(m.section.height-1215.9)).toBeLessThan(4);
+    const eyebrowBreak=await section.locator('.s9-eyebrow').evaluate(el=>{
+      const text=el.firstChild,idx=text.textContent.indexOf('31');
+      const topOf=(start,length)=>{
+        const range=document.createRange();
+        range.setStart(text,start);range.setEnd(text,start+length);
+        return range.getBoundingClientRect().top;
+      };
+      return {first:topOf(0,6),date:topOf(idx,2)};
+    });
+    expect(eyebrowBreak.date-eyebrowBreak.first).toBeGreaterThan(8);
     const exact=await section.evaluate(el=>{
       const inp=el.querySelector('#s9Name'),btn=el.querySelector('.s9-submit'),paper=el.querySelector('.s9-reference-art'),
         wall=el.querySelector('.s9-wall'),wish=el.querySelector('.s9-wish'),base=el.getBoundingClientRect();
@@ -142,7 +152,9 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(wishStyles.cardHeight).toBeGreaterThan(90);
     const frame=await section.locator('.s9-frame').evaluate(el=>{
       const r=el.getBoundingClientRect(),s=document.getElementById('rsvp').getBoundingClientRect();
-      return {top:r.top-s.top,left:r.left-s.left,width:r.width,
+      const disclosure=document.querySelector('#rsvp .s9-demo-note').getBoundingClientRect();
+      return {top:r.top-s.top,bottom:r.bottom-s.top,left:r.left-s.left,width:r.width,
+        noticeTop:disclosure.top-s.top,noticeBottom:disclosure.bottom-s.top,
         radius:getComputedStyle(el).borderTopLeftRadius,
         background:getComputedStyle(el).backgroundImage};
     });
@@ -150,6 +162,13 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
     expect(frame.left).toBeGreaterThan(8);
     expect(frame.left).toBeLessThan(22);
     expect(frame.background).toContain('linear-gradient');
+    // Live source's inner arch ends around section-relative y=1150 at 390px.
+    // The example-wishes disclosure stays visible below the arch, not inside
+    // the grid that artificially stretched the gold border by ~40px.
+    expect(frame.bottom).toBeGreaterThan(1138);
+    expect(frame.bottom).toBeLessThan(1165);
+    expect(frame.noticeTop).toBeGreaterThan(frame.bottom);
+    expect(frame.noticeBottom).toBeLessThan(m.section.height-6);
 
     const flight=await section.locator('.s9-butterfly').evaluate(el=>({
       top:parseFloat(getComputedStyle(el).top),
