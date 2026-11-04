@@ -28,7 +28,7 @@
 .s9-petals{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
 .s9-petals i{
   display:block;position:absolute;top:-28px;left:var(--s9-x,20%);width:var(--s9-w,9px);
-  height:calc(var(--s9-w,9px) * .56);border-radius:75% 8% 70% 18%;
+  height:6px;border-radius:75% 8% 70% 18%;
   background:linear-gradient(120deg,#e9cde2,#b89bc9 72%,#a98dbd);
   box-shadow:0 0 3px #b397bf24;opacity:0;
   transform-origin:center;animation:s9-petal-drift var(--s9-duration,11s) linear
