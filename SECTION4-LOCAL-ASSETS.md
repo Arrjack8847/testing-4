@@ -86,3 +86,33 @@ source access or a local file was missing. This check does **not** download
 artwork to disk or include vendor assets in GitHub. Exact byte identity for
 these two files cannot establish that the entire section has all original
 artwork, fonts, animations, or pixel-identical rendering.
+
+## Four-phone, 12-frame screenshot parity pass
+
+Start the local server in one PowerShell terminal, then in another run:
+
+~~~powershell
+cd D:\testing-4
+node .\tools\section4-visual-parity-4phones.mjs
+~~~
+
+The comparison captures the live `#cgv-events` and local `#eventDetails`
+at 320×568, 360×740, 390×844 and 430×932, at the top, middle and bottom
+of each section: **12 paired frames**. It uses a common viewport, reduced
+motion and Malaysian time zone. Reports and screenshots stay only in
+the gitignored `section4-exact-audit/` folder:
+
+- `section4-visual-parity.json` — event height delta and pixel error
+  within the *overlap* of the visible Events boundaries.
+- `screenshots/reference-...png` and `screenshots/local-...png`
+  — paired frames for manual analysis.
+
+The score is not the sole pass criterion: vendor chrome/overlays, ticking
+countdown values, lazy-loaded animation and font rendering can introduce
+pixel differences. A failed source page produces an incomplete report,
+not an artificial pass. Recheck the reference visually at the same scroll
+positions, and separately verify full interactions and seam behavior.
+
+**Do not merge PR #35 solely because the local files loaded.** Both
+byte-identity and all 12 visual comparisons must be checked, and any
+remaining original artwork/decorations must be inventoried.
