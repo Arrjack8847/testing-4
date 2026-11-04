@@ -421,6 +421,17 @@ test('Expanded wishlist preserves measured first-card and 68px thumbnail geometr
   expect(m.first.height).toBeGreaterThanOrEqual(sourceFirst-10);
   expect(m.first.height).toBeLessThanOrEqual(sourceFirst+16);
   expect(m.overflow).toBeLessThanOrEqual(1);
+  if(testInfo.project.name==='large-phone'){
+    const anchors=await gift.evaluate(section=>{
+      const top=section.getBoundingClientRect().top;
+      const cta=section.querySelector('#giftEightTrigger').getBoundingClientRect();
+      const wish=section.querySelector('#giftEightWishlist').getBoundingClientRect();
+      return {ctaY:cta.top-top,wishlistY:wish.top-top};
+    });
+    // Live reference at 430×932: CTA Y=308.4, wishlist Y=667.6.
+    expect(Math.abs(anchors.ctaY-308.4)).toBeLessThanOrEqual(8);
+    expect(Math.abs(anchors.wishlistY-667.6)).toBeLessThanOrEqual(8);
+  }
   if(testInfo.project.name==='iphone-390'){
     // Source audit: panel 514.9px; first item 185.5px at 390px.
     // Tolerance accommodates fallback fonts and non-licensed placeholders.
