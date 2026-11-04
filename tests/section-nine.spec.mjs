@@ -232,12 +232,18 @@ test('Local reference mode loads split-wing sprite only with explicit opt-in',as
   await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
   await expect(section).toHaveAttribute('data-reference-art','loaded');
   await expect(section).toHaveAttribute('data-reference-butterfly','loaded');
-  const wing=section.locator('.s9-butterfly > .s9-wing-left');
-  const style=await wing.evaluate(el=>({image:getComputedStyle(el).backgroundImage,
-    size:getComputedStyle(el).backgroundSize,animation:getComputedStyle(el).animationName}));
-  expect(style.image).toContain('assets/reference-dev/section9/bfly_1.webp');
-  expect(style.size).toBe('200% 100%');
-  expect(style.animation).toBe('s9-sprite-flap-left');
+  const wings=section.locator('.s9-butterfly > .s9-wing-left, .s9-butterfly-forward > .s9-wing-left');
+  await expect(wings).toHaveCount(2);
+  const styles=await wings.evaluateAll(elements=>elements.map(el=>({
+    image:getComputedStyle(el).backgroundImage,
+    size:getComputedStyle(el).backgroundSize,
+    animation:getComputedStyle(el).animationName
+  })));
+  for(const style of styles){
+    expect(style.image).toContain('assets/reference-dev/section9/bfly_1.webp');
+    expect(style.size).toBe('200% 100%');
+    expect(style.animation).toBe('s9-sprite-flap-left');
+  }
 });
 test('Plain localhost root automatically loads locally staged paper and butterfly',async({page})=>{
   // Harmless generated fixture; no vendor artwork enters Git or CI.
@@ -298,8 +304,10 @@ test('Animation pauses outside view and Reduced Motion remains legible',async({p
   // Reduced Motion affects decorative animations, not optional private paper.
   if(state.image!==null){
     expect(state.image).toBe('./assets/reference-dev/section9/paper.webp');
-    expect(state.referenceLoaded).toBe(true);
-    expect(state.imageNaturalWidth).toBeGreaterThan(0);
+    // The optional image can still be decoding when the invitation opens.
+    // Wait for the actual load event rather than assuming network timing.
+    await expect(section).toHaveClass(/s9-reference-loaded/);
+    expect(await section.locator('.s9-reference-art').evaluate(el=>el.naturalWidth)).toBeGreaterThan(0);
   }else{
     expect(state.referenceLoaded).toBe(false);
   }
