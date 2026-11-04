@@ -156,3 +156,42 @@ from the prototype and decoration/rendering mismatches; the scores cannot
 isolate every cause by themselves. The full source butterfly flight and petal
 field behavior have not been measured, so **exact parity is not established**.
 No reference screenshot or source-owned art file is committed to this repo.
+
+
+## User-run live four-phone audit and regression correction (4 November 2026)
+
+The user's clean Windows worktree at `D:\testing-4-section4-qa` successfully
+ran Playwright against the default local site and live Tasik Kayangan source.
+This is **not** a claim that the latest commits have been retested.
+
+- **Prior** Playwright run: 48 total, 34 passed, 5 failed, 9 skipped.
+  Four failures had approximately 40.13px map-button boxes (source about 42px)
+  because the reception link-group and its children both used the 0.955
+  entrance transform. The wrapper no longer has the reveal class: each
+  button keeps one transformation.
+- The fifth failure was an obsolete test expecting purple
+  `rgb(97,40,82)`. Recovered source DOM computed the original
+  countdown-tile color as **`rgb(92,38,79)`** and **28px** countdown values.
+  The artwork color was correct; the test expectation and number size
+  are now corrected.
+- Live source asset filenames were the same at **all four widths**:
+  `paper.webp`, `arch_event.svg`, `bfly_white.webp`. This confirms
+  observed URL usage and successful loads in that audit, **not** original
+  file hashes or commercial license.
+- Source vs earlier local Events section height was **+161.3px at 320×568**
+  and **+68.9px at 360×740**. The responsive min-height now targets the
+  measured source heights **1742.3px** (320), **1649.9px** (360), and
+  **1580.9px** (390), without replacing any neighboring section.
+- The source uses heading 42px, date 22px, time 14px and venue 19px
+  **even at 320px**. The earlier prototype's 40/20/13/18px narrow-phone
+  overrides have been corrected.
+
+The prior 12-frame comparator output available in the pasted local log
+covers 320 and 360 only; it reported mean RGB differences from **18.073**
+to **42.006**. The latest branch has not been rerun locally yet. The
+390/430 comparison results were not included in that pasted output.
+
+**Required before integration:** rerun all 48 targeted tests on the latest
+commit, capture all 12 current-branch screenshot pairs, inspect them,
+and verify source motion and asset licensing. Preserve this draft PR
+until evidence passes. Do not treat queued GitHub Actions as completed.
