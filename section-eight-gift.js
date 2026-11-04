@@ -25,6 +25,21 @@
     butterfly.src='./assets/reference-dev/bfly_blush.webp';
   }
 
+  if(local){
+    const thumbs=[
+      ['rice','gift-rice-cooker.jpg'],
+      ['kettle','gift-kettle.webp']
+    ];
+    thumbs.forEach(([name,file])=>{
+      const art=new Image();
+      art.onload=()=>{
+        if(art.naturalWidth>0&&art.naturalHeight>0)
+          section.dataset['giftThumb'+name[0].toUpperCase()+name.slice(1)]='reference-local';
+      };
+      art.src='./assets/reference-dev/'+file;
+    });
+  }
+
   function syncAccess(){
     const closed=invitation.dataset.state!=='opened';
     section.inert=closed;
