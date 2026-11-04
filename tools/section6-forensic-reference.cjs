@@ -4,9 +4,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('@playwright/test');
 const out=path.resolve(__dirname,'../artifacts/section6-forensic');
+const localArg=process.argv.indexOf('--local');
+const localUrl=(localArg>=0&&process.argv[localArg+1])?process.argv[localArg+1]:'http://127.0.0.1:8000/';
 const versions=[
   {name:'reference',url:'https://undangankahwin.com/concierge-templates/cg-tasik-kayangan?lang=en',selector:'.cgv-dress'},
-  {name:'local',url:'http://127.0.0.1:8000/',selector:'#dressCode'}
+  {name:'local',url:localUrl,selector:'#dressCode'}
 ];
 const widths=[320,360,390,430];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
