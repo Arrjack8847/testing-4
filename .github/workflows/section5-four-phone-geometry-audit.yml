@@ -1,0 +1,42 @@
+name: Section 5 four-phone live geometry audit
+on:
+  push:
+    branches: [fix/section5-main-motion-regression-20261104]
+    paths:
+      - tools/section5-visual-parity-audit.mjs
+      - .github/workflows/section5-four-phone-geometry-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  geometry-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Start local preview
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/section5-preview.log 2>&1 &
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:8000/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/section5-preview.log
+          exit 1
+      - name: Source versus local geometry, 320 / 360 / 390 / 430
+        run: node tools/section5-visual-parity-audit.mjs --geometry-only
+      - name: Upload read-only visual evidence for manual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section5-four-phone-geometry-evidence
+          path: artifacts/section5-visual-parity/
+          retention-days: 2
+          if-no-files-found: warn
