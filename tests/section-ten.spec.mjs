@@ -426,3 +426,42 @@ test('Section 10 reveal state does not thrash DOM on stationary scroll frames',a
   });
   expect(changes).toBe(0);
 });
+
+
+test('Section 10 staged scene follows measured camera drift and stops under Reduced Motion',async({page},testInfo)=>{
+  const fixture='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#d7c1dd"/></svg>';
+  await page.route('**/assets/reference-dev/scene.webp',route=>route.fulfill({
+    status:200,contentType:'image/svg+xml',body:fixture
+  }));
+  await openInvitation(page);
+  const closing=page.locator('#closingMessage');
+  const scene=closing.locator('.closing10-source-scene');
+  await expect(closing).toHaveAttribute('data-artwork','local-reference');
+  await expect(scene).toHaveJSProperty('naturalWidth',1080);
+  const positions=[-170,-30,80,265,80,-30];
+  const referencePixels=new Map([[-170,-13],[-30,-7],[80,-2],[265,6]]);
+  for(const delta of positions){
+    await page.evaluate(delta=>{
+      const el=document.querySelector('#closingMessage');
+      window.scrollTo({top:el.getBoundingClientRect().top+scrollY+delta,behavior:'instant'});
+    },delta);
+    await expect(closing).toHaveAttribute('data-active','true');
+    const measure=()=>closing.evaluate(el=>{
+      const rect=el.getBoundingClientRect();
+      return {actual:parseFloat(el.style.getPropertyValue('--closing10-scene-y')),
+        expected:Math.max(-24,Math.min(16,-5.587-rect.top*.043788)),
+        computed:getComputedStyle(el.querySelector('.closing10-source-scene')).transform};
+    });
+    await expect.poll(async()=>Number.isFinite((await measure()).actual)).toBe(true);
+    const m=await measure();
+    expect(Math.abs(m.actual-m.expected)).toBeLessThan(.3);
+    expect(m.computed).not.toBe('none');
+    if(testInfo.project.name==='iphone-390' && referencePixels.has(delta)){
+      // Grounded in edge correlation of actual source/local exit screenshots.
+      expect(Math.abs(m.actual-referencePixels.get(delta))).toBeLessThan(1.2);
+    }
+  }
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(closing).not.toHaveAttribute('data-motion-ready');
+  await expect.poll(()=>scene.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+});
