@@ -84,6 +84,19 @@ test('Section 7 source-measured lightbox matches its phone viewport', async ({pa
       path:testInfo.outputPath(`section-five-lightbox-together-${width}.png`),
       animations:'disabled'
     });
+    // The visual toolbar stays hidden, but keyboard navigation must still
+    // change the artwork *and* its frame orientation. This catches stale
+    // portrait sizing when wrapping directly from Together to Lake.
+    await page.keyboard.press('ArrowLeft');
+    await expect(dialog).toHaveAttribute('data-gallery-orientation','landscape');
+    await expect(page.locator('#galleryViewCaption')).toHaveText('The Lake');
+    let switched=await page.locator('.gallery-viewer-figure').boundingBox();
+    near(switched.height,(width-56)*249.44/334,'wrapped Lake landscape frame');
+    await page.keyboard.press('ArrowRight');
+    await expect(dialog).toHaveAttribute('data-gallery-orientation','portrait');
+    await expect(page.locator('#galleryViewCaption')).toHaveText('Together');
+    switched=await page.locator('.gallery-viewer-figure').boundingBox();
+    near(switched.height,(width-56)*4/3,'restored Together portrait frame');
     // Closing on the empty shaded surface should not be blocked by the
     // full-size gallery-viewer flex wrapper.
     await page.mouse.click(width/2,height-35);
