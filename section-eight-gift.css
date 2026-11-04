@@ -572,3 +572,28 @@
     margin-top: 98px; /* restore source wishlist Y ~667.6 */
   }
 }
+
+
+/* Source audit (run 41789080486): 390px panel was +9.3px tall solely
+   because the unconfigured third item's subtitle added an extra line.
+   Short demo labels remain truthful while restoring the reference's
+   single-line source captions. Width-specific wishlist anchoring does
+   not change the closed Gift scene or other workers' sections. */
+@media (max-width:350px) {
+  .gift-eight-wishlist:not([hidden]) {
+    margin-top:84px; /* source wishlist top 798.1px; prior local 748.1px */
+  }
+}
+@media (min-width:351px) and (max-width:374px) {
+  .gift-eight-wishlist:not([hidden]) {
+    margin:55px 2px -10px; /* source 360px panel x=30.2, y=676.4 */
+  }
+  .gift-eight-wishlist:not([hidden]) .gift-eight-wishlist-intro {
+    margin-bottom:31px; /* source first card sits 101px below panel top */
+  }
+}
+@media (min-width:415px) {
+  .gift-eight-wishlist:not([hidden]) {
+    margin:92px 1px -6px; /* source 430px panel x=29.5, y=666.5 */
+  }
+}

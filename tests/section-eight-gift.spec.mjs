@@ -449,3 +449,40 @@ test('Expanded wishlist preserves measured first-card and 68px thumbnail geometr
   expect(Math.abs(reclosedHeight-collapsedHeight)).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
+
+
+test('Expanded source geometry stays within measured tolerance at all four phone widths',async({page},testInfo)=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  await gift.locator('#giftEightTrigger').click();
+  await expect(gift.locator('#giftEightWishlist')).toBeVisible();
+  // DOM values from the source/local screenshot audit in GitHub Actions 41789080486.
+  // No vendor imagery is required for these layout/overflow checks.
+  const reference={
+    'small-phone':{y:798.1,panel:513.2,section:1367.4,first:177.2,third:94.2},
+    'android-360':{y:676.4,panel:529.6,section:1289.1,first:182.8,third:97.2},
+    'iphone-390':{y:655.7,panel:514.9,section:1266.6,first:185.5,third:98.6},
+    'large-phone':{y:666.5,panel:443.8,section:1199.0,first:138.4,third:97.8}
+  }[testInfo.project.name];
+  const measured=await gift.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    const wish=el.querySelector('#giftEightWishlist').getBoundingClientRect();
+    const products=[...el.querySelectorAll('.gift-eight-item')].map(x=>x.getBoundingClientRect().height);
+    const doc=document.documentElement;
+    const prev=document.getElementById('gallery').getBoundingClientRect();
+    const next=document.getElementById('rsvp').getBoundingClientRect();
+    return {
+      y:wish.top-r.top,panel:wish.height,section:r.height,
+      first:products[0],third:products[2],
+      sideways:doc.scrollWidth-innerWidth,
+      galleryGap:r.top-prev.bottom,rsvpGap:next.top-r.bottom
+    };
+  });
+  for(const key of ['y','panel','section','first','third']){
+    expect(Math.abs(measured[key]-reference[key]),key+' geometry drift').toBeLessThanOrEqual(10);
+  }
+  expect(measured.sideways).toBeLessThanOrEqual(1);
+  expect(Math.abs(measured.galleryGap)).toBeLessThanOrEqual(1);
+  expect(Math.abs(measured.rsvpGap)).toBeLessThanOrEqual(1);
+  expect(faults).toEqual([]);
+});

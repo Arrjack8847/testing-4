@@ -66,3 +66,28 @@ recipient details; reservations require a backend or service.
    checks before claiming QA completion.
 5. Verify original assets **with permission** in the local preview;
    GitHub CI fallback screenshots alone cannot certify original art.
+
+## New completed four-phone reference audit, run 41789080486
+
+The revised Section 8 branch `02058ad` passed its four-phone browser
+regression, syntax checks and reference/local screenshot capture. Complete
+reference/local geometry, in pixels, before the next caption/spacing patch:
+
+| Width | Reference wishlist y | Local wishlist y | Reference wishlist h | Local wishlist h | Expanded height reference/local |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 320 | 798.1 | 748.1 | 513.2 | 542.5 | 1367.4 / 1347.4 |
+| 360 | 676.4 | 655.3 | 529.6 | 518.2 | 1289.1 / 1268.5 |
+| 390 | 655.7 | 655.4 | 514.9 | 524.2 | 1266.6 / 1274.5 |
+| 430 | 666.5 | 672.4 | 443.8 | 454.5 | 1199.0 / 1221.7 |
+
+The latest follow-up correction replaces multi-line demo captions with
+short truthful labels (without inventing availability or transactions), removes
+the third item subtitle that the source does not display, and targets
+wishlist margins separately at 320, 360 and 430. It also adds
+per-viewport geometry and adjacency checks. **Do not call the follow-up
+patch validated until its own new-head four-phone CI and screenshot
+evidence are inspected.**
+
+Artwork remains a rights-gated issue: the original source has heavily
+embossed plum botanical art and two branded photos; the published fallback
+uses an independently created SVG and nontransactional placeholders.
