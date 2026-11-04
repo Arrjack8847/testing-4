@@ -17,16 +17,119 @@ const open=async(page)=>{
     await button.first().click({timeout:12000});
   }
 };
+// The reference's .cgv-bf element can be offscreen with opacity 0 while
+// a different animation is visible. Record candidates rather than treating
+// that hidden element as the source's visible butterfly.
 const pose=async(page,root,butterfly)=>{
   return page.evaluate(({root,butterfly})=>{
     const section=document.querySelector(root);
-    const bf=document.querySelector(butterfly);
-    const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {
-      x:Number(r.x.toFixed(1)),y:Number(r.y.toFixed(1)),
-      width:Number(r.width.toFixed(1)),height:Number(r.height.toFixed(1)),
-      transform:getComputedStyle(e).transform,opacity:getComputedStyle(e).opacity
-    }};
-    return {section:box(section),butterfly:box(bf)};
+    const legacyBf=document.querySelector(butterfly);
+    const belongsToSection=element=>section&&section.contains(element);
+    const activeSprite=element=>{
+      if(!element)return false;
+      const r=element.getBoundingClientRect(),s=getComputedStyle(element);
+      return r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&
+        r.left<innerWidth&&r.top<innerHeight&&s.display!=='none'&&
+        s.visibility!=='hidden'&&Number(s.opacity)>0.04;
+    };
+    // The document's first .cgv-bf is a hidden sprite from another section.
+    // Choose only a rendered element DESCENDING FROM the target section.
+    const sectionSprites=section?[...section.querySelectorAll(butterfly)]:[];
+    const bf=sectionSprites.find(activeSprite)||sectionSprites[0]||null;
+    const box=element=>{
+      if(!element)return null;
+      const r=element.getBoundingClientRect(),style=getComputedStyle(element);
+      return {
+        x:Number(r.x.toFixed(1)),y:Number(r.y.toFixed(1)),
+        width:Number(r.width.toFixed(1)),height:Number(r.height.toFixed(1)),
+        transform:style.transform,opacity:style.opacity
+      };
+    };
+    // Floating sprites can belong to a global layer outside #cgv-rsvp.
+    // Track each DOM instance by stable index and its relation to the
+    // current Section 9 viewport, including 120px of the closing seam.
+    const sectionRect=section?.getBoundingClientRect()||null;
+    const nearbyGlobalButterflies=[...document.querySelectorAll(butterfly)]
+      .map((element,index)=>{
+        const rect=element.getBoundingClientRect();
+        const nearSection=!!sectionRect&&rect.bottom>sectionRect.top-100&&
+          rect.top<sectionRect.bottom+120;
+        return {
+          index,withinSection:belongsToSection(element),
+          visible:activeSprite(element),nearSection,
+          containerClass:typeof element.parentElement?.className==='string'?
+            element.parentElement.className.slice(0,160):'',
+          rect:box(element),
+        };
+      })
+      .filter(item=>item.visible&&item.nearSection);
+    const candidates=[];
+    const viewportWidth=innerWidth,viewportHeight=innerHeight;
+    for(const element of document.querySelectorAll('*')){
+      const identity=[
+        element.tagName,element.getAttribute('id')||'',
+        element.getAttribute('class')||'',element.getAttribute('src')||'',
+        element.getAttribute('alt')||'',element.getAttribute('style')||''
+      ].join(' ');
+      // Name-based matching alone misses CSS background and pseudo-element
+      // sprites. First skip non-intersecting anonymous nodes cheaply.
+      const named=/bfly|butterfly|flutter|wing/i.test(identity);
+      const rect=element.getBoundingClientRect();
+      const intersects=rect.width>0&&rect.height>0&&
+        rect.right>0&&rect.bottom>0&&rect.left<viewportWidth&&rect.top<viewportHeight;
+      if(!named&&!intersects)continue;
+      const style=getComputedStyle(element);
+      const background=style.backgroundImage||'none';
+      const sprite=/bfly|butterfly|flutter|wing/i.test(background);
+      const pseudos=[];
+      // Track image-backed pseudo-elements without copying CSS rules.
+      if(intersects){
+        for(const pseudo of ['::before','::after']){
+          const ps=getComputedStyle(element,pseudo);
+          const pseudoImage=ps.backgroundImage||'none';
+          if(/bfly|butterfly|flutter|wing/i.test(pseudoImage)||
+             /bfly|butterfly|flutter|wing/i.test(ps.content||'')){
+            pseudos.push({pseudo,image:pseudoImage.slice(0,200),
+              content:(ps.content||'').slice(0,120),
+              opacity:ps.opacity,display:ps.display});
+          }
+        }
+      }
+      const canvasCandidate=element.tagName==='CANVAS'&&intersects;
+      if(!named&&!sprite&&!pseudos.length&&!canvasCandidate)continue;
+      const visible=intersects&&style.display!=='none'&&
+        style.visibility!=='hidden'&&Number(style.opacity)>0.04;
+      candidates.push({
+        selector:(element.id?'#'+element.id:element.tagName.toLowerCase()+
+          (typeof element.className==='string'&&element.className?
+            '.'+element.className.trim().split(/\s+/).slice(0,2).join('.') :'')),
+        image:element.getAttribute('src')||background.slice(0,160),
+        visible,rect:box(element),
+        animation:style.animationName,animationState:style.animationPlayState,
+        pseudoSprites:pseudos,canvasCandidate,
+        sectionAncestor:element.closest('section')?.id||null
+      });
+    }
+    candidates.sort((left,right)=>Number(right.visible)-Number(left.visible));
+    const visibleButterflyCandidates=candidates.filter(item=>item.visible).slice(0,8);
+    return {
+      section:box(section),
+      // Preserve the old field so prior frame stats can compare old/new audits.
+      butterfly:box(bf),
+      legacyButterfly:box(legacyBf),
+      sectionButterflyFound:sectionSprites.length>0,
+      sectionButterflyVisible:activeSprite(bf),
+      sectionButterflyCount:sectionSprites.length,
+      sectionButterflyIndex:bf?sectionSprites.indexOf(bf):null,
+      visibleSectionSprites:sectionSprites.filter(activeSprite).map(box),
+      nearbyGlobalButterflies,
+      referenceSelectorWasVisible:activeSprite(legacyBf)&&belongsToSection(legacyBf),
+      visibleButterflyCandidates,
+      butterflyCandidates:candidates.slice(0,12),
+      // An absent candidate means "unmeasured", not "no butterfly exists".
+      visibleButterflyMeasurement:visibleButterflyCandidates.length?
+        'visible-dom-candidate':'not-observed'
+    };
   },{root,butterfly});
 };
 try{
@@ -64,7 +167,7 @@ try{
         original.screenshot({path:output+'/reference-'+name+'.png',animations:'allow',timeout:25000}),
         local.screenshot({path:output+'/local-'+name+'.png',animations:'allow',timeout:25000}),
         pose(original,'#cgv-rsvp','.cgv-bf'),
-        pose(local,'#rsvp','.s9-butterfly')
+        pose(local,'#rsvp','.s9-butterfly,.s9-butterfly-forward')
       ]);
       metrics.frames.push({checkpoint:label,elapsedMs:Date.now()-t0,
         files:['reference-'+name+'.png','local-'+name+'.png'],
@@ -76,6 +179,20 @@ try{
   console.error('S9_FRAME_AUDIT_ERROR',String(error));
   process.exitCode=1;
 }finally{
+  const countVisible=key=>metrics.frames.filter(frame=>
+    frame[key]?.sectionButterflyVisible===true).length;
+  console.log('S9_BUTTERFLY_CANDIDATES '+JSON.stringify({
+    totalFrames:metrics.frames.length,
+    referenceVisibleSectionSprites:countVisible('original'),
+    localVisibleSectionSprites:countVisible('local'),
+    referenceSectionSpriteCounts:[...new Set(metrics.frames.map(
+      frame=>frame.original?.sectionButterflyCount||0))],
+    referenceNearbyGlobalSamples:metrics.frames.reduce((n,frame)=>
+      n+(frame.original?.nearbyGlobalButterflies?.length||0),0),
+    localNearbyGlobalSamples:metrics.frames.reduce((n,frame)=>
+      n+(frame.local?.nearbyGlobalButterflies?.length||0),0),
+    note:'Only sprites inside the target section are used for pose; visible global candidates are diagnostic.'
+  }));
   fs.writeFileSync(output+'/frames.json',JSON.stringify(metrics,null,2));
   await browser.close();
 }
