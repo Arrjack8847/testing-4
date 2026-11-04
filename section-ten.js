@@ -5,8 +5,27 @@
   const invitation=document.getElementById('invitation');
   if(!section||!invitation)return;
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-  let visible=false,raf=0,revealed=false;
+  let visible=false,raf=0,revealed=false,revealRaf=0;
   const ready=()=>invitation.dataset.state==='opened'&&!document.hidden;
+  const revealEls=[...section.querySelectorAll('.closing10-reveal')];
+  const inner=section.querySelector('.closing10-inner');
+  // Compare untransformed layout positions, not animated bounding boxes.
+  // Otherwise the 52px reveal translation can re-trigger a hidden element
+  // when it crosses the top of the viewport, producing reverse-scroll flicker.
+  const syncReveals=()=>{
+    revealRaf=0;
+    const baseY=inner.getBoundingClientRect().top;
+    const viewing=ready();
+    const bottomGate=innerHeight-64;
+    for(const el of revealEls){
+      const top=baseY+el.offsetTop;
+      const exposed=viewing&&top+el.offsetHeight>0&&top<bottomGate;
+      el.dataset.inView=String(reduced.matches||exposed);
+    }
+  };
+  const scheduleReveals=()=>{
+    if(!revealRaf)revealRaf=requestAnimationFrame(syncReveals);
+  };
   const stop=()=>{
     if(raf){cancelAnimationFrame(raf);raf=0;}
     section.dataset.active='false';
@@ -28,10 +47,12 @@
       section.dataset.revealed='true';
       stop();
       section.style.setProperty('--closing10-sticky-y','0px');
+      scheduleReveals();
     }else{
       section.dataset.motionReady='true';
       if(revealed)section.dataset.revealed='true';
       schedule();
+      scheduleReveals();
     }
   };
   const observer='IntersectionObserver' in window
@@ -43,18 +64,20 @@
           if(!revealed){revealed=true;section.dataset.revealed='true';}
           schedule();
         }else stop();
+        scheduleReveals();
       }
     },{threshold:0,rootMargin:'0px'})
     :null;
   if(observer)observer.observe(section);
   else{visible=true;revealed=true;section.dataset.revealed='true';}
-  const onScroll=()=>{if(visible)schedule();};
+  const onScroll=()=>{if(visible)schedule();scheduleReveals();};
   window.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',onScroll,{passive:true});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else schedule();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else schedule();scheduleReveals();});
   const stateObserver=new MutationObserver(()=>{
     if(!ready())stop();
     else if(visible){revealed=true;section.dataset.revealed='true';schedule();}
+    scheduleReveals();
   });
   stateObserver.observe(invitation,{attributes:true,attributeFilter:['data-state']});
   if(reduced.addEventListener)reduced.addEventListener('change',syncMotion);
@@ -78,4 +101,5 @@
     }
   }
   syncMotion();
+  scheduleReveals();
 })();
