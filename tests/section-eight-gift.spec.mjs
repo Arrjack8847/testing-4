@@ -276,3 +276,24 @@ test('Section 8 petals and blush wing motions respect Reduce Motion',async({page
   expect(result.hiddenWishlist).toBe(true);
   expect(result.hiddenBanks).toBe(true);
 });
+
+
+test('Authorized local product thumbnails replace placeholder glyphs without external hotlinks',async({page})=>{
+  const sample=Buffer.from('UklGRh4AAABXRUJQVlA4TBEAAAAvA8AAAAdQ69rXvP+BiOh/AAA=','base64');
+  for(const item of ['gift-rice-cooker.jpg','gift-kettle.webp']){
+    await page.route('**/assets/reference-dev/'+item,route=>
+      route.fulfill({status:200,contentType:'image/webp',body:sample}));
+  }
+  const {gift,faults}=await openGift(page);
+  await expect(gift).toHaveAttribute('data-gift-thumb-rice','reference-local');
+  await expect(gift).toHaveAttribute('data-gift-thumb-kettle','reference-local');
+  const assets=await gift.evaluate(el=>({
+    rice:getComputedStyle(el.querySelector('.gift-eight-thumb-rice')).backgroundImage,
+    kettle:getComputedStyle(el.querySelector('.gift-eight-thumb-kettle')).backgroundImage
+  }));
+  expect(assets.rice).toContain('assets/reference-dev/gift-rice-cooker.jpg');
+  expect(assets.kettle).toContain('assets/reference-dev/gift-kettle.webp');
+  expect(assets.rice).not.toContain('susercontent.com');
+  expect(assets.kettle).not.toContain('lazcdn.com');
+  expect(faults).toEqual([]);
+});
