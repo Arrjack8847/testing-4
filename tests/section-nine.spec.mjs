@@ -305,3 +305,37 @@ test('Section 9 keeps opposing flight directions at animation checkpoints',async
   expect(tracks.east.x2-tracks.east.x1).toBeGreaterThan(40);
   expect(tracks.west.x1-tracks.west.x2).toBeGreaterThan(35);
 });
+
+test('Section 9 petals are decorative, scroll-contained and reduced-motion safe',async({page})=>{
+  const {section}=await go(page);
+  const petals=section.locator('.s9-petals i');
+  await expect(petals).toHaveCount(8);
+  await expect(section.locator('.s9-petals')).toHaveAttribute('aria-hidden','true');
+  const initial=await section.evaluate(el=>{
+    const layer=el.querySelector('.s9-petals'),petal=layer.querySelector('i');
+    const lr=layer.getBoundingClientRect(),sr=el.getBoundingClientRect();
+    return {
+      pointer:getComputedStyle(layer).pointerEvents,
+      overflow:getComputedStyle(layer).overflow,
+      animation:getComputedStyle(petal).animationName,
+      left:lr.left-sr.left,right:sr.right-lr.right,
+      top:lr.top-sr.top,bottom:sr.bottom-lr.bottom
+    };
+  });
+  expect(initial.pointer).toBe('none');
+  expect(initial.overflow).toBe('hidden');
+  expect(initial.animation).toBe('s9-petal-drift');
+  for(const side of ['left','right','top','bottom'])expect(Math.abs(initial[side])).toBeLessThanOrEqual(1);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const reduced=await petals.first().evaluate(el=>({
+    animation:getComputedStyle(el).animationName,
+    opacity:getComputedStyle(el).opacity
+  }));
+  expect(reduced.animation).toBe('none');
+  expect(reduced.opacity).toBe('0');
+  await page.evaluate(()=>document.getElementById('closingMessage')
+    .scrollIntoView({block:'start',behavior:'instant'}));
+  await page.evaluate(()=>document.getElementById('rsvp')
+    .scrollIntoView({block:'start',behavior:'instant'}));
+  await expect(section).toBeInViewport();
+});
