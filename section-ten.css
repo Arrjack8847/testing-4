@@ -129,7 +129,7 @@
   transition:opacity .8s ease,transform .9s cubic-bezier(.22,.9,.24,1);
   transition-delay:var(--closing10-delay,0ms);
 }
-.section-ten[data-motion-ready="true"][data-revealed="true"] .closing10-reveal {
+.section-ten[data-motion-ready="true"] .closing10-reveal[data-in-view="true"] {
   opacity:1;transform:none;
 }
 .section-ten .closing10-message,.section-ten .closing10-rule {--closing10-delay:100ms;}
