@@ -49,12 +49,14 @@ if (-not $VerifyOnly) {
 $failed = 0
 foreach ($asset in $assets) {
   $target = Join-Path $destination $asset.Name
-  if (-not (Test-ReferenceAsset $target $asset.Format)) {
-    if ($VerifyOnly) {
+  if ($VerifyOnly) {
+    if (-not (Test-ReferenceAsset $target $asset.Format)) {
       Write-Host ('MISSING/INVALID: ' + $asset.Name) -ForegroundColor Yellow
       $failed++
       continue
     }
+  } else {
+    # Refresh from the exact source URL rather than trusting a same-named local file.
     $temp = $target + '.download'
     try {
       Write-Host ('Fetching exact source asset: ' + $asset.Name)
