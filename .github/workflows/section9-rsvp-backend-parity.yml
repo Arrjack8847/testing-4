@@ -1,7 +1,7 @@
 name: Section 9 persistent RSVP and frame parity
 on:
   push:
-    branches: [feat/section9-rsvp-persistence-visual-audit-20261104]
+    branches: [audit/section9-post-artwork-frame-parity-20261104]
   pull_request:
     paths:
       - index.html
