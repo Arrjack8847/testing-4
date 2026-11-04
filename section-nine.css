@@ -1,7 +1,7 @@
 /* Section 9 only. Independent styles calibrated from public 390x844 reference DOM.
    Source WebP is NOT bundled; only optional, local permission-controlled comparison. */
 .s9-rsvp{--s9-bg:#faf7fb;position:relative;z-index:2;isolation:isolate;overflow:hidden;box-sizing:border-box;
-  width:100%;min-height:1215.9px;padding:96px 28px;color:#4a2a45;background:var(--s9-bg);
+  width:100%;min-height:1215.9px;padding:96px 28px 60px;color:#4a2a45;background:var(--s9-bg);
   text-align:center;font:400 18px/1.65 'EB Garamond',Georgia,serif}
 .s9-rsvp *{box-sizing:border-box}
 .s9-art{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -26,9 +26,10 @@
 /* Source's cgv-tframe: a tall, pointed-arch ivory panel, not four loose
    25px corner brackets. Framing is original CSS, no vendor frame asset copied. */
 .s9-frame{
-  position:absolute;top:-91px;bottom:-67px;left:-13px;right:-13px;
+  position:absolute;top:-91px;bottom:-37px;left:-13px;right:-13px;
   z-index:-1;pointer-events:none;opacity:1;overflow:visible;
-  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,252,253,.93));
+  /* Let the original paper texture remain faintly visible beneath the ivory arch. */
+  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,252,253,.84));
   border:1.25px solid #c6aa78;
   border-radius:190px 190px 19px 19px / 191px 191px 14px 14px;
   box-shadow:0 0 0 4px rgba(255,255,255,.3),inset 0 0 0 5px rgba(255,255,255,.5);
@@ -49,7 +50,7 @@
 .s9-frame i:nth-child(2){right:-5px;top:180px;border-width:1px 1px 0 0}
 .s9-frame i:nth-child(3){left:-2px;bottom:-2px;border-width:0 0 1px 1px;border-bottom-left-radius:13px}
 .s9-frame i:nth-child(4){right:-2px;bottom:-2px;border-width:0 1px 1px 0;border-bottom-right-radius:13px}
-.s9-eyebrow{max-width:234px;margin:0 auto 12px;color:#7e6479;
+.s9-eyebrow{max-width:210px;margin:0 auto 12px;color:#7e6479;
   font:400 11px/1.65 'EB Garamond',Georgia,serif;letter-spacing:4.95px;text-transform:uppercase}
 .s9-heading{font:400 52px/1.15 'Pinyon Script',cursive;color:#7b3d6e;letter-spacing:normal;text-shadow:none;margin:0 0 36px}
 .s9-form{display:flex;flex-direction:column;gap:18px;max-width:100%;margin:0 auto}
@@ -76,16 +77,21 @@
 .s9-form-status.s9-feedback-visible{position:static;width:auto;height:auto;overflow:visible;
   clip-path:none;white-space:normal;margin:0 auto;max-width:34ch;
   font:400 11px/1.45 system-ui,sans-serif;color:#77586f}
-.s9-note{font:400 14px/1.35 'EB Garamond',Georgia,serif;color:#796678;margin:0 auto}
+.s9-note{font:400 12px/1.575 'EB Garamond',Georgia,serif;color:#796678;margin:0 auto}
 .s9-form-status.s9-feedback-visible + .s9-note{margin-top:0}
-.s9-wall{display:grid;gap:12px;padding-right:4px;margin-top:44px;text-align:left}
-.s9-wish{padding:16px 18px;background:#fff;border:0;
+.s9-wall{position:relative;display:grid;gap:14px;padding-right:4px;margin-top:46px;text-align:left}
+.s9-wish{padding:17.5px 18px;background:#fff;border:0;
   border-radius:14px;box-shadow:0 2px 10px #956e9521}
-.s9-who{display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:#744c72;font-size:15px}
+.s9-who{display:flex;justify-content:flex-start;align-items:baseline;flex-wrap:wrap;gap:10px;color:#744c72;font-size:18px}
 .s9-who strong{font-weight:600}
-.s9-who span{font-size:12px;color:#907c8b}
+.s9-who span{font-size:10px;line-height:1.4;text-transform:uppercase;letter-spacing:2px;color:#907c8b}
 .s9-wish p{margin:8px 0 0;font:400 italic 16px/1.35 'EB Garamond',Georgia,serif;color:#69546c}
-.s9-demo-note{margin:0 auto;color:#806c7c;font:400 10px/1.4 system-ui,sans-serif;text-align:center}
+/* The notices identify illustrative wishes but must not stretch the ivory arch.
+   Source reference ends its arch ~40px above the previously extended prototype.
+   Keep this truthful disclosure visible in the open section's bottom breathing room. */
+.s9-demo-note{position:absolute;top:calc(100% + 43px);left:0;right:0;
+  margin:0 auto;color:#806c7c;font:400 10px/1.4 system-ui,sans-serif;
+  text-align:center;pointer-events:none}
 .s9-preview[hidden]{display:none!important}
 .s9-preview{background:#fff8f9;border:1px solid #d5bfcf;border-radius:4px;margin-top:18px;
   padding:15px;text-align:left;font:400 13px/1.4 system-ui,sans-serif}

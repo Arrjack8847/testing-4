@@ -1,0 +1,94 @@
+name: Section 10 closing reference and mobile QA
+on:
+  push:
+    branches:
+      - main
+      - feat/section10-closing-reference-20261104
+    paths:
+      - index.html
+      - section-ten.css
+      - section-ten.js
+      - tests/section-ten.spec.mjs
+      - tools/section10-live-reference.mjs
+      - tools/section10-compare.mjs
+      - stage-section10-art.ps1
+      - .github/workflows/section10-closing-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  closing-reference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Measure the live Section 10 reference in read-only mode
+        run: node tools/section10-live-reference.mjs
+      - name: Upload measurement report and source-only screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section10-source-measurements
+          path: section10-evidence/
+          retention-days: 7
+          if-no-files-found: warn
+  closing-local:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Check independent Section 10 JavaScript syntax
+        run: |
+          if [ -f section-ten.js ]; then node --check section-ten.js; fi
+      - name: Run focused 4-phone Section 10 tests
+        if: hashFiles('tests/section-ten.spec.mjs') != ''
+        run: npx playwright test tests/section-ten.spec.mjs --workers=2
+      - name: Upload local closing screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section10-local-screenshots
+          path: test-results/**/*.png
+          retention-days: 7
+          if-no-files-found: warn
+
+  closing-art-visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Stage existing GitHub artwork only in the temporary runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/reference-dev
+          git fetch --no-tags origin refs/heads/assets/shared-artwork-20261104
+          git show FETCH_HEAD:assets/scene.webp > assets/reference-dev/scene.webp
+          file assets/reference-dev/scene.webp
+      - name: Compare live and local Section 10 at the exact same viewport and scroll end
+        run: node tools/section10-compare.mjs
+      - name: Upload side-by-side inspection images and geometry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section10-matched-visual-qa
+          path: section10-visual-qa/
+          retention-days: 7
+          if-no-files-found: warn

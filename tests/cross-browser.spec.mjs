@@ -206,7 +206,7 @@ test('Current Order of the Day is accessible; legacy countdown remains hidden',a
   expect(errors).toEqual([]);
 });
 
-test('Section 5 provides an accessible gallery without falsely populated photos',async({page})=>{
+test('Section 7 provides an accessible gallery without falsely populated photos',async({page})=>{
   const errors=await load(page);
   const gallery=page.locator('#gallery');
   await expect(gallery).toHaveAttribute('aria-hidden','true');
@@ -219,7 +219,7 @@ test('Section 5 provides an accessible gallery without falsely populated photos'
     document.getElementById('gallery').scrollIntoView({block:'start',behavior:'instant'});
   });
   await expect(gallery).toBeInViewport();
-  await expect(page.getByRole('heading',{level:2,name:'Our Memories'})).toBeVisible();
+  await expect(gallery.getByRole('heading',{level:2,name:'Our Gallery'})).toBeVisible();
   await expect(gallery.locator('[data-gallery-slot]')).toHaveCount(5);
   await expect(gallery.locator('[data-gallery-slot="0"]')).toBeDisabled();
   await expect(gallery.locator('.gallery-disclaimer')).toContainText('not been provided');
