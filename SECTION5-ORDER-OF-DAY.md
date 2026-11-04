@@ -287,6 +287,17 @@ The tool first checks that both local assets exist and have RIFF/WebP
 signatures. If either is missing or invalid, it stops before claiming
 visual parity and reports the missing filename.
 
+Without those files, `node tools/section5-visual-parity-audit.mjs
+--geometry-only` still compares the reference and local section geometry
+at all four phone sizes. It deliberately **skips pixel comparisons** while
+local artwork is missing. The GitHub Actions workflow
+`section5-four-phone-geometry-audit.yml` runs this mode with no WebPs
+and uploads temporary screenshots/measurements for review.
+
+Pixel comparisons keep screenshots at their original sizes: if the
+reference and local sections have different heights, the extra area is
+counted in the mismatch rather than stretching either screenshot.
+
 If both are available, it opens the live reference and local invitation
 at **320×568, 360×740, 390×844 and 430×932**, captures each full timeline
 panel, and writes screenshot pairs, difference heatmaps, element geometry,
