@@ -107,12 +107,12 @@ test('Section 4 source-art is the development default and leaves earlier section
   await expect(page.locator('#message')).toHaveAttribute('data-section','2');
 });
 
-test('Section 4 uses staged local files for both source-art layers when present',async({page})=>{
+test('Section 4 uses staged local files for all measured source-art layers when present',async({page})=>{
   // The CI fixture uses tiny synthetic SVGs, not copyrighted vendor files.
   // This checks local path selection only; exact source identity is checked
   // separately by the permission-gated staging script.
   const syntheticSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="white"/></svg>';
-  for (const suffix of ['paper.webp','arch_event.svg']) {
+  for (const suffix of ['paper.webp','arch_event.svg','bfly_white.webp']) {
     await page.route('**/assets/reference-dev/'+suffix,route=>route.fulfill({
       status:200,contentType:'image/svg+xml',body:syntheticSVG
     }));
@@ -120,12 +120,38 @@ test('Section 4 uses staged local files for both source-art layers when present'
   const {section,errors}=await openEvents(page);
   await expect(section).toHaveAttribute('data-reference-paper-source','local');
   await expect(section).toHaveAttribute('data-reference-frame-source','local');
+  await expect(section).toHaveAttribute('data-reference-wing-source','local');
   await expect(section).toHaveAttribute('data-reference-paper','loaded');
   await expect(section.locator('#eventSourcePaper')).toHaveAttribute(
     'src','./assets/reference-dev/paper.webp');
   const frameSource = await section.locator('.event-reference-card').first().evaluate(
     el=>getComputedStyle(el,'::before').borderImageSource);
   expect(frameSource).toContain('assets/reference-dev/arch_event.svg');
+  const sprite = await section.locator('.event-reference-butterfly').evaluate(el=>{
+    const b=el.getBoundingClientRect();
+    const left=el.querySelector('.event-reference-butterfly-left');
+    const right=el.querySelector('.event-reference-butterfly-right');
+    const ls=getComputedStyle(left);
+    const rs=getComputedStyle(right);
+    return {
+      width:b.width,height:b.height,opacity:getComputedStyle(el).opacity,
+      wingWidth:left.getBoundingClientRect().width,
+      leftPosition:ls.backgroundPosition,
+      rightPosition:rs.backgroundPosition,
+      leftSize:ls.backgroundSize,rightSize:rs.backgroundSize,
+      leftImage:ls.backgroundImage,rightImage:rs.backgroundImage
+    };
+  });
+  expect(sprite.width).toBe(44);
+  expect(sprite.height).toBe(34);
+  expect(sprite.wingWidth).toBe(22);
+  expect(sprite.opacity).toBe('0');
+  expect(sprite.leftSize).toBe('200% 100%');
+  expect(sprite.rightSize).toBe('200% 100%');
+  expect(sprite.leftPosition).toMatch(/^0(?:px|%) 0(?:px|%)$/);
+  expect(sprite.rightPosition).toMatch(/^100% 0(?:px|%)$/);
+  expect(sprite.leftImage).toContain('assets/reference-dev/bfly_white.webp');
+  expect(sprite.rightImage).toContain('assets/reference-dev/bfly_white.webp');
   expect(errors).toEqual([]);
 });
 
