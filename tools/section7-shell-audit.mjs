@@ -39,6 +39,19 @@ function snapshot(){
     const el=document.elementFromPoint(Math.min(innerWidth-2,x),Math.min(innerHeight-2,y));
     return {x,y,hit:fmt(el),chain:tree(el).slice(0,5)};
   });
+  const scenicImage=gallery?.querySelector('.cgv-section-bg-extra > img, .gallery-scene-backdrop > img');
+  const scenicLayer=scenicImage?.parentElement;
+  const wash=gallery?.querySelector('.cgv-wash, .gallery-scene-wash');
+  const scenicStyles=(el)=>{
+    if(!el)return null;
+    const c=getComputedStyle(el);
+    return {...fmt(el),top:c.top,stickyTop:c.top,height:c.height,width:c.width,
+      maxHeight:c.maxHeight,backgroundRepeat:c.backgroundRepeat,
+      backgroundSize:c.backgroundSize,backgroundPosition:c.backgroundPosition,
+      filter:c.filter,mixBlendMode:c.mixBlendMode,maskImage:c.maskImage};
+  };
+  const scenicDetail={image:scenicStyles(scenicImage),layer:scenicStyles(scenicLayer),
+    wash:scenicStyles(wash),natural:[scenicImage?.naturalWidth||0,scenicImage?.naturalHeight||0]};
   const galleryImages=[...gallery?.querySelectorAll('img')||[]].map(el=>({
     src:el.currentSrc||el.src,alt:el.alt,natural:[el.naturalWidth,el.naturalHeight],
     chain:tree(el).slice(0,5)}));
@@ -51,7 +64,7 @@ function snapshot(){
   }).slice(0,120).map(fmt);
   return {scrollY,documentHeight:document.documentElement.scrollHeight,
     scene:backgroundImgs.map(x=>({src:x.src,complete:x.complete,natural:[x.naturalWidth,x.naturalHeight],ancestors:tree(x)})),
-    gallery:fmt(gallery),galleryImages,fixed,notable:cover,points:rgbaPoints};
+    gallery:fmt(gallery),galleryImages,scenicDetail,fixed,notable:cover,points:rgbaPoints};
 }
 for(const [site,url] of [['reference',reference],['local',local]]){
   const ctx=await browser.newContext({viewport:{width:390,height:844},
@@ -82,7 +95,7 @@ for(const [site,url] of [['reference',reference],['local',local]]){
       const snap=await page.evaluate(snapshot);
       record.snapshots.push({stage,...snap});
       console.log('SECTION7_SHELL '+JSON.stringify({site,stage,
-        scrollY:snap.scrollY, gallery:snap.gallery,
+        scrollY:snap.scrollY, gallery:snap.gallery, scenicDetail:snap.scenicDetail,
         scene:snap.scene.map(x=>({src:x.src,natural:x.natural,ancestors:x.ancestors.slice(0,5)})),
         fixed:snap.fixed.filter(x=>x.rect.w>0&&x.rect.h>0).slice(0,25),
         points:snap.points.map(x=>({x:x.x,y:x.y,hit:x.hit,
