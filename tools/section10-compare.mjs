@@ -59,8 +59,13 @@ async function visit(kind,url){
     const rects=await page.evaluate(sel=>{
       const fields={};
       const item=q=>{
-        const el= (q.includes('tasik-kayangan/scene.webp'))
-          ? [...document.querySelectorAll('img[src*="tasik-kayangan/scene.webp"]')].find(e=>e.getBoundingClientRect().width>300)
+        const sourceArt=[...document.querySelectorAll('img[src*="tasik-kayangan/scene.webp"]')];
+        const visibleArt=sourceArt.filter(e=>{
+          const r=e.getBoundingClientRect();
+          return e.naturalWidth===1080&&r.width>300&&r.bottom>0&&r.top<innerHeight;
+        }).sort((a,b)=>Math.abs(a.getBoundingClientRect().top)-Math.abs(b.getBoundingClientRect().top));
+        const el=q.includes('tasik-kayangan/scene.webp')
+          ? (visibleArt[0]||sourceArt.find(e=>e.getBoundingClientRect().width>300))
           : document.querySelector(q);
         if(!el)return null;
         const r=el.getBoundingClientRect(),s=getComputedStyle(el);
@@ -116,6 +121,7 @@ try{
     }
   }
   if(result.source.fields.scene?.naturalWidth!==1080)throw new Error('Unexpected source scene image dimensions.');
+  if(result.source.fields.scene?.y< -1000)throw new Error('Selected source scene is off-screen; reference screenshot comparison would be unreliable.');
   if(result.local.fields.scene?.naturalWidth!==1080)throw new Error('Shared artwork was not loaded.');
   console.log('SECTION10_MATCHED_VISUAL_GEOMETRY '+JSON.stringify(result.geometryDifferences));
   console.log('SECTION10_MATCHED_ART '+JSON.stringify({source:result.source.fields.scene,local:result.local.fields.scene}));
