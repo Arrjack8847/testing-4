@@ -389,3 +389,77 @@ test('Gallery local reference mode retains placeholders if downloaded WebPs are 
   await expect(gallery.locator('.gallery-disclaimer')).toContainText('Local reference WebP missing');
   expect(errors).toEqual([]);
 });
+
+
+test('Section 7 uses its own sticky scene.webp and source wash without blocking photos',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const sceneRequests=[];
+  await page.route('**/assets/scene.webp',route=>{
+    sceneRequests.push(new URL(route.request().url()).pathname);
+    return route.fulfill({status:200,contentType:'image/webp',body:testImage});
+  });
+  // Gallery photograph must remain clickable above the scenic background.
+  await page.route('**/assets/gallery/reference/*.webp',route=>
+    route.fulfill({status:200,contentType:'image/webp',body:testImage}));
+  const {gallery,errors}=await reachGallery(page);
+  const layer=gallery.locator('.gallery-scene-backdrop');
+  const image=layer.locator('img.gallery-scene-image');
+  const wash=layer.locator('.gallery-scene-wash');
+  await expect(layer).toHaveAttribute('aria-hidden','true');
+  await expect(image).toHaveAttribute('src','./assets/scene.webp');
+  await expect(image).toHaveAttribute('alt','');
+  await expect(image).toHaveJSProperty('complete',true);
+  await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5);
+  expect(sceneRequests.length).toBeGreaterThanOrEqual(1);
+
+  const values=await gallery.evaluate(el=>{
+    const layer=el.querySelector('.gallery-scene-backdrop');
+    const image=layer.querySelector('img');
+    const wash=layer.querySelector('.gallery-scene-wash');
+    const text=el.querySelector('.gallery-content');
+    const gs=getComputedStyle(el),ls=getComputedStyle(layer),
+      is=getComputedStyle(image),ws=getComputedStyle(wash),ts=getComputedStyle(text);
+    return {sectionOverflow:gs.overflow,sectionPaper:gs.backgroundColor,
+      layerPosition:ls.position,layerOverflow:ls.overflow,layerZ:ls.zIndex,
+      layerPointer:ls.pointerEvents,layerHeight:layer.getBoundingClientRect().height,
+      sectionHeight:el.getBoundingClientRect().height,
+      imagePosition:is.position,imageTop:is.top,imageFit:is.objectFit,
+      imageCrop:is.objectPosition,imageWidth:image.getBoundingClientRect().width,
+      imageHeight:image.getBoundingClientRect().height,
+      washColor:ws.backgroundColor,washOpacity:ws.opacity,
+      contentZ:Number(ts.zIndex),imageMotion:is.animationName};
+  });
+  expect(values.sectionOverflow).toBe('clip');
+  expect(values.sectionPaper).toBe('rgb(250, 247, 251)');
+  expect(values.layerPosition).toBe('absolute');
+  expect(values.layerOverflow).toBe('clip');
+  expect(values.layerZ).toBe('0');
+  expect(values.layerPointer).toBe('none');
+  expect(Math.abs(values.layerHeight-values.sectionHeight)).toBeLessThan(1);
+  expect(values.imagePosition).toBe('sticky');
+  expect(values.imageTop).toBe('0px');
+  expect(values.imageFit).toBe('cover');
+  expect(values.imageCrop).toBe('50% 50%');
+  const viewport=await page.evaluate(()=>({width:innerWidth,height:innerHeight}));
+  expect(Math.abs(values.imageWidth-viewport.width)).toBeLessThan(1);
+  expect(Math.abs(values.imageHeight-viewport.height)).toBeLessThan(1);
+  expect(values.washColor).toBe('rgb(250, 247, 251)');
+  expect(values.washOpacity).toBe('0.1');
+  expect(values.contentZ).toBeGreaterThan(0);
+  expect(values.imageMotion).toBe('none');
+
+  const galleryDocumentTop=await gallery.evaluate(el=>el.getBoundingClientRect().top+scrollY);
+  // The Gallery backdrop (not the hero's #masterArt) pins to the viewport
+  // on the first part of the Gallery and exits within its own section.
+  await page.evaluate(y=>scrollTo({top:y+100,behavior:'instant'}),galleryDocumentTop);
+  await expect.poll(()=>image.evaluate(el=>Math.abs(el.getBoundingClientRect().top)))
+    .toBeLessThan(1.5);
+  const lowerScroll=galleryDocumentTop+values.sectionHeight-viewport.height+100;
+  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),lowerScroll);
+  await expect.poll(()=>image.evaluate(el=>el.getBoundingClientRect().top))
+    .toBeLessThan(-25);
+  await gallery.locator('[data-gallery-slot="4"]').click();
+  await expect(page.getByRole('dialog',{name:'Wedding photo viewer'})).toBeVisible();
+  await page.keyboard.press('Escape');
+  expect(errors).toEqual([]);
+});
