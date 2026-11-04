@@ -629,3 +629,23 @@
 .gift-eight .gift-eight-bfly-wing{
   background-image:url("./assets/section8-blush-wing-original.svg");
 }
+
+
+/* Expanded wishlist background resets were hiding the original fallback
+   illustrations. Reapply their images with higher specificity, and always
+   prefer verified local comparison photos if supplied on localhost. */
+.gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-rice {
+  background: #fff url("./assets/section8-rice-cooker-original.svg") center / contain no-repeat;
+}
+.gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-kettle {
+  background: #fff url("./assets/section8-kettle-original.svg") center / contain no-repeat;
+}
+.gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-item:nth-child(3) .gift-eight-thumb {
+  background: #fff url("./assets/section8-giftcard-original.svg") center / contain no-repeat;
+}
+.gift-eight[data-gift-thumb-rice="reference-local"] .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-rice {
+  background: #fff url("./assets/reference-dev/gift-rice-cooker.jpg") center / contain no-repeat;
+}
+.gift-eight[data-gift-thumb-kettle="reference-local"] .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-kettle {
+  background: #fff url("./assets/reference-dev/gift-kettle.webp") center / contain no-repeat;
+}
