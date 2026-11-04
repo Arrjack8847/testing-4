@@ -164,9 +164,33 @@ function differences(a,b){
   return {
     eyebrow:delta(a.eyebrow,b.eyebrow),
     heading:delta(a.heading,b.heading),
+    time:delta(a.time,b.time),
     rows:a.rows.map((r,i)=>delta(r,b.rows[i])),
     sectionHeight:+(b.height-a.height).toFixed(2)
   };
+}
+
+function validateGeometry(delta,viewport){
+  // This audits CSS box geometry, NOT exact photographic source artwork.
+  // 1.5 CSS px includes the source's subpixel section height (651.28px)
+  // while rejecting the old 320/430 wrapping and width regressions.
+  const tolerance=1.5;
+  const out=[];
+  const check=(name,part)=>{
+    if(!part){out.push(name+': element missing');return;}
+    for(const [axis,v]of Object.entries(part)){
+      if(!Number.isFinite(v) || Math.abs(v)>tolerance)
+        out.push(name+'.'+axis+'='+v+'px');
+    }
+  };
+  check('eyebrow',delta.eyebrow);
+  check('heading',delta.heading);
+  check('firstTime',delta.time);
+  if(delta.rows.length!==6)out.push('expected six rows, got '+delta.rows.length);
+  delta.rows.forEach((r,i)=>check('row'+(i+1),r));
+  if(!Number.isFinite(delta.sectionHeight) || Math.abs(delta.sectionHeight)>tolerance)
+    out.push('sectionHeight='+delta.sectionHeight+'px');
+  if(out.length)throw new Error('Geometry drift at '+viewport+': '+out.join('; '));
 }
 
 async function comparePixels(browser,aBytes,bBytes){
@@ -253,6 +277,7 @@ try{
       if(!referenceOnly){
         result.local=await capture(browser,localUrl,'local',viewport);
         result.geometryDifference=differences(result.reference.details,result.local.details);
+        validateGeometry(result.geometryDifference,viewport.id);
         if(!geometryOnly){
           const [a,b]=await Promise.all([readFile(result.reference.file),readFile(result.local.file)]);
           const diff=await comparePixels(browser,a,b);
