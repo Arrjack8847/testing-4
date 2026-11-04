@@ -37,8 +37,18 @@ test('default reference couple scene follows mauve and keeps events afterward',a
 });
 test('couple layout has measured first-portrait geometry at 390px and never overflows',async({page},testInfo)=>{
   const {section,errors}=await openCouple(page);
-  await section.locator('.couple-portrait').first().scrollIntoViewIfNeeded();
-  await expect(section.locator('.couple-portrait').first()).toHaveClass(/in-view/);
+  const firstPortrait=section.locator('.couple-portrait').first();
+  const intro=section.locator('.couple-intro');
+  await firstPortrait.scrollIntoViewIfNeeded();
+  await expect(firstPortrait).toHaveClass(/in-view/);
+  // Wait for both 950ms reveal transforms to settle before sampling boxes.
+  // The in-view class is applied at animation start, not at its end.
+  await expect(intro).toHaveClass(/in-view/);
+  await expect.poll(()=>intro.evaluate(el=>getComputedStyle(el).transform),
+    {timeout:5000}).toBe('none');
+  await expect.poll(()=>firstPortrait.evaluate(el=>getComputedStyle(el).transform),
+    {timeout:5000}).toBe('none');
+  await page.evaluate(()=>document.fonts.ready);
   const sizes=await section.evaluate(el=>{
     const band=el.getBoundingClientRect(),intro=el.querySelector('.couple-intro').getBoundingClientRect();
     const arch=el.querySelector('.couple-arch').getBoundingClientRect();
