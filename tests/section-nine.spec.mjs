@@ -103,7 +103,34 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
   await expect(section).toBeInViewport();
   expect(errors).toEqual([]);
 });
-test('Animation pauses outside view and Reduced Motion remains legible',async({page})=>{
+test('Local reference mode loads split-wing sprite only with explicit opt-in',async({page})=>{
+  // Intercept source files with harmless fixtures: no copyrighted assets enter Git.
+  const transparentPng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/2XcAAAAASUVORK5CYII=','base64');
+  await page.route('**/assets/reference-dev/section9/*.webp',route=>route.fulfill({
+    status:200,contentType:'image/png',body:transparentPng
+  }));
+  await page.goto('/?section9Reference=1');
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveClass(/s9-reference-loaded/);
+  await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section).toHaveAttribute('data-reference-butterfly','loaded');
+  const wing=section.locator('.s9-wing-left');
+  const style=await wing.evaluate(el=>({image:getComputedStyle(el).backgroundImage,
+    size:getComputedStyle(el).backgroundSize,animation:getComputedStyle(el).animationName}));
+  expect(style.image).toContain('assets/reference-dev/section9/bfly_1.webp');
+  expect(style.size).toBe('200% 100%');
+  expect(style.animation).toBe('s9-sprite-flap-left');
+});
+test('Missing optional butterfly sprite gracefully falls back to CSS art',async({page})=>{
+  await page.route('**/assets/reference-dev/section9/bfly_1.webp',route=>route.fulfill({status:404,body:'not found'}));
+  await page.goto('/?section9Reference=1');
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveAttribute('data-reference-butterfly','missing');
+  await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
+  const style=await section.locator('.s9-wing-left').evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(style).toContain('radial-gradient');
+});
+,async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   const {section}=await go(page);
   await expect(section.locator('.s9-heading')).toBeVisible();
