@@ -19,6 +19,11 @@ $assets = @(
     Name = 'arch_event.svg'
     Url = 'https://undangankahwin.com/images/concierge/packs/tasik-kayangan/arch_event.svg'
     Format = 'SVG'
+  },
+  @{
+    Name = 'bfly_white.webp'
+    Url = 'https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp'
+    Format = 'WebP'
   }
 )
 
@@ -79,5 +84,5 @@ foreach ($asset in $assets) {
   }
 }
 if ($failed -gt 0) { throw ('Section 4 source asset verification failed for ' + $failed + ' file(s).') }
-Write-Host 'Two identified Section 4 source assets are ready in assets/reference-dev (gitignored).' -ForegroundColor Green
+Write-Host 'Three identified Section 4 source assets are ready in assets/reference-dev (gitignored).' -ForegroundColor Green
 Write-Host 'This confirms file formats, not 1:1 visual parity or commercial usage rights.'
