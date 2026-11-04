@@ -149,11 +149,14 @@ test('Section 10 contact pills and footer follow the measured source geometry',a
   await expect(closing).toHaveAttribute('data-revealed','true');
   await page.waitForTimeout(1300);
   const m=await closing.evaluate(el=>{
-    const box=(n)=>{const r=n.getBoundingClientRect();return {
-      x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom,
-      radius:getComputedStyle(n).borderTopLeftRadius,
-      transform:getComputedStyle(n).textTransform,
-      opacity:getComputedStyle(n).opacity};
+    // Layout measurements must ignore reveal transforms: an out-of-view
+    // block is intentionally translated +52px and scaled to 95.5%.
+    const box=n=>{
+      const x=n.offsetLeft,y=n.offsetTop,width=n.offsetWidth,height=n.offsetHeight;
+      return {x,y,width,height,bottom:y+height,
+        radius:getComputedStyle(n).borderTopLeftRadius,
+        transform:getComputedStyle(n).textTransform,
+        opacity:getComputedStyle(n).opacity};
     };
     const contact=el.querySelector('.closing10-contacts');
     const label=el.querySelector('.closing10-contacts-title');
@@ -217,7 +220,7 @@ test('Section 10 reveals and hides individual blocks on forward and reverse scro
   const headlineExposedAtBottom=await heading.evaluate(el=>{
     const base=el.closest('.closing10-inner').getBoundingClientRect().top;
     const top=base+el.offsetTop;
-    return top+el.offsetHeight>0&&top<innerHeight-64;
+    return top+el.offsetHeight>0&&top<innerHeight*0.85;
   });
   await expect(heading).toHaveAttribute('data-in-view',String(headlineExposedAtBottom));
   await page.waitForTimeout(1450);
