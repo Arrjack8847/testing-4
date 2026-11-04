@@ -183,3 +183,46 @@ test('Section 10 contact pills and footer follow the measured source geometry',a
     expect(Math.abs(m.rule.width-80)).toBeLessThan(1);
   }
 });
+
+
+test('Section 10 reveals and hides individual blocks on forward and reverse scrolling',async({page})=>{
+  await openInvitation(page);
+  const closing=page.locator('#closingMessage');
+  const heading=closing.locator('#closingHeading');
+  const footer=closing.locator('.closing10-credit');
+  const go=async(delta)=>{
+    await page.evaluate(delta=>{
+      const e=document.querySelector('#closingMessage');
+      const top=e.getBoundingClientRect().top+window.scrollY;
+      window.scrollTo({top:top+delta,behavior:'instant'});
+    },delta);
+  };
+  const opacity=async(node)=>Number(await node.evaluate(e=>getComputedStyle(e).opacity));
+
+  // Near the top of the closing section the heading is exposed but footer is
+  // still below the viewport. This is the source's staggered reveal behavior.
+  await go(-200);
+  await expect(heading).toHaveAttribute('data-in-view','true');
+  await expect(footer).toHaveAttribute('data-in-view','false');
+  await page.waitForTimeout(1350);
+  expect(await opacity(heading)).toBeGreaterThan(0.98);
+  expect(await opacity(footer)).toBeLessThan(0.03);
+
+  // At the final scroll stop the heading has left above the viewport, while
+  // the contact/footer region has entered. The headline must animate OUT.
+  await go(265);
+  await expect(heading).toHaveAttribute('data-in-view','false');
+  await expect(footer).toHaveAttribute('data-in-view','true');
+  await page.waitForTimeout(1450);
+  expect(await opacity(heading)).toBeLessThan(0.03);
+  expect(await opacity(footer)).toBeGreaterThan(0.98);
+
+  // Reversing must re-expose the heading, and hide the footer again.
+  await go(-200);
+  await expect(heading).toHaveAttribute('data-in-view','true');
+  await expect(footer).toHaveAttribute('data-in-view','false');
+  await page.waitForTimeout(1350);
+  expect(await opacity(heading)).toBeGreaterThan(0.98);
+  expect(await opacity(footer)).toBeLessThan(0.03);
+  await expect(closing).toHaveAttribute('data-revealed','true');
+});
