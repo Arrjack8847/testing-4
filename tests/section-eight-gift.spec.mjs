@@ -56,10 +56,19 @@ test('Section 8 uses the actual source content order without unsafe fake transac
   await expect(trigger).toBeVisible();
   await expect(trigger).toHaveAttribute('aria-expanded','false');
   await expect(gift.locator('#giftEightBanks')).toBeHidden();
+  await expect(gift.locator('#giftEightWishlist')).toBeHidden();
   await trigger.click();
   await expect(trigger).toHaveAttribute('aria-expanded','true');
   await expect(gift.locator('#giftEightBanks')).toBeVisible();
+  await expect(gift.locator('#giftEightWishlist')).toBeVisible();
   await expect(gift.getByRole('heading',{name:'Gift Wishlist'})).toBeVisible();
+  const carousel=await gift.locator('#giftEightBanks').evaluate(el=>({
+    width:el.getBoundingClientRect().width,
+    scrollWidth:el.scrollWidth,
+    cards:[...el.querySelectorAll('.gift-eight-bank')].map(x=>x.getBoundingClientRect().width)
+  }));
+  expect(carousel.scrollWidth).toBeGreaterThan(carousel.width);
+  expect(carousel.cards).toEqual([278,278]);
   await expect(gift.locator('.gift-eight-bank')).toHaveCount(2);
   await expect(gift.locator('.gift-eight-bank-name')).toHaveText(['Maybank','CIMB']);
   await expect(gift.locator('.gift-eight-item')).toHaveCount(3);
@@ -74,6 +83,7 @@ test('Section 8 uses the actual source content order without unsafe fake transac
   await trigger.click();
   await expect(trigger).toHaveAttribute('aria-expanded','false');
   await expect(gift.locator('#giftEightBanks')).toBeHidden();
+  await expect(gift.locator('#giftEightWishlist')).toBeHidden();
   await expect(gift.locator('.gift-eight-disclaimer')).toContainText('not enabled');
   expect(faults).toEqual([]);
 });
@@ -92,7 +102,8 @@ test('Artwork is local-only and does not expose unauthorized vendor URLs',async(
   if(values.art==='reference-local'){
     expect(values.backdrop).toContain('assets/reference-dev/band_plum.webp');
   }else{
-    expect(values.backdrop).not.toContain('http');
+    expect(values.backdrop).toContain('section8-plum-botanical-original.svg');
+    expect(values.backdrop).not.toContain('undangankahwin.com');
   }
 });
 
@@ -229,4 +240,39 @@ test('Reduced Motion keeps a downloaded blush butterfly still',async({page})=>{
   }));
   expect(timing.butterfly).toBe('none');
   expect(timing.wings).toEqual(['none','none']);
+});
+
+
+test('Default source-style Gift panel stays collapsed until requested',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift,faults}=await openGift(page);
+  await expect(gift.locator('#giftEightBanks')).toBeHidden();
+  await expect(gift.locator('#giftEightWishlist')).toBeHidden();
+  await expect(gift.getByRole('button',{name:/Send Gift/i})).toHaveAttribute('aria-expanded','false');
+  const measurements=await gift.evaluate(el=>({
+    section:el.getBoundingClientRect().height,
+    bg:getComputedStyle(el).backgroundColor,
+    frameTop:getComputedStyle(el,'::before').top,
+    horizontalOverflow:document.documentElement.scrollWidth-innerWidth
+  }));
+  expect(measurements.horizontalOverflow).toBeLessThanOrEqual(1);
+  expect(measurements.bg).toBe('rgb(92, 38, 79)');
+  expect(measurements.frameTop).toBe('70px');
+  expect(measurements.section).toBeGreaterThan(900);
+  expect(faults).toEqual([]);
+});
+
+test('Section 8 petals and blush wing motions respect Reduce Motion',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const {gift}=await openGift(page);
+  const result=await gift.evaluate(el=>({
+    petals:[...el.querySelectorAll('.gift-eight-petals i')]
+      .map(node=>getComputedStyle(node).animationName),
+    hiddenWishlist:el.querySelector('#giftEightWishlist').hidden,
+    hiddenBanks:el.querySelector('#giftEightBanks').hidden
+  }));
+  expect(result.petals).toHaveLength(8);
+  expect(result.petals.every(x=>x==='none')).toBe(true);
+  expect(result.hiddenWishlist).toBe(true);
+  expect(result.hiddenBanks).toBe(true);
 });
