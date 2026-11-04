@@ -242,6 +242,20 @@
   background-repeat:repeat,repeat;
 }
 .order-section[data-art="reference"][data-band-status="loaded"]::before{display:none}
+
+/* Independently illustrated, repository-owned botanical relief when the
+   vendor artwork is unavailable. It is intentionally NOT the reference WebP.
+   The source WebP takes precedence whenever an authorized local copy decodes. */
+.order-section[data-art="reference"][data-band-status="failed"]{
+  background-image:
+    linear-gradient(rgba(20,8,18,.14),rgba(20,8,18,.14)),
+    url("./assets/order-plum-emboss-original.svg");
+  background-size:auto,cover;
+  background-position:0 0,50% 50%;
+  background-repeat:no-repeat,no-repeat;
+}
+.order-section[data-art="reference"][data-band-status="failed"]::before{display:none}
+
 .order-section[data-art="reference"][data-band-status="loaded"] .order-art-image{display:none}
 
 

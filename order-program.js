@@ -40,12 +40,15 @@
       const loading=states.includes('loading');
       const loaded=states.filter(s=>s==='loaded').length;
       section.dataset.artworkStatus=loading?'loading':loaded===images.length?'ready':loaded===0?'missing':'partial';
+      section.dataset.backgroundRenderer=section.dataset.bandStatus==='loaded'?'reference-webp':
+        section.dataset.bandStatus==='failed'?'original-svg':'neutral-loading';
       if (notice) {
         notice.hidden=loading||loaded===images.length;
         if(!notice.hidden) {
           const missing=images.filter(([img,key])=>!img||section.dataset[key]!=='loaded').map(item=>item[3]);
           notice.textContent='Exact reference artwork unavailable: '+missing.join(', ')+
-            '. Provide permission-cleared WebP files in assets/reference-dev/. No substitute artwork is being shown.';
+            '. The background uses original illustrated botanical relief when the reference band is absent. '+
+            'Provide permission-cleared WebP files in assets/reference-dev/ for reference comparison.';
         }
       }
     };

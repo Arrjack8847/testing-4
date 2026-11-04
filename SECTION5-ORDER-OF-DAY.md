@@ -23,10 +23,12 @@ repository**. Only a rights-confirming local PowerShell script may stage them.
 No vendor art is automatically fetched from third-party servers by the
 website.
 
-The unrelated `assets/order-plum-emboss-original.svg` is **not referenced by
-the active Section 5 CSS** anymore. A solid neutral plum canvas appears if the
-background WebP cannot load; an explicit status message identifies missing
-WebPs. It does not silently imitate the reference illustration.
+The independently illustrated `assets/order-plum-emboss-original.svg` is the
+**clearly labeled original fallback** whenever the exact reference band is
+missing or fails to decode. It preserves the plum botanical atmosphere without
+redistributing vendor art. The original relief is not pixel-identical to the
+source's `band_plum.webp`; an explicit status message identifies missing WebPs.
+The live reference WebP takes precedence automatically once present locally.
 
 The root URL requests both local WebPs automatically, with no
 `?orderReference=1`. `#runningOrder[data-artwork-status]` reports

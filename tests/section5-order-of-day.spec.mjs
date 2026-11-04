@@ -101,7 +101,7 @@ test('reduced-motion preserves legible timeline without animation or camera move
   expect(Math.abs(Number(cam))).toBeLessThan(.01);
 });
 
-test('root URL shows a clear warning when reference WebPs are missing (never substitute SVG)',async({page})=>{
+test('root URL shows independently drawn plum relief when reference WebPs are unavailable',async({page})=>{
   await page.route('**/assets/reference-dev/*.webp',route=>
     route.fulfill({status:404,body:'Permission-cleared file not installed'}));
   const {section}=await toOrder(page);
@@ -111,6 +111,8 @@ test('root URL shows a clear warning when reference WebPs are missing (never sub
   await expect(section).toHaveAttribute('data-band-status','failed');
   await expect(section).toHaveAttribute('data-butterfly-status','failed');
   await expect(section).toHaveAttribute('data-artwork-status','missing');
+  await expect(section).toHaveAttribute('data-background-renderer','original-svg');
+  await expect(section.locator('#orderArtworkNotice')).toContainText('original illustrated botanical relief');
   await expect(section.locator('#orderArtworkNotice')).toBeVisible();
   await expect(section.locator('#orderArtworkNotice')).toContainText('band_plum.webp, bfly_blush.webp');
   const state=await section.evaluate(el=>({
@@ -118,7 +120,7 @@ test('root URL shows a clear warning when reference WebPs are missing (never sub
     notice:getComputedStyle(el.querySelector('#orderArtworkNotice')).display,
     sourceUrl:el.querySelector('#orderSourceBand').src
   }));
-  expect(state.background).not.toContain('order-plum-emboss-original.svg');
+  expect(state.background).toContain('order-plum-emboss-original.svg');
   expect(state.background).not.toContain('undangankahwin.com');
   expect(state.notice).not.toBe('none');
   expect(state.sourceUrl).toContain('/assets/reference-dev/band_plum.webp');
@@ -134,6 +136,7 @@ test('plain root uses exact local WebPs with cover geometry and no vendor hotlin
   await expect(section).toHaveAttribute('data-band-status','loaded');
   await expect(section).toHaveAttribute('data-butterfly-status','loaded');
   await expect(section).toHaveAttribute('data-artwork-status','ready');
+  await expect(section).toHaveAttribute('data-background-renderer','reference-webp');
   await expect(section.locator('#orderArtworkNotice')).toBeHidden();
   const result=await section.evaluate(el=>{
     const style=getComputedStyle(el);
@@ -158,6 +161,7 @@ test('missing butterfly is reported while a valid local background remains activ
   await expect(section).toHaveAttribute('data-band-status','loaded');
   await expect(section).toHaveAttribute('data-butterfly-status','failed');
   await expect(section).toHaveAttribute('data-artwork-status','partial');
+  await expect(section).toHaveAttribute('data-background-renderer','reference-webp');
   const msg=section.locator('#orderArtworkNotice');
   await expect(msg).toBeVisible();
   await expect(msg).toContainText('bfly_blush.webp');
