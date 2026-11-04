@@ -223,6 +223,7 @@
   .order-section .order-entry::before{left:86px;}
   .order-section .order-time{padding-left:0;font-size:12px;}
   .order-section .order-event-text strong{font-size:17px;}
+  .order-section .order-event-text{padding-bottom:22px;}
   .order-section h2.order-heading{font-size:46px;white-space:normal;}
 }
 
