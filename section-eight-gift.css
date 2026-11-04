@@ -271,8 +271,8 @@
 }
 .gift-eight-wishlist:not([hidden]){
   display:block;
-  margin:34px 6px 0;
-  padding:23px 13px 29px;
+  margin:34px 0 0;
+  padding:23px 18px 29px;
   border-radius:18px 18px 10px 10px;
   background:rgba(255,252,253,.98);
   box-shadow:0 7px 28px #250e1d28;
