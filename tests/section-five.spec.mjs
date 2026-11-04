@@ -356,10 +356,9 @@ test('Normal localhost Gallery falls back to customer WebPs when reference files
 test('Gallery QA mode loads only five downloaded local WebPs and displays captions',async({page})=>{
   const filenames=['moody.webp','moody-bride.webp','moody-groom.webp','moody-garden.webp','moody-lake.webp'];
   const requested=[];
-  const externalRequests=[];
-  page.on('request',req=>{
-    if (/undangankahwin\.com\/images\/concierge\/couples\//.test(req.url())) externalRequests.push(req.url());
-  });
+  // Scope this test to #gallery. The Section 3 reference preview may
+  // independently request a remote groom portrait elsewhere on the page.
+  // Such requests must not be mistaken for Gallery hotlinks.
   await page.route('**/assets/gallery/reference/*.webp', route => {
     const uri=new URL(route.request().url());
     requested.push(uri.pathname.split('/').at(-1));
@@ -371,7 +370,13 @@ test('Gallery QA mode loads only five downloaded local WebPs and displays captio
   await expect(gallery.locator('.gallery-reference-note')).toContainText('Local comparison');
   await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
   expect(requested.sort()).toEqual([...filenames].sort());
-  expect(externalRequests).toEqual([]);
+  // All photos and the decorative sticky background inside Section 7
+  // must use same-origin files. No unrelated Section 3 requests are counted.
+  const externalGalleryImages=await gallery.locator('img').evaluateAll(nodes=>
+    nodes.map(image=>image.currentSrc||image.src)
+      .filter(Boolean)
+      .filter(src=>new URL(src,location.href).origin!==location.origin));
+  expect(externalGalleryImages).toEqual([]);
   const urls = await gallery.locator('.gallery-image').evaluateAll(nodes=>nodes.map(el=>el.getAttribute('src')));
   expect(urls).toEqual(filenames.map(name=>'./assets/gallery/reference/'+name));
   await gallery.locator('[data-gallery-slot="4"]').click();
