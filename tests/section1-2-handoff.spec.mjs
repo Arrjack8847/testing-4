@@ -186,3 +186,60 @@ test('Section 1 synthetic address bar resize does not reset an unchanged petal c
   expect(result.writes).toEqual({width:0,height:0});
   expect(result.afterHeight).toBe(result.sceneHeight);
 });
+
+
+test('Section 1 never re-enables long camera transitions during a reverse finger swipe',async({page},testInfo)=>{
+  const errors=await ready(page);
+  const invite=page.locator('#invitation');
+  await expect(invite).toHaveAttribute('data-scroll-active','no');
+  const initial=await page.evaluate(()=>{
+    const art=document.getElementById('stage').getBoundingClientRect();
+    return {x:art.x,y:art.y,width:art.width,height:art.height,
+      viewportHeight:document.getElementById('viewport').getBoundingClientRect().height};
+  });
+  // Gesture arrives before compositor scrolling or the first rAF. The long
+  // (1.35-1.7s) cinematic opening easing must immediately become scroll sync.
+  await page.evaluate(()=>window.dispatchEvent(new Event('touchstart')));
+  await expect(invite).toHaveAttribute('data-scroll-active','yes');
+  for(const fraction of [.01,.2,.65,1.5,.65,.03,0,.4,0]){
+    await page.evaluate(async y=>{
+      window.scrollTo({top:Math.round(y),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },initial.viewportHeight*fraction);
+    const state=await page.evaluate(()=>{
+      const stage=document.getElementById('stage');
+      const box=stage.getBoundingClientRect();
+      const lake=document.getElementById('viewport').getBoundingClientRect();
+      const first=document.querySelector('.sky-layer');
+      const tree=document.querySelector('.depth.tree');
+      const arch=document.querySelector('.depth.arch');
+      const t=(e)=>getComputedStyle(e).transitionDuration;
+      const matrix=new DOMMatrix(getComputedStyle(stage).transform);
+      return {
+        x:box.x,y:box.y,width:box.width,height:box.height,
+        stickyTop:lake.top,
+        stageZ:matrix.m43,stageY:matrix.m42,
+        skyTransition:t(first),treeTransition:t(tree),archTransition:t(arch),
+        scrollActive:document.getElementById('invitation').dataset.scrollActive,
+        parallax:document.documentElement.style.getPropertyValue('--stage-parallax'),
+        overflow:document.documentElement.scrollWidth-innerWidth
+      };
+    });
+    expect(state.scrollActive).toBe('yes');
+    expect(state.skyTransition).toBe('0s');
+    expect(state.treeTransition).toBe('0s');
+    expect(state.archTransition).toBe('0s');
+    expect(Math.abs(state.x-initial.x)).toBeLessThanOrEqual(.75);
+    expect(Math.abs(state.y-initial.y)).toBeLessThanOrEqual(.75);
+    expect(Math.abs(state.width-initial.width)).toBeLessThanOrEqual(.75);
+    expect(Math.abs(state.height-initial.height)).toBeLessThanOrEqual(.75);
+    expect(Math.abs(state.stickyTop)).toBeLessThanOrEqual(.75);
+    expect(Math.abs(state.stageZ)).toBeLessThanOrEqual(.01);
+    expect(Math.abs(state.stageY)).toBeLessThanOrEqual(.75);
+    expect(state.parallax.trim()).toBe('0px');
+    expect(state.overflow).toBeLessThanOrEqual(1);
+    if(fraction===.65)await page.screenshot({path:testInfo.outputPath('section1-no-shake-'+testInfo.project.name+'.png'),animations:'disabled'});
+  }
+  expect(errors).toEqual([]);
+});

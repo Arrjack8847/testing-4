@@ -326,6 +326,17 @@ const artworkReady = Promise.all(allNames.map(async name => {
 
 // Cover is a focusable action, not a scroll-triggered trap.
 let openedOnce = false;
+let scrollGestureStarted = false;
+// Once scrolling begins, never re-enable the 1.3–1.7s *opening*
+// transitions at the first few scroll pixels. Their re-entry used to
+// make the moving garden lag or "shake" on tiny reverse finger motions.
+// The initial cover-to-valley entrance remains animated until a gesture.
+function engageScrollMode() {
+  if (!openedOnce || scrollGestureStarted) return;
+  if (window.scrollY > heroHeight() * 3.1) return;
+  scrollGestureStarted = true;
+  invite.dataset.scrollActive = 'yes';
+}
 function openInvitation(event) {
   // When activated from a keyboard, the button becomes inert. Move focus to
   // the new invitation action so screen-reader and keyboard users are not
@@ -341,6 +352,8 @@ function openInvitation(event) {
   opened.inert = false;
   opened.setAttribute('aria-hidden','false');
   openedOnce = true;
+  scrollGestureStarted = false;
+  invite.dataset.scrollActive = 'no';
   document.documentElement.style.overflowY = 'auto';
   if (keyboardActivation) {
     document.querySelector('.swipe-cue')?.focus({preventScroll:true});
@@ -356,6 +369,8 @@ function resetInvitation() {
   opened.inert = true;
   opened.setAttribute('aria-hidden','true');
   openedOnce = false;
+  scrollGestureStarted = false;
+  invite.dataset.scrollActive = 'no';
   document.documentElement.style.overflowY = 'hidden';
   // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
   document.documentElement.style.setProperty('--stage-parallax', '0px');
@@ -439,7 +454,10 @@ function applyScrollScene(fraction) {
   set('--stage-parallax','0px');
   invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
   invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
-  invite.dataset.scrollActive = fraction > .025 ? 'yes' : 'no';
+  // The old threshold re-enabled CSS transitions at the top on each
+  // reverse swipe, introducing delayed camera motion. Stay in scroll mode
+  // for the rest of the opening until reset, even at scroll position zero.
+  if (fraction > .025) engageScrollMode();
   // The original invitation starts a one-time handwritten-name animation
   // when the returning garden reaches its title. Continue writing even if
   // the user stops swiping or reverses slightly. Reset starts a fresh take.
@@ -454,12 +472,19 @@ function synchronizeReading() {
   syncAmbient(); // The overlay can hide a still-sticky scene before IO detects exit.
 }
 function requestReadingSync() {
-  if (!openedOnce || scrollTick) return;
+  if (!openedOnce) return;
+  if (window.scrollY > 1) engageScrollMode();
+  if (scrollTick) return;
   scrollTick = true;
   requestAnimationFrame(synchronizeReading);
 }
 window.addEventListener('scroll', requestReadingSync, {passive:true});
 window.addEventListener('resize', requestReadingSync, {passive:true});
+// On real touch scrolling the compositor can start moving before the
+// following scroll event/rAF. Arm the no-transition mode on touchstart
+// (also for wheel devices) so artwork tracks the very first frame.
+window.addEventListener('touchstart', engageScrollMode, {passive:true});
+window.addEventListener('wheel', engageScrollMode, {passive:true});
 
 // The cue moves into the INTRO on the same sticky lake, never straight
 // past the user to a different section. Smooth native scrolling drives all
