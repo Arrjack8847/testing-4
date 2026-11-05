@@ -110,3 +110,79 @@ test('Section 2→3 flow has no geometry gap or overlapping horizontal edges',as
   // The scene immediately after this seam is the original Couple portrait scene.
   expect(errors).toEqual([]);
 });
+
+
+test('Section 1 native sticky artwork uses a stable mobile viewport on four phones',async({page},testInfo)=>{
+  const errors=await ready(page);
+  const geom=await page.evaluate(()=>{
+    const lake=document.getElementById('viewport');
+    const track=document.getElementById('sceneTrack');
+    const probe=document.createElement('div');
+    probe.style.cssText='position:absolute;visibility:hidden;height:100lvh;width:0';
+    document.body.appendChild(probe);
+    const largeHeight=probe.getBoundingClientRect().height;
+    probe.remove();
+    return {
+      supported:CSS.supports('height','100lvh'),
+      viewportHeight:lake.getBoundingClientRect().height,
+      largeHeight,trackHeight:track.getBoundingClientRect().height,
+      trackMargin:parseFloat(getComputedStyle(track).marginBottom),
+      position:getComputedStyle(lake).position
+    };
+  });
+  expect(geom.supported).toBe(true);
+  expect(geom.position).toBe('sticky');
+  expect(Math.abs(geom.viewportHeight-geom.largeHeight)).toBeLessThanOrEqual(1);
+  expect(geom.trackHeight/geom.viewportHeight).toBeCloseTo(4,2);
+  expect(geom.trackMargin/geom.viewportHeight).toBeCloseTo(-1,2);
+  for(const fraction of [.15,.75,1.5,2.3,2.9,2.3,.75]){
+    await page.evaluate(async ({y})=>{
+      window.scrollTo({top:Math.round(y),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },{y:geom.viewportHeight*fraction});
+    const reading=await page.evaluate(()=>{
+      const hero=document.getElementById('viewport');
+      const root=document.documentElement;
+      return {
+        top:hero.getBoundingClientRect().top,
+        height:hero.getBoundingClientRect().height,
+        y:scrollY,
+        textShift:parseFloat(root.style.getPropertyValue('--text-scroll-shift')),
+        units:['--hanging-scroll-shift','--front-scroll-shift','--reed-scroll-shift']
+          .map(key=>root.style.getPropertyValue(key)),
+        overflow:root.scrollWidth-innerWidth
+      };
+    });
+    expect(Math.abs(reading.top)).toBeLessThanOrEqual(1);
+    expect(Math.abs(reading.height-geom.viewportHeight)).toBeLessThanOrEqual(1);
+    expect(Math.abs(reading.textShift+Math.max(0,reading.y-geom.viewportHeight*2))).toBeLessThanOrEqual(1);
+    expect(reading.units.every(value=>value.endsWith('lvh'))).toBe(true);
+    expect(reading.overflow).toBeLessThanOrEqual(1);
+    if(fraction===2.9)await page.screenshot({path:testInfo.outputPath('section1-stable-viewport-'+testInfo.project.name+'.png'),animations:'disabled'});
+  }
+  expect(errors).toEqual([]);
+});
+
+test('Section 1 synthetic address bar resize does not reset an unchanged petal canvas',async({page})=>{
+  await ready(page);
+  const result=await page.evaluate(async()=>{
+    const canvas=document.getElementById('petalCanvas');
+    const width=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,'width');
+    const height=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,'height');
+    const writes={width:0,height:0};
+    Object.defineProperty(canvas,'width',{configurable:true,
+      get(){return width.get.call(this);},
+      set(value){writes.width++;width.set.call(this,value);}});
+    Object.defineProperty(canvas,'height',{configurable:true,
+      get(){return height.get.call(this);},
+      set(value){writes.height++;height.set.call(this,value);}});
+    const sceneHeight=document.getElementById('viewport').clientHeight;
+    window.dispatchEvent(new Event('resize'));
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+    return {writes,sceneHeight,afterHeight:document.getElementById('viewport').clientHeight};
+  });
+  expect(result.writes).toEqual({width:0,height:0});
+  expect(result.afterHeight).toBe(result.sceneHeight);
+});
