@@ -170,14 +170,24 @@ function ambientAllowed() {
     !pageSuspended && !document.hidden && !reduceMotion.matches &&
     !document.documentElement.classList.contains('debug-freeze');
 }
+// The global 26-petal field completely covers the Section 1 canvas while
+// active. Keep the hero's ambient state running (CSS birds/butterflies depend
+// on it), but avoid rasterizing petals into an invisible duplicate canvas.
+// Debug/phone QA intentionally retain the local renderer for measurements.
+function localPetalsAllowed() {
+  return ambientAllowed() &&
+    (debug || query.has('phoneqa') ||
+     !document.documentElement.classList.contains('global-petals-active'));
+}
 function syncAmbient() {
   const running=ambientAllowed();
+  const paintLocalPetals=localPetalsAllowed();
   invite.dataset.ambient=running ? 'running' : 'paused';
-  if (running && !petalFrame) {
+  if (paintLocalPetals && !petalFrame) {
     lastDraw=0;
     prevFrame=0;
     petalFrame=requestAnimationFrame(renderPetals);
-  } else if (!running) {
+  } else if (!paintLocalPetals) {
     if (petalFrame) cancelAnimationFrame(petalFrame);
     petalFrame=0;
     lastDraw=0;
@@ -203,7 +213,7 @@ function renderPetals(now) {
   // Mark consumed before scheduling the next frame. A visibility/observer
   // callback can always cancel the outstanding frame by its ID.
   petalFrame=0;
-  if (!ambientAllowed()) {
+  if (!localPetalsAllowed()) {
     syncAmbient();
     return;
   }
