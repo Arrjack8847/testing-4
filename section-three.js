@@ -58,64 +58,88 @@
     attributes: true, attributeFilter: ['data-state']
   });
 
-  // The sole reference-asset switch is explicit and independently scoped.
-  // The research reference is now the default at / (legacy query still works).
+  // Reference art is identical to the source, but on mobile it is only
+  // requested within the approach band of Section 4. Offscreen images
+  // and CSS WebP sources are detached for WebKit memory recovery.
   section.dataset.art = 'reference';
   const paper = document.getElementById('eventSourcePaper');
   const butterfly = document.getElementById('eventSourceButterfly');
   const artRoot = 'https://undangankahwin.com/images/concierge/';
-  if (paper) {
-    section.dataset.referencePaper = 'loading';
-    paper.addEventListener('load', () => {
-      section.dataset.referencePaper = paper.naturalWidth > 0 ? 'loaded' : 'failed';
-    }, {once:true});
-    paper.addEventListener('error', () => { section.dataset.referencePaper = 'failed'; }, {once:true});
-    // Only use a locally staged original when it is really present.
-    // Keep the existing remote comparison URL as a fallback.
-    const localPaper = './assets/reference-dev/paper.webp';
-    const paperProbe = new Image();
-    paperProbe.onload = () => {
-      section.dataset.referencePaperSource = 'local';
-      paper.src = localPaper;
+  const localPaper = './assets/reference-dev/paper.webp';
+  let artworkEpoch=0;
+  let probes=[];
+  const trackProbe=img=>{probes.push(img);return img;};
+  const current=epoch=>epoch===artworkEpoch;
+  function activateReferenceArt(){
+    const epoch=++artworkEpoch;
+    // Restore the original CSS defaults while local reference probes resolve.
+    section.style.removeProperty('--event-arch-source');
+    section.style.removeProperty('--event-bfly-source');
+    if(paper){
+      section.dataset.referencePaper='loading';
+      paper.onload=()=>{
+        if(current(epoch)) section.dataset.referencePaper=paper.naturalWidth>0?'loaded':'failed';
+      };
+      paper.onerror=()=>{if(current(epoch)) section.dataset.referencePaper='failed';};
+      const probe=trackProbe(new Image());
+      probe.onload=()=>{
+        if(!current(epoch))return;
+        section.dataset.referencePaperSource='local';
+        paper.src=localPaper;
+      };
+      probe.onerror=()=>{
+        if(!current(epoch))return;
+        section.dataset.referencePaperSource='remote';
+        paper.src=artRoot+'packs/tasik-kayangan/paper.webp';
+      };
+      probe.src=localPaper;
+    }
+    if(butterfly){
+      section.dataset.referenceButterfly='loading';
+      butterfly.onload=()=>{
+        if(current(epoch))section.dataset.referenceButterfly=butterfly.naturalWidth>0?'loaded':'failed';
+      };
+      butterfly.onerror=()=>{if(current(epoch))section.dataset.referenceButterfly='failed';};
+      butterfly.src=artRoot+'packs/anggerik-nirmala/bfly_white.webp';
+    }
+    const frameProbe=trackProbe(new Image());
+    frameProbe.onload=()=>{
+      if(!current(epoch))return;
+      section.style.setProperty('--event-arch-source','url("./assets/reference-dev/arch_event.svg")');
+      section.dataset.referenceFrameSource='local';
     };
-    paperProbe.onerror = () => {
-      section.dataset.referencePaperSource = 'remote';
-      paper.src = artRoot + 'packs/tasik-kayangan/paper.webp';
+    frameProbe.onerror=()=>{if(current(epoch))section.dataset.referenceFrameSource='remote';};
+    frameProbe.src='./assets/reference-dev/arch_event.svg';
+    const wingProbe=trackProbe(new Image());
+    wingProbe.onload=()=>{
+      if(!current(epoch))return;
+      section.style.setProperty('--event-bfly-source','url("./assets/reference-dev/bfly_white.webp")');
+      section.dataset.referenceWingSource='local';
     };
-    paperProbe.src = localPaper;
+    wingProbe.onerror=()=>{if(current(epoch))section.dataset.referenceWingSource='remote';};
+    wingProbe.src='./assets/reference-dev/bfly_white.webp';
   }
-  if (butterfly) {
-    section.dataset.referenceButterfly = 'loading';
-    butterfly.addEventListener('load', () => {
-      section.dataset.referenceButterfly = butterfly.naturalWidth > 0 ? 'loaded' : 'failed';
-    }, {once:true});
-    butterfly.addEventListener('error', () => {
-      section.dataset.referenceButterfly = 'failed';
-    }, {once:true});
-    butterfly.src = artRoot + 'packs/anggerik-nirmala/bfly_white.webp';
+  function releaseReferenceArt(){
+    ++artworkEpoch;
+    for(const probe of probes){
+      probe.onload=null;
+      probe.onerror=null;
+      probe.removeAttribute('src');
+    }
+    probes=[];
+    paper?.removeAttribute('src');
+    butterfly?.removeAttribute('src');
+    // These custom properties override CSS defaults ONLY when far away.
+    section.style.setProperty('--event-arch-source','none');
+    section.style.setProperty('--event-bfly-source','none');
+    section.dataset.referencePaper='deferred';
+    section.dataset.referenceButterfly='deferred';
   }
-
-  // arch_event.svg is the measured Events frame art (not arch_panel.svg).
-  // Prefer the same source SVG staged locally; the CSS retains the remote URL
-  // unless a real local SVG successfully loads.
-  const frameProbe = new Image();
-  frameProbe.onload = () => {
-    section.style.setProperty('--event-arch-source', 'url("./assets/reference-dev/arch_event.svg")');
-    section.dataset.referenceFrameSource = 'local';
-  };
-  frameProbe.onerror = () => { section.dataset.referenceFrameSource = 'remote'; };
-  frameProbe.src = './assets/reference-dev/arch_event.svg';
-
-  // Reuse the original white butterfly sprite for both 22px wing halves.
-  // Its animation is deliberately not guessed: the saved source capture
-  // confirms a transparent resting state but not the complete flight path.
-  const wingProbe = new Image();
-  wingProbe.onload = () => {
-    section.style.setProperty('--event-bfly-source', 'url("./assets/reference-dev/bfly_white.webp")');
-    section.dataset.referenceWingSource = 'local';
-  };
-  wingProbe.onerror = () => { section.dataset.referenceWingSource = 'remote'; };
-  wingProbe.src = './assets/reference-dev/bfly_white.webp';
+  if(window.MobileArtworkLifecycle)
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activateReferenceArt,release:releaseReferenceArt
+    });
+  else activateReferenceArt();
 
   // Four-phone comparison mode: pin the illustrated plane within Events
   // while letting HTML cards, buttons and countdown scroll normally.
