@@ -153,7 +153,13 @@ html.debug-freeze .scene-stage { --stage-parallax:0px; }
 :root { --ink:#5c264f; --gold:#5c264f; --unit:min(1lvh,2.164vw); --open-time:900ms; }
 body { font-family:'EB Garamond', Georgia,serif; }
 /* The reference's 9:16 art frame is bottom-aligned, NOT vertically centered. */
-.scene-stage { top:auto;bottom:0;width:max(100%,56.25lvh);transform:translate(-50%,var(--stage-parallax)); }
+/* Render the whole pinned 9:16 artwork in one stable composited stage.
+   The scene itself never counter-scrolls; only its child layers follow the
+   original reference curves. This has the same x/y geometry as translate(). */
+.scene-stage { top:auto;bottom:0;width:max(100%,56.25lvh);
+  transform:translate3d(-50%,var(--stage-parallax),0);
+  backface-visibility:hidden;
+}
 /* The cover is animated even BEFORE the guest opens it. */
 .invitation[data-layers="ready"] .master-art {opacity:0;}
 .invitation[data-layers="ready"] .animated-scene {opacity:1;}
@@ -547,6 +553,9 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
   opacity:var(--peacock-scroll-opacity,0);
   transform:translateY(var(--front-scroll-shift,45lvh));
 }
+/* The scroll-active state now latches from the first touch/wheel until
+   reset, including a reversal to 0px. Never let the long opening easing
+   resume mid-gesture or smear the artwork behind the user's finger. */
 .invitation[data-state="opened"][data-scroll-active="yes"] :is(
   .sky-layer,.depth.palace img,.depth.palace .waterfalls,
   .depth.arch,.depth.tree,.depth.canopy,.sprite.front,.sprite.hanging
