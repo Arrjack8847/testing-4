@@ -529,3 +529,145 @@ test('reference preview entrance matches measured 52px lift and Reduced Motion r
   const camera=await section.evaluate(el=>parseFloat(el.dataset.referenceCameraOffset));
   expect(camera).toBe(0);
 });
+
+
+test('Section 3 camera is pinned and edge-covered through rapid forward/reverse scrolls on four phones',async({page},testInfo)=>{
+  const {section,errors}=await openCouple(page);
+  const measurements=await section.evaluate(el=>({
+    start:el.getBoundingClientRect().top+scrollY,
+    length:el.offsetHeight,
+    view:innerHeight
+  }));
+  const {start,length,view}=measurements;
+  const travel=Math.max(0,length-view);
+  const targets=[
+    start-view*.55,start+travel*.03,start+travel*.40,
+    start+travel*.91,start+travel*.13,start+travel*.75,
+    start+travel*.45,start+travel*.45,start+travel,
+    start+length-view*.4,start+travel*.4
+  ];
+  let matchingPoint=null;
+  for(let i=0;i<targets.length;i++){
+    const reading=await page.evaluate(async y=>{
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:Math.round(y),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+      const el=document.getElementById('couple');
+      const box=el.getBoundingClientRect();
+      const scene=el.querySelector('.couple-reference-scene').getBoundingClientRect();
+      const camera=parseFloat(el.dataset.referenceCameraOffset);
+      const offset=parseFloat(el.style.getPropertyValue('--couple-reference-y'));
+      const viewport=innerHeight;
+      const scroll=scrollY;
+      const pinned=Math.max(0,Math.min(box.height-viewport,-box.top));
+      const anchor=box.top+scroll-.653*viewport;
+      const expectedCamera=Math.max(-44.8,Math.min(20,-44.8+(scroll-anchor)*.0427));
+      const paintTop=scene.top-64;
+      const paintBottom=scene.bottom+64;
+      const visibleTop=Math.max(0,box.top);
+      const visibleBottom=Math.min(viewport,box.bottom);
+      return {
+        camera,offset,expectedCamera,pinned,
+        sceneTop:scene.top,expectedTop:box.top+pinned+camera,
+        visibleTop,visibleBottom,paintTop,paintBottom,
+        prevGap:box.top-el.previousElementSibling.getBoundingClientRect().bottom,
+        nextGap:el.nextElementSibling.getBoundingClientRect().top-box.bottom,
+        overflow:document.documentElement.scrollWidth-innerWidth,
+        transition:getComputedStyle(el.querySelector('.couple-reference-scene')).transitionDuration
+      };
+    },targets[i]);
+    expect(Math.abs(reading.camera-reading.expectedCamera)).toBeLessThan(.12);
+    expect(Math.abs(reading.offset-(reading.pinned+reading.camera))).toBeLessThan(.15);
+    expect(Math.abs(reading.sceneTop-reading.expectedTop)).toBeLessThan(1.5);
+    if(reading.visibleBottom>reading.visibleTop){
+      expect(reading.paintTop).toBeLessThanOrEqual(reading.visibleTop+1);
+      expect(reading.paintBottom).toBeGreaterThanOrEqual(reading.visibleBottom-1);
+    }
+    expect(Math.abs(reading.prevGap)).toBeLessThanOrEqual(1);
+    expect(Math.abs(reading.nextGap)).toBeLessThanOrEqual(1);
+    expect(reading.overflow).toBeLessThanOrEqual(1);
+    expect(reading.transition).toBe('0s');
+    if(i===2)matchingPoint=reading.camera;
+    // Same camera location on the way back must not accumulate smoothing lag.
+    if(i===10)expect(Math.abs(reading.camera-matchingPoint)).toBeLessThan(.12);
+    if(i===3||i===6||i===9)
+      await page.screenshot({path:testInfo.outputPath('section3-sticky-'+testInfo.project.name+'-'+i+'.png'),animations:'disabled'});
+  }
+  // Coalesce several synchronous touch-like scroll updates into one frame.
+  const final=await page.evaluate(async coords=>{
+    for(const y of coords)scrollTo({top:Math.round(y),behavior:'instant'});
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+    const el=document.getElementById('couple'),box=el.getBoundingClientRect();
+    return {y:scrollY,camera:parseFloat(el.dataset.referenceCameraOffset),
+      displacement:parseFloat(el.style.getPropertyValue('--couple-reference-y')),
+      pinned:Math.max(0,Math.min(box.height-innerHeight,-box.top))};
+  },[start+travel*.9,start+travel*.2,start+travel*.7,start+travel*.4]);
+  expect(Math.abs(final.displacement-(final.pinned+final.camera))).toBeLessThan(.15);
+  expect(errors).toEqual([]);
+});
+
+test('Section 3 portraits hold 105% focus smoothly near both viewport thresholds',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const portrait=section.locator('.couple-profile--groom .couple-portrait');
+  await portrait.scrollIntoViewIfNeeded();
+  await expect(portrait).toHaveClass(/in-view/);
+  await expect.poll(()=>portrait.evaluate(el=>getComputedStyle(el).transform)).toBe('none');
+  const place=async fraction=>{
+    await page.evaluate(async ratio=>{
+      document.documentElement.style.scrollBehavior='auto';
+      const rect=document.querySelector('#couple .couple-profile--groom .couple-portrait').getBoundingClientRect();
+      const midpoint=rect.top+rect.height/2;
+      window.scrollTo({top:Math.round(scrollY+midpoint-innerHeight*ratio),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },fraction);
+  };
+  // Enter by the same original 28%-78% band; release only 3% beyond it.
+  for(const [fraction,focal] of [
+    [.5,true],[.795,true],[.83,false],[.795,false],[.76,true],
+    [.265,true],[.23,false],[.265,false],[.30,true]
+  ]){
+    await place(fraction);
+    if(focal)await expect(portrait).toHaveClass(/is-focal/);
+    else await expect(portrait).not.toHaveClass(/is-focal/);
+  }
+  await place(.5);
+  await expect.poll(()=>portrait.locator('img').evaluate(el=>getComputedStyle(el).transform))
+    .toBe('matrix(1.05, 0, 0, 1.05, 0, 0)');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  expect(errors).toEqual([]);
+});
+
+test('Section 3 camera stays aligned through mobile viewport height changes',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const initial=page.viewportSize();
+  const measure=async()=>{
+    await page.evaluate(async()=>{
+      await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+    });
+    return section.evaluate(el=>{
+      const rect=el.getBoundingClientRect();
+      const scene=el.querySelector('.couple-reference-scene').getBoundingClientRect();
+      const camera=parseFloat(el.dataset.referenceCameraOffset);
+      const pinned=Math.max(0,Math.min(rect.height-innerHeight,-rect.top));
+      return {top:scene.top,expected:rect.top+pinned+camera,
+        gap:el.nextElementSibling.getBoundingClientRect().top-rect.bottom,
+        overflow:document.documentElement.scrollWidth-innerWidth};
+    });
+  };
+  await page.evaluate(()=>{
+    const el=document.getElementById('couple');
+    const rect=el.getBoundingClientRect();
+    window.scrollTo({top:scrollY+rect.top+(el.offsetHeight-innerHeight)*.5,behavior:'instant'});
+  });
+  for(const height of [initial.height,Math.max(480,initial.height-70),initial.height]){
+    await page.setViewportSize({width:initial.width,height});
+    const reading=await measure();
+    expect(Math.abs(reading.top-reading.expected)).toBeLessThan(1.5);
+    expect(Math.abs(reading.gap)).toBeLessThanOrEqual(1);
+    expect(reading.overflow).toBeLessThanOrEqual(1);
+  }
+  expect(errors).toEqual([]);
+});
