@@ -482,3 +482,57 @@ test('Section 10 approved production artwork loads at the ordinary URL and degra
   await page.getByRole('button',{name:'Open Invitation',exact:true}).click();
   await expect(section.locator('#closingHeading')).toHaveText('Until we meet');
 });
+
+
+test('Section 10 native sticky holds the garden without JavaScript counter-scroll on four phones',async({page},testInfo)=>{
+  const errors=await openInvitation(page);
+  const closing=page.locator('#closingMessage');
+  const anchor=await closing.evaluate(el=>({
+    start:el.getBoundingClientRect().top+scrollY,
+    travel:Math.max(0,el.offsetHeight-innerHeight)
+  }));
+  expect(anchor.travel).toBeGreaterThan(50);
+  let middle=null;
+  for(const fraction of [.06,.35,.7,.95,.35,.06]){
+    await page.evaluate(async y=>{
+      window.scrollTo({top:Math.round(y),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },anchor.start+anchor.travel*fraction);
+    const data=await closing.evaluate(el=>{
+      const art=el.querySelector('.closing10-sticky-art');
+      const track=el.querySelector('.ref-environment');
+      const root=el.getBoundingClientRect();
+      const scene=art.getBoundingClientRect();
+      const trackBox=track.getBoundingClientRect();
+      const pinned=Math.max(0,Math.min(root.height-innerHeight,-root.top));
+      return {
+        position:getComputedStyle(art).position,
+        sectionOverflow:getComputedStyle(el).overflow,
+        trackOverflow:getComputedStyle(track).overflow,
+        computedTransform:getComputedStyle(art).transform,
+        artTop:scene.top,
+        visualHeight:scene.height,
+        sourceDrift:parseFloat(el.style.getPropertyValue('--closing10-scene-y')),
+        legacyPin:parseFloat(el.style.getPropertyValue('--closing10-sticky-y')),
+        pinned,rootTop:root.top,trackTop:trackBox.top,
+        seam:root.top-el.previousElementSibling.getBoundingClientRect().bottom,
+        overflow:document.documentElement.scrollWidth-innerWidth
+      };
+    });
+    expect(data.position).toBe('sticky');
+    expect(data.sectionOverflow).toBe('clip');
+    expect(data.trackOverflow).toBe('clip');
+    expect(data.computedTransform).toBe('none');
+    expect(Math.abs(data.artTop)).toBeLessThan(2);
+    expect(Math.abs(data.trackTop-data.rootTop)).toBeLessThan(1);
+    expect(Math.abs(data.legacyPin-data.pinned)).toBeLessThan(2);
+    expect(Number.isFinite(data.sourceDrift)).toBe(true);
+    expect(Math.abs(data.seam)).toBeLessThanOrEqual(1);
+    expect(data.overflow).toBeLessThanOrEqual(1);
+    if(fraction===.35 && middle===null)middle=data.sourceDrift;
+    else if(fraction===.35)expect(Math.abs(data.sourceDrift-middle)).toBeLessThan(.15);
+    if(fraction===.7)await page.screenshot({path:testInfo.outputPath('section10-native-sticky-'+testInfo.project.name+'.png'),animations:'disabled'});
+  }
+  expect(errors).toEqual([]);
+});
