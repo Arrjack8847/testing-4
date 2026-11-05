@@ -201,7 +201,10 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
       butterflyOpacity:parseFloat(bcss.opacity),
       // Computed width ignores the flight's rotation of the bounding box.
       butterflyWidth:parseFloat(bcss.width),
-      butterflyExitGap:el.getBoundingClientRect().bottom-butterfly.getBoundingClientRect().bottom,
+      // The source-calibrated handoff is near the *upper* Gift edge.
+      // Read the CSS anchor, not the animated transformed visual rectangle.
+      butterflyTop:parseFloat(bcss.top),
+      butterflyBottom:bcss.bottom,
       overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
@@ -209,11 +212,13 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
   expect(visual.wing).toContain('reference-dev/bfly_blush.webp');
   expect(visual.butterflyVisibility).toBe('visible');
   expect(visual.butterflyOpacity).toBeGreaterThan(.8);
-  // The butterfly is a 52px paired-wing sprite near the Gift -> RSVP seam.
+  // CSS retains the latest source-calibrated 52px paired-wing sprite
+  // near the upper Wedding Gift handoff; the earlier bottom-edge test was stale.
   expect(visual.butterflyWidth).toBeGreaterThanOrEqual(50);
   expect(visual.butterflyWidth).toBeLessThanOrEqual(54);
-  expect(visual.butterflyExitGap).toBeGreaterThanOrEqual(25);
-  expect(visual.butterflyExitGap).toBeLessThanOrEqual(160);
+  expect(visual.butterflyTop).toBeGreaterThanOrEqual(0);
+  expect(visual.butterflyTop).toBeLessThanOrEqual(25);
+  expect(visual.butterflyBottom).toBe('auto');
   expect(visual.overflow).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
