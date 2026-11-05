@@ -1,0 +1,65 @@
+name: Sections 1 and 10 mobile sticky stability
+
+on:
+  pull_request:
+    paths:
+      - scene.js
+      - styles.css
+      - section-ten.js
+      - section-ten.css
+      - tests/section1-2-handoff.spec.mjs
+      - tests/section-ten.spec.mjs
+      - .github/workflows/section1-section10-sticky-qa.yml
+  push:
+    paths:
+      - scene.js
+      - styles.css
+      - section-ten.js
+      - section-ten.css
+      - tests/section1-2-handoff.spec.mjs
+      - tests/section-ten.spec.mjs
+      - .github/workflows/section1-section10-sticky-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-native-sticky:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Stage existing first-scene source artwork only in the test runner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen,Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25
+          Path('assets').mkdir(exist_ok=True)
+          for name in names:
+              response=urlopen(Request('https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'+name,
+                        headers={'User-Agent':'Mozilla/5.0'}),timeout=45).read()
+              assert response[:4]==b'RIFF' and response[8:12]==b'WEBP',name
+              Path('assets',name).write_bytes(response)
+          PY
+      - name: Check source syntax and four-phone Section 1 and 10 pinning
+        run: |
+          node --check scene.js
+          node --check section-ten.js
+          npx playwright test tests/section1-2-handoff.spec.mjs tests/section-ten.spec.mjs --workers=2
+      - name: Upload mobile sticky evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section1-section10-mobile-sticky
+          path: test-results/
+          retention-days: 5
+          if-no-files-found: warn
