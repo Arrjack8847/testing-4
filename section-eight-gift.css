@@ -649,3 +649,118 @@
 .gift-eight[data-gift-thumb-kettle="reference-local"] .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-kettle {
   background: #fff url("./assets/reference-dev/gift-kettle.webp") center / contain no-repeat;
 }
+
+
+/* Match the adjacent Section 9 butterfly system: paired 52x41 wings,
+   0.22727s sprite flap with staggered right wing and 13s linear flight.
+   Keep this scoped to Section 8 and preserve the existing handoff position. */
+.gift-eight .gift-eight-butterfly{
+  width:52px;height:41px;
+  animation:gift-eight-shared-flight 13s linear infinite;
+  will-change:transform;
+}
+.gift-eight .gift-eight-bfly-wing{
+  top:3px;width:27px;height:34px;
+  background-image:none;
+  background:radial-gradient(ellipse at 60% 40%,#f4eaf7 8%,#b49bbd 57%,#816b9b 92%);
+  border-radius:83% 11% 75% 21%;
+  filter:drop-shadow(0 1px 1px #8f7fa9);
+}
+.gift-eight .gift-eight-bfly-left{
+  left:0;transform-origin:right center;
+  animation:gift-eight-shared-flap-left .41s ease-in-out infinite alternate;
+}
+.gift-eight .gift-eight-bfly-right{
+  right:0;transform-origin:left center;
+  animation:gift-eight-shared-flap-right .41s ease-in-out infinite alternate;
+}
+.gift-eight .gift-eight-bfly-body{left:24px;top:12px}
+.gift-eight[data-gift-butterfly="reference-local"] .gift-eight-bfly-wing{
+  top:0;width:50%;height:100%;border-radius:0;filter:none;
+  background-image:url("./assets/reference-dev/section9/bfly_1.webp");
+  background-repeat:no-repeat;background-size:200% 100%;
+}
+.gift-eight[data-gift-butterfly="reference-local"] .gift-eight-bfly-left{
+  background-position:0 0;transform-origin:100% 50%;
+  animation:gift-eight-shared-sprite-left .22727s ease-in-out infinite alternate;
+}
+.gift-eight[data-gift-butterfly="reference-local"] .gift-eight-bfly-right{
+  background-position:100% 0;transform-origin:0 50%;
+  animation:gift-eight-shared-sprite-right .22727s ease-in-out -.065s infinite alternate;
+}
+@keyframes gift-eight-shared-flight{
+  0%,100%{transform:translate3d(15px,-13px,0) rotate(-8deg)}
+  25%{transform:translate3d(-14px,-20px,0) rotate(6deg)}
+  50%{transform:translate3d(-49px,2px,0) rotate(-3deg)}
+  75%{transform:translate3d(-13px,11px,0) rotate(8deg)}
+}
+@keyframes gift-eight-shared-flap-left{
+  from{transform:perspective(210px) rotateY(8deg)}
+  to{transform:perspective(210px) rotateY(72deg)}
+}
+@keyframes gift-eight-shared-flap-right{
+  from{transform:scaleX(-1) perspective(210px) rotateY(8deg)}
+  to{transform:scaleX(-1) perspective(210px) rotateY(72deg)}
+}
+@keyframes gift-eight-shared-sprite-left{
+  from{transform:perspective(210px) rotateY(8deg)}
+  to{transform:perspective(210px) rotateY(72deg)}
+}
+@keyframes gift-eight-shared-sprite-right{
+  from{transform:perspective(210px) rotateY(8deg)}
+  to{transform:perspective(210px) rotateY(72deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .gift-eight .gift-eight-butterfly,.gift-eight .gift-eight-bfly-wing{
+    animation:none!important;will-change:auto;
+  }
+}
+
+
+/* Section 8 living garden: keep the original floral artwork in place, with
+   restrained background sway and layered petal motion throughout the section.
+   All selectors are local to Wedding Gift. */
+.gift-eight .gift-eight-art{
+  background-position:center top,center top;
+  animation:gift-eight-garden-breathe 12s ease-in-out infinite alternate;
+  will-change:background-position;
+}
+.gift-eight[data-gift-artwork="reference-local"] .gift-eight-art{
+  background-position:center top,center center;
+  animation:gift-eight-garden-reference-breathe 12s ease-in-out infinite alternate;
+}
+@keyframes gift-eight-garden-breathe{
+  from{background-position:center top,49% top}
+  to{background-position:center top,51% top}
+}
+@keyframes gift-eight-garden-reference-breathe{
+  from{background-position:center top,49% center}
+  to{background-position:center top,51% center}
+}
+.gift-eight .gift-eight-petals i{
+  animation-name:gift-eight-petal-meander;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+  will-change:transform,opacity;
+}
+.gift-eight .gift-eight-petals i:nth-child(even){
+  animation-direction:reverse;
+}
+.gift-eight .gift-eight-petals i:nth-child(3n){
+  width:5px;height:9px;opacity:.42;
+}
+@keyframes gift-eight-petal-meander{
+  0%{transform:translate3d(-10px,-36px,0) rotate(12deg) scale(.8);opacity:0}
+  14%{opacity:.56}
+  28%{transform:translate3d(14px,-4px,0) rotate(65deg) scale(1)}
+  53%{transform:translate3d(-7px,30px,0) rotate(115deg) scale(.9);opacity:.62}
+  76%{transform:translate3d(20px,62px,0) rotate(170deg) scale(1)}
+  100%{transform:translate3d(4px,115px,0) rotate(225deg) scale(.8);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .gift-eight .gift-eight-art,
+  .gift-eight .gift-eight-petals i{
+    animation:none!important;
+    will-change:auto;
+  }
+}

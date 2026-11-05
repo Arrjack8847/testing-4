@@ -22,7 +22,7 @@
         section.dataset.giftButterfly='reference-local';
     };
     butterfly.onerror=()=>{section.dataset.giftButterfly='original';};
-    butterfly.src='./assets/reference-dev/bfly_blush.webp';
+    butterfly.src='./assets/reference-dev/section9/bfly_1.webp';
   }
 
   if(local){

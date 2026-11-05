@@ -1,0 +1,42 @@
+/* Cross-section floral continuity. Additive, scoped and deliberately subtle.
+   Existing section-specific artwork and keyframes remain authoritative. */
+:root{--garden-sway-duration:11s;--garden-petal-opacity:.62}
+
+/* Keep decorative layers from blocking taps, inputs or navigation. */
+#message .letter-petal,
+.event-section .event-petal-field,
+.event-section .event-flower,
+.save-date-section .save-date-flower,
+.gallery-section .gallery-floral,
+.rsvp-section .rsvp-flower,
+.gift-eight .gift-eight-petals,
+.s9-rsvp .s9-petals,
+.section-ten .ref-vine{pointer-events:none}
+
+/* Softer and more cohesive petal density between the letter, event, gift
+   and RSVP scenes, without resetting their distinct flight paths. */
+#message .letter-petal,
+.event-section .event-petal-field i,
+.gift-eight .gift-eight-petals i,
+.s9-rsvp .s9-petals i{filter:drop-shadow(0 1px 2px rgba(91,53,91,.12))}
+
+/* Use the same gentle, non-jerky timing family on decorative swaying art.
+   Do not change layout geometry or the section-specific animation names. */
+.event-section .event-flower,
+.rsvp-section .rsvp-flower{animation-timing-function:ease-in-out}
+
+/* Ensure decorative artwork never escapes into the adjacent scene. */
+.gift-eight .gift-eight-petals,
+.s9-rsvp .s9-petals{overflow:hidden}
+
+/* Respect motion accessibility across the full invitation. */
+@media(prefers-reduced-motion:reduce){
+  #message .letter-petal,
+  .event-section .event-flower,
+  .event-section .event-petal-field i,
+  .rsvp-section .rsvp-flower,
+  .gift-eight .gift-eight-petals i,
+  .gift-eight .gift-eight-art,
+  .s9-rsvp .s9-petals i,
+  .section-ten .ref-vine{animation:none!important;will-change:auto!important}
+}

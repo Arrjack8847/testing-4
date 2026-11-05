@@ -1,0 +1,31 @@
+/* Fixed, continuous 26-petal canvas spanning Sections 1–10. */
+.global-petal-canvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  width:100vw;
+  height:100dvh;
+  z-index:20;
+  pointer-events:none;
+  user-select:none;
+  contain:strict;
+  opacity:.86;
+}
+/* Disable duplicate section-local falling petals only when the global
+   animation is actually running. Static floral art, vines and butterflies
+   retain their original layers and animations. */
+.global-petals-active #petalCanvas,
+.global-petals-active #message .letter-petal,
+.global-petals-active .couple-floating-petals,
+.global-petals-active .event-section .event-petal-field,
+.global-petals-active .order-section .order-petals,
+.global-petals-active #orderPetalCanvas,
+.global-petals-active .gift-eight .gift-eight-petals,
+.global-petals-active .s9-rsvp .s9-petals{
+  visibility:hidden!important;
+}
+/* Respect reduced motion and never block the invitation. */
+@media(prefers-reduced-motion:reduce){
+  .global-petal-canvas{display:none!important}
+}
