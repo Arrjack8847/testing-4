@@ -149,8 +149,12 @@
     const referenceAnchor = start - 0.653 * viewport;
     const camera = motion.matches ? 0 :
       clamp(-44.8 + (scroll - referenceAnchor) * 0.0427, -44.8, 20);
+    // Keep the legacy total for diagnostics and fallback browsers, but
+    // on native-sticky browsers NEVER cancel full-speed scrolling in JS.
+    // The compositor owns the pin; JS applies only the 4.27% camera drift.
     const displacement = (pinned + camera).toFixed(2) + 'px';
     const cameraValue = camera.toFixed(2);
+    const cameraDisplacement = cameraValue + 'px';
     // The garden can be 7+ screens away on this page. Only evaluate each
     // portrait rectangle and retain GPU compositing layers while near it.
     // Start warming the layers two viewports before entry for quick swipes.
@@ -161,6 +165,8 @@
     // calibrated camera tied directly to scroll (no trailing easing).
     if (section.style.getPropertyValue('--couple-reference-y') !== displacement)
       section.style.setProperty('--couple-reference-y', displacement);
+    if (section.style.getPropertyValue('--couple-camera-y') !== cameraDisplacement)
+      section.style.setProperty('--couple-camera-y', cameraDisplacement);
     if (section.dataset.referenceCameraOffset !== cameraValue)
       section.dataset.referenceCameraOffset = cameraValue;
     const nearValue = String(near && !motion.matches);
