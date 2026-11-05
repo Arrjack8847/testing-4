@@ -56,27 +56,34 @@
     './assets/scene.webp',
     artRoot + 'packs/tasik-kayangan/scene.webp'
   ];
-  const sceneProbe = new Image();
   let artworkActive = false;
+  let sceneProbe = null;
+  let sceneEpoch = 0;
   let sceneSourceIndex = 0;
-  sceneProbe.onload = () => {
-    if (!artworkActive) return;
-    const imageUrl = sceneProbe.currentSrc || sceneProbe.src;
-    section.style.setProperty('--couple-reference-image', 'url("' + imageUrl + '")');
-    section.dataset.referenceSceneSource = sceneSourceIndex === 0 ? 'local' : 'remote';
-    webpStatus.scene = 'loaded';
-    syncWebpStatus();
-  };
-  sceneProbe.onerror = () => {
-    if (!artworkActive) return;
-    sceneSourceIndex++;
-    if (sceneSourceIndex < sceneSources.length) {
-      sceneProbe.src = sceneSources[sceneSourceIndex];
-      return;
-    }
-    section.dataset.referenceSceneSource = 'unavailable';
-    webpStatus.scene = 'failed';
-    syncWebpStatus();
+  const startSceneProbe = () => {
+    const epoch=++sceneEpoch;
+    const probe=sceneProbe=new Image();
+    sceneSourceIndex=0;
+    probe.onload = () => {
+      if(!artworkActive||epoch!==sceneEpoch)return;
+      const imageUrl=probe.currentSrc||probe.src;
+      section.style.setProperty('--couple-reference-image','url("'+imageUrl+'")');
+      section.dataset.referenceSceneSource=sceneSourceIndex===0?'local':'remote';
+      webpStatus.scene='loaded';
+      syncWebpStatus();
+    };
+    probe.onerror = () => {
+      if(!artworkActive||epoch!==sceneEpoch)return;
+      sceneSourceIndex++;
+      if(sceneSourceIndex<sceneSources.length){
+        probe.src=sceneSources[sceneSourceIndex];
+        return;
+      }
+      section.dataset.referenceSceneSource='unavailable';
+      webpStatus.scene='failed';
+      syncWebpStatus();
+    };
+    probe.src=sceneSources[0];
   };
   syncWebpStatus();
   for (const item of portraitData) {
@@ -122,7 +129,9 @@
     sceneSourceIndex = 0;
     for (const key of Object.keys(webpStatus)) webpStatus[key] = 'loading';
     syncWebpStatus();
-    sceneProbe.src = sceneSources[sceneSourceIndex];
+    // Reuse the local master scene immediately while the probe resolves.
+    section.style.setProperty('--couple-reference-image','url("./assets/scene.webp")');
+    startSceneProbe();
     for (const item of portraitData) {
       const img = section.querySelector(item.selector);
       if (img) img.src = item.url;
@@ -130,7 +139,13 @@
   }
   function releaseArtwork() {
     artworkActive = false;
-    sceneProbe.removeAttribute('src');
+    ++sceneEpoch;
+    if(sceneProbe){
+      sceneProbe.onload=null;
+      sceneProbe.onerror=null;
+      sceneProbe.removeAttribute('src');
+      sceneProbe=null;
+    }
     section.style.setProperty('--couple-reference-image','none');
     for (const item of portraitData) {
       const img = section.querySelector(item.selector);
