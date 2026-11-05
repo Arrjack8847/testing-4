@@ -105,8 +105,9 @@
     ? ['./assets/reference-dev/scene.webp','./assets/section10/scene.webp']
     : ['./assets/section10/scene.webp'];
   let nextImage=0;
+  let artworkActive=false;
   const loadNextImage=()=>{
-    if(!img)return;
+    if(!img||!artworkActive)return;
     if(nextImage>=candidates.length){
       section.dataset.artwork='original';
       img.removeAttribute('src');
@@ -114,13 +115,31 @@
     }
     img.src=candidates[nextImage++];
   };
-  if(img){
+  function activateArtwork(){
+    if(!img)return;
+    artworkActive=true;
+    nextImage=0;
     img.onload=()=>{
-      section.dataset.artwork=img.naturalWidth===1080?'local-reference':'original';
+      if(artworkActive)section.dataset.artwork=img.naturalWidth===1080?'local-reference':'original';
     };
     img.onerror=loadNextImage;
     loadNextImage();
   }
+  function releaseArtwork(){
+    artworkActive=false;
+    if(img){
+      img.onload=null;
+      img.onerror=null;
+      img.removeAttribute('src');
+    }
+    // CSS local 1080x1920 image is only selected with this data attribute.
+    section.dataset.artwork='original';
+  }
+  if(window.MobileArtworkLifecycle)
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activateArtwork,release:releaseArtwork
+    });
+  else activateArtwork();
   syncMotion();
   scheduleReveals();
 })();
