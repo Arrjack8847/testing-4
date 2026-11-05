@@ -745,3 +745,68 @@ test('Mobile V2 releases large GPU layers away from Section 3 and warms them bef
   await expect(section).toHaveAttribute('data-camera-near','false');
   await expect(scene).toHaveCSS('will-change','auto');
 });
+
+
+test('Section 3 native sticky pins the garden without JS counter-scrolling on four phones',async({page},testInfo)=>{
+  const {section,errors}=await openCouple(page);
+  const dimensions=await section.evaluate(el=>({
+    start:el.getBoundingClientRect().top+scrollY,
+    travel:Math.max(0,el.offsetHeight-innerHeight)
+  }));
+  const measurements=[];
+  for(const fraction of [0,.12,.35,.65,.90,1,.60,.20,0]){
+    await page.evaluate(async y=>{
+      document.documentElement.style.scrollBehavior='auto';
+      window.scrollTo({top:Math.round(y),behavior:'instant'});
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    },dimensions.start+dimensions.travel*fraction);
+    const sample=await section.evaluate(el=>{
+      const sc=el.querySelector('.couple-reference-scene');
+      const track=el.querySelector('.couple-reference-track');
+      const root=el.getBoundingClientRect();
+      const scene=sc.getBoundingClientRect();
+      const parent=track.getBoundingClientRect();
+      const camera=Number(el.dataset.referenceCameraOffset);
+      const cameraVar=parseFloat(el.style.getPropertyValue('--couple-camera-y'));
+      const jsTotal=parseFloat(el.style.getPropertyValue('--couple-reference-y'));
+      const pinned=Math.max(0,Math.min(root.height-innerHeight,-root.top));
+      const matrix=getComputedStyle(sc).transform;
+      const computedY=new DOMMatrix(matrix).m42;
+      return {
+        scroll:scrollY,camera,cameraVar,jsTotal,pinned,
+        position:getComputedStyle(sc).position,
+        sectionOverflow:getComputedStyle(el).overflowY,
+        trackTop:parent.top,rootTop:root.top,
+        sceneTop:scene.top,expectedTop:root.top+pinned+camera,
+        computedY,
+        beforeGap:root.top-el.previousElementSibling.getBoundingClientRect().bottom,
+        afterGap:el.nextElementSibling.getBoundingClientRect().top-root.bottom,
+        overflow:document.documentElement.scrollWidth-innerWidth,
+        paintTop:scene.top-64,
+        paintBottom:scene.bottom+64
+      };
+    });
+    expect(sample.position).toBe('sticky');
+    expect(sample.sectionOverflow).toBe('clip');
+    expect(Math.abs(sample.trackTop-sample.rootTop)).toBeLessThan(1);
+    expect(Math.abs(sample.camera-sample.cameraVar)).toBeLessThan(.05);
+    expect(Math.abs(sample.computedY-sample.camera)).toBeLessThan(.12);
+    expect(Math.abs(sample.jsTotal-(sample.pinned+sample.camera))).toBeLessThan(.15);
+    expect(Math.abs(sample.sceneTop-sample.expectedTop)).toBeLessThan(1.5);
+    expect(sample.paintTop).toBeLessThanOrEqual(Math.max(0,sample.rootTop)+1);
+    expect(sample.paintBottom).toBeGreaterThanOrEqual(Math.min(innerHeight,sample.rootTop+await section.evaluate(el=>el.offsetHeight))-1);
+    expect(Math.abs(sample.beforeGap)).toBeLessThanOrEqual(1);
+    expect(Math.abs(sample.afterGap)).toBeLessThanOrEqual(1);
+    expect(sample.overflow).toBeLessThanOrEqual(1);
+    measurements.push(sample);
+  }
+  // In the central pinned range the garden is compositor-anchored: no huge
+  // JS transform that cancels the scroll distance (the previous jitter cause).
+  for(const sample of measurements.slice(1,6)){
+    expect(Math.abs(sample.computedY)).toBeLessThanOrEqual(45);
+  }
+  expect(Math.abs(measurements[3].camera-measurements[6].camera)).toBeLessThan(.12);
+  await page.screenshot({path:testInfo.outputPath('section3-native-sticky-'+testInfo.project.name+'.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+});
