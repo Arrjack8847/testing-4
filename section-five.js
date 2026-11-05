@@ -107,6 +107,9 @@
         // copies exist; otherwise keep the standard owned/consented photo fallback.
         // The strict ?galleryReference=1 QA mode never falls back.
         if ((autoLocalReference || autoHostedReference) && image.getAttribute('src') === REFERENCE_FILES[index]) {
+          // The available guest photographs remain the fallback if a reference
+          // image has been removed from the prototype's hosted assets.
+          section.dataset.galleryArt = 'local';
           image.src = local;
           return;
         }
