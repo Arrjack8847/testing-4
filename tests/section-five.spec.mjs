@@ -20,7 +20,7 @@ async function reachGallery(page,query=''){
 }
 
 test('Section 7 shows five honest empty photograph placeholders',async({page})=>{
-  const {gallery,errors}=await reachGallery(page);
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=0');
   await expect(gallery).toHaveClass(/is-visible/);
   await expect(page.getByRole('heading',{name:'Our Gallery',level:2})).toBeVisible();
   const slots=gallery.locator('[data-gallery-slot]');
@@ -155,7 +155,7 @@ test('Five downloaded local WebPs remove placeholder footer and preserve referen
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.route('**/assets/gallery/photo-*.webp',route=>
     route.fulfill({status:200,contentType:'image/webp',body:testImage}));
-  const {gallery,errors}=await reachGallery(page);
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=0');
   await expect(gallery.locator('.gallery-photo.has-image')).toHaveCount(5,{timeout:15000});
   await expect(gallery.locator('.gallery-disclaimer')).toBeHidden();
   await expect(gallery.locator('.gallery-reference-note')).toBeHidden();
@@ -250,7 +250,7 @@ test('Uploaded local gallery files enable image viewer, keyboard arrows and Esca
     }
     return route.fulfill({status:404,body:'Missing test photograph'});
   });
-  const {gallery,errors}=await reachGallery(page);
+  const {gallery,errors}=await reachGallery(page,'?galleryReference=0');
   const first=gallery.locator('[data-gallery-slot="0"]');
   const second=gallery.locator('[data-gallery-slot="1"]');
   await expect(first).toBeEnabled({timeout:12000});
