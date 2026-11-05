@@ -10,39 +10,59 @@
   // reusable customer invitation. Only it may auto-enable uploaded comparison art.
   const hostedPrototype=/^testing-4(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(location.hostname);
   const allowReference=local||hostedPrototype;
-  if(allowReference){
-    const art=new Image();
+  // Recreate the exact local reference sprite/source choices only near
+  // Section 8. Switch datasets back to original assets when far offscreen.
+  let artworkEpoch=0;
+  let pendingProbes=[];
+  const newProbe=()=>{const probe=new Image();pendingProbes.push(probe);return probe;};
+  function activateArtwork(){
+    if(!allowReference)return;
+    const epoch=++artworkEpoch;
+    const art=newProbe();
     art.onload=()=>{
-      if(art.naturalWidth>0&&art.naturalHeight>0)section.dataset.giftArtwork='reference-local';
+      if(epoch===artworkEpoch&&art.naturalWidth>0&&art.naturalHeight>0)
+        section.dataset.giftArtwork='reference-local';
     };
     art.src='./assets/reference-dev/band_plum.webp';
-  }
-  // Section 8 has its own blush butterfly (not Section 9's purple one).
-  // Its licensed comparison image is stored locally, never hotlinked.
-  if(allowReference){
-    const butterfly=new Image();
+
+    const butterfly=newProbe();
     butterfly.onload=()=>{
-      if(butterfly.naturalWidth>0&&butterfly.naturalHeight>0)
+      if(epoch===artworkEpoch&&butterfly.naturalWidth>0&&butterfly.naturalHeight>0)
         section.dataset.giftButterfly='reference-local';
     };
-    butterfly.onerror=()=>{section.dataset.giftButterfly='original';};
+    butterfly.onerror=()=>{
+      if(epoch===artworkEpoch)section.dataset.giftButterfly='original';
+    };
     butterfly.src='./assets/reference-dev/bfly_blush.webp';
-  }
 
-  if(allowReference){
-    const thumbs=[
-      ['rice','gift-rice-cooker.jpg'],
-      ['kettle','gift-kettle.webp']
-    ];
-    thumbs.forEach(([name,file])=>{
-      const art=new Image();
-      art.onload=()=>{
-        if(art.naturalWidth>0&&art.naturalHeight>0)
-          section.dataset['giftThumb'+name[0].toUpperCase()+name.slice(1)]='reference-local';
-      };
-      art.src='./assets/reference-dev/'+file;
-    });
+    [['rice','gift-rice-cooker.jpg'],['kettle','gift-kettle.webp']]
+      .forEach(([name,file])=>{
+        const probe=newProbe();
+        probe.onload=()=>{
+          if(epoch===artworkEpoch&&probe.naturalWidth>0&&probe.naturalHeight>0)
+            section.dataset['giftThumb'+name[0].toUpperCase()+name.slice(1)]='reference-local';
+        };
+        probe.src='./assets/reference-dev/'+file;
+      });
   }
+  function releaseArtwork(){
+    ++artworkEpoch;
+    for(const probe of pendingProbes){
+      probe.onload=null;
+      probe.onerror=null;
+      probe.removeAttribute('src');
+    }
+    pendingProbes=[];
+    section.dataset.giftArtwork='original';
+    section.dataset.giftButterfly='original';
+    section.dataset.giftThumbRice='original';
+    section.dataset.giftThumbKettle='original';
+  }
+  if(window.MobileArtworkLifecycle)
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activateArtwork,release:releaseArtwork
+    });
+  else activateArtwork();
 
   function syncAccess(){
     const closed=invitation.dataset.state!=='opened';
