@@ -1,8 +1,8 @@
 'use strict';
-// Section 7 uses downloaded WebP files only: no remote image hosts or silent fallback.
-// Production mode uses licensed couple photos. Local development (localhost / 127.0.0.1)
-// prefers locally downloaded reference WebPs when present, with a licensed-photo fallback.
-// ?galleryReference=1 is a strict reference-only QA mode. Reference files are Git-ignored.
+// Section 7 uses local WebPs only, never third-party hotlinks.
+// The testing-4 hosted reference prototype and localhost prefer the already uploaded
+// comparison images; real client galleries can use licensed photo-01..05 assets.
+// ?galleryReference=1 strictly checks reference images, and =0 forces guest photos.
 (() => {
   const section = document.getElementById('gallery');
   const invitation = document.getElementById('invitation');
@@ -16,11 +16,16 @@
     {src:'./assets/gallery/photo-04.webp', alt:'The wedding garden', caption:'The Garden'},
     {src:'./assets/gallery/photo-05.webp', alt:'The lakeside scene', caption:'The Lake'}
   ]);
-  const referenceMode = new URLSearchParams(window.location.search).get('galleryReference') === '1';
-  // Auto-comparison is deliberately limited to loopback addresses: on Vercel, custom
-  // domains and published previews, the guest Gallery never requests vendor photos.
-  const autoLocalReference = !referenceMode &&
+  const galleryMode = new URLSearchParams(window.location.search).get('galleryReference');
+  const referenceMode = galleryMode === '1';
+  const forceGuestPhotos = galleryMode === '0';
+  const autoLocalReference = !referenceMode && !forceGuestPhotos &&
     ['localhost','127.0.0.1','[::1]','::1'].includes(window.location.hostname);
+  // Only this research prototype's Vercel URLs may default to reference photos.
+  // Do not enable this on a commercial invitation without image-use permission.
+  const autoHostedReference = !referenceMode && !forceGuestPhotos &&
+    /^testing-4(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(window.location.hostname);
+  const preferReference = referenceMode || autoLocalReference || autoHostedReference;
   const REFERENCE_FILES = Object.freeze([
     './assets/gallery/reference/moody.webp',
     './assets/gallery/reference/moody-bride.webp',
@@ -28,7 +33,7 @@
     './assets/gallery/reference/moody-garden.webp',
     './assets/gallery/reference/moody-lake.webp'
   ]);
-  section.dataset.galleryArt = referenceMode ? 'reference-comparison' : 'local';
+  section.dataset.galleryArt = referenceMode ? 'reference-comparison' : preferReference ? 'local-reference-preview' : 'local';
   const referenceNote = section.querySelector('.gallery-reference-note');
   if (referenceNote) referenceNote.hidden = !referenceMode;
   const buttons = Array.from(section.querySelectorAll('[data-gallery-slot]'));
@@ -66,18 +71,18 @@
     PHOTOS.forEach((photo,index) => {
       const button = buttons.find(b => Number(b.dataset.gallerySlot) === index);
       const local = safeLocalUrl(photo.src);
-      const photoUrl = safeLocalUrl((referenceMode || autoLocalReference) ? REFERENCE_FILES[index] : local);
+      const photoUrl = safeLocalUrl(preferReference ? REFERENCE_FILES[index] : local);
       if (!button || !photoUrl) return;
       const image = document.createElement('img');
       image.className = 'gallery-image';
-      image.loading = (referenceMode || autoLocalReference) ? 'eager' : 'lazy';
+      image.loading = preferReference ? 'eager' : 'lazy';
       image.decoding = 'async';
       image.alt = photo.alt;
       image.onload = () => {
         if (!image.naturalWidth) return;
         // The downloaded WebPs are for local visual comparison only.
         // Show no extra reference banner so localhost resembles the source Gallery.
-        if (autoLocalReference && image.getAttribute('src') === REFERENCE_FILES[index]) {
+        if ((autoLocalReference || autoHostedReference) && image.getAttribute('src') === REFERENCE_FILES[index]) {
           section.dataset.galleryArt = 'local-reference-preview';
         }
         button.classList.add('has-image');
@@ -101,7 +106,10 @@
         // In normal localhost mode, prefer original comparison artwork if authorized
         // copies exist; otherwise keep the standard owned/consented photo fallback.
         // The strict ?galleryReference=1 QA mode never falls back.
-        if (autoLocalReference && image.getAttribute('src') === REFERENCE_FILES[index]) {
+        if ((autoLocalReference || autoHostedReference) && image.getAttribute('src') === REFERENCE_FILES[index]) {
+          // The available guest photographs remain the fallback if a reference
+          // image has been removed from the prototype's hosted assets.
+          section.dataset.galleryArt = 'local';
           image.src = local;
           return;
         }

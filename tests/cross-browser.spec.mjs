@@ -1,9 +1,9 @@
 import {test,expect} from '@playwright/test';
 
-async function load(page){
+async function load(page,path='/'){
   const failures=[];
   page.on('pageerror',e=>failures.push(e.message));
-  await page.goto('/');
+  await page.goto(path);
   await expect(page.locator('#invitation')).toHaveAttribute('data-layers','ready',{timeout:30000});
   return failures;
 }
@@ -207,7 +207,8 @@ test('Current Order of the Day is accessible; legacy countdown remains hidden',a
 });
 
 test('Section 7 provides an accessible gallery without falsely populated photos',async({page})=>{
-  const errors=await load(page);
+  // Customer-photo mode intentionally has no image files in this prototype.
+  const errors=await load(page,'/?galleryReference=0');
   const gallery=page.locator('#gallery');
   await expect(gallery).toHaveAttribute('aria-hidden','true');
   await expect(gallery).toHaveJSProperty('inert',true);
