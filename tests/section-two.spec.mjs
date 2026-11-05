@@ -186,7 +186,7 @@ test('Section 2 original textured layer is present and its reference-aligned fra
 });
 
 
-test('petal motion runs only on the opened, visible message scene',async({page})=>{
+test('Section 2 local petal clock remains an active fallback while global field avoids duplicate motion',async({page})=>{
   await page.goto('/');
   const section=page.locator('#message');
   const petal=section.locator('.letter-petal').first();
@@ -199,6 +199,15 @@ test('petal motion runs only on the opened, visible message scene',async({page})
     document.getElementById('message').scrollIntoView({block:'start',behavior:'instant'});
   });
   await expect(section).toHaveAttribute('data-petals-active','true');
+  // Normal guest mode uses the globally continuous petal canvas. The
+  // section-local petals are hidden and their redundant clocks are paused.
+  await expect(page.locator('html')).toHaveClass(/global-petals-active/);
+  await expect(petal).toBeHidden();
+  await expect(petal).toHaveCSS('animation-play-state','paused');
+  // If the global field becomes unavailable, the original authored section
+  // choreography must still run without modifying its animation keyframes.
+  await page.evaluate(()=>document.documentElement.classList.remove('global-petals-active'));
+  await expect(petal).toBeVisible();
   await expect(petal).toHaveCSS('animation-play-state','running');
 
   await page.evaluate(()=>document.getElementById('eventDetails').scrollIntoView({
@@ -248,6 +257,9 @@ test('original Section 2 petals have independent curved trajectories without cha
   const section=await reachMessage(page);
   const petals=section.locator('.letter-petal');
   await expect(petals).toHaveCount(8);
+  await expect(page.locator('html')).toHaveClass(/global-petals-active/);
+  await page.evaluate(()=>document.documentElement.classList.remove('global-petals-active'));
+  await expect(petals.first()).toHaveCSS('animation-play-state','running');
   const before=await petals.evaluateAll(nodes=>nodes.map(el=>({
     name:getComputedStyle(el).animationName,
     duration:getComputedStyle(el).animationDuration,
@@ -255,6 +267,9 @@ test('original Section 2 petals have independent curved trajectories without cha
     transform:getComputedStyle(el).transform,
     pointerEvents:getComputedStyle(el.parentElement).pointerEvents
   })));
+  // Verify the underlying section-specific trajectories with the global
+  // display override disabled, as in a legacy/local fallback scenario.
+  // The preceding lifecycle test covers the default global guest mode.
   expect(new Set(before.map(x=>x.name))).toEqual(new Set([
     'letter-petal-fall-a','letter-petal-fall-b','letter-petal-fall-c'
   ]));
