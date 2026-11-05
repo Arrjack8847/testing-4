@@ -300,22 +300,30 @@ function loadArtwork(name) {
     attempt();
   });
 }
-const artworkReady = Promise.all(allNames.map(async name => {
-  const result = await loadArtwork(name);
-  if (result.okay) {
-    if (name === 'scene.webp') master.src = result.src;
-    else byFile.get(name).forEach(img => {
-      img.src = result.src;
-      // Use whichever image URL successfully loaded (local or remote) as the
-      // alpha mask for the soft peacock feather glint; never duplicate art.
-      if (name === 'peacock.webp') {
-        const sheen = img.parentElement?.querySelector('.peacock-glint');
-        if (sheen) sheen.style.setProperty('--peacock-image', 'url("' + result.src + '")');
-      }
-    });
+// Bound image probes at startup. A single Promise.all decoded every large
+// scene layer at once, which can spike WebKit memory before the cover appears.
+// Keep the full-resolution assets, their order, and every animation identical;
+// only limit the number of images simultaneously loading/decoding.
+async function loadSceneArtwork() {
+  const batchSize=4;
+  for(let start=0;start<allNames.length;start+=batchSize){
+    const group=allNames.slice(start,start+batchSize);
+    await Promise.all(group.map(async name=>{
+      const result=await loadArtwork(name);
+      if(!result.okay)return;
+      if(name==='scene.webp')master.src=result.src;
+      else byFile.get(name).forEach(img=>{
+        img.src=result.src;
+        // Share the exact same loaded source with the peacock feather mask.
+        if(name==='peacock.webp'){
+          const sheen=img.parentElement?.querySelector('.peacock-glint');
+          if(sheen)sheen.style.setProperty('--peacock-image','url("'+result.src+'")');
+        }
+      });
+    }));
   }
-  return result;
-})).then(() => {
+}
+const artworkReady=loadSceneArtwork().then(() => {
   // Only the 24 separate layered files are essential to the moving garden.
   // If scene.webp is missing but every layer loaded, prefer the complete
   // animated scene instead of incorrectly hiding it and showing a blank page.
