@@ -93,6 +93,32 @@
     });
   }
 
+  // The Gift background's 12-second repaint animation and the butterfly
+  // retain their exact keyframes. Run them only near the viewport (prewarm
+  // 256px on both sides); pause offscreen or while the invite is closed.
+  let giftNearViewport=false;
+  function syncGiftAmbient(){
+    const enabled=giftNearViewport && invitation.dataset.state==='opened' &&
+      !document.hidden && !reduced.matches;
+    section.dataset.giftAmbient=enabled?'running':'paused';
+  }
+  if('IntersectionObserver' in window){
+    const ambientObserver=new IntersectionObserver(entries=>{
+      giftNearViewport=!!entries[0]?.isIntersecting;
+      syncGiftAmbient();
+    },{rootMargin:'256px 0px 256px 0px',threshold:0});
+    ambientObserver.observe(section);
+  }else{
+    // Safe feature fallback: no visibility gating on legacy browsers.
+    giftNearViewport=true;
+  }
+  new MutationObserver(syncGiftAmbient).observe(invitation,{
+    attributes:true,attributeFilter:['data-state']
+  });
+  document.addEventListener('visibilitychange',syncGiftAmbient);
+  reduced.addEventListener?.('change',syncGiftAmbient);
+  syncGiftAmbient();
+
   let observer;
   function updateMotion(){
     observer?.disconnect();
