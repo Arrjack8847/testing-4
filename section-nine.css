@@ -133,13 +133,15 @@
 .s9-preview button{margin-top:12px;min-height:44px;border:1px solid #ad90a8;background:white;color:#5a3952;border-radius:2px}
 .s9-rsvp :is(input,select,textarea,button):focus-visible{outline:3px solid #925c8e;outline-offset:3px}
 /* Source audit: butterfly travels right-to-left about 80px above the Section 9
-   bottom, at ~33–34px/s. Source wing sprite is 52×41 and rotated ~-90°. */
+   bottom, at ~33–34px/s. Source wing sprite is 52×41 and rotated ~-90°.
+   Keep the entire wing inside the clipped Section 9 canvas rather than
+   placing its upper edge only 12px above the section boundary. */
 /* 390px reference sample: eastbound x121→319, westbound x302→147.
    Reconstructing the previous local animation's effective clock from its
    archived 21 frames predicted eastbound x131→330 and westbound x350→193.
    Apply constant -11px and -52px offsets respectively. This is a calibrated
    horizontal model, NOT proof of frame-exact animation or scroll parity. */
-.s9-butterfly{position:absolute;z-index:1;left:-52px;top:calc(100% - 12px);width:52px;height:41px;opacity:0;pointer-events:none;
+.s9-butterfly{position:absolute;z-index:1;left:-52px;top:calc(100% - 80px);width:52px;height:41px;opacity:0;pointer-events:none;
   transform-origin:center center;animation:s9-flight 13s linear 7.5s infinite;animation-play-state:paused}
 .s9-butterfly-forward{position:absolute;z-index:1;left:-11px;top:calc(100% - 72px);width:52px;height:41px;opacity:0;pointer-events:none;
   transform-origin:center center;animation:s9-flight-forward 16s linear 0s infinite;animation-play-state:paused}

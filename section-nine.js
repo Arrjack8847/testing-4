@@ -43,13 +43,18 @@
   else{inView=true;section.querySelectorAll('.s9-reveal').forEach(e=>e.classList.add('s9-in'));}
   document.addEventListener('visibilitychange',syncMotion);
   motion.addEventListener?.('change',syncMotion);
-  // Reference files are optional and remain Git-ignored. At localhost the developer
-  // preview automatically uses locally staged artwork; public sites keep the original
-  // CSS illustration. ?section9Reference=0 disables auto mode when comparing designs.
+  // The purple sprite has already been uploaded for the named testing-4
+  // reference-recreation prototype. On that Vercel host load only the butterfly
+  // by default; keep the optional paper art scoped to localhost or explicit QA.
+  // Never auto-enable third-party comparison art on a customer's invitation.
+  // ?section9Reference=1 opts in to both; =0 opts out of both.
   const referenceMode=new URLSearchParams(location.search).get('section9Reference');
-  const localPreview=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
-  const tryReference=referenceMode==='1'||(localPreview&&referenceMode!=='0');
-  if(tryReference){
+  const localPreview=['localhost','127.0.0.1','[::1]','::1'].includes(location.hostname);
+  const hostedPrototype=/^testing-4(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(location.hostname);
+  const shouldLoadPaper=referenceMode==='1'||(localPreview&&referenceMode!=='0');
+  const shouldLoadButterfly=referenceMode==='1'||
+    ((localPreview||hostedPrototype)&&referenceMode!=='0');
+  if(shouldLoadPaper||shouldLoadButterfly){
     const paperUrl='./assets/reference-dev/section9/paper.webp';
     const butterflyUrl='./assets/reference-dev/section9/bfly_1.webp';
     const art=document.getElementById('s9ReferenceArt');
@@ -77,8 +82,8 @@
     };
     if(referenceMode==='1'){
       // Explicit mode is useful when testing missing-image fallback.
-      loadPaper();
-      loadButterfly();
+      if(shouldLoadPaper)loadPaper();
+      if(shouldLoadButterfly)loadButterfly();
     }else{
       // HEAD preflight means an absent file never replaces the CSS fallback
       // with a broken <img>. The server is local; no vendor URL is fetched.
@@ -88,15 +93,16 @@
           if(response.ok || response.status===405){onPresent();return;}
           if(kind==='paper')section.dataset.referenceArt='missing';
           else section.dataset.referenceButterfly='missing';
-          console.warn('Section 9 '+kind+' is missing locally (HTTP '+response.status+'). Run ensure-section9-art.ps1.');
+          const hint=localPreview?' Run ensure-section9-art.ps1 locally.':' Verify the hosted artwork asset.';
+          console.warn('Section 9 '+kind+' is missing (HTTP '+response.status+').'+hint);
         }catch(error){
           if(kind==='paper')section.dataset.referenceArt='unavailable';
           else section.dataset.referenceButterfly='unavailable';
-          console.warn('Section 9 '+kind+' could not be checked. Run start.ps1 again.',error);
+          console.warn('Section 9 '+kind+' could not be checked.',error);
         }
       };
-      void loadIfPresent(paperUrl,loadPaper,'paper');
-      void loadIfPresent(butterflyUrl,loadButterfly,'butterfly');
+      if(shouldLoadPaper)void loadIfPresent(paperUrl,loadPaper,'paper');
+      if(shouldLoadButterfly)void loadIfPresent(butterflyUrl,loadButterfly,'butterfly');
     }
   }
   const makeId=()=>{

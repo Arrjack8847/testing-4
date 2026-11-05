@@ -193,7 +193,8 @@ test('Four widths have no overflow and Section 8→9→10 seams stay exact',asyn
         }];
       })
     ));
-    expect(Math.abs(flights['.s9-butterfly'].top-(m.section.height-12))).toBeLessThan(2);
+    // Keep the 41px westbound sprite visible above the clipped bottom edge.
+    expect(Math.abs(flights['.s9-butterfly'].top-(m.section.height-80))).toBeLessThan(2);
     expect(flights['.s9-butterfly'].duration).toBe('13s');
     expect(flights['.s9-butterfly'].delay).toBe('7.5s');
     expect(flights['.s9-butterfly-forward'].name).toBe('s9-flight-forward');
@@ -258,6 +259,33 @@ test('Plain localhost root automatically loads locally staged paper and butterfl
   expect(new URL(page.url()).searchParams.has('section9Reference')).toBe(false);
   await page.goto('/?section9Reference=0');
   await expect(section).not.toHaveClass(/s9-reference-loaded/);
+  await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
+  await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
+});
+
+test('Named Vercel reference prototype loads its uploaded purple butterfly by default',async({page})=>{
+  // Render the local test server under the real prototype hostname. This proves
+  // the production-host allowlist without relying on a remote Vercel deployment.
+  const host='https://testing-4-lime.vercel.app';
+  await page.route(host+'/**',async route=>{
+    const requestUrl=new URL(route.request().url());
+    const target='http://127.0.0.1:8000'+requestUrl.pathname+requestUrl.search;
+    const response=await route.fetch({url:target});
+    await route.fulfill({response});
+  });
+  await page.goto(host+'/');
+  const section=page.locator('#rsvp');
+  await expect(section).toHaveAttribute('data-reference-butterfly','loaded');
+  await expect(section).toHaveClass(/s9-reference-butterfly-loaded/);
+  // Only the requested butterfly is enabled for hosted default mode.
+  await expect(section).not.toHaveClass(/s9-reference-loaded/);
+  await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
+  const wing=section.locator('.s9-butterfly .s9-wing-left');
+  const style=await wing.evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(style).toContain('/assets/reference-dev/section9/bfly_1.webp');
+
+  // Client-photo/commercial mode must be able to opt out of comparison art.
+  await page.goto(host+'/?section9Reference=0');
   await expect(section).not.toHaveClass(/s9-reference-butterfly-loaded/);
   await expect(section.locator('#s9ReferenceArt')).not.toHaveAttribute('src');
 });
