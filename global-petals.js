@@ -36,9 +36,17 @@
   }
   function resize() {
     const oldWidth = width, oldHeight = height;
-    width = Math.max(1, window.innerWidth);
-    height = Math.max(1, window.innerHeight);
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const nextWidth = Math.max(1, window.innerWidth);
+    const nextHeight = Math.max(1, window.innerHeight);
+    const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Mobile address-bar / orientation events may repeat unchanged sizes.
+    // Avoid reallocating and clearing the visible canvas in that case.
+    if (width === nextWidth && height === nextHeight && dpr === nextDpr &&
+        canvas.width === Math.round(nextWidth * nextDpr) &&
+        canvas.height === Math.round(nextHeight * nextDpr)) return;
+    width = nextWidth;
+    height = nextHeight;
+    dpr = nextDpr;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     context.setTransform(dpr, 0, 0, dpr, 0, 0);

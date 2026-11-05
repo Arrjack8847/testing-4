@@ -722,7 +722,7 @@
 .gift-eight .gift-eight-art{
   background-position:center top,center top;
   animation:gift-eight-garden-breathe 12s ease-in-out infinite alternate;
-  will-change:background-position;
+  will-change:auto; /* background-position cannot use compositor promotion */
 }
 .gift-eight[data-gift-artwork="reference-local"] .gift-eight-art{
   background-position:center top,center center;
@@ -762,4 +762,16 @@
     animation:none!important;
     will-change:auto;
   }
+}
+
+
+/* Performance only: leave the exact garden, petal and butterfly keyframes
+   untouched. Pause their animation clocks when the Gift is well offscreen,
+   closed, or the tab is hidden; unpause before it reaches the viewport. */
+.gift-eight[data-gift-ambient="paused"] .gift-eight-art,
+.gift-eight[data-gift-ambient="paused"] .gift-eight-butterfly,
+.gift-eight[data-gift-ambient="paused"] .gift-eight-bfly-wing,
+.gift-eight[data-gift-ambient="paused"] .gift-eight-petals i {
+  animation-play-state:paused!important;
+  will-change:auto!important;
 }

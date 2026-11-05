@@ -427,6 +427,7 @@ test('single localhost root URL joins reference Couple -> reference Events -> Or
       coupleArt:couple.dataset.art,
       eventsArt:events.dataset.art,
       eventPaper:events.querySelector('#eventSourcePaper').getAttribute('src')||'',
+      eventPaperSource:events.dataset.referencePaperSource,
       prior:events.previousElementSibling?.id,
       following:events.nextElementSibling?.id,
       section3To4Gap:rect2.top-rect1.bottom,
@@ -436,7 +437,11 @@ test('single localhost root URL joins reference Couple -> reference Events -> Or
   });
   expect(combined.coupleArt).toBe('reference');
   expect(combined.eventsArt).toBe('reference');
-  expect(combined.eventPaper).toContain('/tasik-kayangan/paper.webp');
+  // Local authorized art is intentionally preferred when staged; the same
+  // reference file remains the remote fallback when not present.
+  expect(['local','remote']).toContain(combined.eventPaperSource);
+  expect(combined.eventPaper).toContain(combined.eventPaperSource==='local'
+    ? '/assets/reference-dev/paper.webp' : '/tasik-kayangan/paper.webp');
   expect(combined.prior).toBe('couple');
   expect(combined.following).toBe('runningOrder');
   expect(Math.abs(combined.section3To4Gap)).toBeLessThanOrEqual(1);
