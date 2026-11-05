@@ -9,7 +9,7 @@
  * caches may still retain decoded memory until WebKit elects to reclaim it.
  */
 (() => {
-  const mobile = matchMedia('(max-width:600px)').matches;
+  const mobile = matchMedia('(max-width:600px), (pointer:coarse)').matches;
   const invitation = document.getElementById('invitation');
   function register(section, handlers) {
     if (!section || !handlers || typeof handlers.activate !== 'function') return;
