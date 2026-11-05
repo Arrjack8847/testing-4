@@ -151,17 +151,25 @@
       clamp(-44.8 + (scroll - referenceAnchor) * 0.0427, -44.8, 20);
     const displacement = (pinned + camera).toFixed(2) + 'px';
     const cameraValue = camera.toFixed(2);
-    const focus = portraitFocusTargets(viewport);
+    // The garden can be 7+ screens away on this page. Only evaluate each
+    // portrait rectangle and retain GPU compositing layers while near it.
+    // Start warming the layers two viewports before entry for quick swipes.
+    const near = box.bottom >= -viewport && box.top <= viewport * 2;
+    const focus = near ? portraitFocusTargets(viewport) : null;
 
     // Suppress identical writes on coalesced scroll/resize events. Keep the
-    // camera tied directly to scroll rather than easing it a frame behind.
+    // calibrated camera tied directly to scroll (no trailing easing).
     if (section.style.getPropertyValue('--couple-reference-y') !== displacement)
       section.style.setProperty('--couple-reference-y', displacement);
     if (section.dataset.referenceCameraOffset !== cameraValue)
       section.dataset.referenceCameraOffset = cameraValue;
+    const nearValue = String(near && !motion.matches);
+    if (section.dataset.cameraNear !== nearValue)
+      section.dataset.cameraNear = nearValue;
     portraitCards.forEach((card, index) => {
-      if (card.classList.contains('is-focal') !== focus[index])
-        card.classList.toggle('is-focal', focus[index]);
+      const shouldFocus = focus ? focus[index] : false;
+      if (card.classList.contains('is-focal') !== shouldFocus)
+        card.classList.toggle('is-focal', shouldFocus);
     });
   }
   function scheduleSync() {

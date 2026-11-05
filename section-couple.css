@@ -179,14 +179,21 @@
    from -44.8px to +20px; the old 100dvh image exposed unpainted seams. */
 .couple-section[data-art="reference"] .couple-reference-scene{
   display:block;position:absolute;inset:0 auto auto 0;
-  width:100%;height:100dvh;min-height:480px;
+  width:100%;height:100dvh;height:100lvh;min-height:480px;
   z-index:0;pointer-events:none;
   background:none;
-  /* One promoted background layer avoids repaint/flicker during quick
-     scroll reversals; the precise camera offset remains JS-calibrated. */
+  /* 100lvh keeps the garden's crop stable as mobile browser chrome
+     expands/collapses; 100dvh is the fallback for older engines.
+     On a fixed viewport, camera geometry and the reference crop are unchanged. */
   transform:translate3d(0,var(--couple-reference-y,0px),0);
-  will-change:transform;
   backface-visibility:hidden;
+}
+/* Promote the garden and portrait zooms only while Section 3 is near the
+   viewport. Avoid keeping large decorative GPU layers alive across the rest
+   of this ten-section page. The motion path stays scroll-synchronous. */
+.couple-section[data-art="reference"][data-camera-near="true"] .couple-reference-scene,
+.couple-section[data-art="reference"][data-camera-near="true"] .couple-portrait img{
+  will-change:transform;
 }
 .couple-section[data-art="reference"] .couple-reference-scene::before{
   content:"";position:absolute;inset:-64px 0;

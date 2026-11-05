@@ -63,3 +63,21 @@ jobs:
             test-results/**/*section2-to-3*.png
           retention-days: 7
           if-no-files-found: warn
+
+  # Mobile V2 has an isolated signal. The legacy integrated job above also
+  # checks Events, whose pre-existing paper URL assertion can fail even when
+  # every Couple camera/viewport case passes.
+  couple-v2-four-phone:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Verify Section 3 camera syntax and four mobile widths
+        run: |
+          node --check section-couple-reference.js
+          npx playwright test tests/section-couple.spec.mjs --workers=2
