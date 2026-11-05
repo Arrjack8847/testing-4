@@ -671,3 +671,77 @@ test('Section 3 camera stays aligned through mobile viewport height changes',asy
   }
   expect(errors).toEqual([]);
 });
+
+
+test('Mobile V2 keeps the reference camera artwork at a toolbar-stable large viewport height',async({page})=>{
+  const {section,errors}=await openCouple(page);
+  const check=async()=>{
+    await page.evaluate(async()=>{await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);});
+    return section.evaluate(el=>{
+      const scene=el.querySelector('.couple-reference-scene');
+      const sceneBox=scene.getBoundingClientRect();
+      const sectionBox=el.getBoundingClientRect();
+      const camera=Number(el.dataset.referenceCameraOffset);
+      const pinned=Math.max(0,Math.min(el.offsetHeight-innerHeight,-sectionBox.top));
+      const probe=document.createElement('div');
+      probe.style.cssText='position:absolute;visibility:hidden;height:100lvh;width:0';
+      document.body.append(probe);
+      const lvhHeight=probe.getBoundingClientRect().height;
+      probe.remove();
+      return {
+        lvhSupported:CSS.supports('height','100lvh'),
+        sceneHeight:sceneBox.height,lvhHeight,
+        camera,pinned,
+        actualTop:sceneBox.top,expectedTop:sectionBox.top+pinned+camera,
+        bottomGap:el.nextElementSibling.getBoundingClientRect().top-sectionBox.bottom,
+        overflow:document.documentElement.scrollWidth-innerWidth
+      };
+    });
+  };
+  const orig=page.viewportSize();
+  // On a fixed viewport, 100lvh and the prior 100dvh are identical, so
+  // all archived camera samples and the 2→3→4 section geometry are retained.
+  for(const height of [orig.height,Math.max(480,orig.height-60),orig.height]){
+    await page.setViewportSize({width:orig.width,height});
+    const v=await check();
+    expect(v.lvhSupported).toBe(true);
+    expect(Math.abs(v.sceneHeight-v.lvhHeight)).toBeLessThanOrEqual(1);
+    expect(Math.abs(v.actualTop-v.expectedTop)).toBeLessThan(1.5);
+    expect(Math.abs(v.bottomGap)).toBeLessThanOrEqual(1);
+    expect(v.overflow).toBeLessThanOrEqual(1);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('Mobile V2 releases large GPU layers away from Section 3 and warms them before entry',async({page})=>{
+  await page.goto('/');
+  const section=page.locator('#couple');
+  const scene=section.locator('.couple-reference-scene');
+  await expect(section).toHaveAttribute('data-camera-near','false');
+  await expect(scene).toHaveCSS('will-change','auto');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(async()=>{
+    const root=document.getElementById('couple');
+    const box=root.getBoundingClientRect();
+    window.scrollTo({top:Math.round(scrollY+box.top-innerHeight*1.6),behavior:'instant'});
+    await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+  });
+  await expect(section).toHaveAttribute('data-camera-near','true');
+  await expect(scene).toHaveCSS('will-change','transform');
+  await expect(section.locator('.couple-portrait img').first()).toHaveCSS('will-change','transform');
+  // A fast leap well beyond Section 4 must not retain invisible GPU layers.
+  await page.evaluate(async()=>{
+    document.getElementById('runningOrder').scrollIntoView({block:'start',behavior:'instant'});
+    await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);
+  });
+  await expect(section).toHaveAttribute('data-camera-near','false');
+  await expect(scene).toHaveCSS('will-change','auto');
+  await expect(section.locator('.couple-portrait img').first()).toHaveCSS('will-change','auto');
+  await section.scrollIntoViewIfNeeded();
+  await expect(section).toHaveAttribute('data-camera-near','true');
+  await expect(scene).toHaveCSS('will-change','transform');
+
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(section).toHaveAttribute('data-camera-near','false');
+  await expect(scene).toHaveCSS('will-change','auto');
+});
