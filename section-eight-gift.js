@@ -6,26 +6,30 @@
   if(!section||!invitation)return;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const local=['localhost','127.0.0.1','[::1]','::1'].includes(location.hostname);
-  if(local){
+  // This named Vercel project is a reference-recreation prototype, not a
+  // reusable customer invitation. Only it may auto-enable uploaded comparison art.
+  const hostedPrototype=/^testing-4(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(location.hostname);
+  const allowReference=local||hostedPrototype;
+  if(allowReference){
     const art=new Image();
     art.onload=()=>{
       if(art.naturalWidth>0&&art.naturalHeight>0)section.dataset.giftArtwork='reference-local';
     };
     art.src='./assets/reference-dev/band_plum.webp';
   }
-  // The blush wing image is separate from the plum background.
-  // Load local authorized artwork for visual QA; never hotlink the vendor.
-  if(local){
+  // Section 8 has its own blush butterfly (not Section 9's purple one).
+  // Its licensed comparison image is stored locally, never hotlinked.
+  if(allowReference){
     const butterfly=new Image();
     butterfly.onload=()=>{
       if(butterfly.naturalWidth>0&&butterfly.naturalHeight>0)
         section.dataset.giftButterfly='reference-local';
     };
     butterfly.onerror=()=>{section.dataset.giftButterfly='original';};
-    butterfly.src='./assets/reference-dev/section9/bfly_1.webp';
+    butterfly.src='./assets/reference-dev/bfly_blush.webp';
   }
 
-  if(local){
+  if(allowReference){
     const thumbs=[
       ['rice','gift-rice-cooker.jpg'],
       ['kettle','gift-kettle.webp']

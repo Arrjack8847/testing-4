@@ -601,7 +601,7 @@
 
 /* Original, independently drawn gift appliance thumbnails. These are generic
    illustrations, not Philips product photography or vendor-owned artwork.
-   A user-authorized reference-dev photo, when available on localhost, wins
+   A user-authorized reference-dev photo, when available in the testing prototype, wins
    over these selectors through higher specificity. */
 .gift-eight .gift-eight-thumb-rice {
   background:#fff url("./assets/section8-rice-cooker-original.svg") center / contain no-repeat;
@@ -633,7 +633,7 @@
 
 /* Expanded wishlist background resets were hiding the original fallback
    illustrations. Reapply their images with higher specificity, and always
-   prefer verified local comparison photos if supplied on localhost. */
+   prefer verified local comparison photos if available in the testing prototype. */
 .gift-eight .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-rice {
   background: #fff url("./assets/section8-rice-cooker-original.svg") center / contain no-repeat;
 }
@@ -661,10 +661,9 @@
 }
 .gift-eight .gift-eight-bfly-wing{
   top:3px;width:27px;height:34px;
-  background-image:none;
-  background:radial-gradient(ellipse at 60% 40%,#f4eaf7 8%,#b49bbd 57%,#816b9b 92%);
-  border-radius:83% 11% 75% 21%;
-  filter:drop-shadow(0 1px 1px #8f7fa9);
+  background-image:url("./assets/section8-blush-wing-original.svg");
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  border-radius:0;filter:none;
 }
 .gift-eight .gift-eight-bfly-left{
   left:0;transform-origin:right center;
@@ -677,7 +676,7 @@
 .gift-eight .gift-eight-bfly-body{left:24px;top:12px}
 .gift-eight[data-gift-butterfly="reference-local"] .gift-eight-bfly-wing{
   top:0;width:50%;height:100%;border-radius:0;filter:none;
-  background-image:url("./assets/reference-dev/section9/bfly_1.webp");
+  background-image:url("./assets/reference-dev/bfly_blush.webp");
   background-repeat:no-repeat;background-size:200% 100%;
 }
 .gift-eight[data-gift-butterfly="reference-local"] .gift-eight-bfly-left{
