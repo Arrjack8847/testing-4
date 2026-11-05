@@ -32,10 +32,23 @@
 .section-ten[data-active="true"] .ref-vine {animation-play-state:running;}
 .section-ten .ref-light-b {opacity:.3;}
 .section-ten .closing10-sticky-art {
-  position:absolute;top:0;left:0;right:0;height:100dvh;
+  position:absolute;top:0;left:0;right:0;height:100dvh;height:100lvh;
   min-height:568px;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 85% 50% at 50% 50%,#fffaf6c7,transparent 80%);
+  /* Legacy fallback: native sticky below does not use JS counter-scroll. */
   transform:translate3d(0,var(--closing10-sticky-y,0px),0);
+}
+/* The existing absolute .ref-environment spans Section 10 and serves as
+   the sticky track. Both overflow:hidden ancestors must switch to clip:
+   hidden creates a scroll container and defeats position:sticky. Clip
+   preserves clipping without becoming a sticky scrolling ancestor. */
+@supports (overflow:clip) and (position:sticky) {
+  .reference-continuation.ref-closing.section-ten {overflow:clip;}
+  .section-ten .ref-environment {overflow:clip;}
+  .section-ten .closing10-sticky-art {
+    position:sticky;top:0;left:auto;right:auto;
+    transform:none;
+  }
 }
 /* The camera pans the licensed local scene up to 24px vertically.
    Paint the unshifted same scene below it so the parallax never exposes
