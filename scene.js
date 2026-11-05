@@ -372,6 +372,10 @@ function openInvitation(event) {
   openedOnce = true;
   scrollGestureStarted = false;
   invite.dataset.scrollActive = 'no';
+  // Mobile cover is fixed until deliberate activation. Release it only here,
+  // not from touch/wheel/scroll events; this prevents fast swipes skipping
+  // the invitation while keeping the post-open scroll choreography native.
+  document.documentElement.classList.remove('invitation-cover-locked');
   document.documentElement.style.overflowY = 'auto';
   if (keyboardActivation) {
     document.querySelector('.swipe-cue')?.focus({preventScroll:true});
@@ -389,6 +393,7 @@ function resetInvitation() {
   openedOnce = false;
   scrollGestureStarted = false;
   invite.dataset.scrollActive = 'no';
+  document.documentElement.classList.add('invitation-cover-locked');
   document.documentElement.style.overflowY = 'hidden';
   // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
   document.documentElement.style.setProperty('--stage-parallax', '0px');
@@ -399,7 +404,12 @@ function resetInvitation() {
 document.documentElement.style.overflowY = 'hidden';
 document.getElementById('openButton').addEventListener('click', openInvitation);
 window.addEventListener('pageshow', () => {
-  if (!openedOnce && window.scrollY) window.scrollTo(0, 0);
+  // Returning from Safari/Telegram page cache must not expose Section 2+
+  // while the cover is closed, even when the browser restores old scroll.
+  if (!openedOnce) {
+    document.documentElement.classList.add('invitation-cover-locked');
+    if (window.scrollY) window.scrollTo({top:0,behavior:'instant'});
+  }
 });
 
 // Reference scroll calibration at 390x844:
