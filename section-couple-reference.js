@@ -118,44 +118,69 @@
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
   const portraitCards = [...section.querySelectorAll('.couple-portrait')];
-  // The live reference zooms a portrait only while the guest is looking at
-  // its central focal area. Returning toward either end of the section
-  // restores the unzoomed crop; this is NOT a permanent groom-only scale.
-  function syncPortraitFocus() {
-    const viewportHeight = Math.max(window.innerHeight, 1);
-    for (const card of portraitCards) {
+  // Keep the source's 28%-78% entry band. Once a portrait is focused,
+  // give it a narrow 3%-of-viewport release margin. This avoids rapidly
+  // retriggering the 600ms zoom while a finger hovers near either threshold.
+  // Neither the zoom magnitude nor the measured camera timeline changes.
+  function portraitFocusTargets(viewportHeight) {
+    if (motion.matches) return portraitCards.map(() => false);
+    return portraitCards.map(card => {
       const rect = card.getBoundingClientRect();
       const midpoint = rect.top + rect.height / 2;
-      const withinFocalBand =
-        midpoint >= viewportHeight * .28 &&
-        midpoint <= viewportHeight * .78;
-      card.classList.toggle('is-focal', !motion.matches && withinFocalBand);
-    }
+      const focused = card.classList.contains('is-focal');
+      const lower = viewportHeight * (focused ? .25 : .28);
+      const upper = viewportHeight * (focused ? .81 : .78);
+      return midpoint >= lower && midpoint <= upper;
+    });
   }
+
+  // Request at most one paint per frame; all geometry is read before changing
+  // styles/classes so portrait focus cannot force extra layouts mid-frame.
   let pending = false;
   function syncScene() {
     pending = false;
     const box = section.getBoundingClientRect();
-    const viewport = window.innerHeight;
-    const start = box.top + window.scrollY;
+    const viewport = Math.max(window.innerHeight, 1);
+    const scroll = window.scrollY;
+    const start = box.top + scroll;
     const pinned = clamp(-box.top, 0, Math.max(0, box.height - viewport));
-    // Reference y=2743 corresponds to ~0.653 viewport before Section 3.
-    // This conversion is independent of the phone height.
+    // Preserve the four archived 390px checkpoints and camera speed exactly.
+    // y=2743 -> -44.8; y=3165 -> -26.8; y=3587 -> -8.8; y=4220 -> +18.2.
     const referenceAnchor = start - 0.653 * viewport;
     const camera = motion.matches ? 0 :
-      clamp(-44.8 + (window.scrollY - referenceAnchor) * 0.0427, -44.8, 20);
-    const displacement = pinned + camera;
-    section.style.setProperty('--couple-reference-y',displacement.toFixed(2)+'px');
-    section.dataset.referenceCameraOffset = camera.toFixed(2);
-    syncPortraitFocus();
+      clamp(-44.8 + (scroll - referenceAnchor) * 0.0427, -44.8, 20);
+    const displacement = (pinned + camera).toFixed(2) + 'px';
+    const cameraValue = camera.toFixed(2);
+    const focus = portraitFocusTargets(viewport);
+
+    // Suppress identical writes on coalesced scroll/resize events. Keep the
+    // camera tied directly to scroll rather than easing it a frame behind.
+    if (section.style.getPropertyValue('--couple-reference-y') !== displacement)
+      section.style.setProperty('--couple-reference-y', displacement);
+    if (section.dataset.referenceCameraOffset !== cameraValue)
+      section.dataset.referenceCameraOffset = cameraValue;
+    portraitCards.forEach((card, index) => {
+      if (card.classList.contains('is-focal') !== focus[index])
+        card.classList.toggle('is-focal', focus[index]);
+    });
   }
   function scheduleSync() {
     if (pending) return;
     pending = true;
-    requestAnimationFrame(syncScene);
+    window.requestAnimationFrame(syncScene);
   }
-  window.addEventListener('scroll',scheduleSync,{passive:true});
-  window.addEventListener('resize',scheduleSync,{passive:true});
-  motion.addEventListener?.('change',scheduleSync);
+  window.addEventListener('scroll', scheduleSync, {passive:true});
+  window.addEventListener('resize', scheduleSync, {passive:true});
+  window.visualViewport?.addEventListener('resize', scheduleSync, {passive:true});
+  window.addEventListener('pageshow', scheduleSync);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) scheduleSync();
+  });
+  motion.addEventListener?.('change', scheduleSync);
+  // A font load or portrait reveal can change the section's measured layout
+  // without a scroll event. Re-anchor on layout shifts, not via a smoothing
+  // timer that would drift from the reference path.
+  if ('ResizeObserver' in window) new ResizeObserver(scheduleSync).observe(section);
+  document.fonts?.ready.then(scheduleSync).catch(() => {});
   syncScene();
 })();
