@@ -25,6 +25,21 @@
 .global-petals-active .s9-rsvp .s9-petals{
   visibility:hidden!important;
 }
+/* Visibility:hidden does not stop CSS animation clocks. Pause only those
+   duplicate decorative layers while the visible global canvas covers them;
+   no guest-visible keyframes, artwork or timings are changed. */
+.global-petals-active #message .letter-petal,
+.global-petals-active .couple-floating-petals,
+.global-petals-active .couple-floating-petals *,
+.global-petals-active .event-section .event-petal-field,
+.global-petals-active .event-section .event-petal-field *,
+.global-petals-active .order-section .order-petals,
+.global-petals-active .order-section .order-petals *,
+.global-petals-active .gift-eight .gift-eight-petals i,
+.global-petals-active .s9-rsvp .s9-petals,
+.global-petals-active .s9-rsvp .s9-petals * {
+  animation-play-state:paused!important;
+}
 /* Respect reduced motion and never block the invitation. */
 @media(prefers-reduced-motion:reduce){
   .global-petal-canvas{display:none!important}
