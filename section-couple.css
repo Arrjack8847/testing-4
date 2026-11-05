@@ -182,7 +182,11 @@
   width:100%;height:100dvh;min-height:480px;
   z-index:0;pointer-events:none;
   background:none;
+  /* One promoted background layer avoids repaint/flicker during quick
+     scroll reversals; the precise camera offset remains JS-calibrated. */
   transform:translate3d(0,var(--couple-reference-y,0px),0);
+  will-change:transform;
+  backface-visibility:hidden;
 }
 .couple-section[data-art="reference"] .couple-reference-scene::before{
   content:"";position:absolute;inset:-64px 0;
