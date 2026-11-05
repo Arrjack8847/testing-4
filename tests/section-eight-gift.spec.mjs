@@ -218,7 +218,9 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
   expect(visual.butterflyWidth).toBeLessThanOrEqual(54);
   expect(visual.butterflyTop).toBeGreaterThanOrEqual(0);
   expect(visual.butterflyTop).toBeLessThanOrEqual(25);
-  expect(visual.butterflyBottom).toBe('auto');
+  // Chromium may resolve computed bottom to a used pixel value when top and
+  // height position an absolute element. Top, size and overflow are the
+  // meaningful visual anchors, all asserted above and below.
   expect(visual.overflow).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
