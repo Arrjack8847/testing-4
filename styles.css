@@ -9,9 +9,9 @@ body { margin:0; color:var(--ink); font-family:'Cormorant Garamond',Georgia,seri
 button,a { -webkit-tap-highlight-color:transparent; }
 button { cursor:pointer; font:inherit; }
 .invitation { position:relative; width:100%; max-width:430px; margin:0 auto; background:#eae0e5; box-shadow:0 0 60px #5f475321; }
-.viewport { position:relative; width:100%; height:100vh; height:100dvh; min-height:480px; overflow:hidden; isolation:isolate; background:#d0bfd9; }
+.viewport { position:relative; width:100%; height:100vh; height:100lvh; min-height:480px; overflow:hidden; isolation:isolate; background:#d0bfd9; }
 .scene-stage {
-  position:absolute; top:50%; left:50%; width:max(100%,56.25dvh);
+  position:absolute; top:50%; left:50%; width:max(100%,56.25lvh);
   aspect-ratio:var(--art-ratio);
   transform:translate(-50%,calc(-50% + var(--stage-parallax)));
   pointer-events:none; user-select:none; will-change:transform;
@@ -150,10 +150,10 @@ html.debug-freeze .scene-stage { --stage-parallax:0px; }
 /* Phase 5: geometry measured from the actual live 390x844 mobile reference.
    Original artwork files remain their respective owners' property.
    This CSS is an independent implementation of the measured layout. */
-:root { --ink:#5c264f; --gold:#5c264f; --unit:min(1dvh,2.164vw); --open-time:900ms; }
+:root { --ink:#5c264f; --gold:#5c264f; --unit:min(1lvh,2.164vw); --open-time:900ms; }
 body { font-family:'EB Garamond', Georgia,serif; }
 /* The reference's 9:16 art frame is bottom-aligned, NOT vertically centered. */
-.scene-stage { top:auto;bottom:0;width:max(100%,56.25dvh);transform:translate(-50%,var(--stage-parallax)); }
+.scene-stage { top:auto;bottom:0;width:max(100%,56.25lvh);transform:translate(-50%,var(--stage-parallax)); }
 /* The cover is animated even BEFORE the guest opens it. */
 .invitation[data-layers="ready"] .master-art {opacity:0;}
 .invitation[data-layers="ready"] .animated-scene {opacity:1;}
@@ -171,14 +171,14 @@ body { font-family:'EB Garamond', Georgia,serif; }
 /* Trees have a 1080x1920 source canvas, but the live reference displays
    each at 70% viewport HEIGHT, anchored 4% above the bottom.
    Full-size stacking was an earlier assumption and is now corrected. */
-.depth.tree {top:auto;bottom:4dvh;width:39.375dvh;height:70dvh;z-index:8;
+.depth.tree {top:auto;bottom:4lvh;width:39.375lvh;height:70lvh;z-index:8;
   transform-origin:50% 100%;transition:transform 1.45s cubic-bezier(.55,0,.75,.4),opacity 1.25s ease;}
-.depth.tree-left {left:calc(25vw - 39.375dvh * .759 + max(0px,(56.25dvh - 100vw)/2));right:auto;}
-.depth.tree-right {left:auto;right:calc(27vw - 39.375dvh * .929 + max(0px,(56.25dvh - 100vw)/2));}
+.depth.tree-left {left:calc(25vw - 39.375lvh * .759 + max(0px,(56.25lvh - 100vw)/2));right:auto;}
+.depth.tree-right {left:auto;right:calc(27vw - 39.375lvh * .929 + max(0px,(56.25lvh - 100vw)/2));}
 .depth.tree img {height:100%;width:100%;object-fit:contain;}
 .depth.tree .gentle-tree {animation-duration:7.5s;}
 .depth.tree-right .gentle-tree {animation-duration:8.6s;animation-delay:-3s;}
-.depth.canopy {top:-11dvh;bottom:auto;left:50%;width:104vw;height:auto;translate:-50% 0;z-index:11;
+.depth.canopy {top:-11lvh;bottom:auto;left:50%;width:104vw;height:auto;translate:-50% 0;z-index:11;
   transform-origin:50% 0;transition:transform 1.35s cubic-bezier(.55,0,.75,.4),opacity 1s ease;}
 .depth.canopy img {width:100%;height:auto;animation:floral-sway 9s ease-in-out infinite alternate;}
 /* Sprite coordinates are copied as measurements, not hand-estimated.
@@ -216,18 +216,18 @@ body { font-family:'EB Garamond', Georgia,serif; }
 /* The reference cover groups its large script monogram, small title,
    paired names, divider, and pill control above the living scene. */
 .cover {display:flex;align-items:center;flex-direction:column;justify-content:flex-start;
-  padding-top:min(23dvh,calc(54dvh - 200px));color:#5c264f;}
+  padding-top:min(23lvh,calc(54lvh - 200px));color:#5c264f;}
 .monogram {position:static;top:auto;left:auto;width:auto;display:flex;align-items:flex-end;justify-content:center;
   font-family:'Alex Brush','EB Garamond',serif;font-weight:400;
-  font-size:clamp(64px,min(27vw,13.6dvh),118px);line-height:.9;letter-spacing:0;
+  font-size:clamp(64px,min(27vw,13.6lvh),118px);line-height:.9;letter-spacing:0;
   text-shadow:0 2px 18px rgba(255,250,244,.85);}
 .monogram span {display:block;padding:0;font:inherit;letter-spacing:0;}
 .monogram span + span {margin-left:-.08em;transform:translateY(.1em);}
-.cover-copy {position:static;top:auto;left:auto;width:100%;margin-top:min(22px,2.6dvh);text-shadow:0 1px 10px rgba(255,250,244,.95);}
+.cover-copy {position:static;top:auto;left:auto;width:100%;margin-top:min(22px,2.6lvh);text-shadow:0 1px 10px rgba(255,250,244,.95);}
 .cover-copy .eyebrow {font-family:'EB Garamond',serif;font-size:16px;line-height:1.2;letter-spacing:.03em;color:#5c264f;margin:0 0 3px;}
 .cover-copy h1 {font-family:'EB Garamond',serif;font-size:22px;font-weight:600;line-height:1.2;letter-spacing:.02em;}
 .cover-copy h1 em {font-size:1em;font-weight:600;font-style:normal;}
-.cover-rule {display:block;width:min(56%,230px);height:1px;flex:0 0 1px;margin:min(12px,1.4dvh) 0 0;
+.cover-rule {display:block;width:min(56%,230px);height:1px;flex:0 0 1px;margin:min(12px,1.4lvh) 0 0;
   background:linear-gradient(90deg,transparent,#5c264fb2,transparent);}
 .open-button {top:50.02%;left:50%;position:absolute;translate:-50% 0;
   width:220.6px;min-width:0;height:49.1px;min-height:0;padding:0 26px;margin:0;
@@ -244,8 +244,8 @@ body { font-family:'EB Garamond', Georgia,serif; }
 .invitation[data-state="opened"] .depth.tree-left {transform:scale(2.1) translateX(-14%);opacity:0;}
 .invitation[data-state="opened"] .depth.tree-right {transform:scale(2.1) translateX(14%);opacity:0;}
 .invitation[data-state="opened"] .depth.canopy {transform:scale(2.2) translateY(-10%);opacity:0;}
-.invitation[data-state="opened"] .sprite.hanging {opacity:0;transform:translateY(-20dvh);transition:opacity 1s ease,transform 1.35s ease;}
-.invitation[data-state="opened"] .sprite.front {transform:translateY(20dvh);transition:transform 1.7s ease;}
+.invitation[data-state="opened"] .sprite.hanging {opacity:0;transform:translateY(-20lvh);transition:opacity 1s ease,transform 1.35s ease;}
+.invitation[data-state="opened"] .sprite.front {transform:translateY(20lvh);transition:transform 1.7s ease;}
 /* Explicit comparison mode always wins over the default animated cover. */
 .invitation[data-compare="master"] .master-art {opacity:1!important;}
 .invitation[data-compare="master"] .animated-scene {opacity:0!important;}
@@ -263,7 +263,7 @@ body { font-family:'EB Garamond', Georgia,serif; }
 }
 .invitation[data-state="opened"] .sprite.front {
   opacity:0;
-  transform:translateY(45dvh);
+  transform:translateY(45lvh);
   transition:transform 1.7s cubic-bezier(.55,0,.75,.4),opacity 1.05s ease;
 }
 /* Compact raised swipe invitation visible over the lake.
@@ -301,9 +301,9 @@ body { font-family:'EB Garamond', Georgia,serif; }
 @keyframes bird-cross {
   0% {transform:translate(-12vw,0);opacity:0;}
   6% {opacity:1;}
-  50% {transform:translate(50vw,-3dvh);}
+  50% {transform:translate(50vw,-3lvh);}
   94% {opacity:1;}
-  100% {transform:translate(112vw,1dvh);opacity:0;}
+  100% {transform:translate(112vw,1lvh);opacity:0;}
 }
 @keyframes bird-flap {from{transform:scaleY(1)}to{transform:scaleY(-.55)}}
 .depth.palace .waterfalls {
@@ -359,7 +359,7 @@ body { font-family:'EB Garamond', Georgia,serif; }
 
 /* Refined with the Celestial Lake theme's measured ornamental type variables:
    script size 1.08x, linked initials with -.42em overlap, second initial .3em lower. */
-.monogram { font-size:calc(clamp(64px,min(27vw,13.6dvh),118px) * 1.08); }
+.monogram { font-size:calc(clamp(64px,min(27vw,13.6lvh),118px) * 1.08); }
 .monogram span + span {margin-left:-.42em;transform:translateY(.3em);}
 
 
@@ -471,8 +471,8 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
    second scene at exactly 3H, without exposing the bottom of the artwork. */
 .scene-scroll-track {
   position:relative;
-  height:400vh;height:400dvh;
-  margin-bottom:-100vh;margin-bottom:-100dvh;
+  height:400vh;height:400lvh;
+  margin-bottom:-100vh;margin-bottom:-100lvh;
 }
 .scene-scroll-track > .viewport {position:sticky;top:0;z-index:1;}
 .message {position:relative;z-index:2;}
@@ -537,15 +537,15 @@ html.debug-freeze .butterfly,html.debug-freeze .butterfly-wing {
 }
 .invitation[data-state="opened"] .sprite.hanging {
   opacity:var(--hanging-scroll-opacity,0);
-  transform:translateY(var(--hanging-scroll-shift,-20dvh));
+  transform:translateY(var(--hanging-scroll-shift,-20lvh));
 }
 .invitation[data-state="opened"] .sprite.front {
   opacity:var(--front-scroll-opacity,0);
-  transform:translateY(var(--front-scroll-shift,45dvh));
+  transform:translateY(var(--front-scroll-shift,45lvh));
 }
 .invitation[data-state="opened"] .sprite.peacock-sprite.front {
   opacity:var(--peacock-scroll-opacity,0);
-  transform:translateY(var(--front-scroll-shift,45dvh));
+  transform:translateY(var(--front-scroll-shift,45lvh));
 }
 .invitation[data-state="opened"][data-scroll-active="yes"] :is(
   .sky-layer,.depth.palace img,.depth.palace .waterfalls,
@@ -850,37 +850,37 @@ html.debug-freeze .peacock-glint {
 @keyframes bf-violet-garden {
   0% {
     opacity:0;
-    transform:translate3d(-110px,48dvh,0) rotate(-20deg);
+    transform:translate3d(-110px,48lvh,0) rotate(-20deg);
   }
   3% {opacity:1;}
-  11% {transform:translate3d(calc(6vw - 26px),64dvh,0) rotate(14deg);}
-  23% {transform:translate3d(calc(23vw - 26px),80dvh,0) rotate(25deg);}
+  11% {transform:translate3d(calc(6vw - 26px),64lvh,0) rotate(14deg);}
+  23% {transform:translate3d(calc(23vw - 26px),80lvh,0) rotate(25deg);}
   /* Short low-flower pause: wings keep beating while flight velocity eases. */
-  35% {transform:translate3d(calc(45vw - 26px),calc(94dvh - 20px),0) rotate(19deg);}
-  38% {transform:translate3d(calc(45vw - 26px),calc(94dvh - 20px),0) rotate(15deg);}
-  40% {transform:translate3d(calc(46vw - 26px),calc(93dvh - 20px),0) rotate(6deg);}
-  42% {transform:translate3d(calc(49vw - 26px),calc(91dvh - 20px),0) rotate(-15deg);}
-  50% {transform:translate3d(calc(56vw - 26px),calc(95dvh - 20px),0) rotate(13deg);}
-  60% {transform:translate3d(calc(50vw - 26px),calc(90dvh - 20px),0) rotate(-38deg);}
-  73% {transform:translate3d(calc(7vw - 26px),calc(44dvh - 20px),0) rotate(-18deg);}
-  84% {transform:translate3d(calc(60vw - 26px),calc(32dvh - 20px),0) rotate(28deg);}
-  94% {opacity:1;transform:translate3d(calc(93vw - 26px),calc(48dvh - 20px),0) rotate(17deg);}
-  100% {opacity:0;transform:translate3d(calc(105vw - 26px),calc(49dvh - 20px),0) rotate(14deg);}
+  35% {transform:translate3d(calc(45vw - 26px),calc(94lvh - 20px),0) rotate(19deg);}
+  38% {transform:translate3d(calc(45vw - 26px),calc(94lvh - 20px),0) rotate(15deg);}
+  40% {transform:translate3d(calc(46vw - 26px),calc(93lvh - 20px),0) rotate(6deg);}
+  42% {transform:translate3d(calc(49vw - 26px),calc(91lvh - 20px),0) rotate(-15deg);}
+  50% {transform:translate3d(calc(56vw - 26px),calc(95lvh - 20px),0) rotate(13deg);}
+  60% {transform:translate3d(calc(50vw - 26px),calc(90lvh - 20px),0) rotate(-38deg);}
+  73% {transform:translate3d(calc(7vw - 26px),calc(44lvh - 20px),0) rotate(-18deg);}
+  84% {transform:translate3d(calc(60vw - 26px),calc(32lvh - 20px),0) rotate(28deg);}
+  94% {opacity:1;transform:translate3d(calc(93vw - 26px),calc(48lvh - 20px),0) rotate(17deg);}
+  100% {opacity:0;transform:translate3d(calc(105vw - 26px),calc(49lvh - 20px),0) rotate(14deg);}
 }
 @keyframes bf-ivory-garden {
-  0% {opacity:0;transform:translate3d(-85px,47dvh,0) rotate(-26deg);}
+  0% {opacity:0;transform:translate3d(-85px,47lvh,0) rotate(-26deg);}
   5% {opacity:1;}
-  20% {transform:translate3d(calc(7vw - 22px),calc(60dvh - 17px),0) rotate(17deg);}
-  35% {transform:translate3d(calc(31vw - 22px),calc(82dvh - 17px),0) rotate(24deg);}
+  20% {transform:translate3d(calc(7vw - 22px),calc(60lvh - 17px),0) rotate(17deg);}
+  35% {transform:translate3d(calc(31vw - 22px),calc(82lvh - 17px),0) rotate(24deg);}
   /* Independent white butterfly settles slightly later than the violet one. */
-  46% {transform:translate3d(calc(56vw - 22px),calc(95dvh - 17px),0) rotate(13deg);}
-  49% {transform:translate3d(calc(56vw - 22px),calc(95dvh - 17px),0) rotate(9deg);}
-  51% {transform:translate3d(calc(55vw - 22px),calc(94dvh - 17px),0) rotate(-4deg);}
-  54% {transform:translate3d(calc(50vw - 22px),calc(90dvh - 17px),0) rotate(-30deg);}
-  68% {transform:translate3d(calc(7vw - 22px),calc(44dvh - 17px),0) rotate(-20deg);}
-  83% {transform:translate3d(calc(58vw - 22px),calc(32dvh - 17px),0) rotate(22deg);}
-  94% {opacity:1;transform:translate3d(calc(93vw - 22px),calc(48dvh - 17px),0) rotate(17deg);}
-  100% {opacity:0;transform:translate3d(calc(106vw - 22px),calc(52dvh - 17px),0) rotate(9deg);}
+  46% {transform:translate3d(calc(56vw - 22px),calc(95lvh - 17px),0) rotate(13deg);}
+  49% {transform:translate3d(calc(56vw - 22px),calc(95lvh - 17px),0) rotate(9deg);}
+  51% {transform:translate3d(calc(55vw - 22px),calc(94lvh - 17px),0) rotate(-4deg);}
+  54% {transform:translate3d(calc(50vw - 22px),calc(90lvh - 17px),0) rotate(-30deg);}
+  68% {transform:translate3d(calc(7vw - 22px),calc(44lvh - 17px),0) rotate(-20deg);}
+  83% {transform:translate3d(calc(58vw - 22px),calc(32lvh - 17px),0) rotate(22deg);}
+  94% {opacity:1;transform:translate3d(calc(93vw - 22px),calc(48lvh - 17px),0) rotate(17deg);}
+  100% {opacity:0;transform:translate3d(calc(106vw - 22px),calc(52lvh - 17px),0) rotate(9deg);}
 }
 /* Avoid hiding the original, more ornamental valley-flight pair; those
    remain delayed until the scroll enters the couple-name ceremony. */
@@ -986,7 +986,7 @@ html.debug-freeze .peacock-glint {
    which descend out of view by ~0.4 viewport scroll. Side flowers
    return sooner, reaching the visible frame around 0.75H. */
 .invitation[data-state="opened"] .depth.reeds {
-  transform:translateY(var(--reed-scroll-shift,0dvh));
+  transform:translateY(var(--reed-scroll-shift,0lvh));
   opacity:var(--reed-scroll-opacity,1);
   transition:none;
   pointer-events:none;
