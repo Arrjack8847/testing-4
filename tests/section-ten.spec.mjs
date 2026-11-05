@@ -327,6 +327,10 @@ test('Section 10 artwork camera pins through the Section 9 seam and reverses at 
     await expect.poll(async()=>{
       return camera.evaluate(el=>Math.abs(el.getBoundingClientRect().top));
     },{timeout:3000,intervals:[50,100,150]}).toBeLessThan(2);
+    // CSS sticky positioning can already be correct before the next
+    // intersection-observer/requestAnimationFrame paint. Await the actual
+    // camera-active state rather than sampling a transient false in CI.
+    await expect(section).toHaveAttribute('data-active','true');
     const state=await section.evaluate(el=>({
       art:el.dataset.artwork,
       active:el.dataset.active,
