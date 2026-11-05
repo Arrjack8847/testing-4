@@ -6,6 +6,25 @@
 *,*::before,*::after { box-sizing:border-box; }
 html { background:#c9bed0; scroll-behavior:smooth; }
 body { margin:0; color:var(--ink); font-family:'Cormorant Garamond',Georgia,serif; }
+/* Mobile only: html overflow:hidden alone can leak root/body momentum scrolling
+   in iOS Safari and embedded WebKit. Pin the unopened cover at first paint.
+   This class is removed when Open Invitation is activated, so the original
+   sticky cameras and continuous Sections 1–10 scrolling are unchanged. */
+@media (max-width:430px) {
+  html.invitation-cover-locked {
+    overflow:hidden!important;
+    overscroll-behavior:none;
+  }
+  html.invitation-cover-locked body {
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+    touch-action:none;
+  }
+}
 button,a { -webkit-tap-highlight-color:transparent; }
 button { cursor:pointer; font:inherit; }
 .invitation { position:relative; width:100%; max-width:430px; margin:0 auto; background:#eae0e5; box-shadow:0 0 60px #5f475321; }
