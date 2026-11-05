@@ -342,6 +342,63 @@ const artworkReady=loadSceneArtwork().then(() => {
   return layersComplete;
 });
 
+// Mobile-only cleanup: Section 1's animated backdrop includes many
+// 1080x1920 transparent WebP layers. Keep the still master as a fallback,
+// but detach the animated <img> sources when the sticky hero is multiple
+// viewports away. The shared lifecycle prewarms on reverse scrolling.
+// This cannot force iOS to free cached textures, but removes live DOM holders.
+artworkReady.then(ready => {
+  if(!ready || !window.MobileArtworkLifecycle?.mobile)return;
+  const layers=[...byFile.values()].flat().filter(Boolean);
+  const sources=layers.map(img=>[img,img.getAttribute('src')]);
+  const sheens=[...document.querySelectorAll('.peacock-glint')]
+    .map(node=>[node,node.style.getPropertyValue('--peacock-image')]);
+  let detached=false;
+  let generation=0;
+  function restoreHero(){
+    if(!detached)return;
+    detached=false;
+    const version=++generation;
+    invite.dataset.heroRehydrating='true';
+    for(const [node,value] of sheens)
+      if(value)node.style.setProperty('--peacock-image',value);
+    const loads=sources.map(([img,url])=>new Promise(resolve=>{
+      if(!url){resolve(false);return;}
+      let settled=false;
+      const finish=ok=>{
+        if(settled)return;
+        settled=true;
+        img.removeEventListener('load',onLoad);
+        img.removeEventListener('error',onError);
+        resolve(ok);
+      };
+      const onLoad=()=>finish(img.naturalWidth>0);
+      const onError=()=>finish(false);
+      img.addEventListener('load',onLoad);
+      img.addEventListener('error',onError);
+      img.src=url;
+      if(img.complete && img.naturalWidth>0)finish(true);
+    }));
+    Promise.all(loads).then(results=>{
+      if(version!==generation || detached)return;
+      // Never show a partially transparent animated scene in place of the
+      // original master while returning rapidly from Sections 6–10.
+      if(results.every(Boolean))invite.dataset.heroRehydrating='false';
+    });
+  }
+  function releaseHero(){
+    if(detached)return;
+    detached=true;
+    ++generation;
+    invite.dataset.heroRehydrating='true';
+    for(const [img] of sources)img.removeAttribute('src');
+    for(const [node] of sheens)node.style.setProperty('--peacock-image','none');
+  }
+  window.MobileArtworkLifecycle.register(heroViewport,{
+    activate:restoreHero,release:releaseHero
+  });
+});
+
 // Cover is a focusable action, not a scroll-triggered trap.
 let openedOnce = false;
 let scrollGestureStarted = false;
