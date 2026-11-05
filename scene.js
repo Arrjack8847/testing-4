@@ -21,6 +21,10 @@ const master = document.getElementById('masterArt');
 const cover = document.getElementById('cover');
 const opened = document.getElementById('opened');
 const notification = document.getElementById('networkNote');
+// The native-sticky hero has a toolbar-stable 100lvh canvas. Tie Section 1
+// choreography to that scene, not the mobile browser's changing innerHeight.
+const heroViewport = document.getElementById('viewport');
+const heroHeight = () => Math.max(heroViewport?.clientHeight || window.innerHeight, 1);
 
 // Render the repeated reference assets as separate DOM elements.
 // Background layers retain the reference artwork's 563x1000 coordinate system.
@@ -162,7 +166,7 @@ function ambientAllowed() {
   // overlaid by Section 2 at document 3H. The lake is no longer visible
   // once the mauve message fully covers the phone.
   return !!petalContext && sceneVisible &&
-    (invite.dataset.state !== 'opened' || window.scrollY < window.innerHeight*3) &&
+    (invite.dataset.state !== 'opened' || window.scrollY < heroHeight()*3) &&
     !pageSuspended && !document.hidden && !reduceMotion.matches &&
     !document.documentElement.classList.contains('debug-freeze');
 }
@@ -183,10 +187,16 @@ function syncAmbient() {
 }
 function resizePetals() {
   const bounds = petalCanvas.getBoundingClientRect();
-  petalW=bounds.width;petalH=bounds.height;
   const ratio=Math.min(window.devicePixelRatio||1,2);
-  petalCanvas.width=Math.round(petalW*ratio);
-  petalCanvas.height=Math.round(petalH*ratio);
+  const physicalW=Math.round(bounds.width*ratio);
+  const physicalH=Math.round(bounds.height*ratio);
+  // The address bar may fire resize while the 100lvh scene stays unchanged.
+  // Do not clear/reallocate the canvas in that case (it causes a flash).
+  if(petalCanvas.width===physicalW && petalCanvas.height===physicalH &&
+     petalW===bounds.width && petalH===bounds.height) return;
+  petalW=bounds.width;petalH=bounds.height;
+  petalCanvas.width=physicalW;
+  petalCanvas.height=physicalH;
   petalContext?.setTransform(ratio,0,0,ratio,0,0);
 }
 function renderPetals(now) {
@@ -394,7 +404,10 @@ function applyScrollScene(fraction) {
   const secondName = easeBetween(fraction, 1.79, 2.08);
   const names = Math.max(firstName, secondName);
   const details = easeBetween(fraction, 2.08, 2.42);
-  const set = (name,value) => rootStyle.setProperty(name,String(value));
+  const set = (name,value) => {
+    const next=String(value);
+    if(rootStyle.getPropertyValue(name)!==next)rootStyle.setProperty(name,next);
+  };
   set('--sky-scroll-scale', (1.12-.12*skyRetreat).toFixed(4));
   set('--sky-scroll-y', (-4*(1-skyRetreat)).toFixed(3)+'%');
   set('--palace-scroll-scale', (.99-.33*palaceRetreat).toFixed(4));
@@ -405,11 +418,11 @@ function applyScrollScene(fraction) {
   set('--canopy-scroll-scale', (2.2-1.2*framing).toFixed(4));
   set('--canopy-scroll-shift', (-10*(1-framing)).toFixed(3)+'%');
   set('--hanging-scroll-opacity', framing.toFixed(4));
-  set('--hanging-scroll-shift', (-20*(1-framing)).toFixed(3)+'dvh');
+  set('--hanging-scroll-shift', (-20*(1-framing)).toFixed(3)+'lvh');
   set('--front-scroll-opacity', blossoms.toFixed(4));
-  set('--front-scroll-shift', (45*(1-blossoms)).toFixed(3)+'dvh');
+  set('--front-scroll-shift', (45*(1-blossoms)).toFixed(3)+'lvh');
   set('--reed-scroll-opacity', reeds.toFixed(4));
-  set('--reed-scroll-shift', (38*(1-reeds)).toFixed(3)+'dvh');
+  set('--reed-scroll-shift', (38*(1-reeds)).toFixed(3)+'lvh');
   set('--peacock-scroll-opacity', peacocks.toFixed(4));
   set('--reading-progress', greeting.toFixed(4));
   set('--names-progress', names.toFixed(4));
@@ -422,7 +435,7 @@ function applyScrollScene(fraction) {
   // The 3H reference keeps its garden pinned while the text itself
   // scrolls upward after 2H. The mauve section covers the garden from
   // screen bottom to top during 2H–3H; no second scenery translation.
-  set('--text-scroll-shift',(-Math.max(0,fraction-2)*window.innerHeight).toFixed(1)+'px');
+  set('--text-scroll-shift',(-Math.max(0,fraction-2)*heroHeight()).toFixed(1)+'px');
   set('--stage-parallax','0px');
   invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
   invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
@@ -437,7 +450,7 @@ function applyScrollScene(fraction) {
 function synchronizeReading() {
   scrollTick = false;
   if(!openedOnce) return;
-  applyScrollScene(window.scrollY/Math.max(window.innerHeight,1));
+  applyScrollScene(window.scrollY/heroHeight());
   syncAmbient(); // The overlay can hide a still-sticky scene before IO detects exit.
 }
 function requestReadingSync() {
@@ -454,7 +467,7 @@ window.addEventListener('resize', requestReadingSync, {passive:true});
 document.querySelector('.swipe-cue')?.addEventListener('click', event => {
   if (!openedOnce) return;
   event.preventDefault();
-  const destination = Math.max(window.scrollY, window.innerHeight*1.6);
+  const destination = Math.max(window.scrollY, heroHeight()*1.6);
   window.scrollTo({top:destination,
     behavior:reduceMotion.matches ? 'instant' : 'smooth'});
 });
