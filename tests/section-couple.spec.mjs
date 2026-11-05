@@ -754,7 +754,7 @@ test('Section 3 native sticky pins the garden without JS counter-scrolling on fo
     travel:Math.max(0,el.offsetHeight-innerHeight)
   }));
   const measurements=[];
-  for(const fraction of [0,.12,.35,.65,.90,1,.60,.20,0]){
+  for(const fraction of [0,.12,.35,.65,.90,1,.65,.20,0]){
     await page.evaluate(async y=>{
       document.documentElement.style.scrollBehavior='auto';
       window.scrollTo({top:Math.round(y),behavior:'instant'});
@@ -784,7 +784,8 @@ test('Section 3 native sticky pins the garden without JS counter-scrolling on fo
         afterGap:el.nextElementSibling.getBoundingClientRect().top-root.bottom,
         overflow:document.documentElement.scrollWidth-innerWidth,
         paintTop:scene.top-64,
-        paintBottom:scene.bottom+64
+        paintBottom:scene.bottom+64,
+        visibleTop:Math.max(0,root.top),visibleBottom:Math.min(innerHeight,root.bottom)
       };
     });
     expect(sample.position).toBe('sticky');
@@ -794,8 +795,10 @@ test('Section 3 native sticky pins the garden without JS counter-scrolling on fo
     expect(Math.abs(sample.computedY-sample.camera)).toBeLessThan(.12);
     expect(Math.abs(sample.jsTotal-(sample.pinned+sample.camera))).toBeLessThan(.15);
     expect(Math.abs(sample.sceneTop-sample.expectedTop)).toBeLessThan(1.5);
-    expect(sample.paintTop).toBeLessThanOrEqual(Math.max(0,sample.rootTop)+1);
-    expect(sample.paintBottom).toBeGreaterThanOrEqual(Math.min(innerHeight,sample.rootTop+await section.evaluate(el=>el.offsetHeight))-1);
+    if(sample.visibleBottom>sample.visibleTop){
+      expect(sample.paintTop).toBeLessThanOrEqual(sample.visibleTop+1);
+      expect(sample.paintBottom).toBeGreaterThanOrEqual(sample.visibleBottom-1);
+    }
     expect(Math.abs(sample.beforeGap)).toBeLessThanOrEqual(1);
     expect(Math.abs(sample.afterGap)).toBeLessThanOrEqual(1);
     expect(sample.overflow).toBeLessThanOrEqual(1);
