@@ -24,9 +24,8 @@
   new MutationObserver(()=>{syncCover();updateAmbient();}).observe(invite,{attributes:true,attributeFilter:['data-state']});
 
   {
-    // The original WebPs are intentionally NOT committed or hotlinked.
-    // A user who has the necessary rights stages these files locally, and
-    // both are used on the plain root URL without a mode flag.
+    // Same licensed reference WebPs as before; staging changes only when
+    // their DOM <img> tags hold decoded resources on mobile.
     section.dataset.art='reference';
     section.dataset.assetSource='local-webp';
     const notice=document.getElementById('orderArtworkNotice');
@@ -37,35 +36,64 @@
     ];
     const syncArtworkStatus=()=>{
       const states=images.map(([img,key])=>img?section.dataset[key]:'failed');
+      const deferred=states.every(s=>s==='deferred');
       const loading=states.includes('loading');
       const loaded=states.filter(s=>s==='loaded').length;
-      section.dataset.artworkStatus=loading?'loading':loaded===images.length?'ready':loaded===0?'missing':'partial';
+      section.dataset.artworkStatus=deferred?'deferred':loading?'loading':
+        loaded===images.length?'ready':loaded===0?'missing':'partial';
       section.dataset.backgroundRenderer=section.dataset.bandStatus==='loaded'?'reference-webp':
         section.dataset.bandStatus==='failed'?'original-svg':'neutral-loading';
-      if (notice) {
-        notice.hidden=loading||loaded===images.length;
-        if(!notice.hidden) {
-          const missing=images.filter(([img,key])=>!img||section.dataset[key]!=='loaded').map(item=>item[3]);
+      if(notice){
+        notice.hidden=deferred||loading||loaded===images.length;
+        if(!notice.hidden){
+          const missing=images.filter(([img,key])=>!img||section.dataset[key]!=='loaded')
+            .map(item=>item[3]);
           notice.textContent='Exact reference artwork unavailable: '+missing.join(', ')+
             '. The background uses original illustrated botanical relief when the reference band is absent. '+
             'Provide permission-cleared WebP files in assets/reference-dev/ for reference comparison.';
         }
       }
     };
-    for (const [img,key,url] of images) {
-      section.dataset[key]=img?'loading':'failed';
-      if (!img) continue;
-      img.addEventListener('load',()=>{
-        section.dataset[key]=img.naturalWidth>0?'loaded':'failed';
-        syncArtworkStatus();updateAmbient();
-      },{once:true});
-      img.addEventListener('error',()=>{
-        section.dataset[key]='failed';
-        syncArtworkStatus();updateAmbient();
-      },{once:true});
-      img.src=url;
-    }
+    let artworkActive=false;
+    const activateArtwork=()=>{
+      artworkActive=true;
+      for(const [img,key,url] of images){
+        section.dataset[key]=img?'loading':'failed';
+        if(!img)continue;
+        img.onload=()=>{
+          if(!artworkActive)return;
+          section.dataset[key]=img.naturalWidth>0?'loaded':'failed';
+          syncArtworkStatus();updateAmbient();
+        };
+        img.onerror=()=>{
+          if(!artworkActive)return;
+          section.dataset[key]='failed';
+          syncArtworkStatus();updateAmbient();
+        };
+        img.src=url;
+      }
+      syncArtworkStatus();
+    };
+    const releaseArtwork=()=>{
+      artworkActive=false;
+      for(const [img,key] of images){
+        if(img){
+          img.onload=null;
+          img.onerror=null;
+          img.removeAttribute('src');
+        }
+        section.dataset[key]='deferred';
+      }
+      syncArtworkStatus();
+      updateAmbient();
+    };
+    for(const [img,key] of images)section.dataset[key]=img?'deferred':'failed';
     syncArtworkStatus();
+    if(window.MobileArtworkLifecycle)
+      window.MobileArtworkLifecycle.register(section,{
+        activate:activateArtwork,release:releaseArtwork
+      });
+    else activateArtwork();
   }
 
   const reveals=[...section.querySelectorAll('.order-reveal')];
