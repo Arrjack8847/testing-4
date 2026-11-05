@@ -174,19 +174,34 @@
   display:block;z-index:1;pointer-events:none;
   background:#f8f1ec;opacity:.1;
 }
-/* Keep the measured camera trajectory while extending the ART (not the
-   camera coordinate box) 64px past each viewport edge. The camera ranges
-   from -44.8px to +20px; the old 100dvh image exposed unpainted seams. */
+/* The track fills exactly the existing Section 3 padding box, without
+   affecting the Couple portraits, arch or either adjacent section. A native
+   sticky child lets the browser's scrolling compositor pin the garden in
+   the SAME frame as the content instead of cancelling scroll from a JS rAF.
+   Both dimensions and the reference's 64px artwork overscan are preserved. */
+.couple-section[data-art="reference"] .couple-reference-track{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+}
 .couple-section[data-art="reference"] .couple-reference-scene{
-  display:block;position:absolute;inset:0 auto auto 0;
+  display:block;position:absolute;top:0;left:0;
   width:100%;height:100dvh;height:100lvh;min-height:480px;
   z-index:0;pointer-events:none;
   background:none;
-  /* 100lvh keeps the garden's crop stable as mobile browser chrome
-     expands/collapses; 100dvh is the fallback for older engines.
-     On a fixed viewport, camera geometry and the reference crop are unchanged. */
+  /* Legacy fallback (older engines without overflow:clip or sticky):
+     existing JS pin displacement remains available. */
   transform:translate3d(0,var(--couple-reference-y,0px),0);
   backface-visibility:hidden;
+}
+/* overflow:hidden creates a new scrolling ancestor and breaks sticky pinning.
+   clip does not. The absolute track bounds the sticky scene to Section 3,
+   naturally releasing it at the same end-of-section point as the old camera.
+   Only the small source-calibrated 4.27% drift stays JS-controlled. */
+@supports (overflow:clip) and (position:sticky){
+  .couple-section[data-art="reference"]{overflow:clip;}
+  .couple-section[data-art="reference"] .couple-reference-scene{
+    position:sticky;top:0;left:auto;
+    transform:translate3d(0,var(--couple-camera-y,0px),0);
+  }
 }
 /* Promote the garden and portrait zooms only while Section 3 is near the
    viewport. Avoid keeping large decorative GPU layers alive across the rest
@@ -261,7 +276,6 @@
 }
 @media(prefers-reduced-motion:reduce){
   .couple-section[data-art="reference"] .couple-reference-scene{
-    transform:translate3d(0,var(--couple-reference-y,0px),0);
     transition:none;
   }
 }
