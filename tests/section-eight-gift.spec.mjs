@@ -199,7 +199,8 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
       wing:wcss.backgroundImage,
       butterflyVisibility:bcss.visibility,
       butterflyOpacity:parseFloat(bcss.opacity),
-      butterflyWidth:butterfly.getBoundingClientRect().width,
+      // Computed width ignores the flight's rotation of the bounding box.
+      butterflyWidth:parseFloat(bcss.width),
       butterflyExitGap:el.getBoundingClientRect().bottom-butterfly.getBoundingClientRect().bottom,
       overflow:document.documentElement.scrollWidth-innerWidth
     };
