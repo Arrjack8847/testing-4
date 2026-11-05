@@ -649,3 +649,43 @@
 .gift-eight[data-gift-thumb-kettle="reference-local"] .gift-eight-wishlist:not([hidden]) .gift-eight-thumb-kettle {
   background: #fff url("./assets/reference-dev/gift-kettle.webp") center / contain no-repeat;
 }
+
+
+/* Section 8 butterfly flight refinement: a smooth closed arc with independent
+   wing cadence. Scoped to Wedding Gift; does not affect neighboring sections.
+   These timings are original approximations pending reference-frame comparison. */
+.gift-eight .gift-eight-butterfly{
+  animation:gift-eight-butterfly-arc 7.2s cubic-bezier(.45,.05,.55,.95) infinite;
+  will-change:transform;
+}
+.gift-eight .gift-eight-bfly-left{
+  animation:gift-eight-wing-left 0.92s ease-in-out infinite alternate;
+  backface-visibility:visible;
+}
+.gift-eight .gift-eight-bfly-right{
+  animation:gift-eight-wing-right 1.03s ease-in-out -.21s infinite alternate;
+  backface-visibility:visible;
+}
+@keyframes gift-eight-butterfly-arc{
+  0%,100%{transform:translate3d(15px,-13px,0) rotate(-8deg)}
+  14%{transform:translate3d(3px,-23px,0) rotate(-2deg)}
+  31%{transform:translate3d(-22px,-7px,0) rotate(9deg)}
+  49%{transform:translate3d(-47px,10px,0) rotate(4deg)}
+  66%{transform:translate3d(-33px,17px,0) rotate(-7deg)}
+  83%{transform:translate3d(-4px,1px,0) rotate(5deg)}
+}
+@keyframes gift-eight-wing-left{
+  from{transform:rotateY(12deg) rotate(-7deg)}
+  to{transform:rotateY(76deg) rotate(-15deg)}
+}
+@keyframes gift-eight-wing-right{
+  from{transform:scaleX(-1) rotateY(16deg) rotate(-6deg)}
+  to{transform:scaleX(-1) rotateY(73deg) rotate(-13deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .gift-eight .gift-eight-butterfly,
+  .gift-eight .gift-eight-bfly-wing{
+    animation:none!important;
+    will-change:auto;
+  }
+}
