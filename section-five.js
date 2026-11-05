@@ -232,7 +232,7 @@
     section.classList.add('is-visible');
     loadPhotos();
   };
-  if(window.MobileArtworkLifecycle)
+  if(window.MobileArtworkLifecycle?.mobile)
     window.MobileArtworkLifecycle.register(section,{
       activate:activatePhotos,release:releasePhotos
     });
