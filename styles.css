@@ -1027,7 +1027,7 @@ html.debug-freeze .peacock-glint {
 /* iPhone Safari resource lifecycle. Only paint offscreen CSS art when the
    source section has entered its prewarm band. No artwork dimensions,
    transforms, camera curves, or animation timing is changed. */
-@media (max-width:600px) {
+@media (max-width:600px), (pointer:coarse) {
   .invitation[data-hero-rehydrating="true"] .master-art {
     opacity:1!important;
     transition:none!important;
