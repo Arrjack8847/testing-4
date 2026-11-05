@@ -200,7 +200,7 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
       butterflyVisibility:bcss.visibility,
       butterflyOpacity:parseFloat(bcss.opacity),
       butterflyWidth:butterfly.getBoundingClientRect().width,
-      butterflyTop:butterfly.getBoundingClientRect().top-el.getBoundingClientRect().top,
+      butterflyExitGap:el.getBoundingClientRect().bottom-butterfly.getBoundingClientRect().bottom,
       overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
@@ -208,14 +208,18 @@ test('Authorized downloaded local plum and blush WebPs are detected independentl
   expect(visual.wing).toContain('reference-dev/bfly_blush.webp');
   expect(visual.butterflyVisibility).toBe('visible');
   expect(visual.butterflyOpacity).toBeGreaterThan(.8);
-  expect(visual.butterflyWidth).toBeGreaterThanOrEqual(25);
-  expect(visual.butterflyWidth).toBeLessThanOrEqual(40);
-  expect(visual.butterflyTop).toBeLessThan(70);
+  // The butterfly is a 52px paired-wing sprite near the Gift -> RSVP seam.
+  expect(visual.butterflyWidth).toBeGreaterThanOrEqual(50);
+  expect(visual.butterflyWidth).toBeLessThanOrEqual(54);
+  expect(visual.butterflyExitGap).toBeGreaterThanOrEqual(25);
+  expect(visual.butterflyExitGap).toBeLessThanOrEqual(160);
   expect(visual.overflow).toBeLessThanOrEqual(1);
   expect(faults).toEqual([]);
 });
 
 test('Missing private butterfly uses original animated fallback without vendor hotlinks',async({page})=>{
+  await page.route('**/assets/reference-dev/bfly_blush.webp',route=>
+    route.fulfill({status:404,body:'Reference not installed'}));
   const requested=[];
   page.on('request',req=>{
     if(/bfly_blush|band_plum/i.test(req.url()))requested.push(req.url());
@@ -227,7 +231,7 @@ test('Missing private butterfly uses original animated fallback without vendor h
     opacity:parseFloat(getComputedStyle(el.querySelector('.gift-eight-butterfly')).opacity),
     background:getComputedStyle(el.querySelector('.gift-eight-bfly-left')).backgroundImage
   }));
-  expect(['original','reference-local']).toContain(value.status);
+  expect(value.status).toBe('original');
   expect(value.visibility).toBe('visible');
   expect(value.opacity).toBeGreaterThan(.8);
   if(value.status==='original'){
@@ -523,7 +527,13 @@ test('Published wishlist icons use original assets and preserve local authorized
     expect(await response.text()).toContain('<svg ');
     const tile=items.nth(i).locator('.gift-eight-thumb');
     const style=await tile.evaluate(el=>getComputedStyle(el).backgroundImage);
-    expect(style).toContain(illustrations[i]);
+    const source=i===0
+      ?await gift.getAttribute('data-gift-thumb-rice')
+      :i===1?await gift.getAttribute('data-gift-thumb-kettle'):null;
+    const expected=source==='reference-local'
+      ?(i===0?'reference-dev/gift-rice-cooker.jpg':'reference-dev/gift-kettle.webp')
+      :illustrations[i];
+    expect(style).toContain(expected);
   }
   expect(faults).toEqual([]);
 });
