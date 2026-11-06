@@ -370,14 +370,17 @@ artworkReady.then(ready => {
     .map(node=>[node,node.style.getPropertyValue('--peacock-image')]);
   let detached=false;
   let generation=0;
-  function restoreHero(){
+  let activeRestore=null;
+  async function restoreHero(){
     if(!detached)return;
     detached=false;
     const version=++generation;
+    // A previous reverse swipe may still have image loads in flight.
+    activeRestore?.abort();
+    const controller=new AbortController();
+    activeRestore=controller;
     invite.dataset.heroRehydrating='true';
-    for(const [node,value] of sheens)
-      if(value)node.style.setProperty('--peacock-image',value);
-    const loads=sources.map(([img,url])=>new Promise(resolve=>{
+    const restoreOne=([img,url])=>new Promise(resolve=>{
       if(!url){resolve(false);return;}
       let settled=false;
       const finish=ok=>{
@@ -385,32 +388,57 @@ artworkReady.then(ready => {
         settled=true;
         img.removeEventListener('load',onLoad);
         img.removeEventListener('error',onError);
+        controller.signal.removeEventListener('abort',onAbort);
         resolve(ok);
       };
       const onLoad=()=>finish(img.naturalWidth>0);
       const onError=()=>finish(false);
+      const onAbort=()=>finish(false);
       img.addEventListener('load',onLoad);
       img.addEventListener('error',onError);
+      controller.signal.addEventListener('abort',onAbort,{once:true});
+      if(controller.signal.aborted){finish(false);return;}
       img.src=url;
       if(img.complete && img.naturalWidth>0)finish(true);
-    }));
-    Promise.all(loads).then(results=>{
-      if(version!==generation || detached)return;
-      // Never show a partially transparent animated scene in place of the
-      // original master while returning rapidly from Sections 6–10.
-      if(results.every(Boolean))invite.dataset.heroRehydrating='false';
     });
+    // Returning from later sections used to reattach every full-screen
+    // WebP simultaneously. Bound the restore work and yield to the browser
+    // between groups to avoid a large decode/compositing burst on WebKit.
+    let allLoaded=true;
+    const restoreBatchSize=3;
+    for(let i=0;i<sources.length;i+=restoreBatchSize){
+      if(controller.signal.aborted || version!==generation || detached)return;
+      const outcomes=await Promise.all(
+        sources.slice(i,i+restoreBatchSize).map(restoreOne)
+      );
+      if(controller.signal.aborted || version!==generation || detached)return;
+      if(!outcomes.every(Boolean))allLoaded=false;
+      if(i+restoreBatchSize<sources.length){
+        await new Promise(resolve=>requestAnimationFrame(resolve));
+      }
+    }
+    if(version!==generation || detached || controller.signal.aborted)return;
+    activeRestore=null;
+    // Only reveal the animated scene after all layers are restored. Until
+    // then, the unchanged original master painting stays visible.
+    if(allLoaded){
+      for(const [node,value] of sheens)
+        if(value)node.style.setProperty('--peacock-image',value);
+      invite.dataset.heroRehydrating='false';
+    }
   }
   function releaseHero(){
     if(detached)return;
     detached=true;
     ++generation;
+    activeRestore?.abort();
+    activeRestore=null;
     invite.dataset.heroRehydrating='true';
     for(const [img] of sources)img.removeAttribute('src');
     for(const [node] of sheens)node.style.setProperty('--peacock-image','none');
   }
   window.MobileArtworkLifecycle.register(heroViewport,{
-    activate:restoreHero,release:releaseHero
+    activate:restoreHero,release:releaseHero,initiallyActive:true
   });
 });
 
