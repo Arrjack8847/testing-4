@@ -75,6 +75,9 @@ test('mobile artwork hysteresis scales with phone viewport',async({page})=>{
   }));
   const near=Math.max(1000,Math.min(1700,Math.round(height*1.5)));
   const retain=Math.max(near+650,Math.min(3100,Math.round(height*2.75)));
+  const trailing=Math.min(retain,near+450);
+  const reverse=Math.max(1700,Math.min(2900,Math.round(height*3.25)));
   expect(margins).toContain(`${near}px 0px ${near}px 0px`);
-  expect(margins).toContain(`${retain}px 0px ${retain}px 0px`);
+  expect(margins).toContain(`${retain}px 0px ${trailing}px 0px`);
+  expect(margins).toContain(`${reverse}px 0px 0px 0px`);
 });
