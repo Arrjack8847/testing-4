@@ -16,17 +16,21 @@ test('reverse-direction prewarm restores Section 3 well before it enters view',a
     scrollTo({top:closing.getBoundingClientRect().top+scrollY,behavior:'instant'});
   });
   await expect(couple).toHaveAttribute('data-asset-lifecycle','released');
-  // Return upward but remain 2,000px after the Couple section's bottom,
-  // beyond the 1,000-1,700px normal prewarm band at all four phone widths.
-  const farAbove=await page.evaluate(()=>{
+  // Return upward but remain outside the standard near band and inside
+  // the larger upward-only band, adapting to the four phone viewport heights.
+  const {y,gap}=await page.evaluate(()=>{
     const el=document.getElementById('couple');
-    const y=el.getBoundingClientRect().bottom+scrollY+2000;
+    const h=innerHeight;
+    const near=Math.max(1000,Math.min(1700,Math.round(h*1.5)));
+    const reverse=Math.max(1700,Math.min(2900,Math.round(h*3.25)));
+    const gap=Math.round((near+reverse)/2);
+    const y=el.getBoundingClientRect().bottom+scrollY+gap;
     scrollTo({top:y,behavior:'instant'});
-    return y;
+    return {y,gap};
   });
-  expect(farAbove).toBeGreaterThan(1000);
+  expect(y).toBeGreaterThan(1000);
   await expect.poll(()=>couple.evaluate(el=>el.getBoundingClientRect().bottom))
-    .toBeLessThan(-1700);
+    .toBeLessThan(-gap+2);
   await expect(couple).toHaveAttribute('data-asset-lifecycle','near');
   await expect(couple.locator('#groomPortrait')).toHaveAttribute(
     'src',/couples\/moody-groom\.webp/);
