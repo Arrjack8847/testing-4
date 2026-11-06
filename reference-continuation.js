@@ -34,19 +34,39 @@
     sections.forEach(section=>section.querySelectorAll('.ref-reveal').forEach(el=>el.classList.add('ref-in-view')));
   }
 
+  // Only the visible continuation scene needs a camera update. The observer
+  // also schedules the first correct frame on reverse-scroll re-entry.
+  const activeSections = 'IntersectionObserver' in window ? new Set() : null;
   let raf = 0;
   function paint() {
     raf = 0;
     if (reduced.matches || invite.dataset.state !== 'opened') return;
-    for(const section of sections){
+    for(const section of activeSections || sections){
       const rect=section.getBoundingClientRect();
       if(rect.bottom<0 || rect.top>innerHeight)continue;
       const middle=rect.top+rect.height/2;
       const displacement=Math.max(-20,Math.min(20,(innerHeight/2-middle)*.035));
-      section.style.setProperty('--ref-camera-y',displacement.toFixed(2)+'px');
+      const value=displacement.toFixed(2)+'px';
+      if(section.style.getPropertyValue('--ref-camera-y')!==value)
+        section.style.setProperty('--ref-camera-y',value);
     }
   }
-  function schedule(){if(!raf)raf=requestAnimationFrame(paint);}
+  function schedule(){
+    if(!raf && !document.hidden && (!activeSections || activeSections.size))
+      raf=requestAnimationFrame(paint);
+  }
+  if(activeSections){
+    const visibilityObserver=new IntersectionObserver(entries=>{
+      for(const entry of entries){
+        if(entry.isIntersecting && entry.intersectionRect.height>0)
+          activeSections.add(entry.target);
+        else activeSections.delete(entry.target);
+      }
+      if(activeSections.size) schedule();
+      else if(raf){cancelAnimationFrame(raf);raf=0;}
+    },{threshold:0,rootMargin:'100px 0px'});
+    sections.forEach(section=>visibilityObserver.observe(section));
+  }
   function toggleReduced(){
     if (reduced.matches) {
       if (raf) cancelAnimationFrame(raf);

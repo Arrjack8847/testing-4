@@ -333,6 +333,11 @@ test('390px reference mode uses source individual arches and reversible paper pa
   await page.goto('/?eventsReference=1');
   const section=page.locator('#eventDetails');
   await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('eventDetails').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toHaveAttribute('data-asset-lifecycle','near');
   await expect(section).toHaveAttribute('data-reference-paper','loaded',{timeout:16000});
   const arch=await section.locator('.event-card-nikah').evaluate(el=>{
     const style=getComputedStyle(el,'::before');

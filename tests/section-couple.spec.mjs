@@ -156,14 +156,18 @@ test('default reference garden camera follows scrolling without moving cards',as
 test('Section 3 uses the local Section 1 painting with enough overscan at every scroll position',async({page})=>{
   await page.goto('/');
   await expect(page.locator('#couple')).toHaveAttribute('data-art','reference');
-  // CI installs the 25 first-scene WebPs in assets/ before starting browsers.
-  await expect.poll(()=>page.locator('#couple').getAttribute('data-reference-scene-source')).toBe('local');
+  // Mobile artwork must remain deferred until the guest approaches Section 3.
+  await expect(page.locator('#couple')).toHaveAttribute('data-reference-webp-state','deferred');
   await page.getByRole('button',{name:'Open Invitation'}).click();
   const section=page.locator('#couple');
   const geom=await section.evaluate(el=>({
     start:el.getBoundingClientRect().top+scrollY,
     travel:Math.max(0,el.offsetHeight-innerHeight)
   }));
+  await page.evaluate(y=>scrollTo({top:Math.round(y),behavior:'instant'}),geom.start);
+  await expect(section).toHaveAttribute('data-asset-lifecycle','near');
+  // CI installs the 25 first-scene WebPs in assets/ before starting browsers.
+  await expect.poll(()=>section.getAttribute('data-reference-scene-source')).toBe('local');
   for(const fraction of [0,.15,.50,.85,1]){
     await page.evaluate(async y=>{
       document.documentElement.style.scrollBehavior='auto';
@@ -262,8 +266,17 @@ test('both plain / and old flag URL show identical approved Section 3 artwork',a
   await page.goto('/');
   const section=page.locator('#couple');
   await expect(section).toHaveAttribute('data-art','reference');
-  // Three known WebP URLs (garden, groom, bride) are actively observed,
-  // not merely referenced in markup. Third-party hosting may block them.
+  // Deferred when distant: the artwork probes must not run on the cover.
+  await expect(section).toHaveAttribute('data-reference-webp-state','deferred');
+  await expect(section).toHaveAttribute('data-reference-webp-count','0');
+  await page.getByRole('button',{name:'Open Invitation'}).click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    document.getElementById('couple').scrollIntoView({block:'start',behavior:'instant'});
+  });
+  await expect(section).toHaveAttribute('data-asset-lifecycle','near');
+  // Once visible, the actual URLs must be requested; external hosting may
+  // block the portraits, so loaded/partial are both legitimate states.
   await expect(section).toHaveAttribute('data-reference-webp-state',/^(loading|ready|partial)$/);
   await expect.poll(()=>section.getAttribute('data-reference-webp-count'))
     .toMatch(/^[0-3]$/);
@@ -286,11 +299,6 @@ test('both plain / and old flag URL show identical approved Section 3 artwork',a
   expect(style.garden).toMatch(/(?:assets\/scene\.webp|tasik-kayangan\/scene\.webp)/);
   expect(style.clouds).toBe('none');
   expect(style.width).toBeLessThanOrEqual(1);
-  await page.getByRole('button',{name:'Open Invitation'}).click();
-  await page.evaluate(()=>{
-    document.documentElement.style.scrollBehavior='auto';
-    document.getElementById('couple').scrollIntoView({block:'start',behavior:'instant'});
-  });
   await expect.poll(()=>section.evaluate(el=>{
     const camera=parseFloat(el.dataset.referenceCameraOffset);
     const total=parseFloat(el.style.getPropertyValue('--couple-reference-y'));
