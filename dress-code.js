@@ -11,16 +11,34 @@
   // paper.webp is exactly the source 1080x1920 artwork.
   section.dataset.art='local-webp';
   const paper=document.getElementById('dressSourceScene');
-  if(paper){
+  let artworkActive=false;
+  const activateArtwork=()=>{
+    if(!paper)return;
+    artworkActive=true;
     section.dataset.sceneStatus='loading';
-    paper.addEventListener('load',()=>{
-      section.dataset.sceneStatus=paper.naturalWidth>0?'loaded':'failed';
-    },{once:true});
-    paper.addEventListener('error',()=>{
-      section.dataset.sceneStatus='failed';
-    },{once:true});
+    paper.onload=()=>{
+      if(artworkActive)section.dataset.sceneStatus=paper.naturalWidth>0?'loaded':'failed';
+    };
+    paper.onerror=()=>{
+      if(artworkActive)section.dataset.sceneStatus='failed';
+    };
     paper.src='./assets/section6/paper.webp';
-  }
+  };
+  const releaseArtwork=()=>{
+    artworkActive=false;
+    if(paper){
+      paper.onload=null;
+      paper.onerror=null;
+      paper.removeAttribute('src');
+    }
+    section.dataset.sceneStatus='deferred';
+  };
+  section.dataset.sceneStatus='deferred';
+  if(window.MobileArtworkLifecycle)
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activateArtwork,release:releaseArtwork
+    });
+  else activateArtwork();
 
   let cameraFrame=0,flightFrame=0,flightStart=0;
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

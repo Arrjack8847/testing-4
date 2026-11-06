@@ -54,27 +54,31 @@
   const shouldLoadPaper=referenceMode==='1'||(localPreview&&referenceMode!=='0');
   const shouldLoadButterfly=referenceMode==='1'||
     ((localPreview||hostedPrototype)&&referenceMode!=='0');
+  // Suppress Section 9's source probes until the RSVP is approaching.
+  let artEpoch=0, butterflyProbe=null;
+  function activateReferenceArtwork(){
+    const version=++artEpoch;
   if(shouldLoadPaper||shouldLoadButterfly){
     const paperUrl='./assets/reference-dev/section9/paper.webp';
     const butterflyUrl='./assets/reference-dev/section9/bfly_1.webp';
     const art=document.getElementById('s9ReferenceArt');
     const loadPaper=()=>{
       if(!art)return;
-      art.addEventListener('load',()=>{
+      art.addEventListener('load',()=>{if(version!==artEpoch)return;
         if(art.naturalWidth>0){section.classList.add('s9-reference-loaded');section.dataset.referenceArt='loaded';}
       },{once:true});
-      art.addEventListener('error',()=>{section.dataset.referenceArt='missing';if(localPreview)console.warn('Section 9 paper.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');},{once:true});
+      art.addEventListener('error',()=>{if(version!==artEpoch)return;section.dataset.referenceArt='missing';if(localPreview)console.warn('Section 9 paper.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');},{once:true});
       art.src=paperUrl;
     };
     const loadButterfly=()=>{
-      const sprite=new Image();
-      sprite.addEventListener('load',()=>{
+      const sprite=butterflyProbe=new Image();
+      sprite.addEventListener('load',()=>{if(version!==artEpoch)return;
         if(sprite.naturalWidth>0&&sprite.naturalHeight>0){
           section.classList.add('s9-reference-butterfly-loaded');
           section.dataset.referenceButterfly='loaded';
         }
       },{once:true});
-      sprite.addEventListener('error',()=>{
+      sprite.addEventListener('error',()=>{if(version!==artEpoch)return;
         section.dataset.referenceButterfly='missing';
         if(localPreview)console.warn('Section 9 bfly_1.webp is unavailable. Run ensure-section9-art.ps1 in the local folder.');
       },{once:true});
@@ -90,12 +94,14 @@
       const loadIfPresent=async(url,onPresent,kind)=>{
         try{
           const response=await fetch(url,{method:'HEAD',cache:'no-store'});
+          if(version!==artEpoch)return;
           if(response.ok || response.status===405){onPresent();return;}
           if(kind==='paper')section.dataset.referenceArt='missing';
           else section.dataset.referenceButterfly='missing';
           const hint=localPreview?' Run ensure-section9-art.ps1 locally.':' Verify the hosted artwork asset.';
           console.warn('Section 9 '+kind+' is missing (HTTP '+response.status+').'+hint);
         }catch(error){
+          if(version!==artEpoch)return;
           if(kind==='paper')section.dataset.referenceArt='unavailable';
           else section.dataset.referenceButterfly='unavailable';
           console.warn('Section 9 '+kind+' could not be checked.',error);
@@ -105,6 +111,21 @@
       if(shouldLoadButterfly)void loadIfPresent(butterflyUrl,loadButterfly,'butterfly');
     }
   }
+  }
+  function releaseReferenceArtwork(){
+    ++artEpoch;
+    butterflyProbe?.removeAttribute('src');
+    butterflyProbe=null;
+    document.getElementById('s9ReferenceArt')?.removeAttribute('src');
+    section.classList.remove('s9-reference-loaded','s9-reference-butterfly-loaded');
+    section.dataset.referenceArt='deferred';
+    section.dataset.referenceButterfly='deferred';
+  }
+  if(window.MobileArtworkLifecycle)
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activateReferenceArtwork,release:releaseReferenceArtwork
+    });
+  else activateReferenceArtwork();
   const makeId=()=>{
     if(typeof crypto.randomUUID==='function')return crypto.randomUUID();
     const a=crypto.getRandomValues(new Uint8Array(16));a[6]=(a[6]&15)|64;a[8]=(a[8]&63)|128;

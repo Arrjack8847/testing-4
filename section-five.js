@@ -79,7 +79,7 @@
       image.decoding = 'async';
       image.alt = photo.alt;
       image.onload = () => {
-        if (!image.naturalWidth) return;
+        if (!image.isConnected || !image.naturalWidth) return;
         // The downloaded WebPs are for local visual comparison only.
         // Show no extra reference banner so localhost resembles the source Gallery.
         if ((autoLocalReference || autoHostedReference) && image.getAttribute('src') === REFERENCE_FILES[index]) {
@@ -103,6 +103,7 @@
         }
       };
       image.onerror = () => {
+        if (!image.isConnected) return;
         // In normal localhost mode, prefer original comparison artwork if authorized
         // copies exist; otherwise keep the standard owned/consented photo fallback.
         // The strict ?galleryReference=1 QA mode never falls back.
@@ -205,17 +206,46 @@
     }, {threshold:0.08});
     section.querySelectorAll('.gallery-reveal').forEach(node => revealObserver.observe(node));
   }
-  // Image loading remains lazy and independent of reveal/reverse motion.
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      if (!entries.some(entry=>entry.isIntersecting)) return;
-      section.classList.add('is-visible');
-      loadPhotos();
-      observer.disconnect();
-    },{threshold:.08,rootMargin:'130px 0px'});
-    observer.observe(section);
-  } else {
+  // Prewarm the exact same gallery WebPs before the visitor gets here.
+  // The gallery dialog keeps its selected image while open. Far away, remove
+  // the five DOM img elements to release references to decoded textures.
+  function releasePhotos(){
+    if(dialog.open)return;
+    for(const button of buttons){
+      button.querySelector('.gallery-image')?.remove();
+      button.classList.remove('has-image');
+      button.disabled=true;
+      const placeholder=button.querySelector('.gallery-photo-placeholder');
+      if(placeholder)placeholder.hidden=false;
+    }
+    available.clear();
+    assetsRequested=false;
+    disclaimer.hidden=false;
+    section.dataset.galleryArt=referenceMode?'reference-comparison':
+      preferReference?'local-reference-preview':'local';
+  }
+  dialog.addEventListener('close',()=>{
+    const rect=section.getBoundingClientRect();
+    if(rect.bottom<-3100||rect.top>innerHeight+3100)releasePhotos();
+  });
+  const activatePhotos=()=>{
     section.classList.add('is-visible');
     loadPhotos();
+  };
+  if(window.MobileArtworkLifecycle?.mobile)
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activatePhotos,release:releasePhotos
+    });
+  else {
+    // Legacy standalone / desktop behavior remains unchanged.
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver(entries=>{
+        if(!entries.some(entry=>entry.isIntersecting))return;
+        activatePhotos();
+        observer.disconnect();
+      },{threshold:.08,rootMargin:'130px 0px'});
+      observer.observe(section);
+    }else activatePhotos();
   }
+
 })();

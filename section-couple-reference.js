@@ -38,12 +38,12 @@
   // confusing CSS/HTML URLs with successful network image responses.
   // This diagnostic runs on the default prototype and never downloads
   // third-party files into the repository.
-  const webpStatus = {scene:'loading',groom:'loading',bride:'loading'};
+  const webpStatus = {scene:'deferred',groom:'deferred',bride:'deferred'};
   const syncWebpStatus = () => {
     const states = Object.values(webpStatus);
     section.dataset.referenceWebpCount = String(states.filter(state => state === 'loaded').length);
     section.dataset.referenceWebpState = states.every(state => state === 'loaded')
-      ? 'ready' : states.some(state => state === 'loading') ? 'loading' : 'partial';
+      ? 'ready' : states.every(state => state === 'deferred') ? 'deferred' : states.some(state => state === 'loading') ? 'loading' : 'partial';
     section.dataset.referenceWebpMissing = Object.entries(webpStatus)
       .filter(([,state]) => state === 'failed' || state === 'fallback')
       .map(([name]) => name).join(',');
@@ -56,36 +56,47 @@
     './assets/scene.webp',
     artRoot + 'packs/tasik-kayangan/scene.webp'
   ];
-  const sceneProbe = new Image();
+  let artworkActive = false;
+  let sceneProbe = null;
+  let sceneEpoch = 0;
   let sceneSourceIndex = 0;
-  sceneProbe.onload = () => {
-    const imageUrl = sceneProbe.currentSrc || sceneProbe.src;
-    section.style.setProperty('--couple-reference-image', 'url("' + imageUrl + '")');
-    section.dataset.referenceSceneSource = sceneSourceIndex === 0 ? 'local' : 'remote';
-    webpStatus.scene = 'loaded';
-    syncWebpStatus();
-  };
-  sceneProbe.onerror = () => {
-    sceneSourceIndex++;
-    if (sceneSourceIndex < sceneSources.length) {
-      sceneProbe.src = sceneSources[sceneSourceIndex];
-      return;
-    }
-    section.dataset.referenceSceneSource = 'unavailable';
-    webpStatus.scene = 'failed';
-    syncWebpStatus();
+  const startSceneProbe = () => {
+    const epoch=++sceneEpoch;
+    const probe=sceneProbe=new Image();
+    sceneSourceIndex=0;
+    probe.onload = () => {
+      if(!artworkActive||epoch!==sceneEpoch)return;
+      const imageUrl=probe.currentSrc||probe.src;
+      section.style.setProperty('--couple-reference-image','url("'+imageUrl+'")');
+      section.dataset.referenceSceneSource=sceneSourceIndex===0?'local':'remote';
+      webpStatus.scene='loaded';
+      syncWebpStatus();
+    };
+    probe.onerror = () => {
+      if(!artworkActive||epoch!==sceneEpoch)return;
+      sceneSourceIndex++;
+      if(sceneSourceIndex<sceneSources.length){
+        probe.src=sceneSources[sceneSourceIndex];
+        return;
+      }
+      section.dataset.referenceSceneSource='unavailable';
+      webpStatus.scene='failed';
+      syncWebpStatus();
+    };
+    probe.src=sceneSources[0];
   };
   syncWebpStatus();
-  sceneProbe.src = sceneSources[sceneSourceIndex];
   for (const item of portraitData) {
     const img = section.querySelector(item.selector);
     if (!img) continue;
     const fallback = img.getAttribute('src');
     img.addEventListener('load', () => {
+      if (!artworkActive) return;
       webpStatus[item.key] = img.currentSrc === item.url ? 'loaded' : 'fallback';
       syncWebpStatus();
     });
     img.addEventListener('error', () => {
+      if (!artworkActive) return;
       // If the provider blocks a photo, show only the neutral transparent
       // placeholder: never substitute the retired illustrated portraits.
       if (img.getAttribute('src') !== fallback) {
@@ -101,7 +112,7 @@
       }
     });
     img.dataset.referenceUrl = item.url;
-    img.src = item.url;
+    img.dataset.referenceFallback = fallback;
     img.alt = item.alt;
     const profile = img.closest('.couple-profile');
     if (!profile) continue;
@@ -109,6 +120,45 @@
     profile.querySelector('.couple-role').textContent = item.role;
     profile.querySelector('.couple-family').textContent = item.family;
   }
+
+  // Only attach large reference portraits and scenic WebP when mobile readers
+  // approach. After departure, detach far-offscreen DOM URLs so WebKit can
+  // reclaim decoded textures; all original image sources stay unchanged.
+  function activateArtwork() {
+    artworkActive = true;
+    sceneSourceIndex = 0;
+    for (const key of Object.keys(webpStatus)) webpStatus[key] = 'loading';
+    syncWebpStatus();
+    // Reuse the local master scene immediately while the probe resolves.
+    section.style.setProperty('--couple-reference-image','url("./assets/scene.webp")');
+    startSceneProbe();
+    for (const item of portraitData) {
+      const img = section.querySelector(item.selector);
+      if (img) img.src = item.url;
+    }
+  }
+  function releaseArtwork() {
+    artworkActive = false;
+    ++sceneEpoch;
+    if(sceneProbe){
+      sceneProbe.onload=null;
+      sceneProbe.onerror=null;
+      sceneProbe.removeAttribute('src');
+      sceneProbe=null;
+    }
+    section.style.setProperty('--couple-reference-image','none');
+    for (const item of portraitData) {
+      const img = section.querySelector(item.selector);
+      if (img) img.src = img.dataset.referenceFallback;
+    }
+    for (const key of Object.keys(webpStatus)) webpStatus[key] = 'deferred';
+    syncWebpStatus();
+  }
+  if (window.MobileArtworkLifecycle) {
+    window.MobileArtworkLifecycle.register(section,{
+      activate:activateArtwork, release:releaseArtwork
+    });
+  } else activateArtwork();
 
   // Reference measurements at 390×844, with absolute document Y:
   // 2743 => image offset -44.8px; 3165 => -26.8px;

@@ -300,22 +300,44 @@ function loadArtwork(name) {
     attempt();
   });
 }
-const artworkReady = Promise.all(allNames.map(async name => {
-  const result = await loadArtwork(name);
-  if (result.okay) {
-    if (name === 'scene.webp') master.src = result.src;
-    else byFile.get(name).forEach(img => {
-      img.src = result.src;
-      // Use whichever image URL successfully loaded (local or remote) as the
-      // alpha mask for the soft peacock feather glint; never duplicate art.
-      if (name === 'peacock.webp') {
-        const sheen = img.parentElement?.querySelector('.peacock-glint');
-        if (sheen) sheen.style.setProperty('--peacock-image', 'url("' + result.src + '")');
-      }
-    });
+// Bound image probes at startup. A single Promise.all decoded every large
+// scene layer at once, which can spike WebKit memory before the cover appears.
+// Keep the full-resolution assets, their order, and every animation identical;
+// only limit the number of images simultaneously loading/decoding.
+async function loadSceneArtwork() {
+  const batchSize=4;
+  for(let start=0;start<allNames.length;start+=batchSize){
+    const group=allNames.slice(start,start+batchSize);
+    await Promise.all(group.map(async name=>{
+      const result=await loadArtwork(name);
+      if(!result.okay)return;
+      if(name==='scene.webp')master.src=result.src;
+      else byFile.get(name).forEach(img=>{
+        img.src=result.src;
+        // Share the exact same loaded source with the peacock feather mask.
+        if(name==='peacock.webp'){
+          const sheen=img.parentElement?.querySelector('.peacock-glint');
+          if(sheen)sheen.style.setProperty('--peacock-image','url("'+result.src+'")');
+        }
+      });
+    }));
   }
-  return result;
-})).then(() => {
+}
+// Diagnostic-only mode for real iPhone WebKit process crashes. The normal
+// reference website is unchanged. ?heroStill=1 keeps the original full-quality
+// master painting and skips only the 24 decoded transparent scene files.
+// Comparing this with the normal preview isolates the layered hero's GPU load.
+const heroStillProbe = query.get('heroStill') === '1';
+if(heroStillProbe) invite.dataset.heroDiagnostic = 'still';
+const artworkReady=(heroStillProbe
+  ?loadArtwork('scene.webp').then(result=>{
+    if(result.okay)master.src=result.src;
+    invite.dataset.layers='failed';
+    notification.hidden=result.okay;
+    if(!result.okay)notification.textContent='Still artwork unavailable.';
+    return false;
+  })
+  :loadSceneArtwork().then(() => {
   // Only the 24 separate layered files are essential to the moving garden.
   // If scene.webp is missing but every layer loaded, prefer the complete
   // animated scene instead of incorrectly hiding it and showing a blank page.
@@ -332,6 +354,92 @@ const artworkReady = Promise.all(allNames.map(async name => {
       'Invitation artwork could not be loaded. Check your connection or run download-assets.ps1.';
   }
   return layersComplete;
+  })
+);
+
+// Mobile-only cleanup: Section 1's animated backdrop includes many
+// 1080x1920 transparent WebP layers. Keep the still master as a fallback,
+// but detach the animated <img> sources when the sticky hero is multiple
+// viewports away. The shared lifecycle prewarms on reverse scrolling.
+// This cannot force iOS to free cached textures, but removes live DOM holders.
+artworkReady.then(ready => {
+  if(!ready || !window.MobileArtworkLifecycle?.mobile)return;
+  const layers=[...byFile.values()].flat().filter(Boolean);
+  const sources=layers.map(img=>[img,img.getAttribute('src')]);
+  const sheens=[...document.querySelectorAll('.peacock-glint')]
+    .map(node=>[node,node.style.getPropertyValue('--peacock-image')]);
+  let detached=false;
+  let generation=0;
+  let activeRestore=null;
+  async function restoreHero(){
+    if(!detached)return;
+    detached=false;
+    const version=++generation;
+    // A previous reverse swipe may still have image loads in flight.
+    activeRestore?.abort();
+    const controller=new AbortController();
+    activeRestore=controller;
+    invite.dataset.heroRehydrating='true';
+    const restoreOne=([img,url])=>new Promise(resolve=>{
+      if(!url){resolve(false);return;}
+      let settled=false;
+      const finish=ok=>{
+        if(settled)return;
+        settled=true;
+        img.removeEventListener('load',onLoad);
+        img.removeEventListener('error',onError);
+        controller.signal.removeEventListener('abort',onAbort);
+        resolve(ok);
+      };
+      const onLoad=()=>finish(img.naturalWidth>0);
+      const onError=()=>finish(false);
+      const onAbort=()=>finish(false);
+      img.addEventListener('load',onLoad);
+      img.addEventListener('error',onError);
+      controller.signal.addEventListener('abort',onAbort,{once:true});
+      if(controller.signal.aborted){finish(false);return;}
+      img.src=url;
+      if(img.complete && img.naturalWidth>0)finish(true);
+    });
+    // Returning from later sections used to reattach every full-screen
+    // WebP simultaneously. Bound the restore work and yield to the browser
+    // between groups to avoid a large decode/compositing burst on WebKit.
+    let allLoaded=true;
+    const restoreBatchSize=3;
+    for(let i=0;i<sources.length;i+=restoreBatchSize){
+      if(controller.signal.aborted || version!==generation || detached)return;
+      const outcomes=await Promise.all(
+        sources.slice(i,i+restoreBatchSize).map(restoreOne)
+      );
+      if(controller.signal.aborted || version!==generation || detached)return;
+      if(!outcomes.every(Boolean))allLoaded=false;
+      if(i+restoreBatchSize<sources.length){
+        await new Promise(resolve=>requestAnimationFrame(resolve));
+      }
+    }
+    if(version!==generation || detached || controller.signal.aborted)return;
+    activeRestore=null;
+    // Only reveal the animated scene after all layers are restored. Until
+    // then, the unchanged original master painting stays visible.
+    if(allLoaded){
+      for(const [node,value] of sheens)
+        if(value)node.style.setProperty('--peacock-image',value);
+      invite.dataset.heroRehydrating='false';
+    }
+  }
+  function releaseHero(){
+    if(detached)return;
+    detached=true;
+    ++generation;
+    activeRestore?.abort();
+    activeRestore=null;
+    invite.dataset.heroRehydrating='true';
+    for(const [img] of sources)img.removeAttribute('src');
+    for(const [node] of sheens)node.style.setProperty('--peacock-image','none');
+  }
+  window.MobileArtworkLifecycle.register(heroViewport,{
+    activate:restoreHero,release:releaseHero,initiallyActive:true
+  });
 });
 
 // Cover is a focusable action, not a scroll-triggered trap.
@@ -364,6 +472,10 @@ function openInvitation(event) {
   openedOnce = true;
   scrollGestureStarted = false;
   invite.dataset.scrollActive = 'no';
+  // Mobile cover is fixed until deliberate activation. Release it only here,
+  // not from touch/wheel/scroll events; this prevents fast swipes skipping
+  // the invitation while keeping the post-open scroll choreography native.
+  document.documentElement.classList.remove('invitation-cover-locked');
   document.documentElement.style.overflowY = 'auto';
   if (keyboardActivation) {
     document.querySelector('.swipe-cue')?.focus({preventScroll:true});
@@ -381,6 +493,7 @@ function resetInvitation() {
   openedOnce = false;
   scrollGestureStarted = false;
   invite.dataset.scrollActive = 'no';
+  document.documentElement.classList.add('invitation-cover-locked');
   document.documentElement.style.overflowY = 'hidden';
   // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
   document.documentElement.style.setProperty('--stage-parallax', '0px');
@@ -391,7 +504,12 @@ function resetInvitation() {
 document.documentElement.style.overflowY = 'hidden';
 document.getElementById('openButton').addEventListener('click', openInvitation);
 window.addEventListener('pageshow', () => {
-  if (!openedOnce && window.scrollY) window.scrollTo(0, 0);
+  // Returning from Safari/Telegram page cache must not expose Section 2+
+  // while the cover is closed, even when the browser restores old scroll.
+  if (!openedOnce) {
+    document.documentElement.classList.add('invitation-cover-locked');
+    if (window.scrollY) window.scrollTo({top:0,behavior:'instant'});
+  }
 });
 
 // Reference scroll calibration at 390x844:

@@ -10,6 +10,18 @@ async function openInvitation(page) {
   await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';});
   return errors;
 }
+// Progressive mobile artwork is requested only shortly before Section 10
+// enters. Stage it explicitly before tests that assert WebP dimensions.
+async function warmClosingArtwork(page) {
+  if(await page.locator('#invitation').getAttribute('data-state')!=='opened')
+    await page.getByRole('button',{name:'Open Invitation',exact:true}).click();
+  await page.evaluate(()=>{
+    document.documentElement.style.scrollBehavior='auto';
+    const closing=document.getElementById('closingMessage');
+    window.scrollTo({top:closing.getBoundingClientRect().top+scrollY,behavior:'instant'});
+  });
+  await expect(page.locator('#closingMessage')).toHaveAttribute('data-asset-lifecycle','near');
+}
 async function sectionY(page,id) {
   return page.locator('#'+id).evaluate(e=>e.getBoundingClientRect().top+scrollY);
 }
@@ -22,6 +34,7 @@ test('Section 10 stays last, content matches reference, and never pretends conta
   await expect(closing).toHaveAttribute('aria-hidden','false');
   await expect(closing).toHaveJSProperty('inert',false);
   await expect(closing).toHaveAttribute('data-section','10');
+  await warmClosingArtwork(page);
   await expect(closing).toHaveAttribute('data-artwork','local-reference');
   await expect(closing.locator('.closing10-source-scene')).toHaveJSProperty('naturalWidth',1080);
   await expect(closing.locator('h2')).toHaveText('Until we meet');
@@ -128,12 +141,12 @@ test('Section 10 uses the locally staged reference scene when the WebP endpoint 
   }));
   await page.goto('/');
   const section=page.locator('#closingMessage');
+  await warmClosingArtwork(page);
   await expect(section).toHaveAttribute('data-artwork','local-reference');
   const image=section.locator('.closing10-source-scene');
   await expect(image).toHaveJSProperty('naturalWidth',1080);
   await expect(image).toBeVisible();
   await expect(section.locator('.closing10-message')).toContainText('greatest honour');
-  await page.getByRole('button',{name:'Open Invitation',exact:true}).click();
   await page.evaluate(()=>document.getElementById('closingMessage').scrollIntoView({block:'center',behavior:'instant'}));
   await expect(image).toBeInViewport();
   await expect(section).toHaveAttribute('data-artwork','local-reference');
@@ -307,6 +320,7 @@ test('Section 10 artwork camera pins through the Section 9 seam and reverses at 
   await openInvitation(page);
   const section=page.locator('#closingMessage');
   const scene=section.locator('.closing10-source-scene');
+  await warmClosingArtwork(page);
   await expect(section).toHaveAttribute('data-artwork','local-reference');
   await expect(scene).toHaveJSProperty('naturalWidth',1080);
   const params=await section.evaluate(el=>{
@@ -356,6 +370,7 @@ test('Section 9→10 visual seam has no blank frame, overlap, or camera jump on 
   const errors=await openInvitation(page);
   const closing=page.locator('#closingMessage'),previous=page.locator('#rsvp');
   const scene=closing.locator('.closing10-source-scene');
+  await warmClosingArtwork(page);
   await expect(closing).toHaveAttribute('data-artwork','local-reference');
   await expect(scene).toHaveJSProperty('naturalWidth',1080);
   const seam=await page.evaluate(()=>{
@@ -441,6 +456,7 @@ test('Section 10 staged scene follows measured camera drift and stops under Redu
   await openInvitation(page);
   const closing=page.locator('#closingMessage');
   const scene=closing.locator('.closing10-source-scene');
+  await warmClosingArtwork(page);
   await expect(closing).toHaveAttribute('data-artwork','local-reference');
   await expect(scene).toHaveJSProperty('naturalWidth',1080);
   const positions=[-170,-30,80,265,80,-30];
@@ -475,6 +491,7 @@ test('Section 10 approved production artwork loads at the ordinary URL and degra
   await page.goto('/');
   const scene=page.locator('#closingMessage .closing10-source-scene');
   const section=page.locator('#closingMessage');
+  await warmClosingArtwork(page);
   await expect(section).toHaveAttribute('data-artwork','local-reference');
   await expect(scene).toHaveJSProperty('naturalWidth',1080);
   const response=await page.request.get('/assets/section10/scene.webp');
@@ -482,8 +499,8 @@ test('Section 10 approved production artwork loads at the ordinary URL and degra
   expect(response.headers()['content-type']).toContain('image/webp');
   await page.route('**/assets/section10/scene.webp',route=>route.abort());
   await page.reload();
+  await warmClosingArtwork(page);
   await expect(section).toHaveAttribute('data-artwork','original');
-  await page.getByRole('button',{name:'Open Invitation',exact:true}).click();
   await expect(section.locator('#closingHeading')).toHaveText('Until we meet');
 });
 
