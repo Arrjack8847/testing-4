@@ -20,10 +20,24 @@
     return n - Math.floor(n);
   };
   function makePetal(i) {
+    const radius = 2.8 + rand(i + 121) * 3.6;
+    // Cache identical vector geometry once instead of rebuilding two Bezier
+    // curves for each petal on every frame. Path2D and the fallback both draw
+    // the same full-quality shape; movement and frame cadence are untouched.
+    let path = null;
+    if (typeof Path2D !== 'undefined') {
+      path = new Path2D();
+      path.moveTo(0, -radius * 1.65);
+      path.bezierCurveTo(radius * 1.1, -radius * 1.2,
+        radius * 1.15, radius * .75, 0, radius * 1.5);
+      path.bezierCurveTo(-radius * 1.4, radius * .65,
+        -radius * 1.1, -radius * 1.1, 0, -radius * 1.65);
+    }
     return {
+      path,
       x: rand(i + 1) * width,
       y: rand(i + 71) * height,
-      radius: 2.8 + rand(i + 121) * 3.6,
+      radius,
       speed: 11 + rand(i + 171) * 19,
       drift: 5 + rand(i + 221) * 14,
       phase: rand(i + 271) * TAU,
@@ -69,13 +83,18 @@
     context.rotate(turn);
     context.globalAlpha = p.opacity;
     context.fillStyle = p.color;
-    context.beginPath();
-    context.moveTo(0, -p.radius * 1.65);
-    context.bezierCurveTo(p.radius * 1.1, -p.radius * 1.2,
-      p.radius * 1.15, p.radius * .75, 0, p.radius * 1.5);
-    context.bezierCurveTo(-p.radius * 1.4, p.radius * .65,
-      -p.radius * 1.1, -p.radius * 1.1, 0, -p.radius * 1.65);
-    context.fill();
+    if (p.path) {
+      context.fill(p.path);
+    } else {
+      // Keep an exact drawing fallback for older embedded browsers.
+      context.beginPath();
+      context.moveTo(0, -p.radius * 1.65);
+      context.bezierCurveTo(p.radius * 1.1, -p.radius * 1.2,
+        p.radius * 1.15, p.radius * .75, 0, p.radius * 1.5);
+      context.bezierCurveTo(-p.radius * 1.4, p.radius * .65,
+        -p.radius * 1.1, -p.radius * 1.1, 0, -p.radius * 1.65);
+      context.fill();
+    }
     context.restore();
   }
   function tick(now) {
