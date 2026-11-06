@@ -21,6 +21,8 @@
   let visible = false;
   let countdownTimer = null;
   let cameraFrame = null;
+  // Initially allow one camera sync. The observer gates subsequent offscreen work.
+  let cameraNear = true;
 
   function renderCountdown() {
     if (!Number.isFinite(eventTime)) return;
@@ -156,13 +158,21 @@
     // Unlike a fixed hero this remains in normal scrolling flow.
     const motionDistance = -rect.top - Math.max(0, rect.height - viewport) / 2;
     const paperShift = reduced.matches ? 0 : clamp(motionDistance * .0427, -24, 24);
-    section.style.setProperty('--event-stage-y', (pinned + camera).toFixed(2) + 'px');
-    section.style.setProperty('--event-paper-shift', paperShift.toFixed(2) + 'px');
-    section.dataset.eventCamera = camera.toFixed(2);
-    section.dataset.eventPaperShift = paperShift.toFixed(2);
+    const stageY = (pinned + camera).toFixed(2) + 'px';
+    const paperY = paperShift.toFixed(2) + 'px';
+    const cameraValue = camera.toFixed(2);
+    const paperValue = paperShift.toFixed(2);
+    // Style invalidation is expensive on WebKit: keep exact reference values,
+    // but do not write identical values on every scroll callback.
+    if (section.style.getPropertyValue('--event-stage-y') !== stageY)
+      section.style.setProperty('--event-stage-y', stageY);
+    if (section.style.getPropertyValue('--event-paper-shift') !== paperY)
+      section.style.setProperty('--event-paper-shift', paperY);
+    if (section.dataset.eventCamera !== cameraValue) section.dataset.eventCamera = cameraValue;
+    if (section.dataset.eventPaperShift !== paperValue) section.dataset.eventPaperShift = paperValue;
   }
   function scheduleCamera() {
-    if (cameraFrame !== null) return;
+    if (!cameraNear || document.hidden || cameraFrame !== null) return;
     cameraFrame = window.requestAnimationFrame(paintCamera);
   }
   window.addEventListener('scroll', scheduleCamera, {passive:true});
@@ -188,6 +198,11 @@
 
     const sectionObserver = new IntersectionObserver(entries => {
       visible = entries.some(entry => entry.isIntersecting);
+      cameraNear = visible;
+      if (!cameraNear && cameraFrame !== null) {
+        window.cancelAnimationFrame(cameraFrame);
+        cameraFrame = null;
+      } else if (cameraNear) scheduleCamera();
       updateTimerState();
     }, {threshold:0,rootMargin:'100px 0px'});
     sectionObserver.observe(section);
@@ -198,5 +213,11 @@
   }
   reduced.addEventListener?.('change', syncMotion);
   document.addEventListener('visibilitychange', updateTimerState);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && cameraFrame !== null) {
+      window.cancelAnimationFrame(cameraFrame);
+      cameraFrame = null;
+    } else if (!document.hidden) scheduleCamera();
+  });
   syncMotion();
 })();
