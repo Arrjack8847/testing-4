@@ -1,4 +1,7 @@
 name: Section 5 exact artwork loader QA
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 on:
   push:
     branches: [fix/section5-licensed-reference-art-default-20261104]
