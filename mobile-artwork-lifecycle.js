@@ -22,8 +22,11 @@
     window.addEventListener('scroll',()=>{
       const next=window.scrollY;
       const delta=next-lastScrollY;
-      lastScrollY=next;
+      // Keep the sample anchor until at least 8px of travel. On iPhone,
+      // gentle scrolling often produces 1-4px events; resetting the anchor
+      // on every such event would hide a real reversal indefinitely.
       if(Math.abs(delta)<8)return;
+      lastScrollY=next;
       const direction=delta<0?'up':'down';
       if(direction===scrollDirection)return;
       scrollDirection=direction;
