@@ -82,7 +82,8 @@
       section.dataset.referencePaperSource = 'remote';
       paper.src = artRoot + 'packs/tasik-kayangan/paper.webp';
     };
-    paperProbe.src = localPaper;
+    if (/\\.vercel\\.app$/i.test(location.hostname)) paperProbe.onerror();
+    else paperProbe.src = localPaper;
   }
   if (butterfly) {
     section.dataset.referenceButterfly = 'loading';
@@ -104,7 +105,8 @@
     section.dataset.referenceFrameSource = 'local';
   };
   frameProbe.onerror = () => { section.dataset.referenceFrameSource = 'remote'; };
-  frameProbe.src = './assets/reference-dev/arch_event.svg';
+  if (/\\.vercel\\.app$/i.test(location.hostname)) section.dataset.referenceFrameSource = 'remote';
+  else frameProbe.src = './assets/reference-dev/arch_event.svg';
 
   // Reuse the original white butterfly sprite for both 22px wing halves.
   // Its animation is deliberately not guessed: the saved source capture
@@ -115,7 +117,8 @@
     section.dataset.referenceWingSource = 'local';
   };
   wingProbe.onerror = () => { section.dataset.referenceWingSource = 'remote'; };
-  wingProbe.src = './assets/reference-dev/bfly_white.webp';
+  if (/\\.vercel\\.app$/i.test(location.hostname)) section.dataset.referenceWingSource = 'remote';
+  else wingProbe.src = './assets/reference-dev/bfly_white.webp';
 
   // Four-phone comparison mode: pin the illustrated plane within Events
   // while letting HTML cards, buttons and countdown scroll normally.

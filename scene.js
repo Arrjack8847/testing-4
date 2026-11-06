@@ -286,7 +286,8 @@ const failed = new Set();
 function loadArtwork(name) {
   // Prefer locally stored artwork, fallback to reference host when absent.
   const local = skinAssetBase + name;
-  const sources = activeSkin ? [local] : (forceRemote ? [REMOTE + name] : [local, REMOTE + name]);
+  const isHosted = /\\.vercel\\.app$/i.test(window.location.hostname);
+  const sources = activeSkin ? [local] : ((forceRemote || isHosted) ? [REMOTE + name, local] : [local, REMOTE + name]);
   return new Promise(resolve => {
     let index = 0;
     const test = new Image();
