@@ -84,7 +84,7 @@
       retainKnown = true;
       retain = !!entries[0]?.isIntersecting;
       reconcile();
-    }, {rootMargin:`${retainMargin}px 0px ${retainMargin}px 0px`, threshold:0});
+    }, {rootMargin:`${retainMargin}px 0px ${trailingMargin}px 0px`, threshold:0});
     const reverseObserver = new IntersectionObserver(entries => {
       reverseNear = !!entries[0]?.isIntersecting;
       if(scrollDirection==='up')reconcile();
