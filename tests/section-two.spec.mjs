@@ -114,7 +114,7 @@ test('full sticky lake remains under mauve overlay until exactly 3H',async({page
     const message=document.getElementById('message').getBoundingClientRect();
     return {lakeTop:lake.top/innerHeight,lakeBottom:lake.bottom/innerHeight,
       messageTop:message.top/innerHeight,overlap:lake.bottom-message.top,
-      textShift:document.documentElement.style.getPropertyValue('--text-scroll-shift').trim()};
+      textShift:document.getElementById('viewport').style.getPropertyValue('--text-scroll-shift').trim()};
   });
   // Entire lake stays pinned under the mauve band. The lower half is
   // intentionally overlaid; only the upper half of the garden remains visible.
@@ -122,7 +122,7 @@ test('full sticky lake remains under mauve overlay until exactly 3H',async({page
   expect(mid.lakeBottom).toBeCloseTo(1,1);
   expect(mid.messageTop).toBeCloseTo(.5,1);
   expect(mid.overlap/initial.height).toBeCloseTo(.5,1);
-  await expect.poll(()=>page.evaluate(()=>parseFloat(document.documentElement.style
+  await expect.poll(()=>page.evaluate(()=>parseFloat(document.getElementById('viewport').style
     .getPropertyValue('--text-scroll-shift'))/innerHeight)).toBeCloseTo(-.5,1);
   await page.screenshot({path:testInfo.outputPath('section-two-transition-half.png'),animations:'disabled'});
 

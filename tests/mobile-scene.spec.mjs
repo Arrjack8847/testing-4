@@ -107,7 +107,7 @@ test('developer alignment controls and reset work after scrolling', async ({ pag
   await expect.poll(async () =>
     page.evaluate(() => window.scrollY)).toBe(0);
   await expect.poll(async () =>
-    page.evaluate(() => document.documentElement.style.getPropertyValue('--stage-parallax').trim())).toBe('0px');
+    page.evaluate(() => document.getElementById('viewport').style.getPropertyValue('--stage-parallax').trim())).toBe('0px');
   await expect(page.locator('#opened')).toHaveAttribute('inert','');
 });
 
@@ -261,11 +261,11 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   await expect(page.locator('#invitation')).toHaveAttribute('data-swiped','yes');
   await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
   await expect.poll(async()=>page.evaluate(()=>
-    document.documentElement.style.getPropertyValue('--frame-scroll-opacity')
+    document.getElementById('viewport').style.getPropertyValue('--frame-scroll-opacity')
   )).toBe('0.0000');
   await visit(1.15);
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--frame-scroll-opacity'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--frame-scroll-opacity'))
   )).toBeGreaterThan(.1);
   await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','0');
   await visit(1.50);
@@ -280,14 +280,14 @@ test('garden returns before wedding text during the pinned scroll',async({page})
   });
   expect(activeAnimation).toEqual({name:'write-ceremony-name',duration:'1.5s',delay:'0.35s'});
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--first-name-progress'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--first-name-progress'))
   )).toBeGreaterThan(.5);
   await expect(page.locator('.ceremony-names')).toHaveCSS('opacity','1');
   await expect(page.locator('.ceremony-names .name-amp')).toHaveCSS('opacity','0');
   await visit(2.20);
   await expect(page.locator('.opened-copy .eyebrow')).toHaveCSS('opacity','1');
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--second-name-progress'))
   )).toBe(1);
   // The measured source keeps the entire garden pinned past 2H; only
   // the names scroll upwards while the mauve panel covers its lower part.
@@ -295,11 +295,11 @@ test('garden returns before wedding text during the pinned scroll',async({page})
     Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
   )).toBe(0);
   await expect.poll(async()=>page.evaluate(()=>
-    document.documentElement.style.getPropertyValue('--stage-parallax').trim()
+    document.getElementById('viewport').style.getPropertyValue('--stage-parallax').trim()
   )).toBe('0px');
   await visit(2.5);
   await expect.poll(async()=>page.evaluate(()=>
-    Number((parseFloat(document.documentElement.style.getPropertyValue('--text-scroll-shift'))/innerHeight).toFixed(2))
+    Number((parseFloat(document.getElementById('viewport').style.getPropertyValue('--text-scroll-shift'))/innerHeight).toFixed(2))
   )).toBeCloseTo(-.5,1);
   await expect.poll(async()=>page.evaluate(()=>
     Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
@@ -368,17 +368,17 @@ test('ceremony lettering matches live 390px typography and stacked geometry',asy
     scrollTo({top:innerHeight*1.5,behavior:'instant'});
   });
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--first-name-progress'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--first-name-progress'))
   )).toBeGreaterThan(.5);
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--first-name-hidden'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--first-name-hidden'))
   )).toBeLessThan(50);
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--second-name-progress'))
   )).toBe(0);
   await page.evaluate(()=>scrollTo({top:innerHeight*2.2,behavior:'instant'}));
   await expect.poll(async()=>page.evaluate(()=>
-    parseFloat(document.documentElement.style.getPropertyValue('--second-name-progress'))
+    parseFloat(document.getElementById('viewport').style.getPropertyValue('--second-name-progress'))
   )).toBe(1);
   await expect.poll(async()=>page.locator('.name-second').evaluate(el=>
     getComputedStyle(el).maskPosition
@@ -671,11 +671,11 @@ test('first swipe retreats sky and palace before garden returns',async({page})=>
     // Scroll state is applied by the scene's requestAnimationFrame callback.
     // Wait for its committed CSS value, not merely for scrollY to change.
     await expect.poll(async()=>page.evaluate(()=>
-      Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale'))
+      Number(document.getElementById('viewport').style.getPropertyValue('--palace-scroll-scale'))
     )).toBeCloseTo(.99-.33*ease(fraction,.22,.72),2);
     return page.evaluate(()=>({
-      sky:Number(document.documentElement.style.getPropertyValue('--sky-scroll-scale')),
-      palace:Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale')),
+      sky:Number(document.getElementById('viewport').style.getPropertyValue('--sky-scroll-scale')),
+      palace:Number(document.getElementById('viewport').style.getPropertyValue('--palace-scroll-scale')),
       sceneTop:Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
     }));
   };
@@ -692,7 +692,7 @@ test('first swipe retreats sky and palace before garden returns',async({page})=>
   expect(mid.sceneTop).toBe(0);
   await seek(.8);
   await expect.poll(async()=>page.evaluate(()=>
-    Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale'))
+    Number(document.getElementById('viewport').style.getPropertyValue('--palace-scroll-scale'))
   )).toBeCloseTo(.66,2);
   await expect(page.locator('#invitation')).toHaveAttribute('data-reading','no');
 });
@@ -715,14 +715,14 @@ test('opened lake retains reeds briefly then returns border flowers by 0.75H',as
       return p*p*(3-2*p);
     };
     await expect.poll(async()=>page.evaluate(()=>
-      Number(document.documentElement.style.getPropertyValue('--reed-scroll-opacity'))
+      Number(document.getElementById('viewport').style.getPropertyValue('--reed-scroll-opacity'))
     )).toBeCloseTo(1-easing(fraction,.12,.40),3);
     await expect.poll(async()=>page.evaluate(()=>
-      Number(document.documentElement.style.getPropertyValue('--front-scroll-opacity'))
+      Number(document.getElementById('viewport').style.getPropertyValue('--front-scroll-opacity'))
     )).toBeCloseTo(easing(fraction,.47,.78),3);
     return await page.evaluate(()=>({
-      reeds:+document.documentElement.style.getPropertyValue('--reed-scroll-opacity'),
-      flowers:+document.documentElement.style.getPropertyValue('--front-scroll-opacity'),
+      reeds:+document.getElementById('viewport').style.getPropertyValue('--reed-scroll-opacity'),
+      flowers:+document.getElementById('viewport').style.getPropertyValue('--front-scroll-opacity'),
       reedComputed:+getComputedStyle(document.querySelector('.depth.reeds')).opacity,
       pinned:Math.round(document.querySelector('#viewport').getBoundingClientRect().top)
     }));
