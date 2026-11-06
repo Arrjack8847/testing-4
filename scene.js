@@ -323,7 +323,21 @@ async function loadSceneArtwork() {
     }));
   }
 }
-const artworkReady=loadSceneArtwork().then(() => {
+// Diagnostic-only mode for real iPhone WebKit process crashes. The normal
+// reference website is unchanged. ?heroStill=1 keeps the original full-quality
+// master painting and skips only the 24 decoded transparent scene files.
+// Comparing this with the normal preview isolates the layered hero's GPU load.
+const heroStillProbe = query.get('heroStill') === '1';
+if(heroStillProbe) invite.dataset.heroDiagnostic = 'still';
+const artworkReady=(heroStillProbe
+  ?loadArtwork('scene.webp').then(result=>{
+    if(result.okay)master.src=result.src;
+    invite.dataset.layers='failed';
+    notification.hidden=result.okay;
+    if(!result.okay)notification.textContent='Still artwork unavailable.';
+    return false;
+  })
+  :loadSceneArtwork().then(() => {
   // Only the 24 separate layered files are essential to the moving garden.
   // If scene.webp is missing but every layer loaded, prefer the complete
   // animated scene instead of incorrectly hiding it and showing a blank page.
@@ -340,7 +354,8 @@ const artworkReady=loadSceneArtwork().then(() => {
       'Invitation artwork could not be loaded. Check your connection or run download-assets.ps1.';
   }
   return layersComplete;
-});
+  })
+);
 
 // Mobile-only cleanup: Section 1's animated backdrop includes many
 // 1080x1920 transparent WebP layers. Keep the still master as a fallback,
