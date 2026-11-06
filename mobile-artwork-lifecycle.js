@@ -1,8 +1,9 @@
 'use strict';
 /*
  * Mobile-only artwork lifecycle for the 10-section reference prototype.
- * No assets are resized or substituted. Load 1700px before a section enters,
- * keep decoded imagery for 3100px beyond it, then release selected DOM images.
+ * No assets are resized or substituted. Prewarm about 1.5 viewport heights
+ * before a section enters; retain about 2.75 heights beyond it, then release
+ * selected DOM images. These margins are capped to prevent wide overlap.
  * Hysteresis avoids load/unload thrashing at section boundaries.
  *
  * A "released" state means DOM image sources have been detached; browser
@@ -41,15 +42,21 @@
         release();
       }
     };
+    // Fixed 1700px/3100px bands overlapped multiple artwork-heavy sections
+    // on short iPhones. Bound the bands to the initial viewport height, without
+    // sacrificing hysteresis or changing the source image quality.
+    const viewportH = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 800);
+    const nearMargin = Math.max(1000, Math.min(1700, Math.round(viewportH * 1.5)));
+    const retainMargin = Math.max(nearMargin + 650, Math.min(3100, Math.round(viewportH * 2.75)));
     const nearObserver = new IntersectionObserver(entries => {
       near = !!entries[0]?.isIntersecting;
       reconcile();
-    }, {rootMargin:'1700px 0px 1700px 0px', threshold:0});
+    }, {rootMargin:`${nearMargin}px 0px ${nearMargin}px 0px`, threshold:0});
     const retainObserver = new IntersectionObserver(entries => {
       retainKnown = true;
       retain = !!entries[0]?.isIntersecting;
       reconcile();
-    }, {rootMargin:'3100px 0px 3100px 0px', threshold:0});
+    }, {rootMargin:`${retainMargin}px 0px ${retainMargin}px 0px`, threshold:0});
     nearObserver.observe(section);
     retainObserver.observe(section);
     new MutationObserver(reconcile).observe(invitation,{
