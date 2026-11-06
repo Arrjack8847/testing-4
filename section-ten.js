@@ -82,7 +82,9 @@
     :null;
   if(observer)observer.observe(section);
   else{visible=true;revealed=true;section.dataset.revealed='true';}
-  const onScroll=()=>{if(visible)schedule();scheduleReveals();};
+  // The section observer schedules reveal synchronization on enter/exit.
+  // Do not measure invisible closing text on every scroll in Sections 1–9.
+  const onScroll=()=>{if(visible){schedule();scheduleReveals();}};
   window.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',onScroll,{passive:true});
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else schedule();scheduleReveals();});
