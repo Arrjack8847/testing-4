@@ -23,7 +23,7 @@ test('three forward-and-reverse scroll journeys preserve invitation and artwork'
     for(const id of sectionIds){
       await page.evaluate(name=>{
         const section=document.getElementById(name);
-        const top=section.getBoundingClientRect().top+scrollY;
+        const top=name==='viewport' ? 0 : section.getBoundingClientRect().top+scrollY;
         scrollTo({top:Math.round(top),behavior:'instant'});
       },id);
       await page.waitForTimeout(50);
@@ -33,7 +33,7 @@ test('three forward-and-reverse scroll journeys preserve invitation and artwork'
     for(const id of sectionIds.slice().reverse()){
       await page.evaluate(name=>{
         const section=document.getElementById(name);
-        const top=section.getBoundingClientRect().top+scrollY;
+        const top=name==='viewport' ? 0 : section.getBoundingClientRect().top+scrollY;
         scrollTo({top:Math.round(top),behavior:'instant'});
       },id);
       await page.waitForTimeout(50);
