@@ -26,6 +26,7 @@
     <p class="phone-qa-info">Runs on this phone only. No results are sent anywhere.</p>
     <dl id="phoneQaTelemetry" class="phone-qa-stats" aria-live="off"></dl>
     <button type="button" id="phoneQaMeasure">Measure 5 seconds</button>
+    <button type="button" id="phoneQaScrollMeasure">Measure 20-second scroll (panel closes)</button>
     <p id="phoneQaMeasureResult" role="status" aria-live="polite">No performance sample yet.</p>
     <fieldset id="phoneQaChecks">
       <legend>Check on this actual phone</legend>
@@ -45,6 +46,7 @@
 
   const telemetry = byId('phoneQaTelemetry');
   const measureButton = byId('phoneQaMeasure');
+  const scrollMeasureButton = byId('phoneQaScrollMeasure');
   const result = byId('phoneQaMeasureResult');
   const report = byId('phoneQaReport');
   const feedback = byId('phoneQaFeedback');
@@ -111,46 +113,76 @@
     attributes:true,attributeFilter:['data-layers','data-state','data-ambient']
   });
 
-  measureButton.addEventListener('click',async()=>{
-    if(measuring) return;
-    measuring=true;
-    sample=null;
-    measureButton.disabled=true;
-    result.textContent='Sampling on this phone… keep this tab visible.';
-    const start=performance.now();
-    const readDraws=()=>window.__scenePerf?.draws ?? null;
-    const startDraws=readDraws();
-    let frames=0,longTasks=0;
+  // Diagnostic-only sampling, enabled via ?phoneqa=1. The normal guest page
+  // never performs this telemetry. These are browser proxies, NOT iOS CPU,
+  // device temperature or WebKit graphics-memory measurements.
+  async function measureFor(durationMs, scrollMode) {
+    if (measuring) return;
+    measuring = true;
+    sample = null;
+    measureButton.disabled = true;
+    scrollMeasureButton.disabled = true;
+    result.textContent = scrollMode
+      ? 'Recording scrolling for 20 seconds. Reopen Phone QA for results.'
+      : 'Sampling on this phone… keep this tab visible.';
+    if (scrollMode) show(false);
+    const start = performance.now();
+    const readDraws = () => window.__scenePerf?.draws ?? null;
+    const startDraws = readDraws();
+    let frames = 0, longTasks = 0, previousStamp = 0;
+    const intervals = [];
+    let peakNearSections = 0, peakLoadedImages = 0, lastSnapshot = -1000;
     let observer;
-    if('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
-      observer=new PerformanceObserver(list=>{longTasks+=list.getEntries().length;});
+    if ('PerformanceObserver' in window && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
+      observer = new PerformanceObserver(list => { longTasks += list.getEntries().length; });
       observer.observe({entryTypes:['longtask']});
     }
-    let cancelled=false;
-    const timer=window.setTimeout(()=>{cancelled=true;},5000);
-    while(!cancelled && !document.hidden) {
-      await new Promise(resolve=>requestAnimationFrame(resolve));
+    let timedOut = false;
+    const timer = window.setTimeout(() => { timedOut = true; }, durationMs);
+    while (!timedOut && !document.hidden) {
+      const stamp = await new Promise(resolve => requestAnimationFrame(resolve));
       frames++;
+      if (previousStamp) intervals.push(stamp - previousStamp);
+      previousStamp = stamp;
+      if (stamp - lastSnapshot >= 1000) {
+        lastSnapshot = stamp;
+        peakNearSections = Math.max(peakNearSections,
+          document.querySelectorAll('[data-asset-lifecycle="near"]').length);
+        peakLoadedImages = Math.max(peakLoadedImages,
+          document.querySelectorAll('img[src]').length);
+      }
     }
     clearTimeout(timer);
     observer?.disconnect();
-    const elapsed=(performance.now()-start)/1000;
-    const endDraws=readDraws();
-    const complete=cancelled && !document.hidden;
-    sample={
-      seconds:+elapsed.toFixed(2),
-      frameCallbackHz:+(frames/Math.max(elapsed,.01)).toFixed(1),
-      petalPaintHz:startDraws===null||endDraws===null?null:+((endDraws-startDraws)/Math.max(elapsed,.01)).toFixed(1),
-      longTasks:observer?longTasks:null,
+    const elapsed = (performance.now() - start) / 1000;
+    const endDraws = readDraws();
+    const ordered = intervals.sort((a,b) => a-b);
+    const p95 = ordered.length ? ordered[Math.ceil(ordered.length * .95) - 1] : null;
+    const over33 = ordered.filter(n => n > 33.4).length;
+    const complete = timedOut && !document.hidden;
+    sample = {
+      mode: scrollMode ? 'scrolling' : 'stationary',
+      seconds: +elapsed.toFixed(2),
+      frameCallbackHz: +(frames/Math.max(elapsed,.01)).toFixed(1),
+      p95FrameIntervalMs: p95 === null ? null : +p95.toFixed(1),
+      frameIntervalsOver33MsPct: ordered.length ? +(100*over33/ordered.length).toFixed(1) : null,
+      petalPaintHz: startDraws === null || endDraws === null ? null
+        : +((endDraws-startDraws)/Math.max(elapsed,.01)).toFixed(1),
+      longTasks: observer ? longTasks : null,
+      peakNearSections,
+      peakImagesWithSrc: peakLoadedImages,
       complete
     };
-    result.textContent=complete
-      ? `Sample: ${sample.frameCallbackHz} screen frames/s; ${sample.petalPaintHz===null?'petal paint unavailable':sample.petalPaintHz+' petal paints/s'}; ${sample.longTasks===null?'long-task API unavailable':sample.longTasks+' long tasks'}.`
+    result.textContent = complete
+      ? `Sample: ${sample.frameCallbackHz} callbacks/s; p95 frame interval ${sample.p95FrameIntervalMs ?? 'n/a'}ms; ${sample.frameIntervalsOver33MsPct ?? 'n/a'}% over 33ms; ${sample.longTasks ?? 'n/a'} long tasks. These are not hardware FPS or temperature readings.`
       : 'Sample interrupted; keep this tab active and try again.';
-    measureButton.disabled=false;
-    measuring=false;
+    measureButton.disabled = false;
+    scrollMeasureButton.disabled = false;
+    measuring = false;
     drawStats();
-  });
+  }
+  measureButton.addEventListener('click', () => { void measureFor(5000, false); });
+  scrollMeasureButton.addEventListener('click', () => { void measureFor(20000, true); });
 
   function makeReport() {
     const checkItems=[...checks.querySelectorAll('input[type="checkbox"]')].map(x=>
