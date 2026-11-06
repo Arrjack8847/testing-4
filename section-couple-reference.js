@@ -57,6 +57,10 @@
     artRoot + 'packs/tasik-kayangan/scene.webp'
   ];
   let artworkActive = false;
+  // Retain one shared original scene painting as a cheap, accurate still
+  // backdrop while portraits/scene probes rehydrate on fast reverse swipes.
+  // This is the same source image as the Section 1 master, not new artwork.
+  let lastSceneUrl = sceneSources[0];
   let sceneProbe = null;
   let sceneEpoch = 0;
   let sceneSourceIndex = 0;
@@ -67,6 +71,7 @@
     probe.onload = () => {
       if(!artworkActive||epoch!==sceneEpoch)return;
       const imageUrl=probe.currentSrc||probe.src;
+      lastSceneUrl=imageUrl;
       section.style.setProperty('--couple-reference-image','url("'+imageUrl+'")');
       section.dataset.referenceSceneSource=sceneSourceIndex===0?'local':'remote';
       webpStatus.scene='loaded';
@@ -146,7 +151,10 @@
       sceneProbe.removeAttribute('src');
       sceneProbe=null;
     }
-    section.style.setProperty('--couple-reference-image','none');
+    // Do not blank the whole garden as soon as artwork is released. The
+    // single full-resolution painting remains as a fallback while the
+    // heavier portrait textures stay detached. The image URL is reused.
+    section.style.setProperty('--couple-reference-image','url("'+lastSceneUrl+'")');
     for (const item of portraitData) {
       const img = section.querySelector(item.selector);
       if (img) img.src = img.dataset.referenceFallback;
