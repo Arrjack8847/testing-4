@@ -927,7 +927,10 @@ html.debug-freeze .peacock-glint {
 .invitation[data-ambient="paused"] .butterfly-wing {
   animation-play-state:paused !important;
 }
-.invitation[data-ambient="paused"] .butterfly {
+.invitation[data-ambient="paused"] .butterfly,
+.invitation[data-ambient="paused"] .butterfly-wing {
+  /* Release compositor promotion while offscreen; restore the original
+     transform hints and exact animation on re-entry. */
   will-change:auto;
 }
 
