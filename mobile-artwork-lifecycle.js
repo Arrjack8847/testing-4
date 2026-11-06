@@ -68,6 +68,10 @@
     const viewportH = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 800);
     const nearMargin = Math.max(1000, Math.min(1700, Math.round(viewportH * 1.5)));
     const retainMargin = Math.max(nearMargin + 650, Math.min(3100, Math.round(viewportH * 2.75)));
+    // Keep the long release buffer for artwork ABOVE the viewport. Use a
+    // shorter but still hysteretic buffer BELOW it, freeing sections already
+    // passed on an upward return before their replacements are decoded.
+    const trailingMargin = Math.min(retainMargin, nearMargin + 450);
     // Upward-only lead is larger than the standard near band but limited
     // to roughly three phone screens. It activates at most nearby sections,
     // not every released scene on the page.
