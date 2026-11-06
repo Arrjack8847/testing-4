@@ -664,10 +664,6 @@ if (activeSkin) {
   }
 }
 
-// Opt-in phone testing only. The diagnostics never run in a guest invitation.
-// On-device results stay in this browser until the tester chooses to copy them.
-if (query.has('phoneqa')) {
-  const loader=document.createElement('script');
-  loader.src='./phone-qa.js';
-  document.body.appendChild(loader);
-}
+// The opt-in phone diagnostics script is loaded once by index.html.
+// It exits immediately when ?phoneqa is absent; avoid injecting a second
+// script instance that duplicates the overlay and sampling loops.
