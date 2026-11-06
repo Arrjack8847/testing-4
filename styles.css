@@ -1036,10 +1036,9 @@ html.debug-freeze .peacock-glint {
     opacity:0!important;
     transition:none!important;
   }
-  .couple-section:is([data-asset-lifecycle="deferred"],[data-asset-lifecycle="released"])
-    .couple-reference-scene::before {
-    background-image:none!important;
-  }
+  /* The Section 3 shared scene.webp still is an intentional one-image
+     fallback during reverse scroll. Do not blank its scenery while the
+     detailed reference artwork rehydrates; portraits remain detached. */
   .couple-section:is([data-asset-lifecycle="deferred"],[data-asset-lifecycle="released"])
     .couple-arch {
     border-image-source:none!important;
