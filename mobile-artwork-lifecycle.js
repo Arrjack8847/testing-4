@@ -20,9 +20,13 @@
       activate();
       return;
     }
-    let near = false, retain = false, retainKnown = false, live = false;
+    // Some callers (the hero) already contain loaded image layers when
+    // registration begins. Treat those as live so a delayed registration,
+    // after a fast swipe, still releases them when far from the viewport.
+    let near = false, retain = false, retainKnown = false;
+    let live = handlers.initiallyActive === true;
     const setState = state => { section.dataset.assetLifecycle = state; };
-    setState('deferred');
+    setState(live ? 'near' : 'deferred');
     const reconcile = () => {
       const opened = invitation.dataset.state === 'opened';
       // Do not wait for a cover click when the guest has deep-linked, or
