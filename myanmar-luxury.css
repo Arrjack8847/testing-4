@@ -56,24 +56,21 @@
   background: rgba(245,239,228,.91);
   box-shadow: 0 3px 12px rgba(71,45,26,.12);
 }
-/* Base imagery remains stable during the original opening/camera curves.
-   Using the master artwork as a masked path avoids adding a 28th asset and
-   avoids removing the royal walkway with the disappearing "reeds" layer. */
+/* Compact alpha-masked cutout from the original scene painting, cropped to
+   its lower 855 source pixels. Stays at the artwork's fixed bottom anchor.
+   No full-screen clip-path or animated mask is needed on the GPU. */
 .invitation[data-skin="myanmar-luxury"] .myanmar-stone-path {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 2;
   pointer-events: none;
-  overflow: hidden;
 }
 .invitation[data-skin="myanmar-luxury"] .myanmar-stone-path img {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  clip-path: polygon(44% 58%, 56% 58%, 69% 78%, 86% 100%, 14% 100%, 31% 78%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 57%, #000 66%);
-  mask-image: linear-gradient(180deg, transparent 57%, #000 66%);
+  height: auto;
 }
 /* Align the new 1920-square illustrated palace higher within its existing
    bottom-anchored camera sprite. Keep scale timing and scroll curves intact. */

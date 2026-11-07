@@ -18,7 +18,10 @@ test('Myanmar skin loads locally, keeps a permanent path, and preserves opening'
   expect(sources.length).toBeGreaterThanOrEqual(25);
   expect(sources.every(src=>src.includes('/assets/skins/myanmar-luxury/'))).toBe(true);
   const ground=page.locator('.myanmar-stone-path img');
+  await expect.poll(()=>ground.evaluate(el=>new URL(el.currentSrc).pathname))
+    .toBe('/assets/skins/myanmar-luxury/path.webp');
   await expect.poll(()=>ground.evaluate(el=>el.complete&&el.naturalWidth>0)).toBe(true);
+  expect(await ground.evaluate(el=>[el.naturalWidth,el.naturalHeight])).toEqual([1080,855]);
   const button=page.getByRole('button',{name:'Open Invitation'});
   await expect(button).toBeVisible();
   const coverReadability=await page.locator('.cover-copy').evaluate(el=>{

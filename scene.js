@@ -75,15 +75,15 @@ const definitions = [
 ];
 
 // The new painted pavilion has no permanent pathway in its transparent square.
-// Reuse the master painting's central stone path as a clipped, stationary ground
-// layer, beneath the moving pavilion and gardens. No second image download is
-// required because the scene.webp URL is already used for the fallback artwork.
+// A compact, softly alpha-masked crop of the owner's scene painting persists
+// behind the moving pavilion. This avoids rerasterizing another full master image
+// and preserves the authored original stone pathway while reeds move away.
 if (activeSkin === 'myanmar-luxury') {
   const pathway = document.createElement('div');
   pathway.className = 'myanmar-stone-path';
   pathway.setAttribute('aria-hidden', 'true');
   const image = document.createElement('img');
-  image.src = skinAssetBase + 'scene.webp';
+  image.src = skinAssetBase + 'path.webp';
   image.alt = '';
   image.decoding = 'async';
   pathway.appendChild(image);
