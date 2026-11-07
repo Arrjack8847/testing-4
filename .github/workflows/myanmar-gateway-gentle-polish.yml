@@ -1,0 +1,55 @@
+name: Myanmar Gateway Minimal Polish (Option A)
+on:
+  pull_request:
+    paths:
+      - tools/myanmar-gateway-gentle-polish.py
+      - .github/workflows/myanmar-gateway-gentle-polish.yml
+      - assets/skins/myanmar-luxury/arch.webp
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-before-after:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image and mobile preview tooling
+        run: |
+          python -m pip install Pillow numpy
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Local development server
+        run: |
+          python -m http.server 8000 --bind 127.0.0.1 >/tmp/myanmar-polish.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8000/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          exit 1
+      - name: Show unpolished source gateway (identical user-uploaded PNG)
+        run: |
+          python tools/myanmar-gateway-upload.py | grep '^MYANMAR_UPLOADED_PNG\\|^MYANMAR_GATEWAY_WEBP_CHECK'
+          node tools/myanmar-priority1-preview.mjs baseline
+      - name: Produce revised gateway and verify geometry and alpha
+        run: python tools/myanmar-gateway-gentle-polish.py
+      - name: View refined gateway with unchanged CSS animations
+        run: node tools/myanmar-priority1-preview.mjs candidate
+      - name: Print before/after iPhone comparison thumbnails
+        run: python tools/myanmar-priority1-thumbs.py
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: myanmar-gateway-minimal-polish-preview
+          path: candidate-screens/
+          retention-days: 14
+          if-no-files-found: warn
