@@ -7,7 +7,7 @@ await fs.mkdir(dir,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
 const results=[];
 let failures=0;
-for (const [name,width,height] of [['iphone-390',390,844],['small-phone',320,568]]) {
+for (const [name,width,height] of [['iphone-390',390,844],['iphone-browser-390',390,675],['small-phone',320,568]]) {
  const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:2,isMobile:true,hasTouch:true});
  const errors=[];const requests=[];
  page.on('pageerror',err=>errors.push(err.message));
