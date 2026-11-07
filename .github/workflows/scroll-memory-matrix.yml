@@ -1,0 +1,70 @@
+name: PR76 isolated mobile memory comparison
+on:
+  push:
+    branches: [perf/iphone-scroll-memory-20261106]
+    paths:
+      - tools/scroll-memory-matrix.mjs
+      - .github/workflows/scroll-memory-matrix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr76-scroll-memory-matrix
+  cancel-in-progress: true
+
+jobs:
+  six-cycle-comparison:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Prepare matched baseline and ephemeral reference art
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/testing4-baseline" 6fc38409a9645e18ae9557b4a9f6320a33ecc3f1
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re
+          names=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          assert len(names)==25, f'Expected 25 source files, got {len(names)}'
+          base='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'
+          for name in names:
+              request=Request(base+name,headers={'User-Agent':'Mozilla/5.0'})
+              data=urlopen(request,timeout=40).read()
+              assert data[:4]==b'RIFF' and data[8:12]==b'WEBP',name
+              Path('assets',name).write_bytes(data)
+          PY
+          mkdir -p "$RUNNER_TEMP/testing4-baseline/assets"
+          cp -a assets/. "$RUNNER_TEMP/testing4-baseline/assets/"
+      - name: Serve both commits from identical runner
+        run: |
+          python3 -m http.server 8111 --bind 127.0.0.1 --directory "$RUNNER_TEMP/testing4-baseline" >/tmp/testing4-baseline.log 2>&1 &
+          python3 -m http.server 8112 --bind 127.0.0.1 --directory "$GITHUB_WORKSPACE" >/tmp/testing4-optimized.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8111/ >/dev/null && curl -fsS http://127.0.0.1:8112/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+      - name: Run sequential matched four-phone six-cycle comparison
+        run: node tools/scroll-memory-matrix.mjs
+      - name: Publish diagnostic records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr76-six-cycle-four-phone-memory
+          path: perf-results/*
+          if-no-files-found: warn
+          retention-days: 14

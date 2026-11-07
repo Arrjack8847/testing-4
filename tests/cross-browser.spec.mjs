@@ -63,16 +63,16 @@ test('button touch/click, scroll, garden and text remain usable across engines',
   await open(page);
   await setScroll(page,.45);
   await expect.poll(async()=>page.evaluate(()=>
-    Number(document.documentElement.style.getPropertyValue('--palace-scroll-scale'))
+    Number(document.getElementById('viewport').style.getPropertyValue('--palace-scroll-scale'))
   )).toBeLessThan(.89);
   await setScroll(page,1.5);
   await expect.poll(async()=>page.evaluate(()=>
-    Number(document.documentElement.style.getPropertyValue('--frame-scroll-opacity'))
+    Number(document.getElementById('viewport').style.getPropertyValue('--frame-scroll-opacity'))
   )).toBeGreaterThan(.8);
   await expect(page.locator('.ceremony-names')).toBeVisible();
   await setScroll(page,2.25);
   await expect.poll(async()=>page.evaluate(()=>
-    Number(document.documentElement.style.getPropertyValue('--second-name-progress'))
+    Number(document.getElementById('viewport').style.getPropertyValue('--second-name-progress'))
   )).toBe(1);
   expect(errors).toEqual([]);
 });

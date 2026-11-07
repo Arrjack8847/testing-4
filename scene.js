@@ -182,7 +182,8 @@ function localPetalsAllowed() {
 function syncAmbient() {
   const running=ambientAllowed();
   const paintLocalPetals=localPetalsAllowed();
-  invite.dataset.ambient=running ? 'running' : 'paused';
+  const ambient=running ? 'running' : 'paused';
+  if(invite.dataset.ambient!==ambient)invite.dataset.ambient=ambient;
   if (paintLocalPetals && !petalFrame) {
     lastDraw=0;
     prevFrame=0;
@@ -383,8 +384,8 @@ function resetInvitation() {
   invite.dataset.scrollActive = 'no';
   document.documentElement.style.overflowY = 'hidden';
   // Clear scroll-driven parallax as well as scrolling, or reset leaves the scene displaced.
-  document.documentElement.style.setProperty('--stage-parallax', '0px');
-  document.documentElement.style.setProperty('--reading-progress', '0');
+  heroViewport.style.setProperty('--stage-parallax', '0px');
+  heroViewport.style.setProperty('--reading-progress', '0');
   window.scrollTo({top:0, behavior:'instant'});
   document.getElementById('openButton').focus({preventScroll:true});
 }
@@ -406,7 +407,13 @@ function easeBetween(x, start, end) {
   return p*p*(3-2*p);
 }
 function applyScrollScene(fraction) {
-  const rootStyle = document.documentElement.style;
+  // Section 2 fully covers the sticky garden at 3H. Its final text position
+  // stays outside the clipped scene; do not invalidate inherited root styles
+  // through Sections 3–10. Reverse scrolling uses the same unmodified curve.
+  fraction=Math.min(fraction,3);
+  // Every consumer is inside the hero viewport. Root inheritance used to
+  // invalidate styles (including SVG-backed artwork) in all ten sections.
+  const rootStyle = heroViewport.style;
   const garden = easeBetween(fraction, .52, 1.43);
   // The reference starts retreating from the valley during the first swipe:
   // its palace roof and palm tree silhouettes move visibly lower by 0.45H.
@@ -462,8 +469,10 @@ function applyScrollScene(fraction) {
   // screen bottom to top during 2H–3H; no second scenery translation.
   set('--text-scroll-shift',(-Math.max(0,fraction-2)*heroHeight()).toFixed(1)+'px');
   set('--stage-parallax','0px');
-  invite.dataset.swiped = fraction >= .15 ? 'yes' : 'no';
-  invite.dataset.reading = fraction >= 1.37 ? 'yes' : 'no';
+  const swiped=fraction >= .15 ? 'yes' : 'no';
+  const reading=fraction >= 1.37 ? 'yes' : 'no';
+  if(invite.dataset.swiped!==swiped)invite.dataset.swiped=swiped;
+  if(invite.dataset.reading!==reading)invite.dataset.reading=reading;
   // The old threshold re-enabled CSS transitions at the top on each
   // reverse swipe, introducing delayed camera motion. Stay in scroll mode
   // for the rest of the opening until reset, even at scroll position zero.

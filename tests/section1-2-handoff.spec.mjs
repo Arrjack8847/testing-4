@@ -21,7 +21,7 @@ async function at(page,ratio) {
     .toBeCloseTo(ratio,2);
   // Scroll-driven variables are set on requestAnimationFrame.
   await expect.poll(()=>page.evaluate(()=>{
-    const shift=parseFloat(document.documentElement.style.getPropertyValue('--text-scroll-shift'));
+    const shift=parseFloat(document.getElementById('viewport').style.getPropertyValue('--text-scroll-shift'));
     return Math.abs(shift+(scrollY-innerHeight*2));
   }),{timeout:5000}).toBeLessThanOrEqual(1);
   return page.evaluate(()=>{
@@ -41,7 +41,7 @@ async function at(page,ratio) {
       track:toRect(track),lake:toRect(viewport),scene:toRect(stage),
       band:toRect(band),next:toRect(next),
       zLake:+getComputedStyle(viewport).zIndex,zMessage:+style.zIndex,
-      textShift:parseFloat(document.documentElement.style.getPropertyValue('--text-scroll-shift')),
+      textShift:parseFloat(document.getElementById('viewport').style.getPropertyValue('--text-scroll-shift')),
       overflow:document.documentElement.scrollWidth-innerWidth,
       ambient:invitation.dataset.ambient,
       petalsActive:band.dataset.petalsActive,
@@ -148,9 +148,9 @@ test('Section 1 native sticky artwork uses a stable mobile viewport on four phon
         top:hero.getBoundingClientRect().top,
         height:hero.getBoundingClientRect().height,
         y:scrollY,
-        textShift:parseFloat(root.style.getPropertyValue('--text-scroll-shift')),
+        textShift:parseFloat(hero.style.getPropertyValue('--text-scroll-shift')),
         units:['--hanging-scroll-shift','--front-scroll-shift','--reed-scroll-shift']
-          .map(key=>root.style.getPropertyValue(key)),
+          .map(key=>hero.style.getPropertyValue(key)),
         overflow:root.scrollWidth-innerWidth
       };
     });
@@ -222,7 +222,7 @@ test('Section 1 never re-enables long camera transitions during a reverse finger
         stageZ:matrix.m43,stageY:matrix.m42,
         skyTransition:t(first),treeTransition:t(tree),archTransition:t(arch),
         scrollActive:document.getElementById('invitation').dataset.scrollActive,
-        parallax:document.documentElement.style.getPropertyValue('--stage-parallax'),
+        parallax:document.getElementById('viewport').style.getPropertyValue('--stage-parallax'),
         overflow:document.documentElement.scrollWidth-innerWidth
       };
     });

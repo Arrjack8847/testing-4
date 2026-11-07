@@ -137,12 +137,27 @@
   // Request at most one paint per frame; all geometry is read before changing
   // styles/classes so portrait focus cannot force extra layouts mid-frame.
   let pending = false;
+  let bounds = null;
+  function leaveCameraBand() {
+    if(section.dataset.cameraNear!=='false')section.dataset.cameraNear='false';
+    portraitCards.forEach(card=>{
+      if(card.classList.contains('is-focal'))card.classList.remove('is-focal');
+    });
+  }
   function syncScene() {
     pending = false;
-    const box = section.getBoundingClientRect();
     const viewport = Math.max(window.innerHeight, 1);
     const scroll = window.scrollY;
+    // Cached document bounds permit an offscreen check without flushing
+    // styles written by other scroll controllers earlier in this frame.
+    // Keep the existing two-viewport approach / one-viewport exit band.
+    if(bounds && (bounds.bottom-scroll < -viewport || bounds.top-scroll > viewport*2)){
+      leaveCameraBand();
+      return;
+    }
+    const box = section.getBoundingClientRect();
     const start = box.top + scroll;
+    bounds={top:start,bottom:box.bottom+scroll};
     const pinned = clamp(-box.top, 0, Math.max(0, box.height - viewport));
     // Preserve the four archived 390px checkpoints and camera speed exactly.
     // y=2743 -> -44.8; y=3165 -> -26.8; y=3587 -> -8.8; y=4220 -> +18.2.
@@ -183,18 +198,26 @@
     pending = true;
     window.requestAnimationFrame(syncScene);
   }
+  function layoutChanged() {
+    bounds=null;
+    scheduleSync();
+  }
   window.addEventListener('scroll', scheduleSync, {passive:true});
-  window.addEventListener('resize', scheduleSync, {passive:true});
-  window.visualViewport?.addEventListener('resize', scheduleSync, {passive:true});
-  window.addEventListener('pageshow', scheduleSync);
+  window.addEventListener('resize', layoutChanged, {passive:true});
+  window.visualViewport?.addEventListener('resize', layoutChanged, {passive:true});
+  window.addEventListener('pageshow', layoutChanged);
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) scheduleSync();
+    if (!document.hidden) layoutChanged();
   });
   motion.addEventListener?.('change', scheduleSync);
   // A font load or portrait reveal can change the section's measured layout
   // without a scroll event. Re-anchor on layout shifts, not via a smoothing
   // timer that would drift from the reference path.
-  if ('ResizeObserver' in window) new ResizeObserver(scheduleSync).observe(section);
-  document.fonts?.ready.then(scheduleSync).catch(() => {});
+  if ('ResizeObserver' in window) {
+    const observer=new ResizeObserver(layoutChanged);
+    observer.observe(section);
+    observer.observe(document.body);
+  }
+  document.fonts?.ready.then(layoutChanged).catch(() => {});
   syncScene();
 })();
