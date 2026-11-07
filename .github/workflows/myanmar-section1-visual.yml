@@ -38,6 +38,8 @@ jobs:
           done
           cat /tmp/myanmar-preview.log
           exit 1
+      - name: Generate optimized path cutout for review
+        run: python3 tools/build-myanmar-path.py
       - name: Capture cover, open, camera, reverse on 2 mobile widths
         run: node tools/myanmar-section1-visual.mjs
       - name: Reviewable small snapshots
