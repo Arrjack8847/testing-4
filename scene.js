@@ -16,6 +16,14 @@ const activeSkin = /^[a-z0-9][a-z0-9-]{0,39}$/.test(requestedSkin) && requestedS
 const skinAssetBase = activeSkin ? './assets/skins/' + activeSkin + '/' : './assets/';
 
 const invite = document.getElementById('invitation');
+if (activeSkin) invite.dataset.skin = activeSkin;
+// The alternate skin stylesheet only loads for its opt-in preview.
+if (activeSkin === 'myanmar-luxury') {
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = './myanmar-luxury.css';
+  document.head.appendChild(stylesheet);
+}
 const art = document.getElementById('animatedScene');
 const master = document.getElementById('masterArt');
 const cover = document.getElementById('cover');
@@ -66,6 +74,22 @@ const definitions = [
   ["bloom_6.webp","sprite flower front flipped",{"--x":"69","--y":"-2","--h":"9","--z":"7","--sa":"1.888659793814433","--sd":"4.152808988764045s","--sl":"-2.99s"}],
 ];
 
+// The new painted pavilion has no permanent pathway in its transparent square.
+// Reuse the master painting's central stone path as a clipped, stationary ground
+// layer, beneath the moving pavilion and gardens. No second image download is
+// required because the scene.webp URL is already used for the fallback artwork.
+if (activeSkin === 'myanmar-luxury') {
+  const pathway = document.createElement('div');
+  pathway.className = 'myanmar-stone-path';
+  pathway.setAttribute('aria-hidden', 'true');
+  const image = document.createElement('img');
+  image.src = skinAssetBase + 'scene.webp';
+  image.alt = '';
+  image.decoding = 'async';
+  pathway.appendChild(image);
+  art.appendChild(pathway);
+}
+
 const byFile = new Map();
 for (const [filename, classes, properties] of definitions) {
   const wrapper = document.createElement('div');
@@ -80,7 +104,8 @@ for (const [filename, classes, properties] of definitions) {
   if (classes.includes('plant') || classes.includes('leaf')) img.classList.add('plant-sway');
   if (classes.includes('flower')) img.classList.add('flower-sway');
   wrapper.appendChild(img);
-  if (filename === 'palace.webp') {
+  // Waterfall overlays belong to the reference lake, not the Myanmar royal garden.
+  if (filename === 'palace.webp' && activeSkin !== 'myanmar-luxury') {
     // Two water streams are placed against the same 1920px painting as the original.
     // The overlay scales with the building, so the falls do not drift during the camera push.
     const water = document.createElement('div');
