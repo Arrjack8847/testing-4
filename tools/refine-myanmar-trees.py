@@ -6,7 +6,6 @@ Inputs are the unchanged raw uploads on main; generated assets preserve the
 """
 from pathlib import Path
 from PIL import Image
-import base64
 
 root=Path(__file__).resolve().parents[1]
 source=root/"New folder (3)"
@@ -49,4 +48,3 @@ for name in ("tree_l.webp","tree_r.webp"):
     out=destination/name
     image.save(out,format="WEBP",quality=89,method=6)
     print(f"MYANMAR_TREE_RESULT {name} size={out.stat().st_size} dimensions={image.size}",flush=True)
-    print(f"MYANMAR_TREE_B64_{name}="+base64.b64encode(out.read_bytes()).decode("ascii"),flush=True)
