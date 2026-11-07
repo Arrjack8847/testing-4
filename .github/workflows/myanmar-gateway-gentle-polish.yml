@@ -37,7 +37,7 @@ jobs:
           exit 1
       - name: Show unpolished source gateway (identical user-uploaded PNG)
         run: |
-          python tools/myanmar-gateway-upload.py | grep '^MYANMAR_UPLOADED_PNG\\|^MYANMAR_GATEWAY_WEBP_CHECK'
+          python tools/myanmar-gateway-upload.py | grep -E '^(MYANMAR_UPLOADED_PNG|MYANMAR_GATEWAY_WEBP_CHECK)'
           node tools/myanmar-priority1-preview.mjs baseline
       - name: Produce revised gateway and verify geometry and alpha
         run: python tools/myanmar-gateway-gentle-polish.py
