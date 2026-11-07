@@ -43,7 +43,20 @@ jobs:
                   (root/name).write_bytes(payload)
               except Exception as e:
                   print(f'REFERENCE_UNAVAILABLE {name}: {type(e).__name__}: {e}',flush=True)
-          print(f'EPHEMERAL_REFERENCE_COUNT {len(list(root.glob("*.webp")))}/{len(files)}')
+          extra={
+              'bfly_1.webp': 'https://undangankahwin.com/images/concierge/packs/serambi-ungu/bfly_1.webp',
+              'bfly_white.webp': 'https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp',
+          }
+          for name,url in extra.items():
+              try:
+                  with urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=15) as f:
+                      payload=f.read()
+                  if payload[:4]!=b'RIFF' or payload[8:12]!=b'WEBP':
+                      raise ValueError('not a WebP file')
+                  (root/name).write_bytes(payload)
+              except Exception as e:
+                  print(f'BUTTERFLY_REFERENCE_UNAVAILABLE {name}: {type(e).__name__}: {e}',flush=True)
+          print(f'EPHEMERAL_REFERENCE_COUNT {len(list(root.glob("*.webp")))}/{len(files)+len(extra)}')
           PY
       - name: Compare original geometry to Myanmar replacements
         run: python tools/myanmar-section1-geometry-audit.py --reference-dir /tmp/myanmar-reference-slot-metrics --output reports/myanmar-section1-asset-audit.md --json-output reports/myanmar-section1-asset-audit.json

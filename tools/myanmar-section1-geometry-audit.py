@@ -142,39 +142,42 @@ def main():
         "",
         "## Source and evaluation method",
         "",
-        "- New art: \`assets/skins/myanmar-luxury/\` from the strict 1:1 replacement branch.",
-        "- Animation slots: \`scene.js\` definitions and inherited \`styles.css\`.",
+        "- New art: `assets/skins/myanmar-luxury/` from the strict 1:1 replacement branch.",
+        "- Animation slots: `scene.js` definitions and inherited `styles.css`.",
         "- Reference: original 25 source-slot WebPs downloaded **only inside CI for metrics**, never committed or included in outputs; butterflies have no such matching source in that pack.",
         "- For each image: real decoded dimensions, alpha presence, visible alpha bounding box (threshold 24/255), edge coverage and theoretical RGBA decode footprint.",
         "- Strict compatibility is NOT implied by matching filenames. Normalized alpha-bounds movement >=4% prompts review; >=8% is high priority. Art differences can still be significant at 0%.",
         "",
         "## Artwork-by-artwork results",
         "",
-        "| Old slot = New Myanmar asset | Expected role | Source canvas | New canvas | New alpha | New visible bounds (0–1) | Instances / mirrored | Verdict |",
-        "|---|---|---|---|---|---|---|---|"
+        "| Old slot = New Myanmar asset | Role | Old canvas | New canvas | Old visible alpha bounds | New visible alpha bounds | Max alpha drift | Instances / mirrored | Verdict |",
+        "|---|---|---|---|---|---|---|---|---|---|"
     ]
     for row in data:
         new=row["new"]; old=row["baseline"]; used=row["instances"]
         dims=lambda obj:"—" if not obj or "size" not in obj else f"{obj['size'][0]}×{obj['size'][1]}"
-        alpha= "—" if "alpha" not in new else ("yes" if new["alpha"] else "no")
-        bounds=", ".join(f"{n:.2f}" for n in new["bbox"]) if new.get("bbox") else "—"
+        def bounds(obj):
+            if not obj or not obj.get("bbox"): return "—"
+            return ", ".join(f"{n:.2f}" for n in obj["bbox"])
+        drift=max(abs(x-y) for x,y in zip(old["bbox"],new["bbox"])) if old and old.get("bbox") and new.get("bbox") else None
+        drift_label=f"{100*drift:.1f}%" if drift is not None else "—"
         repeats=f"{len(used)} / {'yes' if any(x['flipped'] for x in used) else 'no'}"
-        lines.append(f"| \`{row['name']}\` | {row['role']} | {dims(old)} | {dims(new)} | {alpha} | {bounds} | {repeats} | **{row['status']}** |")
+        lines.append(f"| `{row['name']}` | {row['role']} | {dims(old)} | {dims(new)} | {bounds(old)} | {bounds(new)} | {drift_label} | {repeats} | **{row['status']}** |")
     lines.extend(["","## Precise runtime geometry for each repeated image","",
-                  "The coordinates are from \`scene.js\`: x in viewport %, y in *--unit* from the top for hanging sprites and bottom for foreground sprites; h is sprite height in *--unit* (unit = min(1lvh, 2.164vw)). These are original source positions, **not recommendations for new CSS**.",
+                  "The coordinates are from `scene.js`: x in viewport %, y in *--unit* from the top for hanging sprites and bottom for foreground sprites; h is sprite height in *--unit* (unit = min(1lvh, 2.164vw)). These are original source positions, **not recommendations for new CSS**.",
                   "",
                   "| File | Instance | x | y | h | Pivot | Mirror | Sway (degree / duration) |",
                   "|---|---:|---:|---:|---:|---|---|---|"])
     for row in data:
         for i,instance in enumerate(row["instances"],1):
-            lines.append(f"| \`{row['name']}\` | {i} | {instance['x'] or 'CSS'} | {instance['y'] or 'CSS'} | {instance['h'] or 'CSS'} | {instance['anchor']} | {'yes' if instance['flipped'] else 'no'} | {instance['sway_degrees'] or '—'} / {instance['duration'] or '—'} |")
+            lines.append(f"| `{row['name']}` | {i} | {instance['x'] or 'CSS'} | {instance['y'] or 'CSS'} | {instance['h'] or 'CSS'} | {instance['anchor']} | {'yes' if instance['flipped'] else 'no'} | {instance['sway_degrees'] or '—'} / {instance['duration'] or '—'} |")
     lines.extend(["", "## Original choreography contract — not to be changed under Option A","",
                   "- Pavilion: bottom-centered image, cover scale ~0.66, opens to ~0.99, retreat begins 0.22H and ends 0.72H.",
                   "- Gateway: normal frame on cover, expands to 2.6× and fades at open, reappears between 0.84H and 1.42H.",
                   "- Trees: 70lvh tall, anchored 4lvh above bottom, existing CSS sway/pivots; open scale ~2.1 and fade, return by 1.42H.",
                   "- Hanging canopy and garlands: top pivot, existing wind; canopy opens at scale 2.2 and returns to 1 by 1.42H.",
                   "- Low plants, leaves, peacocks: bottom-anchored image slots; foreground flowers return ~0.47H–0.78H; peacocks appear 1.06H–1.44H.",
-                  "- Butterflies: \`bfly_1.webp\` 52×41 CSS body envelope and \`bfly_white.webp\` 44×34; CSS mirrors two half-wings. Wing art needs manual shape inspection.",
+                  "- Butterflies: `bfly_1.webp` 52×41 CSS body envelope and `bfly_white.webp` 44×34; CSS mirrors two half-wings. Wing art needs manual shape inspection.",
                   "- Names: greeting fades 1.37H–1.67H; scripted names and details continue until ~2.42H; Section 2 covers hero by 3H.",
                   "- Original reference lake waterfalls, mist/glow, pink petals and other source-era effects remain under strict Option A; list as creative limitations, do not silently edit.",
                   "",
