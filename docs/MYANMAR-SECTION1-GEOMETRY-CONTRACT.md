@@ -34,6 +34,11 @@
 - **1.37H–1.67H** greeting and subsequent name handwriting; **~2.42H** details; **3H** Section 2 overlays hero.
 - Original water glow, waterfall/mist, mauve petals and other reference-era art effects are **known limitations of Option A**, not automatically corrected.
 
+## Completed measured audit
+
+- [Results for all 27 assets](../reports/myanmar-section1-asset-audit.md).
+- [Prioritized artwork correction queue](MYANMAR-SECTION1-REWORK-QUEUE.md).
+
 ## Audit output
 
 The companion [read-only audit script](../tools/myanmar-section1-geometry-audit.py) writes:
