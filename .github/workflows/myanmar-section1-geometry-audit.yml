@@ -1,0 +1,72 @@
+name: Myanmar Section 1 Geometry Audit
+on:
+  pull_request:
+    paths:
+      - tools/myanmar-section1-geometry-audit.py
+      - docs/MYANMAR-SECTION1-GEOMETRY-CONTRACT.md
+      - .github/workflows/myanmar-section1-geometry-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure-assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pillow
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Inspect replacement WebPs and create read-only report
+        run: python tools/myanmar-section1-geometry-audit.py --output reports/myanmar-section1-asset-audit.md --json-output reports/myanmar-section1-asset-audit.json
+      - name: Download reference-slot artwork for geometry comparison only
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          import re
+          root=Path('/tmp/myanmar-reference-slot-metrics')
+          root.mkdir(parents=True,exist_ok=True)
+          files=re.findall(r'^([a-z0-9_]+\.webp)$',Path('ASSET-MANIFEST.txt').read_text(),re.M)
+          base='https://undangankahwin.com/images/concierge/packs/tasik-kayangan/'
+          for name in files:
+              try:
+                  with urlopen(Request(base+name,headers={'User-Agent':'Mozilla/5.0'}),timeout=15) as f:
+                      payload=f.read()
+                  if payload[:4]!=b'RIFF' or payload[8:12]!=b'WEBP':
+                      raise ValueError('not a WebP file')
+                  (root/name).write_bytes(payload)
+              except Exception as e:
+                  print(f'REFERENCE_UNAVAILABLE {name}: {type(e).__name__}: {e}',flush=True)
+          extra={
+              'bfly_1.webp': 'https://undangankahwin.com/images/concierge/packs/serambi-ungu/bfly_1.webp',
+              'bfly_white.webp': 'https://undangankahwin.com/images/concierge/packs/anggerik-nirmala/bfly_white.webp',
+          }
+          for name,url in extra.items():
+              try:
+                  with urlopen(Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=15) as f:
+                      payload=f.read()
+                  if payload[:4]!=b'RIFF' or payload[8:12]!=b'WEBP':
+                      raise ValueError('not a WebP file')
+                  (root/name).write_bytes(payload)
+              except Exception as e:
+                  print(f'BUTTERFLY_REFERENCE_UNAVAILABLE {name}: {type(e).__name__}: {e}',flush=True)
+          print(f'EPHEMERAL_REFERENCE_COUNT {len(list(root.glob("*.webp")))}/{len(files)+len(extra)}')
+          PY
+      - name: Compare original geometry to Myanmar replacements
+        run: python tools/myanmar-section1-geometry-audit.py --reference-dir /tmp/myanmar-reference-slot-metrics --output reports/myanmar-section1-asset-audit.md --json-output reports/myanmar-section1-asset-audit.json
+      - name: Upload diagnostic report only (no original provider artwork)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: myanmar-section1-geometry-audit
+          path: |
+            reports/myanmar-section1-asset-audit.md
+            reports/myanmar-section1-asset-audit.json
+          retention-days: 30
+          if-no-files-found: warn
