@@ -46,18 +46,25 @@ def arch_reposition():
 def feather_upper_tree(name):
     img=Image.open(DIR/name).convert("RGBA")
     assert img.size==(1080,1920),img.size
-    # The uploaded tree artwork ends at ~y=760. The next 40 rows include
-    # detached flecks and hard cutoff. Softly taper ONLY the final ~38px;
-    # do not invent a long trunk or stretch greenery into fake timber.
+    # The original uploaded canvas has two abrupt boundaries: the topmost
+    # leaves start at y~120 along a perfectly straight horizontal row, while
+    # branch ends / detached pixels form an abrupt lower cutoff at y~760.
+    # Feather BOTH seams in the exported alpha (no browser mask/filter).
+    # Missing full-length trunks are NOT generated or faked here.
     from PIL import ImageChops, ImageDraw
     a=img.getchannel("A")
     atten=Image.new("L",img.size,255)
     pen=ImageDraw.Draw(atten)
-    for y in range(708,800):
-        t=max(0,min(1,(y-708)/92))
+    pen.rectangle((0,0,1079,117),fill=0)
+    for y in range(118,228):
+        t=max(0,min(1,(y-118)/110))
+        factor=t*t*(3-2*t)
+        pen.line((0,y,1079,y),fill=round(255*factor))
+    for y in range(670,790):
+        t=max(0,min(1,(y-670)/120))
         factor=(1-t*t*(3-2*t))
         pen.line((0,y,1079,y),fill=round(255*factor))
-    pen.rectangle((0,800,1079,1919),fill=0)
+    pen.rectangle((0,790,1079,1919),fill=0)
     alpha=ImageChops.multiply(a,atten)
     img.putalpha(alpha)
     return img
