@@ -1,0 +1,54 @@
+name: Uploaded Myanmar Gateway Visual QA
+on:
+  pull_request:
+    paths:
+      - assets/skins/myanmar-luxury/bea1db68-4afc-4d72-ae54-d137c40f7299.png
+      - assets/skins/myanmar-luxury/arch.webp
+      - tools/myanmar-gateway-upload.py
+      - .github/workflows/myanmar-gateway-upload.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gateway-art-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Pillow and headless Chromium
+        run: |
+          python -m pip install Pillow
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Start isolated mobile preview
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/myanmar-gateway.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8000/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          exit 1
+      - name: Baseline screenshots (existing stretched candidate)
+        run: node tools/myanmar-priority1-preview.mjs baseline
+      - name: Convert uploaded transparent gateway into 1080x1920 WebP and verify alpha
+        run: python tools/myanmar-gateway-upload.py
+      - name: New gateway screenshots (existing CSS/camera untouched)
+        run: node tools/myanmar-priority1-preview.mjs candidate
+      - name: Preview comparison thumbnails
+        run: python tools/myanmar-priority1-thumbs.py
+      - name: Upload before/after mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uploaded-myanmar-gateway-visuals
+          path: candidate-screens/
+          if-no-files-found: warn
+          retention-days: 14

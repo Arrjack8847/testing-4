@@ -1,0 +1,60 @@
+name: Myanmar Priority 1 Candidate Visual QA
+on:
+  pull_request:
+    paths:
+      - tools/myanmar-priority1-candidates.py
+      - tools/myanmar-priority1-preview.mjs
+      - tools/myanmar-priority1-thumbs.py
+      - .github/workflows/myanmar-priority1-candidate.yml
+      - assets/skins/myanmar-luxury/arch.webp
+      - assets/skins/myanmar-luxury/tree_l.webp
+      - assets/skins/myanmar-luxury/tree_r.webp
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-prototype:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image and browser tooling
+        run: |
+          python -m pip install Pillow
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Local test web server
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/myanmar-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8000/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          exit 1
+      - name: Stage unmodified uploaded art for genuine baseline screenshots
+        run: |
+          for f in arch.webp tree_l.webp tree_r.webp; do cp "New folder (3)/$f" "assets/skins/myanmar-luxury/$f"; done
+      - name: Screenshot original strict 1:1 swap
+        run: node tools/myanmar-priority1-preview.mjs baseline
+      - name: Build provisional image-only candidates (never commit generated art automatically)
+        run: python tools/myanmar-priority1-candidates.py
+      - name: Screenshot candidate with original runtime untouched
+        run: node tools/myanmar-priority1-preview.mjs candidate
+      - name: Print thumbnail comparisons
+        run: python tools/myanmar-priority1-thumbs.py
+      - name: Upload visual evidence (no reference-provider assets)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: myanmar-priority1-art-comparison
+          path: candidate-screens/
+          if-no-files-found: warn
+          retention-days: 14
