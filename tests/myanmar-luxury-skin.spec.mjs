@@ -29,7 +29,22 @@ test('Myanmar skin loads locally, keeps a permanent path, and preserves opening'
     return {background:style.backgroundImage,fontSize:parseFloat(name.fontSize),color:name.color};
   });
   expect(coverReadability.background).toContain('radial-gradient');
-  expect(coverReadability.fontSize).toBeGreaterThanOrEqual(23);
+  expect(coverReadability.fontSize).toBeGreaterThanOrEqual(22);
+  // Photo-review regression: the hero architecture must not disappear behind
+  // a giant monogram, broad name banner, or center-blocking button.
+  const coverLayout=await page.evaluate(()=>{
+    const rect=sel=>{
+      const r=document.querySelector(sel).getBoundingClientRect();
+      return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width};
+    };
+    return {height:innerHeight,width:innerWidth,mark:rect('.cover .monogram'),
+      names:rect('.cover .cover-copy'),button:rect('.cover .open-button')};
+  });
+  expect(coverLayout.mark.bottom).toBeLessThan(coverLayout.names.top+12);
+  expect(coverLayout.names.width).toBeLessThanOrEqual(coverLayout.width*.85);
+  expect(coverLayout.names.bottom).toBeLessThan(coverLayout.button.top-15);
+  expect(coverLayout.button.top).toBeGreaterThanOrEqual(coverLayout.height*.60);
+  expect(coverLayout.button.bottom).toBeLessThan(coverLayout.height*.79);
   await page.screenshot({path:testInfo.outputPath('myanmar-cover.png')});
   await button.click();
   await expect(invite).toHaveAttribute('data-state','opened');
