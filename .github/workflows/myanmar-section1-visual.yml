@@ -40,6 +40,8 @@ jobs:
           exit 1
       - name: Generate optimized path cutout for review
         run: python3 tools/build-myanmar-path.py
+      - name: Feather hard-cut tree artwork for temporary visual comparison
+        run: python3 tools/refine-myanmar-trees.py
       - name: Capture cover, open, camera, reverse on 2 mobile widths
         run: node tools/myanmar-section1-visual.mjs
       - name: Reviewable small snapshots
