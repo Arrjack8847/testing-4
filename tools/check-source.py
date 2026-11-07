@@ -22,8 +22,19 @@ used = set(re.findall(r"\b([a-z0-9_]+\.webp)\b", js))
 butterfly_slots = {"bfly_1.webp", "bfly_white.webp"}
 assert len(listed) == 25, f"Expected 25 unique WebP assets, got {len(listed)}"
 assert butterfly_slots.issubset(used), "Skin butterfly slot mapping is incomplete"
-scene_used = used - butterfly_slots
+# Myanmar Royal Luxury adds one separately derived, opt-in pathway cutout.
+# It is NOT part of the 25-file original scene manifest or butterfly slots.
+skin_only = {"path.webp"} if "path.webp" in used else set()
+scene_used = used - butterfly_slots - skin_only
 assert listed == scene_used, f"JS layer usage mismatch: {listed ^ scene_used}"
+if skin_only:
+    assert "activeSkin === 'myanmar-luxury'" in js, "Path cutout must be opt-in only"
+    path = ROOT / "assets/skins/myanmar-luxury/path.webp"
+    assert path.is_file(), "Missing opt-in Myanmar pathway artwork"
+    with path.open("rb") as stream:
+        header = stream.read(12)
+    assert header[:4] == b"RIFF" and header[8:12] == b"WEBP", "Invalid Myanmar WebP"
+
 for script, source in [("download-assets.ps1", ps1), ("start.ps1", start)]:
     assert "ASSET-MANIFEST.txt" in source, f"{script} must read artwork manifest"
     assert "Test-ValidWebP" in source, f"{script} must validate cached WebPs"
