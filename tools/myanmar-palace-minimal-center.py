@@ -36,14 +36,17 @@ for y in range(top + 18, min(top + 195, 1920)):
     row_centers.append((float((lo+hi)/2),int(y),int(len(xx))))
 assert len(row_centers) >= 40, "Insufficient roof spire observations"
 apex_x = float(statistics.median(c[0] for c in row_centers))
-dx = int(round(im.width/2 - apex_x))
-assert abs(dx) <= 240, f"Measured offset unexpectedly large {dx}px"
-# Changes smaller than 8px should be left untouched.
-if abs(dx) < 8:
-    dx = 0
+requested_dx = int(round(im.width/2 - apex_x))
+assert abs(requested_dx) <= 240, f"Measured offset unexpectedly large {requested_dx}px"
 bbox = im.getchannel("A").point(lambda x:255 if x>=24 else 0).getbbox()
 assert bbox is not None
-assert 0 <= bbox[0]+dx and bbox[2]+dx <= im.width, f"Center correction would crop palace: {bbox}, dx={dx}"
+# Reserve 4px transparent padding on both edges; never crop or stretch pixels.
+safe_left = 4 - bbox[0]
+safe_right = im.width - 4 - bbox[2]
+dx = max(safe_left,min(requested_dx,safe_right))
+if abs(dx) < 8:
+    dx = 0
+assert 0 <= bbox[0]+dx and bbox[2]+dx <= im.width, f"Cannot safely place palace: {bbox}, dx={dx}"
 result = Image.new("RGBA", im.size, (0,0,0,0))
 result.paste(im, (dx,0))
 result.save(PATH,"WEBP",quality=91,method=6,exact=True)
@@ -55,7 +58,8 @@ with Image.open(PATH) as check:
     assert new_bbox[0] == bbox[0]+dx and new_bbox[2] == bbox[2]+dx, "Horizontal alpha bounds changed unexpectedly"
 metrics={
     "canvas":list(im.size), "apex_x_before_px":round(apex_x,1),
-    "target_apex_x_px":960, "shift_right_px":dx,
+    "target_apex_x_px":960, "requested_shift_px":requested_dx,
+    "shift_right_px":dx, "apex_x_after_px":round(apex_x+dx,1),
     "roof_rows_measured":len(row_centers), "first_roof_y":top,
     "visible_bounds_before":list(bbox),"visible_bounds_after":list(new_bbox),
     "image_bytes":PATH.stat().st_size
