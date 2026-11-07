@@ -1,0 +1,54 @@
+name: Myanmar Section 1 visual QA
+on:
+  pull_request:
+    paths:
+      - scene.js
+      - myanmar-luxury.css
+      - assets/skins/myanmar-luxury/**
+      - tools/myanmar-section1-visual.mjs
+      - tools/myanmar-section1-thumbnails.py
+      - .github/workflows/myanmar-section1-visual.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  myanmar-section1-visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python3 -m pip install --user pillow
+      - name: Verify 27 local WebPs
+        run: python3 tools/asset-migration-audit.py --art-dir assets/skins/myanmar-luxury
+      - name: Run local read-only preview
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/myanmar-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:8000/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/myanmar-preview.log
+          exit 1
+      - name: Generate optimized path cutout for review
+        run: python3 tools/build-myanmar-path.py
+      - name: Capture cover, open, camera, reverse on 2 mobile widths
+        run: node tools/myanmar-section1-visual.mjs
+      - name: Reviewable small snapshots
+        run: python3 tools/myanmar-section1-thumbnails.py
+      - name: Upload Section 1 screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: myanmar-section1-visual
+          path: visual-myanmar/
+          if-no-files-found: warn
+          retention-days: 14
