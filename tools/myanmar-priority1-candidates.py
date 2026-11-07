@@ -14,6 +14,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 DIR=ROOT/"assets/skins/myanmar-luxury"
+RAW=ROOT/"New folder (3)"
 def saved(name, im):
     path=DIR/name
     im.save(path,"WEBP",quality=90,method=6)
@@ -22,7 +23,7 @@ def saved(name, im):
     print("MYANMAR_CANDIDATE_B64_"+name+"="+base64.b64encode(buf).decode(),flush=True)
 
 def arch_reposition():
-    image=Image.open(DIR/"arch.webp").convert("RGBA")
+    image=Image.open(RAW/"arch.webp").convert("RGBA")
     assert image.size==(1080,1920), image.size
     # Piecewise height mapping: preserve upper carved gable, lengthen column
     # shafts, and preserve the original ornamental plinth at the bottom.
@@ -44,7 +45,7 @@ def arch_reposition():
     return dest
 
 def feather_upper_tree(name):
-    img=Image.open(DIR/name).convert("RGBA")
+    img=Image.open(RAW/name).convert("RGBA")
     assert img.size==(1080,1920),img.size
     # The original uploaded canvas has two abrupt boundaries: the topmost
     # leaves start at y~120 along a perfectly straight horizontal row, while
