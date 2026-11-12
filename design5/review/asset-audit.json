@@ -2,13 +2,14 @@
   "description": "Design 5 Golden Pagoda Garden static cover composited from uploaded source WebPs",
   "source_folder": "assets/assests/",
   "additional_root_file": "hang_2.webp",
+  "lake_color_reference": "assets/assests/design5_scene_review.webp (central water crop)",
   "width": 1080,
   "height": 1920,
   "file_count": 26,
   "notes": [
     "Text, butterflies and falling petals are rendered separately by the website.",
     "Only the approved left peacock is used.",
-    "Reeds are hidden on the original static cover and omitted.",
+    "Reeds and lake imagery are included to match the approved Design 5 preview (the live reference cover hides reeds).",
     "The resulting preview still requires visual QA against live browser geometry."
   ],
   "assets": [
