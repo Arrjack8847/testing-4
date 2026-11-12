@@ -1,0 +1,588 @@
+{
+  "description": "Design 5 Golden Pagoda Garden static cover composited from uploaded source WebPs",
+  "source_folder": "assets/assests/",
+  "additional_root_file": "hang_2.webp",
+  "width": 1080,
+  "height": 1920,
+  "file_count": 26,
+  "notes": [
+    "Text, butterflies and falling petals are rendered separately by the website.",
+    "Only the approved left peacock is used.",
+    "Reeds are hidden on the original static cover and omitted.",
+    "The resulting preview still requires visual QA against live browser geometry."
+  ],
+  "assets": [
+    {
+      "name": "sky.webp",
+      "source": "assets/assests/sky.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "bytes": 230270,
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "sha256": "6d84d1c98e2e77d420059532807980f0ca66f9999b3d0a64b17bbe79c566f950",
+      "warnings": []
+    },
+    {
+      "name": "palace.webp",
+      "source": "assets/assests/palace.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 1626982,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1760,
+        887
+      ],
+      "sha256": "9854c439e1bc7dad40da4eb6ba411ccb1c7d3158293eed05de8027e62135c021",
+      "warnings": []
+    },
+    {
+      "name": "reeds.webp",
+      "source": "assets/assests/reeds.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 663612,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1774,
+        887
+      ],
+      "sha256": "d3cf0333731e7a84987c443736ae688e3f71db554f4ab4315dc8659398a25fd9",
+      "warnings": []
+    },
+    {
+      "name": "arch.webp",
+      "source": "assets/assests/arch.webp",
+      "format": "WEBP",
+      "dimensions": [
+        941,
+        1672
+      ],
+      "bytes": 520620,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        15,
+        941,
+        1672
+      ],
+      "sha256": "4be3545567132243e88ffd18df201112fab48685f69ac1bfb58dc7cc840842fd",
+      "warnings": []
+    },
+    {
+      "name": "tree_l.webp",
+      "source": "assets/assests/tree_l.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "bytes": 570622,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1006,
+        1620
+      ],
+      "sha256": "beb9f48d9d59593dc43dec4c0a256a7a379c1dfd223dec6cc80163bb1208b0a1",
+      "warnings": []
+    },
+    {
+      "name": "tree_r.webp",
+      "source": "assets/assests/tree_r.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "bytes": 661694,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        23,
+        0,
+        1080,
+        1920
+      ],
+      "sha256": "78b8c3b0cc7e91c449afc31036fe4ec6a301608f31e3a7fef8a93b651d7b16d3",
+      "warnings": []
+    },
+    {
+      "name": "drape.webp",
+      "source": "assets/assests/drape.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "bytes": 402048,
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1024,
+        1536
+      ],
+      "sha256": "59534d790123dbb420eb51af7d8541bd1ecaf92e6fc3e2ced8fd1ea9330dbd8d",
+      "warnings": []
+    },
+    {
+      "name": "hang_1.webp",
+      "source": "assets/assests/hang_1.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "bytes": 1179062,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        188,
+        0,
+        931,
+        1508
+      ],
+      "sha256": "e46b2f9f9fc91cb972639353e869534c43423df4049eff55f84944105753b2a9",
+      "warnings": []
+    },
+    {
+      "name": "hang_2.webp",
+      "source": "hang_2.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "bytes": 786068,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        43,
+        16,
+        927,
+        1506
+      ],
+      "sha256": "43a724f0d1aca775c78b855b8140b26958191008a61b0911674a6e7171f5d4bb",
+      "warnings": []
+    },
+    {
+      "name": "hang_3.webp",
+      "source": "assets/assests/hang_3.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "bytes": 859752,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        14,
+        11,
+        994,
+        1510
+      ],
+      "sha256": "1772f8ab874d8ad83acf681e76acb7312546137f4f4be306270d51d544e4acf3",
+      "warnings": []
+    },
+    {
+      "name": "hang_4.webp",
+      "source": "assets/assests/hang_4.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "bytes": 992106,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        47,
+        8,
+        972,
+        1520
+      ],
+      "sha256": "c2aa5600767bd1788f5993f7388b44708c649107d741aa37d327297e5443dd11",
+      "warnings": []
+    },
+    {
+      "name": "spike_3.webp",
+      "source": "assets/assests/spike_3.webp",
+      "format": "WEBP",
+      "dimensions": [
+        768,
+        1536
+      ],
+      "bytes": 537976,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        173,
+        166,
+        615,
+        1512
+      ],
+      "sha256": "45428c3acf54976ecff3eaaccee06853a558d07ea77064d73bc21c8683b81795",
+      "warnings": []
+    },
+    {
+      "name": "spike_4.webp",
+      "source": "assets/assests/spike_4.webp",
+      "format": "WEBP",
+      "dimensions": [
+        768,
+        1536
+      ],
+      "bytes": 363108,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        156,
+        480,
+        566,
+        1524
+      ],
+      "sha256": "18f04a71d8e9f05c7b85b3314f9c80a1f10935e60cf1e615b5f8406ee3de6740",
+      "warnings": []
+    },
+    {
+      "name": "spike_5.webp",
+      "source": "assets/assests/spike_5.webp",
+      "format": "WEBP",
+      "dimensions": [
+        768,
+        1536
+      ],
+      "bytes": 874952,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        86,
+        326,
+        682,
+        1528
+      ],
+      "sha256": "9cecb0b53de7958bdc09cf47b14845864db4c44d096b5ff4f3fe96b032bb6ff7",
+      "warnings": []
+    },
+    {
+      "name": "stem_1.webp",
+      "source": "assets/assests/stem_1.webp",
+      "format": "WEBP",
+      "dimensions": [
+        768,
+        1536
+      ],
+      "bytes": 434698,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        74,
+        531,
+        660,
+        1516
+      ],
+      "sha256": "8474827d7accae48c4abdbb8e58874eb8704246724be9ca4dad6fcb242df0b9e",
+      "warnings": []
+    },
+    {
+      "name": "stem_2.webp",
+      "source": "assets/assests/stem_2.webp",
+      "format": "WEBP",
+      "dimensions": [
+        768,
+        1536
+      ],
+      "bytes": 399992,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        115,
+        637,
+        715,
+        1520
+      ],
+      "sha256": "6e7462047b1e1e75195c37fde76ff833b5fe3fee6fd851f903261f4fabaf30ba",
+      "warnings": []
+    },
+    {
+      "name": "leaf_4.webp",
+      "source": "assets/assests/leaf_4.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 990230,
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox": [
+        0,
+        15,
+        1536,
+        1024
+      ],
+      "sha256": "00f01b5d7b4a008670d1b8af5e5cd0063c62b15f95a072d63a1e9dc5f29326cf",
+      "warnings": []
+    },
+    {
+      "name": "leaf_5.webp",
+      "source": "assets/assests/leaf_5.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 867270,
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox": [
+        0,
+        11,
+        1508,
+        1024
+      ],
+      "sha256": "e9ed922df6dad92cd321d2767785c572e859474c886f84894e3cfed5d2368d78",
+      "warnings": []
+    },
+    {
+      "name": "leaf_6.webp",
+      "source": "assets/assests/leaf_6.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 728798,
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox": [
+        57,
+        0,
+        1516,
+        1006
+      ],
+      "sha256": "37faef45d1c00dd2845c433d616194b7871a6b360b352b5eaa734825d7cbf806",
+      "warnings": []
+    },
+    {
+      "name": "bloom_1.webp",
+      "source": "assets/assests/bloom_1.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1400,
+        1400
+      ],
+      "bytes": 177770,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        251,
+        252,
+        1160,
+        1163
+      ],
+      "sha256": "feca5aed2304de04affbd180bd48f385e15572151bc5f2c8a3a1fe900d9241a9",
+      "warnings": []
+    },
+    {
+      "name": "bloom_2.webp",
+      "source": "assets/assests/bloom_2.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1400,
+        1400
+      ],
+      "bytes": 239148,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        233,
+        232,
+        1198,
+        1101
+      ],
+      "sha256": "d28cbf9c09d7d0e209d93018c205bd6aa2fe6b477ae77055c9c58f026be7eefd",
+      "warnings": []
+    },
+    {
+      "name": "bloom_5.webp",
+      "source": "assets/assests/bloom_5.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1400,
+        1400
+      ],
+      "bytes": 188182,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        248,
+        334,
+        1192,
+        1217
+      ],
+      "sha256": "1459a0e803975b82ffa8e00ae51af03c54851dc85e90762b0ad2793c2ddf1146",
+      "warnings": []
+    },
+    {
+      "name": "bloom_6.webp",
+      "source": "assets/assests/bloom_6.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1400,
+        1400
+      ],
+      "bytes": 229760,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        193,
+        190,
+        1215,
+        1285
+      ],
+      "sha256": "a0425dd829442a7ffb5294cf0bbd7f6dc902b8925fb473f8a8303939e268cd2c",
+      "warnings": []
+    },
+    {
+      "name": "peacock.webp",
+      "source": "assets/assests/peacock.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "bytes": 567534,
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1008,
+        1536
+      ],
+      "sha256": "10cd7ae5556fedecf44b46dbaa7d93d40cf20f268c5f29c80712e2421966e5ef",
+      "warnings": []
+    },
+    {
+      "name": "bfly_1.webp",
+      "source": "assets/assests/bfly_1.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1400,
+        1400
+      ],
+      "bytes": 265330,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        105,
+        134,
+        1295,
+        1161
+      ],
+      "sha256": "5ef0343c68efa1240b4ac4c68deff362543d1a5fe198060aa90c28e382ea7dbc",
+      "warnings": []
+    },
+    {
+      "name": "bfly_white.webp",
+      "source": "assets/assests/bfly_white.webp",
+      "format": "WEBP",
+      "dimensions": [
+        1400,
+        1400
+      ],
+      "bytes": 233274,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        105,
+        134,
+        1295,
+        1161
+      ],
+      "sha256": "97322bcbe147cfe0a9da60c963a39ac331e8f17f29ef52c5aeee8370bd263ca7",
+      "warnings": []
+    }
+  ]
+}
