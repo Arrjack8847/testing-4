@@ -62,10 +62,22 @@ def audit():
 
 def compose():
     frame=art('sky.webp').resize((W,H),Image.Resampling.LANCZOS)
-    # Preserve the source's transparent padding; don't crop silhouettes.
-    pheight=H*.66; pwidth=pheight*aspect('palace.webp')
-    draw(frame,'palace.webp',(W-pwidth)/2,H-pheight,pwidth,pheight)
-    # Reeds are hidden for the original resting cover (shown only during open).
+    # Align the calm lake using the user's uploaded full-scene review, not AI regeneration.
+    # Only sample its WATER CENTER; independently drawn objects remain separate source WebPs.
+    review=art('design5_scene_review.webp').resize((W,H),Image.Resampling.LANCZOS)
+    lake=review.crop((290,1460,790,1910)).resize((W,630),Image.Resampling.LANCZOS)
+    # Feather upper edge of the lake into the painted sky to avoid a hard horizon seam.
+    mask=Image.new('L',(W,630))
+    mask.putdata([min(255,round(255*y/185)) for y in range(630) for _ in range(W)])
+    lake.putalpha(mask)
+    frame.alpha_composite(lake,(0,1290))
+    # Wide 2:1 palace artwork must be sized by width (not the square reference's height).
+    # Maintain clear invitation text space and the user's approved lower-palace proportions.
+    pwidth=1110; pheight=pwidth/aspect('palace.webp')
+    draw(frame,'palace.webp',(W-pwidth)/2,1000,pwidth,pheight)
+    # The approved still scene shows lotus plants in the lower water foreground.
+    reed_w=1120;reed_h=reed_w/aspect('reeds.webp')
+    draw(frame,'reeds.webp',(W-reed_w)/2,1530,reed_w,reed_h)
     awidth=W; aheight=awidth/aspect('arch.webp')
     draw(frame,'arch.webp',0,H-aheight,awidth,aheight)
     tw,th=756,1344
@@ -92,7 +104,7 @@ def compose():
         ('leaf_4.webp',55,-1,8,True,3),('leaf_5.webp',64,-1,10,True,3),
         ('bloom_5.webp',39,-2,10,False,4),('bloom_1.webp',47,-2,8,False,4),
         ('bloom_5.webp',53,-2,8,True,4),('bloom_1.webp',61,-2,10,True,4),
-        ('peacock.webp',20,-2,40,False,6), # user-approved: only left peacock
+        ('peacock.webp',20,-2,50,False,6), # user-approved: only left peacock
         ('bloom_2.webp',23,-1,8,False,7),('bloom_6.webp',31,-2,9,False,7),
         ('bloom_2.webp',77,-1,8,True,7),('bloom_6.webp',69,-2,9,True,7)]
     for name,x,y,h,flip,z in sorted(foreground,key=lambda t:t[5]):
@@ -119,10 +131,11 @@ def main():
     report={
         'description':'Design 5 Golden Pagoda Garden static cover composited from uploaded source WebPs',
         'source_folder':'assets/assests/','additional_root_file':'hang_2.webp',
+        'lake_color_reference':'assets/assests/design5_scene_review.webp (central water crop)',
         'width':W,'height':H,'file_count':len(review),
         'notes':['Text, butterflies and falling petals are rendered separately by the website.',
                  'Only the approved left peacock is used.',
-                 'Reeds are hidden on the original static cover and omitted.',
+                 'Reeds and lake imagery are included to match the approved Design 5 preview (the live reference cover hides reeds).',
                  'The resulting preview still requires visual QA against live browser geometry.'],
         'assets':review}
     (REVIEW/'asset-audit.json').write_text(json.dumps(report,indent=2))
