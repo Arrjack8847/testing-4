@@ -108,6 +108,14 @@ def main():
     result=OUT/'scene.webp'
     frame.save(result,format='WEBP',quality=91,method=6)
     frame.resize((540,960),Image.Resampling.LANCZOS).save(REVIEW/'scene-preview.jpg',quality=88)
+    # Source thumbnails are internal visual QA references, not final assets.
+    for thumb_name in ('palace.webp','reeds.webp'):
+        sample=art(thumb_name)
+        sample.thumbnail((900,900),Image.Resampling.LANCZOS)
+        backdrop=Image.new('RGBA',sample.size,'#f0d9bc')
+        backdrop.alpha_composite(sample)
+        backdrop.convert('RGB').save(REVIEW/(thumb_name.replace('.webp','-source-preview.jpg')),quality=88)
+
     report={
         'description':'Design 5 Golden Pagoda Garden static cover composited from uploaded source WebPs',
         'source_folder':'assets/assests/','additional_root_file':'hang_2.webp',
